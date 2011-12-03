@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>de.urb.quagga</groupId>
+    <artifactId>quagga-java</artifactId>
+    <version>${version.de.urb.quagga}</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.urb.quagga</groupId>
+  <artifactId>lib</artifactId>
+  <packaging>pom</packaging>
+  <version>${version.de.urb.quagga}</version>
+  <name>Libraries project</name>
+  <description>Libraries project</description>
+
+  <modules>
+    <module>netty-quagga</module>
+    <module>snmp4j-easybox</module>
+  </modules>
+
+</project>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:nil
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

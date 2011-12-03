@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.urb.quagga</groupId>
+  <artifactId>quagga-java</artifactId>
+  <packaging>pom</packaging>
+  <version>${version.de.urb.quagga}</version>
+  <name>Quagga</name>
+  <description>Quagga java binding</description>
+
+  <scm>
+    <connection>scm:svn:http://www.urb.de/svn/quagga-java/trunk/java</connection>
+  </scm>
+
+  <developers>  
+    <developer>
+      <id>rainer</id>
+      <name>Rainer Bieniek</name>
+      <email>rainer@urb.de</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone/>
+    </developer>
+  </developers>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>codehaus-repository</id>
+      <url>http://repository.codehaus.org/</url>
+      <snapshots>
+		<enabled>true</enabled>
+      </snapshots>
+      <releases>
+		<enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>repository.jboss.org</id>
+      <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+      <snapshots>
+	<enabled>false</enabled>
+      </snapshots>
+    </repository>  
+    <repository>
+      <id>snmp4j-repository</id>
+      <name>SNMP4J maven repository</name>
+      <url>https://server.oosnmp.net/dist/release/</url>
+      <snapshots>
+	<enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <plugins>    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+    	  <source>1.6</source>
+    	  <target>1.6</target>
+	  <debug>true</debug>
+	  <debuglevel>vars,lines,source</debuglevel>
+    	</configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+
+  <properties>
+    <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
+
+    <version.commons.codec>1.4</version.commons.codec>
+    <version.commons.logging>1.1.1</version.commons.logging>
+    <version.commons.lang>3.0.1</version.commons.lang>
+    <version.org.hibernate.validator>4.2.0.Final</version.org.hibernate.validator>
+    <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
+    <version.org.jboss.netty>3.2.7.Final</version.org.jboss.netty>
+    <version.org.jboss.spec.bom>2.0.0.Final</version.org.jboss.spec.bom>
+    <version.org.richfaces.bom>4.0.0.Final</version.org.richfaces.bom>
+    <version.org.seamframework>3.0.0.Final</version.org.seamframework>
+    <version.org.snmp4j>2.0.3</version.org.snmp4j>
+    <version.junit.junit>4.8.1</version.junit.junit>
+  </properties>
+
+  <modules>
+    <module>lib</module>
+<!--
+    <module>clients</module>1
+    <module>wow-log-ear</module>
+    <module>ejb</module>
+    <module>webapps</module>
+    <module>timesheet-ear</module>
+-->
+
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+	<groupId>commons-codec</groupId>
+	<artifactId>commons-codec</artifactId>
+	<version>${version.commons.codec}</version>
+      </dependency>
+      <dependency>
+	<groupId>commons-logging</groupId>
+	<artifactId>commons-logging</artifactId>
+	<version>${version.commons.logging}</version>
+      </dependency>
+      <dependency> 
+	<groupId>junit</groupId> 
+	<artifactId>junit</artifactId> 
+	<version>${version.junit.junit}</version> 
+      </dependency> 
+      <dependency>
+	<groupId>org.hibernate</groupId>
+	<artifactId>hibernate-validator</artifactId>
+	<version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-lang3</artifactId>
+	<version>${version.commons.lang}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.jboss.arquillian</groupId>
+	<artifactId>arquillian-junit</artifactId>
+	<version>${version.org.jboss.arquillian}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.jboss.netty</groupId>
+	<artifactId>netty</artifactId>
+	<version>${version.org.jboss.netty}</version>
+      </dependency>
+     <dependency>
+	<groupId>org.jboss.seam</groupId>
+	<artifactId>seam-bom</artifactId>
+	<version>${version.org.seamframework}</version>
+	<type>pom</type>
+	<scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.spec</groupId>
+        <artifactId>jboss-javaee-web-6.0</artifactId>
+        <version>${version.org.jboss.spec.bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.richfaces</groupId>
+        <artifactId>richfaces-bom</artifactId>
+        <version>${version.org.richfaces.bom}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.snmp4j</groupId>
+        <artifactId>snmp4j</artifactId>
+        <version>${version.org.snmp4j}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:nil
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
