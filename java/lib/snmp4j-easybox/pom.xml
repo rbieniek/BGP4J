@@ -12,7 +12,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>common-types</artifactId>
+  <artifactId>snmp4j-easybox</artifactId>
   <version>${version.de.urb.quagga}</version>
   <name>SNMP4J interface to easybox</name>
   <description>SNMP4J interface to easybox</description>

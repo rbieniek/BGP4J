@@ -106,7 +106,6 @@
   <properties>
     <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
     
-    <version.com.google.protobuf>2.4.1</version.com.google.protobuf>
     <version.commons.codec>1.4</version.commons.codec>
     <version.commons.logging>1.1.1</version.commons.logging>
     <version.commons.lang>3.0.1</version.commons.lang>
@@ -134,11 +133,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-	<groupId>com.google.protobuf</groupId>
-	<artifactId>protobuf-java</artifactId>
-	<version>${version.com.google.protobuf}</version>
-      </dependency>
       <dependency>
 	<groupId>commons-codec</groupId>
 	<artifactId>commons-codec</artifactId>
