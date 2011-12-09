@@ -109,10 +109,14 @@
     <version.commons.codec>1.4</version.commons.codec>
     <version.commons.logging>1.1.1</version.commons.logging>
     <version.commons.lang>3.0.1</version.commons.lang>
+    <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
     <version.org.hibernate.validator>4.2.0.Final</version.org.hibernate.validator>
     <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
     <version.org.jboss.netty>3.2.7.Final</version.org.jboss.netty>
     <version.org.jboss.spec.bom>2.0.0.Final</version.org.jboss.spec.bom>
+    <version.org.jboss.weld.api.bom>1.1.Final</version.org.jboss.weld.api.bom>
+    <version.org.jboss.weld.core.bom>1.1.4.Final</version.org.jboss.weld.core.bom>
+    <version.org.jboss.weld.spi>1.1.Final</version.org.jboss.weld.spi>
     <version.org.richfaces.bom>4.0.0.Final</version.org.richfaces.bom>
     <version.org.seamframework>3.0.0.Final</version.org.seamframework>
     <version.org.snmp4j>2.0.3</version.org.snmp4j>
@@ -154,6 +158,11 @@
 	<version>${version.org.hibernate.validator}</version>
       </dependency>
       <dependency>
+	<groupId>javax.enterprise</groupId>
+	<artifactId>cdi-api</artifactId>
+	<version>${version.javax.enterprise.cdi-api}</version>
+      </dependency>
+      <dependency>
 	<groupId>org.apache.commons</groupId>
 	<artifactId>commons-lang3</artifactId>
 	<version>${version.commons.lang}</version>
@@ -181,6 +190,25 @@
         <version>${version.org.jboss.spec.bom}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-api-bom</artifactId>
+        <version>${version.org.jboss.weld.api.bom}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-core-bom</artifactId>
+        <version>${version.org.jboss.weld.core.bom}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-spi</artifactId>
+        <version>${version.org.jboss.weld.spi}</version>
       </dependency>
       <dependency>
         <groupId>org.richfaces</groupId>

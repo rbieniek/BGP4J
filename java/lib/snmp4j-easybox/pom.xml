@@ -20,6 +20,12 @@
   <dependencies>
     
     <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-weld</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <scope>provided</scope>

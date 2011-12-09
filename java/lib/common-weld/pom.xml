@@ -12,10 +12,10 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>netty-quagga</artifactId>
+  <artifactId>common-weld</artifactId>
   <version>${version.de.urb.quagga}</version>
-  <name>Netty client to quagga routing daemon</name>
-  <description>Netty client to quagga routing daemon</description>
+  <name>Common weld support</name>
+  <description>Common weld support</description>
 
   <dependencies>
 
@@ -25,19 +25,23 @@
     </dependency>
 
     <dependency>
-      <groupId>de.urb.quagga</groupId>
-      <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.netty</groupId>
-      <artifactId>netty</artifactId>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-spi</artifactId>
     </dependency>
 
     <dependency> 
