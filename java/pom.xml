@@ -116,6 +116,7 @@
     <version.org.jboss.spec.bom>2.0.0.Final</version.org.jboss.spec.bom>
     <version.org.jboss.weld.api.bom>1.1.Final</version.org.jboss.weld.api.bom>
     <version.org.jboss.weld.core.bom>1.1.4.Final</version.org.jboss.weld.core.bom>
+    <version.org.jboss.weld.se>1.1.4.Final</version.org.jboss.weld.se>
     <version.org.jboss.weld.spi>1.1.Final</version.org.jboss.weld.spi>
     <version.org.richfaces.bom>4.0.0.Final</version.org.richfaces.bom>
     <version.org.seamframework>3.0.0.Final</version.org.seamframework>
@@ -125,6 +126,7 @@
 
   <modules>
     <module>lib</module>
+    <module>apps</module>
 <!--
     <module>clients</module>1
     <module>wow-log-ear</module>
@@ -209,6 +211,11 @@
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-spi</artifactId>
         <version>${version.org.jboss.weld.spi}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld.se</groupId>
+        <artifactId>weld-se-core</artifactId>
+        <version>${version.org.jboss.weld.se}</version>
       </dependency>
       <dependency>
         <groupId>org.richfaces</groupId>

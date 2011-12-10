@@ -7,8 +7,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -18,17 +19,16 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 
+import de.urb.quagga.weld.Configuration;
+
 /**
  * @author rainer
  *
  */
 public class QuaggaClient {
-	private static final Log log = LogFactory.getLog(QuaggaClient.class);
+	private @Inject Log log;
+	private @Inject Configuration config;
 	
-	public static final int DEFAULT_ZEBRA_PORT = 2600;
-		
-	private int zebraPort = DEFAULT_ZEBRA_PORT;
-
 	private Channel clientChannel;
 	private ChannelFactory channelFactory;
 
@@ -48,7 +48,7 @@ public class QuaggaClient {
 		bootstrap.setOption("tcpnoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getLocalHost(), this.zebraPort));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getLocalHost(), config.getZebraPort()));
 		boolean connected = false;
 		
 		while(!connected) {
@@ -81,20 +81,6 @@ public class QuaggaClient {
 			
 			channelFactory.releaseExternalResources();
 		}
-	}
-	
-	/**
-	 * @return the zebraPort
-	 */
-	public int getZebraPort() {
-		return zebraPort;
-	}
-
-	/**
-	 * @param zebraPort the zebraPort to set
-	 */
-	public void setZebraPort(int zebraPort) {
-		this.zebraPort = zebraPort;
 	}
 	
 }
