@@ -5,7 +5,6 @@ package de.urb.quagga.apps.shared;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -21,7 +20,6 @@ import de.urb.quagga.weld.ConfigurationProducer;
  *
  */
 @ApplicationScoped
-@Singleton
 public class CommandLineConfigurationProducer implements ConfigurationProducer {
 
 	@Inject @Parameters private String[] commandLine;

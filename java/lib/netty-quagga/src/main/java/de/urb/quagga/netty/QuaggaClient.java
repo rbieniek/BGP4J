@@ -7,9 +7,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -21,17 +19,16 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
+import de.urb.quagga.weld.Config;
 import de.urb.quagga.weld.Configuration;
 
 /**
  * @author rainer
  *
  */
-@ApplicationScoped
-@Singleton
 public class QuaggaClient {
 	private @Inject Logger log;
-	private @Inject Configuration config;
+	private @Config @Inject Configuration config;
 	
 	private Channel clientChannel;
 	private ChannelFactory channelFactory;
@@ -54,10 +51,11 @@ public class QuaggaClient {
 		bootstrap.setOption("tcpnoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getLocalHost(), config.getZebraPort()));
 		boolean connected = false;
 		
 		while(!connected) {
+			ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getLocalHost(), config.getZebraPort()));
+
 			try {
 				future = future.await();
 			} catch(InterruptedException e) {
@@ -67,6 +65,7 @@ public class QuaggaClient {
 			if(future.isDone()) {
 				if(future.isSuccess()) {
 					connected = true;
+					this.clientChannel = future.getChannel();
 				} else {
 					log.warn("Cannot connect to zebra server", future.getCause());
 					
@@ -78,7 +77,6 @@ public class QuaggaClient {
 			}
 		}
 		
-		this.clientChannel = future.getChannel();
 	}
 	
 	public void stopClient() {
