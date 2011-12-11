@@ -14,6 +14,6 @@ public interface ConfigurationProducer {
 	 * 
 	 * @return
 	 */
-	public Configuration getConfiguration();
+	public Configuration getConfiguration() throws Exception;
 
 }

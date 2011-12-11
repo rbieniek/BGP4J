@@ -7,7 +7,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.logging.Log;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -25,12 +27,16 @@ import de.urb.quagga.weld.Configuration;
  * @author rainer
  *
  */
+@ApplicationScoped
+@Singleton
 public class QuaggaClient {
 	private @Inject Log log;
 	private @Inject Configuration config;
 	
 	private Channel clientChannel;
 	private ChannelFactory channelFactory;
+
+	private @Inject QuaggaChannelHandler quaggaChannelHander;
 
 	public void startClient() throws Exception {
 		channelFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
@@ -41,7 +47,7 @@ public class QuaggaClient {
 			
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new QuaggaChannelHandler());
+				return Channels.pipeline(quaggaChannelHander);
 			}
 		});
 		
