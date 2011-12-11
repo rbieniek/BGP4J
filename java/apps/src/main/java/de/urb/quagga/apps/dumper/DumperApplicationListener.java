@@ -6,7 +6,7 @@ package de.urb.quagga.apps.dumper;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 
 import de.urb.quagga.netty.QuaggaClient;
 import de.urb.quagga.weld.SeApplicationStartEvent;
@@ -16,7 +16,7 @@ import de.urb.quagga.weld.SeApplicationStartEvent;
  *
  */
 public class DumperApplicationListener {
-	private @Inject Log log;
+	private @Inject Logger log;
 	private @Inject QuaggaClient quaggaClient;
 	
 	public void listen(@Observes @DumperApplicationSelector SeApplicationStartEvent event) throws Exception {

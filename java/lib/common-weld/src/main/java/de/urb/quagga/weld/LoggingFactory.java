@@ -8,8 +8,8 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author rainer
@@ -17,8 +17,8 @@ import org.apache.commons.logging.LogFactory;
  */
 @ApplicationScoped
 @Singleton
-public class CommonsLoggingFactory {
-	@Produces Log produceLog(InjectionPoint ip) {
-		return LogFactory.getLog(ip.getMember().getDeclaringClass());
+public class LoggingFactory {
+	@Produces Logger produceSlf4jLog(InjectionPoint ip) {
+		return LoggerFactory.getLogger(ip.getMember().getDeclaringClass());
 	}
 }

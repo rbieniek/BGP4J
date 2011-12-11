@@ -20,11 +20,6 @@
   <dependencies>
 
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>de.urb.quagga</groupId>
       <artifactId>common-weld</artifactId>
       <version>${version.de.urb.quagga}</version>
@@ -40,6 +35,16 @@
       <artifactId>netty</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-ext</artifactId>
+    </dependency>
+    
     <dependency> 
       <groupId>junit</groupId> 
       <artifactId>junit</artifactId> 

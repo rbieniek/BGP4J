@@ -11,7 +11,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.logging.Log;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -20,6 +19,7 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.slf4j.Logger;
 
 import de.urb.quagga.weld.Configuration;
 
@@ -30,7 +30,7 @@ import de.urb.quagga.weld.Configuration;
 @ApplicationScoped
 @Singleton
 public class QuaggaClient {
-	private @Inject Log log;
+	private @Inject Logger log;
 	private @Inject Configuration config;
 	
 	private Channel clientChannel;

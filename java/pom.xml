@@ -107,9 +107,9 @@
     <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
     <version.commons.cli>1.2</version.commons.cli>
     <version.commons.codec>1.4</version.commons.codec>
-    <version.commons.logging>1.1.1</version.commons.logging>
     <version.commons.lang>3.0.1</version.commons.lang>
     <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
+    <version.log4j>1.2.16</version.log4j>
     <version.org.codehaus.mojo.appassembler_maven_plugin>1.0</version.org.codehaus.mojo.appassembler_maven_plugin>
     <version.org.hibernate.validator>4.2.0.Final</version.org.hibernate.validator>
     <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
@@ -121,6 +121,7 @@
     <version.org.jboss.weld.spi>1.1.Final</version.org.jboss.weld.spi>
     <version.org.richfaces.bom>4.0.0.Final</version.org.richfaces.bom>
     <version.org.seamframework>3.0.0.Final</version.org.seamframework>
+    <version.org.slf4j>1.5.10</version.org.slf4j>
     <version.org.snmp4j>2.0.3</version.org.snmp4j>
     <version.junit.junit>4.8.1</version.junit.junit>
   </properties>
@@ -150,20 +151,35 @@
 	<artifactId>commons-cli</artifactId>
 	<version>${version.commons.cli}</version>
       </dependency>
-      <dependency>
-	<groupId>commons-logging</groupId>
-	<artifactId>commons-logging</artifactId>
-	<version>${version.commons.logging}</version>
-      </dependency>
       <dependency> 
 	<groupId>junit</groupId> 
 	<artifactId>junit</artifactId> 
 	<version>${version.junit.junit}</version> 
       </dependency> 
+      <dependency> 
+	<groupId>log4j</groupId> 
+	<artifactId>log4j</artifactId> 
+	<version>${version.log4j}</version> 
+      </dependency> 
       <dependency>
 	<groupId>org.hibernate</groupId>
 	<artifactId>hibernate-validator</artifactId>
 	<version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-api</artifactId>
+	<version>${version.org.slf4j}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-ext</artifactId>
+	<version>${version.org.slf4j}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-log4j12</artifactId>
+	<version>${version.org.slf4j}</version>
       </dependency>
       <dependency>
 	<groupId>javax.enterprise</groupId>
@@ -222,6 +238,11 @@
         <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se-core</artifactId>
         <version>${version.org.jboss.weld.se}</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${version.log4j}</version>
       </dependency>
       <dependency>
         <groupId>org.richfaces</groupId>
