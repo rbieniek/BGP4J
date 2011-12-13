@@ -123,7 +123,7 @@
     <version.org.seamframework>3.0.0.Final</version.org.seamframework>
     <version.org.slf4j>1.5.10</version.org.slf4j>
     <version.org.snmp4j>2.0.3</version.org.snmp4j>
-    <version.junit.junit>4.8.1</version.junit.junit>
+    <version.junit.junit>4.10</version.junit.junit>
   </properties>
 
   <modules>
@@ -179,6 +179,11 @@
       <dependency>
 	<groupId>org.slf4j</groupId>
 	<artifactId>slf4j-log4j12</artifactId>
+	<version>${version.org.slf4j}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.slf4j</groupId>
+	<artifactId>slf4j-simple</artifactId>
 	<version>${version.org.slf4j}</version>
       </dependency>
       <dependency>
