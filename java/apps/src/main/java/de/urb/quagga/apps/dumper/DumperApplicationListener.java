@@ -22,12 +22,9 @@ public class DumperApplicationListener {
 	public void listen(@Observes @DumperApplicationSelector SeApplicationStartEvent event) throws Exception {
 		try {
 			quaggaClient.startClient();
-			
-			while(true) {
-				try {
-					Thread.sleep(10*1000);
-				} catch(InterruptedException e) {}
-			}
+
+			quaggaClient.waitForChannelClose();
+			quaggaClient.stopClient();
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			

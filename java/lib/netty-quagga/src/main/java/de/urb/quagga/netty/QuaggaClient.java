@@ -34,6 +34,9 @@ public class QuaggaClient {
 	private ChannelFactory channelFactory;
 
 	private @Inject QuaggaChannelHandler quaggaChannelHander;
+	private @Inject QuaggaPacketReframer quaggaPacketReframer;
+	private @Inject QuaggaPacketDecoder quaggaPacketDecoder;
+	private @Inject QuaggaPacketEncoder quaggaPacketEncoder;
 
 	public void startClient() throws Exception {
 		channelFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
@@ -44,7 +47,12 @@ public class QuaggaClient {
 			
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(quaggaChannelHander);
+				return Channels.pipeline(
+						quaggaPacketReframer,
+						quaggaPacketDecoder,
+						quaggaPacketEncoder,
+						quaggaChannelHander
+						);
 			}
 		});
 		
@@ -82,9 +90,16 @@ public class QuaggaClient {
 	public void stopClient() {
 		if(clientChannel != null) {
 			clientChannel.getCloseFuture().awaitUninterruptibly();
+			this.clientChannel = null;
 			
 			channelFactory.releaseExternalResources();
+			this.channelFactory = null;
 		}
 	}
 	
+	public void waitForChannelClose() {
+		if(this.clientChannel != null) {
+			this.clientChannel.getCloseFuture().awaitUninterruptibly();
+		}
+	}
 }
