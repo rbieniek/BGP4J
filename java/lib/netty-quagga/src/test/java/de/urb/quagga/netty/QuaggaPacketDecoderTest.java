@@ -3,9 +3,18 @@
  */
 package de.urb.quagga.netty;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
+import org.apache.log4j.net.SocketAppender;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.UpstreamMessageEvent;
+import org.jboss.weld.logging.messages.EventMessage;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,21 +62,35 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 	 */
 	private void putString(ChannelBuffer buffer, String string, int maxLength) {
 		byte[] tBuf = new byte[maxLength];
-		char[] sBuf =  string.toCharArray();
 		
-		System.arraycopy(sBuf, 0, tBuf, 0, sBuf.length < maxLength ? sBuf.length : maxLength);
+		for(int i=0; i<string.length() && i < maxLength; i++) {
+			char c = string.charAt(i);
+			
+			tBuf[i] = (byte)c;
+		}
 		
 		buffer.writeBytes(tBuf, 0, maxLength);
 	}
 	
 	@SuppressWarnings("unchecked")
 	private <T extends QuaggaPacket> T executeDecode(ChannelBuffer buffer) throws Exception {
-		UpstreamMessageEvent me = new UpstreamMessageEvent(null, buffer, null);
-		MockChannelHandlerContext ctx = new MockChannelHandlerContext();
-		QuaggaPacketDecoder decoder = obtainInstance(QuaggaPacketDecoder.class);
+		MockChannelHandler handler = obtainInstance(MockChannelHandler.class);
+		ChannelPipeline pipeline = Channels.pipeline(
+				obtainInstance(QuaggaPacketDecoder.class),
+				handler
+				);
+		MockChannelSink sink = obtainInstance(MockChannelSink.class);
+		MockChannel channel = new MockChannel(pipeline, sink);
+		UpstreamMessageEvent me = new UpstreamMessageEvent(channel, buffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
 		
-		decoder.messageReceived(ctx, me);
-		return (T)ctx.getMessage();
+		pipeline.sendUpstream(me);
+		
+		MessageEvent result = handler.nextEvent();
+
+		if(result != null)
+			return (T)result.getMessage();
+		else
+			return null;
 	}
 
 	// ---- Interface add packet, protocol version 1
@@ -81,10 +104,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(0); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -110,10 +133,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(1); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -139,10 +162,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(2); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -168,10 +191,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(4); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -199,10 +222,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(0); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -228,10 +251,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(1); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -257,10 +280,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(2); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
@@ -286,10 +309,10 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		buffer.writeInt(1); // Interface index
 		buffer.writeByte(4); // status flag
 		buffer.writeLong(0xaabbccdd00112233L); // interface flags
-		buffer.writeLong(1); // interface metric
-		buffer.writeLong(1512); // IPv4 mtu
-		buffer.writeLong(1496); // IPv6 MTU
-		buffer.writeLong(1000); // bandwidth
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
 		
 		ZServAddInterfacePacket packet = executeDecode(buffer);
 		
