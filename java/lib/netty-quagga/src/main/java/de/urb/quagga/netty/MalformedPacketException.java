@@ -21,6 +21,13 @@ public class MalformedPacketException extends Exception {
 	}
 
 	/**
+	 * 
+	 */
+	public MalformedPacketException(int wanted, int received) {
+		super("received " + received + " bytes, wanted " + wanted + " bytes");
+	}
+
+	/**
 	 * @param message
 	 */
 	public MalformedPacketException(String message) {

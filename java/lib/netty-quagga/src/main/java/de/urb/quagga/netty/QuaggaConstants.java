@@ -12,7 +12,9 @@ public class QuaggaConstants {
 	public static final int ZEBRA_PROTOCOL_VERSION = 0x1;
 	public static final int ZEBRA_HEADER_MARKER = 0xff;
 	public static final int INTERFACE_NAMSIZ = 20;
-	public static final int  IFINDEX_INTERNAL = 0;
+	public static final int IFINDEX_INTERNAL = 0;
+	public static final int SIZEOF_IPV4_ADDRESS = 4;
+	public static final int SIZEOF_IPV6_ADDRESS = 16;
 	
 	public static final int ZEBRA_INTERFACE_ACTIVE = (1 << 0);
 	public static final int ZEBRA_INTERFACE_SUB = (1 << 1);
@@ -28,6 +30,10 @@ public class QuaggaConstants {
 	
 	public static final int ZEBRA_INTERFACE_ADD_PKT_MIN = 49;
 	public static final int ZEBRA_INTERFACE_DEL_PKT_MIN = 49;
+	public static final int ZEBRA_INTERFACE_ADDRESS_ADD_PKT_MIN = 15;
+	public static final int ZEBRA_INTERFACE_ADDRESS_ADD_PKT_MAX = 39;
+	public static final int ZEBRA_INTERFACE_ADDRESS_DELETE_PKT_MIN = 15;
+	public static final int ZEBRA_INTERFACE_ADDRESS_DELETE_PKT_MAX = 39;
 	
 	public static final int AF_INET = 2;
 	public static final int AF_INET6_BSD = 24;
