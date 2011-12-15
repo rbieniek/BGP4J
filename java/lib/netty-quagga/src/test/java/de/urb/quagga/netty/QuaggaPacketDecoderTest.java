@@ -22,6 +22,8 @@ import de.urb.quagga.netty.protocol.ZServAddInterfacePacket;
 import de.urb.quagga.netty.protocol.ZServDeleteInterfacePacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressAddPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressDeletePacket;
+import de.urb.quagga.netty.protocol.ZServInterfaceDownPacket;
+import de.urb.quagga.netty.protocol.ZServInterfaceUpPacket;
 import de.urb.quagga.weld.WeldTestCaseBase;
 
 /**
@@ -1434,5 +1436,477 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		Assert.assertNotNull(packet.getDestination());
 		Assert.assertTrue(packet.getDestination() instanceof Inet6Address);
 		Assert.assertEquals(packet.getDestination(), InetAddress.getByAddress(destination));
+	}
+	
+	// ---- Interface delete packet, protocol version 1
+	
+	@Test
+	public void testZServInterfaceDownPacketv1status0() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_DOWN
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(0); // status flag
+		buffer.writeLong(0x00112233aabbccddL); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 0);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0x00112233aabbccddL);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv1status1() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(1); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 1);
+		Assert.assertTrue(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv1status2() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(2); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 2);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertTrue(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv1status4() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(4); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 4);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertTrue(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+
+	// ---- Interface add packet, protocol version 0
+	
+	@Test
+	public void testZServInterfaceDownPacketv0status0() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(0); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 0);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv0status1() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(1); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 1);
+		Assert.assertTrue(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv0status2() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(2); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 2);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertTrue(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceDownPacketv0status4() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_DOWN); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(4); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceDownPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 4);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertTrue(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	// ---- Interface add packet, protocol version 1
+	
+	@Test
+	public void testZServInterfaceUpPacketv1status0() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(0); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 0);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv1status1() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(1); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 1);
+		Assert.assertTrue(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv1status2() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(2); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 2);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertTrue(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv1status4() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion1();
+		
+		buffer.writeShort(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(4); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 1);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 4);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertTrue(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+
+	// ---- Interface add packet, protocol version 0
+	
+	@Test
+	public void testZServInterfaceUpPacketv0status0() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(0); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 0);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv0status1() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(1); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 1);
+		Assert.assertTrue(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv0status2() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(2); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getStatusFlags(), 2);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertFalse(packet.isInterfaceLinkDetection());
+		Assert.assertTrue(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	@Test
+	public void testZServInterfaceUpPacketv0status4() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_INTERFACE_UP); // Quagga protocol constant ZEBRA_INTERFACE_UP
+		putString(buffer, "eth0", QuaggaConstants.INTERFACE_NAMSIZ);
+		buffer.writeInt(1); // Interface index
+		buffer.writeByte(4); // status flag
+		buffer.writeLong(0xaabbccdd00112233L); // interface flags
+		buffer.writeInt(1); // interface metric
+		buffer.writeInt(1512); // IPv4 mtu
+		buffer.writeInt(1496); // IPv6 MTU
+		buffer.writeInt(1000); // bandwidth
+		
+		ZServInterfaceUpPacket packet = executeDecode(buffer);
+		
+		Assert.assertEquals(packet.getProtocolVersion(), 0);
+		Assert.assertEquals(packet.getInterfaceName(), "eth0");
+		Assert.assertEquals(packet.getInterfaceIndex(), 1);
+		Assert.assertEquals(packet.getStatusFlags(), 4);
+		Assert.assertFalse(packet.isInterfaceActive());
+		Assert.assertTrue(packet.isInterfaceLinkDetection());
+		Assert.assertFalse(packet.isInterfaceSub());
+		Assert.assertEquals(packet.getInterfaceFlags(), 0xaabbccdd00112233L);
+		Assert.assertEquals(packet.getInterfaceMetric(), 1);
+		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
+		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
+		Assert.assertEquals(packet.getBandwidth(), 1000);
 	}
 }

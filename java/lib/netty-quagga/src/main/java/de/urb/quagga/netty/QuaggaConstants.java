@@ -27,6 +27,8 @@ public class QuaggaConstants {
 	public static final int ZEBRA_INTERFACE_DELETE = 2;
 	public static final int ZEBRA_INTERFACE_ADDRESS_ADD = 3;
 	public static final int ZEBRA_INTERFACE_ADDRESS_DELETE = 4;
+	public static final int ZEBRA_INTERFACE_UP = 5;
+	public static final int ZEBRA_INTERFACE_DOWN = 6;
 	
 	public static final int ZEBRA_INTERFACE_ADD_PKT_MIN = 49;
 	public static final int ZEBRA_INTERFACE_DEL_PKT_MIN = 49;
@@ -34,6 +36,8 @@ public class QuaggaConstants {
 	public static final int ZEBRA_INTERFACE_ADDRESS_ADD_PKT_MAX = 39;
 	public static final int ZEBRA_INTERFACE_ADDRESS_DELETE_PKT_MIN = 15;
 	public static final int ZEBRA_INTERFACE_ADDRESS_DELETE_PKT_MAX = 39;
+	public static final int ZEBRA_INTERFACE_UP_PKT_SIZE = 49;
+	public static final int ZEBRA_INTERFACE_DOWN_PKT_SIZE = 49;
 	
 	public static final int AF_INET = 2;
 	public static final int AF_INET6_BSD = 24;

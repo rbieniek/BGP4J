@@ -20,6 +20,8 @@ import de.urb.quagga.netty.protocol.ZServAddInterfacePacket;
 import de.urb.quagga.netty.protocol.ZServDeleteInterfacePacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressAddPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressDeletePacket;
+import de.urb.quagga.netty.protocol.ZServInterfaceDownPacket;
+import de.urb.quagga.netty.protocol.ZServInterfaceUpPacket;
 
 /**
  * Byte-array to POJO decoder for handling Quagga protocol packages sent from the Zebra server to the client.
@@ -80,6 +82,12 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 			case QuaggaConstants.ZEBRA_INTERFACE_ADDRESS_DELETE:
 				result = decodeZServInterfaceAddressDeletePacket(buffer, version);
 				break;
+			case QuaggaConstants.ZEBRA_INTERFACE_UP:
+				result = decodeZServInterfaceUpPacket(buffer, version);
+				break;
+			case QuaggaConstants.ZEBRA_INTERFACE_DOWN:
+				result = decodeZServInterfaceDownPacket(buffer, version);
+				break;
 			default:
 				log.info("cannot handle protocol packet version {}, command {}", version, command);
 				break;
@@ -100,6 +108,12 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 			case QuaggaConstants.ZEBRA_INTERFACE_ADDRESS_DELETE:
 				result = decodeZServInterfaceAddressDeletePacket(buffer, 0);
 				break;
+			case QuaggaConstants.ZEBRA_INTERFACE_UP:
+				result = decodeZServInterfaceUpPacket(buffer, 0);
+				break;
+			case QuaggaConstants.ZEBRA_INTERFACE_DOWN:
+				result = decodeZServInterfaceDownPacket(buffer, 0);
+				break;
 			default:
 				log.info("cannot handle protocol packet version 0, command {}", markerOrCommand);
 				break;
@@ -110,7 +124,14 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 			ctx.sendUpstream(new UpstreamMessageEvent(e.getChannel(), result, e.getRemoteAddress()));
 	}
 
-	
+	/**
+	 * handle a INTERFACE_ADD command packet (command 1)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
 	private ZServAddInterfacePacket decodeZServAddInterfacePacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
 		ZServAddInterfacePacket packet = new ZServAddInterfacePacket(protocolVersion);
 		if(buffer.readableBytes() < QuaggaConstants.ZEBRA_INTERFACE_ADD_PKT_MIN)
@@ -128,6 +149,14 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 		return packet;
 	}
 	
+	/**
+	 * handle a INTERFACE_DELETE command packet (command 2)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
 	private ZServDeleteInterfacePacket decodeZServDeleteInterfacePacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
 		ZServDeleteInterfacePacket packet = new ZServDeleteInterfacePacket(protocolVersion);
 		if(buffer.readableBytes() < QuaggaConstants.ZEBRA_INTERFACE_DEL_PKT_MIN)
@@ -145,6 +174,14 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 		return packet;
 	}
 	
+	/**
+	 * handle a INTERFACE_ADDRESS_ADD command packet (command 3)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
 	private ZServInterfaceAddressAddPacket decodeZServInterfaceAddressAddPacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
 		ZServInterfaceAddressAddPacket packet = new ZServInterfaceAddressAddPacket(protocolVersion);
 		int readable = buffer.readableBytes();
@@ -201,6 +238,14 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 		return packet;
 	}
 	
+	/**
+	 * handle a INTERFACE_ADDRESS_ADD command packet (command 4)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
 	private ZServInterfaceAddressDeletePacket decodeZServInterfaceAddressDeletePacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
 		ZServInterfaceAddressDeletePacket packet = new ZServInterfaceAddressDeletePacket(protocolVersion);
 		int readable = buffer.readableBytes();
@@ -254,6 +299,56 @@ public class QuaggaPacketDecoder extends SimpleChannelUpstreamHandler {
 			}				
 		}
 
+		return packet;
+	}
+	
+	/**
+	 * handle a INTERFACE_UP command packet (command 5)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
+	private ZServInterfaceUpPacket decodeZServInterfaceUpPacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
+		ZServInterfaceUpPacket packet = new ZServInterfaceUpPacket(protocolVersion);
+		if(buffer.readableBytes() < QuaggaConstants.ZEBRA_INTERFACE_UP_PKT_SIZE)
+			throw new MalformedPacketException(QuaggaConstants.ZEBRA_INTERFACE_UP_PKT_SIZE, buffer.readableBytes());
+		
+		packet.setInterfaceName(decodeString(buffer, QuaggaConstants.INTERFACE_NAMSIZ));
+		packet.setInterfaceIndex((int)buffer.readUnsignedInt());
+		packet.setStatusFlags((short)buffer.readUnsignedByte());
+		packet.setInterfaceFlags(buffer.readLong());
+		packet.setInterfaceMetric((int)buffer.readUnsignedInt());
+		packet.setIpV4Mtu((int)buffer.readUnsignedInt());
+		packet.setIpV6Mtu((int)buffer.readUnsignedInt());
+		packet.setBandwidth((int)buffer.readUnsignedInt());
+		
+		return packet;
+	}
+	
+	/**
+	 * handle a INTERFACE_DELETE command packet (command 2)
+	 * 
+	 * @param buffer buffer containing packet payload stripped of complete header information
+	 * @param protocolVersion the protocol version in use
+	 * @return the decoded object
+	 * @throws MalformedPacketException packet structure problems
+	 */
+	private ZServInterfaceDownPacket decodeZServInterfaceDownPacket(ChannelBuffer buffer, int protocolVersion) throws MalformedPacketException {
+		ZServInterfaceDownPacket packet = new ZServInterfaceDownPacket(protocolVersion);
+		if(buffer.readableBytes() < QuaggaConstants.ZEBRA_INTERFACE_DOWN_PKT_SIZE)
+			throw new MalformedPacketException(QuaggaConstants.ZEBRA_INTERFACE_DOWN_PKT_SIZE, buffer.readableBytes());
+		
+		packet.setInterfaceName(decodeString(buffer, QuaggaConstants.INTERFACE_NAMSIZ));
+		packet.setInterfaceIndex((int)buffer.readUnsignedInt());
+		packet.setStatusFlags((short)buffer.readUnsignedByte());
+		packet.setInterfaceFlags(buffer.readLong());
+		packet.setInterfaceMetric((int)buffer.readUnsignedInt());
+		packet.setIpV4Mtu((int)buffer.readUnsignedInt());
+		packet.setIpV6Mtu((int)buffer.readUnsignedInt());
+		packet.setBandwidth((int)buffer.readUnsignedInt());
+		
 		return packet;
 	}
 	
