@@ -6,6 +6,7 @@ package de.urb.quagga.netty.protocol;
 import java.net.InetAddress;
 
 import de.urb.quagga.netty.EQuaggaRouteType;
+import de.urb.quagga.netty.QuaggaConstants;
 
 /**
  * @author rainer
@@ -157,5 +158,80 @@ public class ZServRoutePacket extends QuaggaPacket {
 	 */
 	public void setInterfaceIndex(int interfaceIndex) {
 		this.interfaceIndex = interfaceIndex;
+	}
+	
+	public boolean isInternal() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_INTERNAL);
+	}
+	
+	public void setInternal(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_INTERNAL, flag);
+	}
+	
+	public boolean isSelfRoute() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_SELFROUTE);
+	}
+	
+	public void setSelfRoute(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_SELECTED, flag);
+	}
+	
+	public boolean isBlackHole() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_BLACKHOLE);
+	}
+	
+	public void setBlackHole(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_BLACKHOLE, flag);
+	}
+	
+	public boolean isIbgb() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_IBGP);
+	}
+	
+	public void setIbgp(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_IBGP, flag);
+	}
+
+	public boolean isSelected() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_SELECTED);
+	}
+	
+	public void setSelected(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_SELECTED, flag);
+	}
+	
+	public boolean isChanged() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_CHANGED);
+	}
+	
+	public void setChanged(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_CHANGED, flag);
+	}
+	
+	public boolean isStatic() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_STATIC);
+	}
+	
+	public void setStatic(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_STATIC, flag);
+	}
+	
+	public boolean isReject() {
+		return checkBit(this.flags, QuaggaConstants.ZEBRA_FLAG_REJECT);
+	}
+	
+	public void setReject(boolean flag) {
+		this.flags = setBit(this.flags, QuaggaConstants.ZEBRA_FLAG_REJECT, flag);
+	}	
+
+	private boolean checkBit(int value, int mask) {
+		return ((value & mask) != 0);
+	}
+	
+	private int setBit(int value, int mask, boolean flag) {
+		if(flag)
+			return value | mask;
+		else
+			return (value & ~mask);
 	}
 }

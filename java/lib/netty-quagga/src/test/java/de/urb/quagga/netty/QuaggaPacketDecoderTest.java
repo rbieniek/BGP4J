@@ -20,6 +20,7 @@ import org.junit.Test;
 import de.urb.quagga.netty.protocol.QuaggaPacket;
 import de.urb.quagga.netty.protocol.ZServAddInterfacePacket;
 import de.urb.quagga.netty.protocol.ZServDeleteInterfacePacket;
+import de.urb.quagga.netty.protocol.ZServIPv4RouteAddPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressAddPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressDeletePacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceDownPacket;
@@ -1908,5 +1909,43 @@ public class QuaggaPacketDecoderTest extends WeldTestCaseBase {
 		Assert.assertEquals(packet.getIpV4Mtu(), 1512);
 		Assert.assertEquals(packet.getIpV6Mtu(), 1496);
 		Assert.assertEquals(packet.getBandwidth(), 1000);
+	}
+	
+	//-- Add/Delete IPv4/IPv6 protocol version 0 packet
+	public void testZServIpV4RouteAddProtocol0SystemFlags0Prefix8Gateway() throws Exception {
+		ChannelBuffer buffer = createQuaggaPacketVersion0();
+		byte[] prefix = new byte[] { (byte)0x12 };
+		byte[] gateway = new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x1, (byte)0x1 };
+		
+		buffer.writeByte(QuaggaConstants.ZEBRA_IPV4_ROUTE_ADD); // Quagga protocol constant ZEBRA_IPV4_ROUTE_ADD
+		buffer.writeByte(0); // route type SYSTEM
+		buffer.writeByte(0); // no flags
+		buffer.writeByte(QuaggaConstants.ZAPI_MESSAGE_NEXTHOP|QuaggaConstants.ZAPI_MESSAGE_IFINDEX
+				|QuaggaConstants.ZAPI_MESSAGE_DISTANCE|QuaggaConstants.ZAPI_MESSAGE_METRIC); // message aka ZAPI flags
+		buffer.writeByte(8); // prefix length
+		buffer.writeBytes(prefix);
+		buffer.writeByte(1); // nexthop number
+		buffer.writeBytes(gateway); // IPv4 gateway address
+		buffer.writeByte(1); // interface index (??), not explained in zserv.c
+		buffer.writeInt(16); // interface index
+		buffer.writeByte(1); // distance
+		buffer.writeInt(32); // metric
+		
+		ZServIPv4RouteAddPacket packet = executeDecode(buffer);
+		
+		// route type
+		Assert.assertEquals(EQuaggaRouteType.System, packet.getType());
+
+		// message flags
+		Assert.assertEquals(0, packet.getFlags());
+		Assert.assertFalse(packet.isInternal());
+		Assert.assertFalse(packet.isSelfRoute());
+		Assert.assertFalse(packet.isBlackHole());
+		Assert.assertFalse(packet.isIbgb());
+		Assert.assertFalse(packet.isSelected());
+		Assert.assertFalse(packet.isChanged());
+		Assert.assertFalse(packet.isStatic());
+		Assert.assertFalse(packet.isReject());
+		
 	}
 }
