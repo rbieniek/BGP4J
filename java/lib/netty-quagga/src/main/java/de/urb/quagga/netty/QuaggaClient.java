@@ -62,7 +62,7 @@ public class QuaggaClient {
 		boolean connected = false;
 		
 		while(!connected) {
-			ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getLocalHost(), config.getZebraPort()));
+			ChannelFuture future = bootstrap.connect(new InetSocketAddress(InetAddress.getByName("localhost"), config.getZebraPort()));
 
 			try {
 				future = future.await();

@@ -23,6 +23,7 @@ public class QuaggaChannelHandler extends SimpleChannelHandler {
 	 */
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		log.info("received: " + e.getMessage());
 	}
 
 }
