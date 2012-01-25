@@ -12,22 +12,16 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>netty-bgp4-client</artifactId>
+  <artifactId>netty-bgp4</artifactId>
   <version>${version.de.urb.quagga}</version>
-  <name>Netty BGPv4 client implementation</name>
-  <description>Netty BGPv4 client implementation</description>
+  <name>Netty BGPv4 implementation</name>
+  <description>Netty BGPv4 implementation</description>
 
   <dependencies>
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
       <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>de.urb.quagga</groupId>
-      <artifactId>netty-bgp4-shared</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>
 
