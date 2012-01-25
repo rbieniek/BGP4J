@@ -1,61 +1,49 @@
-/**
- * 
- */
 package de.urb.netty.bgp4;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
-/**
- * @author rainer
- *
- */
-public class BGPv4Configuration {
-
-	private InetSocketAddress bgpServer;
-	private int bgpIdentifier;
-	private int holdTime;
+public interface BGPv4Configuration {
 
 	/**
 	 * @return the bgpv4Server
 	 */
-	public InetSocketAddress getBgpv4Server() {
-		return bgpServer;
-	}
+	public abstract InetSocketAddress getBgpv4Server();
 
 	/**
-	 * @param bgpv4Server the bgpv4Server to set
+	 * get the list of peers
+	 * 
+	 * @return a read-only list of peers
 	 */
-	public void setBgpv4Server(InetSocketAddress bgpv4Server) {
-		this.bgpServer = bgpv4Server;
-	}
+	public abstract List<BGPv4PeerConfiguration> getPeers();
 
 	/**
-	 * @return the bgpIdentifier
+	 * add a peer to the configuration. Any listener is notified after the peer has been added.
+	 * 
+	 * @param peer the peer to add
 	 */
-	public int getBgpIdentifier() {
-		return bgpIdentifier;
-	}
+	public abstract void addPeer(BGPv4PeerConfiguration peer);
 
 	/**
-	 * @param bgpIdentifier the bgpIdentifier to set
+	 * remove a peer from the configuration. If the peer is removed any listener is notified before the peer is removed.
+	 * 
+	 * @param peer the peer to remove.
 	 */
-	public void setBgpIdentifier(int bgpIdentifier) {
-		this.bgpIdentifier = bgpIdentifier;
-	}
+	public abstract void removePeer(BGPv4PeerConfiguration peer);
 
 	/**
-	 * @return the holdTime
+	 * add a listener
+	 * 
+	 * @param listener the listener
 	 */
-	public int getHoldTime() {
-		return holdTime;
-	}
+	public abstract void addListener(PeerConfigurationChangedListener listener);
 
 	/**
-	 * @param holdTime the holdTime to set
+	 * remove a listener
+	 * 
+	 * @param listener the listener
 	 */
-	public void setHoldTime(int holdTime) {
-		this.holdTime = holdTime;
-	}
-	
-	
+	public abstract void removeListener(
+			PeerConfigurationChangedListener listener);
+
 }

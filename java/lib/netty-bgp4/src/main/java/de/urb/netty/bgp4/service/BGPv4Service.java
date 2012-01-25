@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.urb.netty.bgp4.client;
+package de.urb.netty.bgp4.service;
 
 import java.util.concurrent.Executors;
 
@@ -18,6 +18,7 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
+import de.urb.netty.bgp4.BGPv4PeerConfiguration;
 import de.urb.netty.bgp4.fsm.BGPv4FSM;
 import de.urb.netty.bgp4.protocol.BGPv4Codec;
 import de.urb.netty.bgp4.protocol.BGPv4Reframer;
@@ -26,7 +27,7 @@ import de.urb.netty.bgp4.protocol.BGPv4Reframer;
  * @author rainer
  *
  */
-public class BGPv4Client {
+public class BGPv4Service {
 	private @Inject Logger log;
 
 	private @Inject @New BGPv4FSM bgp4fsm;
@@ -37,7 +38,7 @@ public class BGPv4Client {
 	private Channel clientChannel;
 	private ChannelFactory channelFactory;
 
-	public void startClient(BGPv4ClientConfiguration configuration) {
+	public void startClient(BGPv4PeerConfiguration configuration) {
 		validateServer.setConfiguration(configuration);
 		
 		channelFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());

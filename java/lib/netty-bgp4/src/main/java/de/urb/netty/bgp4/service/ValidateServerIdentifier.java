@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.urb.netty.bgp4.client;
+package de.urb.netty.bgp4.service;
 
 import javax.inject.Inject;
 
@@ -10,6 +10,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 
+import de.urb.netty.bgp4.BGPv4PeerConfiguration;
 import de.urb.netty.bgp4.protocol.OpenPacket;
 
 /**
@@ -23,7 +24,7 @@ import de.urb.netty.bgp4.protocol.OpenPacket;
 public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 	private @Inject Logger log;
 
-	private BGPv4ClientConfiguration configuration;
+	private BGPv4PeerConfiguration configuration;
 	private boolean isClosed;
 	
 	/* (non-Javadoc)
@@ -70,7 +71,7 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 	/**
 	 * @param configuration the configuration to set
 	 */
-	public void setConfiguration(BGPv4ClientConfiguration configuration) {
+	public void setConfiguration(BGPv4PeerConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
