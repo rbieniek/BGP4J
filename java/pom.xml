@@ -128,7 +128,7 @@
     <version.org.codehaus.mojo.appassembler_maven_plugin>1.0</version.org.codehaus.mojo.appassembler_maven_plugin>
     <version.org.hibernate.validator>4.2.0.Final</version.org.hibernate.validator>
     <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
-    <version.org.jboss.netty>3.3.0.Final</version.org.jboss.netty>
+    <version.io.netty>3.3.0.Final</version.io.netty>
     <version.org.jboss.spec.bom>2.0.0.Final</version.org.jboss.spec.bom>
     <version.org.jboss.weld.api.bom>1.1.Final</version.org.jboss.weld.api.bom>
     <version.org.jboss.weld.core.bom>1.1.4.Final</version.org.jboss.weld.core.bom>
@@ -217,9 +217,9 @@
 	<version>${version.org.jboss.arquillian}</version>
       </dependency>
       <dependency>
-	<groupId>org.jboss.netty</groupId>
+	<groupId>io.netty</groupId>
 	<artifactId>netty</artifactId>
-	<version>${version.org.jboss.netty}</version>
+	<version>${version.io.netty}</version>
       </dependency>
      <dependency>
 	<groupId>org.jboss.seam</groupId>
