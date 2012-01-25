@@ -3,29 +3,42 @@
  */
 package de.urb.netty.bgp4.client;
 
-import java.net.InetSocketAddress;
+import de.urb.netty.bgp4.BGPv4Configuration;
 
 /**
  * @author rainer
  *
  */
-public class BGPv4ClientConfiguration {
-
-	private InetSocketAddress bgpv4Server;
+public class BGPv4ClientConfiguration extends BGPv4Configuration {
+	private int remoteBgpIdentitifer;
+	private int remoteAutonomousSystem;
 
 	/**
-	 * @return the bgpv4Server
+	 * @return the remoteBgpIdentitifer
 	 */
-	public InetSocketAddress getBgpv4Server() {
-		return bgpv4Server;
+	public int getRemoteBgpIdentitifer() {
+		return remoteBgpIdentitifer;
 	}
 
 	/**
-	 * @param bgpv4Server the bgpv4Server to set
+	 * @param remoteBgpIdentitifer the remoteBgpIdentitifer to set
 	 */
-	public void setBgpv4Server(InetSocketAddress bgpv4Server) {
-		this.bgpv4Server = bgpv4Server;
+	public void setRemoteBgpIdentitifer(int remoteBgpIdentitifer) {
+		this.remoteBgpIdentitifer = remoteBgpIdentitifer;
 	}
-	
+
+	/**
+	 * @return the remoteAutonomousSystem
+	 */
+	public int getRemoteAutonomousSystem() {
+		return remoteAutonomousSystem;
+	}
+
+	/**
+	 * @param remoteAutonomousSystem the remoteAutonomousSystem to set
+	 */
+	public void setRemoteAutonomousSystem(int remoteAutonomousSystem) {
+		this.remoteAutonomousSystem = remoteAutonomousSystem;
+	}
 	
 }

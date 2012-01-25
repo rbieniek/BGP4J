@@ -5,6 +5,7 @@ package de.urb.netty.bgp4.client;
 
 import java.util.concurrent.Executors;
 
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -17,6 +18,10 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
+import de.urb.netty.bgp4.fsm.BGPv4FSM;
+import de.urb.netty.bgp4.protocol.BGPv4Codec;
+import de.urb.netty.bgp4.protocol.BGPv4Reframer;
+
 /**
  * @author rainer
  *
@@ -24,12 +29,17 @@ import org.slf4j.Logger;
 public class BGPv4Client {
 	private @Inject Logger log;
 
-	private @Inject BGPv4ClientFSM bgp4fsm;
+	private @Inject @New BGPv4FSM bgp4fsm;
+	private @Inject @New BGPv4Codec codec;
+	private @Inject @New ValidateServerIdentifier validateServer;
+	private @Inject BGPv4Reframer reframer;
 	
 	private Channel clientChannel;
 	private ChannelFactory channelFactory;
 
 	public void startClient(BGPv4ClientConfiguration configuration) {
+		validateServer.setConfiguration(configuration);
+		
 		channelFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 		
 		ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
@@ -39,6 +49,9 @@ public class BGPv4Client {
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
 				return Channels.pipeline(
+						reframer,
+						codec,
+						validateServer,
 						bgp4fsm
 						);
 			}
@@ -76,7 +89,7 @@ public class BGPv4Client {
 
 	public void stopClient() {
 		if(clientChannel != null) {
-			clientChannel.getCloseFuture().awaitUninterruptibly();
+			clientChannel.close().awaitUninterruptibly();
 			this.clientChannel = null;
 			
 			channelFactory.releaseExternalResources();

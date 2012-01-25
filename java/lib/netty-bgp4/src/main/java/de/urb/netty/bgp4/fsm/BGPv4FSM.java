@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.urb.netty.bgp4.client;
+package de.urb.netty.bgp4.fsm;
 
 import org.jboss.netty.channel.SimpleChannelHandler;
 
@@ -9,6 +9,6 @@ import org.jboss.netty.channel.SimpleChannelHandler;
  * @author rainer
  *
  */
-public class BGPv4ClientFSM extends SimpleChannelHandler {
+public class BGPv4FSM extends SimpleChannelHandler {
 
 }
