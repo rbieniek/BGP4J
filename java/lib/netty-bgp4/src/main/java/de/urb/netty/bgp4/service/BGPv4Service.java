@@ -3,104 +3,137 @@
  */
 package de.urb.netty.bgp4.service;
 
-import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
+import de.urb.netty.bgp4.BGPv4Configuration;
 import de.urb.netty.bgp4.BGPv4PeerConfiguration;
-import de.urb.netty.bgp4.fsm.BGPv4FSM;
-import de.urb.netty.bgp4.protocol.BGPv4Codec;
-import de.urb.netty.bgp4.protocol.BGPv4Reframer;
+import de.urb.netty.bgp4.PeerConfigurationChangedListener;
 
 /**
  * @author rainer
  *
  */
 public class BGPv4Service {
-	private @Inject Logger log;
-
-	private @Inject @New BGPv4FSM bgp4fsm;
-	private @Inject @New BGPv4Codec codec;
-	private @Inject @New ValidateServerIdentifier validateServer;
-	private @Inject BGPv4Reframer reframer;
 	
-	private Channel clientChannel;
-	private ChannelFactory channelFactory;
+	private class ConfigurationChangeListener implements PeerConfigurationChangedListener {
 
-	public void startClient(BGPv4PeerConfiguration configuration) {
-		validateServer.setConfiguration(configuration);
-		
-		channelFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-		
-		ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
-
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+		@Override
+		public void peerAdded(BGPv4PeerConfiguration peerConfiguration) {
+			BGPv4Client client = clientProvider.get();
 			
-			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(
-						reframer,
-						codec,
-						validateServer,
-						bgp4fsm
-						);
+			client.setPeerConfiguration(peerConfiguration);
+			peerInstances.put(client.getClientUuid(), client);
+
+			client.startClient();
+		}
+
+		@Override
+		public void peerRemoved(BGPv4PeerConfiguration peerConfiguration) {
+			synchronized (scheduledReconnectInstances) {
+				List<ReconnectSchedule> removedInstances = new LinkedList<ReconnectSchedule>();
+				
+				for(ReconnectSchedule schedule : scheduledReconnectInstances) {
+					if(schedule.getClient().getPeerConfiguration().equals(peerConfiguration))
+						removedInstances.add(schedule);
+				}
+				
+				for(ReconnectSchedule schedule : removedInstances) {
+					scheduledReconnectInstances.remove(schedule);
+				}
 			}
-		});
-
-		bootstrap.setOption("tcpnoDelay", true);
-		bootstrap.setOption("keepAlive", true);
 		
-		boolean connected = false;
-		
-		while(!connected) {
-			ChannelFuture future = bootstrap.connect(configuration.getBgpv4Server());
-
-			try {
-				future = future.await();
-			} catch(InterruptedException e) {
-				log.info("caught interrupt", e);
+			List<String> removedClientIds = new LinkedList<String>();
+			
+			for(String clientUuid : peerInstances.keySet()) {
+				if(peerInstances.get(clientUuid).getPeerConfiguration().equals(peerConfiguration))
+					removedClientIds.add(clientUuid);
 			}
 			
-			if(future.isDone()) {
-				if(future.isSuccess()) {
-					connected = true;
-					this.clientChannel = future.getChannel();
-				} else {
-					log.warn("Cannot connect to zebra server", future.getCause());
+			for(String clientUuid : removedClientIds) {
+				peerInstances.get(clientUuid).stopClient();
+				peerInstances.remove(clientUuid);
+			}
+		}		
+	}
+	
+	private class ReconnectClientTask extends TimerTask {
+
+		@Override
+		public void run() {
+			synchronized (scheduledReconnectInstances) {
+				long stamp = System.currentTimeMillis();
+				List<ReconnectSchedule> dueInstances = new LinkedList<ReconnectSchedule>();
+				
+				for(ReconnectSchedule schedule : scheduledReconnectInstances) {
+					if(stamp > schedule.getRescheduleWhen()) {
+						dueInstances.add(schedule);
+					}
+				}
+				
+				for(ReconnectSchedule schedule : dueInstances) {
+					BGPv4Client client = schedule.getClient();
 					
-					// sleep for one second and retry
-					try {
-						Thread.sleep(1000);
-					} catch(InterruptedException e) {}
+					log.info("attempt to reconnect client " + client.getClientUuid());
+					client.startClient();
+					
+					scheduledReconnectInstances.remove(schedule);
 				}
 			}
 		}
-	}
 
-	public void stopClient() {
-		if(clientChannel != null) {
-			clientChannel.close().awaitUninterruptibly();
-			this.clientChannel = null;
+	}
+	
+	private @Inject Logger log;
+
+	private @Inject @New Instance<BGPv4Client> clientProvider;
+	private @Inject Instance<BGPv4Server> serverProvider;
+	
+	private Map<String, BGPv4Client> peerInstances = new HashMap<String, BGPv4Client>();
+	private BGPv4Server serverInstance;
+	private List<ReconnectSchedule> scheduledReconnectInstances = new LinkedList<ReconnectSchedule>();
+	private Timer timer = new Timer(true);
+	
+	public void startService(BGPv4Configuration configuration) {
+		configuration.addListener(new ConfigurationChangeListener());
+		
+		timer.scheduleAtFixedRate(new ReconnectClientTask(), 5000L, 5000L);
+		
+		if(configuration.getBgpv4Server() != null) {
+			log.info("starting local BGPv4 server");
 			
-			channelFactory.releaseExternalResources();
-			this.channelFactory = null;
+			this.serverInstance = serverProvider.get();
+			serverInstance.setConfiguration(configuration);
+			
+			serverInstance.startServer();
+		}
+		
+		for(BGPv4PeerConfiguration peerConfiguration : configuration.getPeers()) {
+			BGPv4Client client = clientProvider.get();
+			
+			client.setPeerConfiguration(peerConfiguration);
+			peerInstances.put(client.getClientUuid(), client);
+
+			client.startClient();
 		}
 	}
 	
-	public void waitForChannelClose() {
-		if(this.clientChannel != null) {
-			this.clientChannel.getCloseFuture().awaitUninterruptibly();
+	public void handleReconnectNeeded(@Observes ClientNeedReconnectEvent event) {
+		if(peerInstances.containsKey(event.getClientUuid())) {
+			BGPv4Client peerInstance = peerInstances.get(event.getClientUuid()); 
+			
+			this.scheduledReconnectInstances.add(new ReconnectSchedule(peerInstance));
 		}
 	}
 }

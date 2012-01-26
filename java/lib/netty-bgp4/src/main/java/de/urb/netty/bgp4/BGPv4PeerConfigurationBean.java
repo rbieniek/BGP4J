@@ -5,6 +5,8 @@ package de.urb.netty.bgp4;
 
 import java.net.InetSocketAddress;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 
 /**
  * @author rainer
@@ -14,6 +16,7 @@ public class BGPv4PeerConfigurationBean implements BGPv4PeerConfiguration {
 	private int localBgpIdentifier;
 	private int localAutonomousSystem;
 	private int localHoldTime;
+	private int connectRetryInterval;
 
 	private InetSocketAddress remotePeerAddress;
 	private int remoteBgpIdentitifer;
@@ -108,5 +111,38 @@ public class BGPv4PeerConfigurationBean implements BGPv4PeerConfiguration {
 	public void setLocalHoldTime(int localHoldTime) {
 		this.localHoldTime = localHoldTime;
 	}
+
+	/**
+	 * @return the connectRetryInterval
+	 */
+	public int getConnectRetryInterval() {
+		return connectRetryInterval;
+	}
+
+	/**
+	 * @param connectRetryInterval the connectRetryInterval to set
+	 */
+	public void setConnectRetryInterval(int connectRetryInterval) {
+		this.connectRetryInterval = connectRetryInterval;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		BGPv4PeerConfiguration c = (BGPv4PeerConfiguration)obj;
+		
+		return (new EqualsBuilder())
+				.append(getConnectRetryInterval(), c.getConnectRetryInterval())
+				.append(getLocalAutonomousSystem(), c.getLocalAutonomousSystem())
+				.append(getLocalBgpIdentifier(), c.getLocalBgpIdentifier())
+				.append(getLocalHoldTime(), c.getLocalHoldTime())
+				.append(getRemoteAutonomousSystem(), c.getRemoteAutonomousSystem())
+				.append(getRemoteBgpIdentitifer(), c.getRemoteBgpIdentitifer())
+				.append(getRemotePeerAddress(), c.getRemotePeerAddress())
+				.isEquals();
+	}
+	
 	
 }

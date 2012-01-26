@@ -2,6 +2,14 @@ package de.urb.netty.bgp4;
 
 import java.net.InetSocketAddress;
 
+/**
+ * Configuration for a BGPv4 peer.
+ *
+ * The peer configuration <b>MUST</b> implement <code>equals</code> properly.
+ * 
+ * @author rainer
+ *
+ */
 public interface BGPv4PeerConfiguration {
 
 	/**
@@ -34,4 +42,9 @@ public interface BGPv4PeerConfiguration {
 	 */
 	public abstract int getLocalHoldTime();
 
+	/**
+	 * retry interval for establishing a connection to the remote peer
+	 * @return
+	 */
+	public abstract int getConnectRetryInterval();
 }

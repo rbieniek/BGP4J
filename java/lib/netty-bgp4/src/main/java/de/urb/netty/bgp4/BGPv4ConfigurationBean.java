@@ -17,7 +17,7 @@ import java.util.List;
 public class BGPv4ConfigurationBean implements BGPv4Configuration {
 
 	private List<PeerConfigurationChangedListener> listeners = new LinkedList<PeerConfigurationChangedListener>();
-	private InetSocketAddress localBgpServer = new InetSocketAddress(BGPv4Constants.BGP_PORT);
+	private InetSocketAddress localBgpServer;
 	private List<BGPv4PeerConfiguration> peers = new LinkedList<BGPv4PeerConfiguration>();
 
 	/* (non-Javadoc)
