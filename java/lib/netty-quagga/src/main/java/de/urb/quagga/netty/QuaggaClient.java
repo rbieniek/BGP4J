@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
+import org.bgp4j.weld.Config;
+import org.bgp4j.weld.Configuration;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -19,8 +21,6 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
-import de.urb.quagga.weld.Config;
-import de.urb.quagga.weld.Configuration;
 
 /**
  * @author rainer

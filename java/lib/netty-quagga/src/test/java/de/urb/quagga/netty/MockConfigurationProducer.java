@@ -3,8 +3,8 @@
  */
 package de.urb.quagga.netty;
 
-import de.urb.quagga.weld.Configuration;
-import de.urb.quagga.weld.ConfigurationProducer;
+import org.bgp4j.weld.Configuration;
+import org.bgp4j.weld.ConfigurationProducer;
 
 /**
  * @author rainer
