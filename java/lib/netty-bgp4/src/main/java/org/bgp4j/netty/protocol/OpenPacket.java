@@ -6,13 +6,17 @@ package org.bgp4j.netty.protocol;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.netty.BGPv4Constants;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+
 /**
  * @author rainer
  *
  */
 public class OpenPacket extends BGPv4Packet {
 	private int protocolVersion;
-	private int autonomuosSystem;
+	private int autonomousSystem;
 	private int holdTime;
 	private int bgpIdentifier;
 	private List<Capability> capabilities = new LinkedList<Capability>();
@@ -35,14 +39,14 @@ public class OpenPacket extends BGPv4Packet {
 	 * @return the autonomuosSystem
 	 */
 	public int getAutonomuosSystem() {
-		return autonomuosSystem;
+		return autonomousSystem;
 	}
 	
 	/**
 	 * @param autonomuosSystem the autonomuosSystem to set
 	 */
 	public void setAutonomuosSystem(int autonomuosSystem) {
-		this.autonomuosSystem = autonomuosSystem;
+		this.autonomousSystem = autonomuosSystem;
 	}
 	
 	/**
@@ -85,5 +89,28 @@ public class OpenPacket extends BGPv4Packet {
 	 */
 	public void setCapabilities(List<Capability> capabilities) {
 		this.capabilities = capabilities;
+	}
+
+	@Override
+	protected ChannelBuffer encodePayload() {
+		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
+		
+		buffer.writeByte(getProtocolVersion());
+		buffer.writeShort(getAutonomuosSystem());
+		buffer.writeShort(getHoldTime());
+		buffer.writeInt(getBgpIdentifier());
+		
+		ChannelBuffer capabilities = Capability.encodeCapabilities(getCapabilities());
+		
+		buffer.writeByte(capabilities.readableBytes());
+		if(capabilities.readableBytes() > 0)
+			buffer.writeBytes(capabilities);
+		
+		return buffer;
+	}
+
+	@Override
+	protected int getType() {
+		return BGPv4Constants.BGP_PACKET_TYPE_OPEN;
 	}
 }

@@ -25,7 +25,6 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 	private @Inject Logger log;
 
 	private BGPv4PeerConfiguration configuration;
-	private boolean isClosed;
 	
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelUpstreamHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
@@ -33,13 +32,6 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		boolean doClose = false;
-
-		if(isClosed) {
-			log.info("channel is closed, dropping packet {}", e.getMessage().getClass().getName());
-			
-			return;
-		}
-		
 		if(e.getMessage() instanceof OpenPacket) {
 			OpenPacket openPacket = (OpenPacket)e.getMessage();
 			
@@ -59,8 +51,6 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 		}
 		
 		if(doClose) {
-			isClosed = true;
-			
 			ctx.getChannel().close();
 		} else {
 			ctx.sendUpstream(e);

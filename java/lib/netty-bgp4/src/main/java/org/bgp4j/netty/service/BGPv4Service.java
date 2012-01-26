@@ -85,8 +85,10 @@ public class BGPv4Service {
 				for(ReconnectSchedule schedule : dueInstances) {
 					BGPv4Client client = schedule.getClient();
 					
-					log.info("attempt to reconnect client " + client.getClientUuid());
-					client.startClient();
+					if(!peerConnectionRegistry.isPeerRegistered(client.getPeerConfiguration().getRemotePeerAddress())) {
+						log.info("attempt to reconnect client " + client.getClientUuid());
+						client.startClient();
+					}
 					
 					scheduledReconnectInstances.remove(schedule);
 				}
@@ -99,12 +101,18 @@ public class BGPv4Service {
 
 	private @Inject @New Instance<BGPv4Client> clientProvider;
 	private @Inject Instance<BGPv4Server> serverProvider;
+	private @Inject PeerConnectionRegistry peerConnectionRegistry;
 	
 	private Map<String, BGPv4Client> peerInstances = new HashMap<String, BGPv4Client>();
 	private BGPv4Server serverInstance;
 	private List<ReconnectSchedule> scheduledReconnectInstances = new LinkedList<ReconnectSchedule>();
 	private Timer timer = new Timer(true);
-	
+
+	/**
+	 * start the service
+	 * 
+	 * @param configuration the initial service configuration
+	 */
 	public void startService(BGPv4Configuration configuration) {
 		configuration.addListener(new ConfigurationChangeListener());
 		
@@ -127,6 +135,24 @@ public class BGPv4Service {
 
 			client.startClient();
 		}
+	}
+
+	/**
+	 * stop the running service
+	 * 
+	 */
+	public void stopService() {
+		if(serverInstance != null)
+			serverInstance.stopServer();
+
+		List<String> clientUuids = new LinkedList<String>(peerInstances.keySet());
+		
+		for(String clientUuid : clientUuids) {
+			BGPv4Client client = peerInstances.remove(clientUuid);
+			
+			client.stopClient();
+		}
+		
 	}
 	
 	public void handleReconnectNeeded(@Observes ClientNeedReconnectEvent event) {

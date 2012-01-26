@@ -4,7 +4,6 @@
 package org.bgp4j.netty.service;
 
 import java.util.UUID;
-import java.util.concurrent.Executors;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.New;
@@ -22,7 +21,6 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 
 
@@ -35,8 +33,9 @@ public class BGPv4Client {
 
 	private @Inject @New BGPv4FSM bgp4fsm;
 	private @Inject BGPv4Codec codec;
-	private @Inject @New ValidateServerIdentifier validateServer;
+	private @Inject ValidateServerIdentifier validateServer;
 	private @Inject BGPv4Reframer reframer;
+	private @Inject DuplicateConnectionBlocker duplicateBlocker;
 	private @Inject Event<ClientNeedReconnectEvent> reconnectEvent;
 	private @Inject @ClientFactory ChannelFactory channelFactory;
 	
@@ -55,6 +54,7 @@ public class BGPv4Client {
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
 				return Channels.pipeline(
+						duplicateBlocker,
 						reframer,
 						codec,
 						validateServer,

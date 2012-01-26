@@ -22,4 +22,9 @@ public class BGPv4Server {
 		
 	}
 
+	public void stopServer() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
