@@ -197,6 +197,9 @@ public class BGPv4Constants {
 	/** Minimum NOTIFICATION packet size including header (RFC 4271) */
 	public static final int BGP_PACKET_MIN_SIZE_NOTIFICATION = 21;
 	
+	/** Minimum NOTIFICATION packet size including header (RFC 4271) */
+	public static final int BGP_PACKET_MIN_SIZE_UPDATE = 23;
+	
 	/** KEEPALIVE packet size including header (RFC 4271) */
 	public static final int BGP_PACKET_SIZE_KEEPALIVE = 19;
 	

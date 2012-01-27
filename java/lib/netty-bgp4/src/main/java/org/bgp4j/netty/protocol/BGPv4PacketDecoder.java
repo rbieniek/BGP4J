@@ -3,8 +3,14 @@
  */
 package org.bgp4j.netty.protocol;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author rainer
@@ -21,6 +27,7 @@ public class BGPv4PacketDecoder {
 			packet = decodeOpenPacket(buffer);
 			break;
 		case BGPv4Constants.BGP_PACKET_TYPE_UPDATE:
+			packet = decodeUpdatePacket(buffer);
 			break;
 		case BGPv4Constants.BGP_PACKET_TYPE_NOTIFICATION:
 			packet = decodeNotificationPacket(buffer);
@@ -37,6 +44,96 @@ public class BGPv4PacketDecoder {
 		return packet;
 	}
 	
+	private BGPv4Packet decodeUpdatePacket(ChannelBuffer buffer) {
+		UpdatePacket packet = new UpdatePacket();
+		
+		verifyPacketSize(buffer, BGPv4Constants.BGP_PACKET_MIN_SIZE_UPDATE, -1);
+		
+		int totalAvailable = buffer.readableBytes();
+		
+		// handle withdrawn routes
+		int withdrawnOctets = buffer.readUnsignedShort();
+		
+		if(withdrawnOctets > 0) {
+			ChannelBuffer withdrawnBuffer = ChannelBuffers.buffer(withdrawnOctets);
+			
+			buffer.readBytes(withdrawnBuffer);
+			
+			try {
+				packet.getWithdrawnRoutes().addAll(decodeWithdrawnRoutes(withdrawnBuffer));
+			} catch(IndexOutOfBoundsException e) {
+				throw new ProtocolPacketFormatMessageLengthException(withdrawnOctets);
+			}
+		}
+		
+		// handle path attributes
+		int pathAttributeOctets =  buffer.readUnsignedShort();
+		
+		if(pathAttributeOctets > 0) {
+			ChannelBuffer pathAttributesBuffer = ChannelBuffers.buffer(pathAttributeOctets);
+			
+			buffer.readBytes(pathAttributesBuffer);
+			
+			// now decode path attributes
+		}
+		
+		// handle network layer reachability information
+		try {
+			while(buffer.readable()) {
+				int prefixLength = buffer.readUnsignedByte();
+				NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation();
+				
+				nlri.setPrefixLength(prefixLength);
+				
+				if(prefixLength > 0) {
+					int prefixBytes = ((prefixLength-1)/8)+1;
+					byte[] addressBytes = new byte[4];
+					
+					buffer.readBytes(addressBytes, 0, prefixBytes);
+					
+					try {
+						nlri.setPrefix((Inet4Address)Inet4Address.getByAddress(addressBytes));
+					} catch (UnknownHostException e) {
+					}
+				}
+				
+				packet.getNlris().add(nlri);
+				
+			}
+		} catch (IndexOutOfBoundsException e) {
+			throw new ProtocolPacketFormatMessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
+		}
+
+		return packet;
+	}
+	
+	private List<WithdrawnRoute> decodeWithdrawnRoutes(ChannelBuffer buffer)  {
+		List<WithdrawnRoute> routes = new LinkedList<WithdrawnRoute>();
+		
+		while(buffer.readable()) {
+			int prefixLength = buffer.readUnsignedByte();
+			WithdrawnRoute route = new WithdrawnRoute();
+			
+			route.setPrefixLength(prefixLength);
+			
+			if(prefixLength > 0) {
+				int prefixBytes = ((prefixLength-1)/8)+1;
+				byte[] addressBytes = new byte[4];
+				
+				buffer.readBytes(addressBytes, 0, prefixBytes);
+				
+				try {
+					route.setPrefix((Inet4Address)Inet4Address.getByAddress(addressBytes));
+				} catch (UnknownHostException e) {
+				}
+			}
+			
+			routes.add(route);
+			
+		}
+		return routes;
+	}
+	
 	/**
 	 * decode the NOTIFICATION network packet. The NOTIFICATION packet must be at least 2 octets large at this point.
 	 * 
@@ -46,7 +143,7 @@ public class BGPv4PacketDecoder {
 	private BGPv4Packet decodeNotificationPacket(ChannelBuffer buffer) {
 		NotificationPacket packet = null;
 		
-		verifyPacketSize(buffer, BGPv4Constants.BGP_PACKET_MIN_SIZE_OPEN, -1);
+		verifyPacketSize(buffer, BGPv4Constants.BGP_PACKET_MIN_SIZE_NOTIFICATION, -1);
 		
 		int errorCode = buffer.readUnsignedByte();
 		int errorSubcode = buffer.readUnsignedByte();
