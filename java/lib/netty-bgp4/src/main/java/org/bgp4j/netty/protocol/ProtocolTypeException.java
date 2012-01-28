@@ -7,7 +7,7 @@ package org.bgp4j.netty.protocol;
  * @author rainer
  *
  */
-public class ProtocolPacketFormatTypeException extends ProtocolPacketFormatException {
+public class ProtocolTypeException extends ProtocolPacketFormatException {
 
 	/**
 	 * 
@@ -19,20 +19,20 @@ public class ProtocolPacketFormatTypeException extends ProtocolPacketFormatExcep
 	/**
 	 * 
 	 */
-	public ProtocolPacketFormatTypeException() {
+	public ProtocolTypeException() {
 	}
 
 	/**
 	 * 
 	 */
-	public ProtocolPacketFormatTypeException(int type) {
+	public ProtocolTypeException(int type) {
 		this.type = type;
 	}
 
 	/**
 	 * @param message
 	 */
-	public ProtocolPacketFormatTypeException(String message, int type) {
+	public ProtocolTypeException(String message, int type) {
 		super(message);
 		
 		this.type = type;

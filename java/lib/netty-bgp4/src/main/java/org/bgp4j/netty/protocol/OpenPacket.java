@@ -17,6 +17,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
 public class OpenPacket extends BGPv4Packet {
 	private int protocolVersion;
 	private int autonomousSystem;
+	private int as4AutonomousSystem = -1;
 	private int holdTime;
 	private int bgpIdentifier;
 	private List<Capability> capabilities = new LinkedList<Capability>();
@@ -38,14 +39,14 @@ public class OpenPacket extends BGPv4Packet {
 	/**
 	 * @return the autonomuosSystem
 	 */
-	public int getAutonomuosSystem() {
+	public int getAutonomousSystem() {
 		return autonomousSystem;
 	}
 	
 	/**
 	 * @param autonomuosSystem the autonomuosSystem to set
 	 */
-	public void setAutonomuosSystem(int autonomuosSystem) {
+	public void setAutonomousSystem(int autonomuosSystem) {
 		this.autonomousSystem = autonomuosSystem;
 	}
 	
@@ -96,7 +97,7 @@ public class OpenPacket extends BGPv4Packet {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		
 		buffer.writeByte(getProtocolVersion());
-		buffer.writeShort(getAutonomuosSystem());
+		buffer.writeShort(getAutonomousSystem());
 		buffer.writeShort(getHoldTime());
 		buffer.writeInt(getBgpIdentifier());
 		
@@ -112,5 +113,33 @@ public class OpenPacket extends BGPv4Packet {
 	@Override
 	protected int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_OPEN;
+	}
+
+	/**
+	 * @return the as4AutonomousSystem
+	 */
+	public int getAs4AutonomousSystem() {
+		return as4AutonomousSystem;
+	}
+
+	/**
+	 * @param as4AutonomousSystem the as4AutonomousSystem to set
+	 */
+	public void setAs4AutonomousSystem(int as4AutonomousSystem) {
+		this.as4AutonomousSystem = as4AutonomousSystem;
+	}
+	
+	/**
+	 * get the effective autonomous system number. RFC 4893 defines that the AS OPEN field carries the
+	 * magic number AS_TRANS and the the four-byte AS number is carried in capability field if the speakers
+	 * support four-byte AS numbers
+	 * 
+	 * @return
+	 */
+	public int getEffectiveAutonomousSystem() {
+		if(getAutonomousSystem() == BGPv4Constants.BGP_AS_TRANS)
+			return getAs4AutonomousSystem();
+		else
+			return getAutonomousSystem();
 	}
 }

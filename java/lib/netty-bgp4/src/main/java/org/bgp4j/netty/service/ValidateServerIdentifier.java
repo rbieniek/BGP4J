@@ -41,10 +41,10 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 				doClose = true;
 			}
 
-			if(openPacket.getAutonomuosSystem() != configuration.getRemoteAutonomousSystem()) {	
+			if(openPacket.getEffectiveAutonomousSystem() != configuration.getRemoteAutonomousSystem()) {	
 				log.error("expected remote autonomous systemr {}, received autonomous system {}", 
 						configuration.getRemoteAutonomousSystem(), 
-						openPacket.getAutonomuosSystem());
+						openPacket.getEffectiveAutonomousSystem());
 				
 				doClose = true;
 			}

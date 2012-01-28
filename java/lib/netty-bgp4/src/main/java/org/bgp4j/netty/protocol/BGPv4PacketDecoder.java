@@ -38,7 +38,7 @@ public class BGPv4PacketDecoder {
 		case BGPv4Constants.BGP_PACKET_TYPE_ROUTE_REFRESH:
 			break;
 		default:
-			throw new ProtocolPacketFormatTypeException(type);
+			throw new ProtocolTypeException(type);
 		}
 		
 		return packet;
@@ -62,7 +62,7 @@ public class BGPv4PacketDecoder {
 			try {
 				packet.getWithdrawnRoutes().addAll(decodeWithdrawnRoutes(withdrawnBuffer));
 			} catch(IndexOutOfBoundsException e) {
-				throw new ProtocolPacketFormatMessageLengthException(withdrawnOctets);
+				throw new MessageLengthException(withdrawnOctets);
 			}
 		}
 		
@@ -73,6 +73,11 @@ public class BGPv4PacketDecoder {
 			ChannelBuffer pathAttributesBuffer = ChannelBuffers.buffer(pathAttributeOctets);
 			
 			buffer.readBytes(pathAttributesBuffer);
+			try {
+				
+			} catch(IndexOutOfBoundsException ex) {
+				throw new MalformedAttributeListException();
+			}
 			
 			// now decode path attributes
 		}
@@ -101,7 +106,7 @@ public class BGPv4PacketDecoder {
 				
 			}
 		} catch (IndexOutOfBoundsException e) {
-			throw new ProtocolPacketFormatMessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
+			throw new MessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
 		}
 
 		return packet;
@@ -234,15 +239,21 @@ public class BGPv4PacketDecoder {
 		verifyPacketSize(buffer, BGPv4Constants.BGP_PACKET_MIN_SIZE_OPEN, -1);
 		
 		packet.setProtocolVersion(buffer.readUnsignedByte());
-		packet.setAutonomuosSystem(buffer.readUnsignedShort());
+		packet.setAutonomousSystem(buffer.readUnsignedShort());
 		packet.setHoldTime(buffer.readUnsignedShort());
-		packet.setAutonomuosSystem(buffer.readInt());
+		packet.setAutonomousSystem(buffer.readInt());
 		
 		int capabilitiesLength = buffer.readUnsignedByte();
 		
 		if(capabilitiesLength > 0) {
 			while(buffer.readable()) {
 				packet.getCapabilities().add(Capability.decodeCapability(buffer));
+			}
+		}
+		
+		for(Capability cap : packet.getCapabilities()) {
+			if(cap instanceof AutonomousSystem4Capability) {
+				packet.setAs4AutonomousSystem(((AutonomousSystem4Capability)cap).getAutonomousSystem());
 			}
 		}
 		
@@ -272,13 +283,13 @@ public class BGPv4PacketDecoder {
 	private void verifyPacketSize(ChannelBuffer buffer, int minimumPacketSize, int maximumPacketSize) {
 		if(minimumPacketSize != -1) {
 			if(buffer.readableBytes() < (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new ProtocolPacketFormatMessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+				throw new MessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
 						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
 			}
 		}
 		if(maximumPacketSize != -1) {
 			if(buffer.readableBytes() > (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new ProtocolPacketFormatMessageLengthException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+				throw new MessageLengthException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
 						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
 			}
 		}

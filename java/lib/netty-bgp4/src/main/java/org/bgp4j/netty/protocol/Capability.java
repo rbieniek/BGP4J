@@ -56,6 +56,9 @@ public abstract class Capability {
 		case BGPv4Constants.BGP_CAPABILITY_TYPE_ROUTE_REFRESH:
 			cap = new RouteRefreshCapability();
 			break;
+		case BGPv4Constants.BGP_CAPABILITY_TYPE_AS4_NUMBERS:
+			cap = new AutonomousSystem4Capability();
+			break;
 		default:
 			cap = new UnknownCapability();
 			break;

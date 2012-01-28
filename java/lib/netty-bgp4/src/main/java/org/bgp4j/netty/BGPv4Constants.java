@@ -154,6 +154,9 @@ public class BGPv4Constants {
 	
 	/** supported protocol version */
 	public static final int BGP_VERSION = 4;
+
+	/** Transitive Autonomous System number for 4-byte AS number support (RFC 4893) */
+	public static final int BGP_AS_TRANS = 23456;
 	
 	/** packet marker with all bits set to 1 (RFC 4271) */
 	public static final int BGP_PACKET_MARKER_LENGTH = 16;
@@ -188,6 +191,9 @@ public class BGPv4Constants {
 	/** REFRESH packet type code (RFC 2918) */
 	public static final int BGP_PACKET_TYPE_ROUTE_REFRESH = 5;
 	
+	/** 4-byte Autonomous System numbers capability (RFC 4893) */
+	public static final int BGP_CAPABILITY_TYPE_AS4_NUMBERS = 65;
+	
 	/** ROUTE-REFRESH capability (RFC 2918) */
 	public static final int BGP_CAPABILITY_TYPE_ROUTE_REFRESH = 2;
 	
@@ -221,4 +227,49 @@ public class BGPv4Constants {
 	/** NOTIFICATION error code (RFC 4271) */
 	public static final int BGP_ERROR_CODE_CEASE = 6;
 	
+	/** PATH ATTRIBUTE ORIGIN type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_ORIGIN = 1;
+	
+	/** PATH ATTRIBUTE AS PATH type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS_PATH = 2;
+	
+	/** PATH ATTRIBUTE NEXT_HOP type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_NEXT_HOP = 3;
+
+	/** PATH ATTRIBUTE MULTI_EXIT_DISC type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC = 4;
+
+	/** PATH ATTRIBUTE LOCAL_PREF type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_LOCAL_PREF = 5;
+
+	/** PATH ATTRIBUTE ATOMIC_AGGREGATE type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_ATOMIC_AGGREGATE = 6;
+
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR = 7;
+	
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 1997) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_COMMUNITIES = 8;
+	
+	/** PATH ATTRIBUTE AS PATH type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH = 17;
+
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4271) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR = 18;
+	
+	/** PATH ATTRIBUTE FLAG for OPTIONAL bit (based on 16 bit flags / type code value) */
+	public static  final int BGP_PATH_ATTRIBUTE_OPTIONAL_BIT = 1<<15;
+	
+	/** PATH ATTRIBUTE FLAG for TRANSITIVE bit (based on 16 bit flags / type code value) */
+	public static  final int BGP_PATH_ATTRIBUTE_TRANSITIVE_BIT = 1<<14;
+
+	/** PATH ATTRIBUTE FLAG for PARTIAL bit (based on 16 bit flags / type code value) */
+	public static  final int BGP_PATH_ATTRIBUTE_PARTIAL_BIT = 1<<13;
+
+	/** PATH ATTRIBUTE FLAG for EXTENDED_LENGTH bit (based on 16 bit flags / type code value) */
+	public static  final int BGP_PATH_ATTRIBUTE_EXTENDED_LENGTH_BIT = 1<<12;
+	
+	/** PATH ATTRIBUTE type code mask (based on 16 bit flags / type code value) */
+	public static  final int BGP_PATH_ATTRIBUTE_TYPE_MASK = 0x00ff;
 }
+

@@ -7,7 +7,7 @@ package org.bgp4j.netty.protocol;
  * @author rainer
  *
  */
-public class ProtocolPacketFormatMessageLengthException extends ProtocolPacketFormatException {
+public class MessageLengthException extends ProtocolPacketFormatException {
 
 	/**
 	 * 
@@ -19,20 +19,20 @@ public class ProtocolPacketFormatMessageLengthException extends ProtocolPacketFo
 	/**
 	 * 
 	 */
-	public ProtocolPacketFormatMessageLengthException() {
+	public MessageLengthException() {
 	}
 
 	/**
 	 * 
 	 */
-	public ProtocolPacketFormatMessageLengthException(int length) {
+	public MessageLengthException(int length) {
 		this.length = length;
 	}
 
 	/**
 	 * @param message
 	 */
-	public ProtocolPacketFormatMessageLengthException(String message, int length) {
+	public MessageLengthException(String message, int length) {
 		super(message);
 		
 		this.length = length;
