@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.protocol.OriginPathAttribute.Origin;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -74,7 +75,7 @@ public class BGPv4PacketDecoder {
 			
 			buffer.readBytes(pathAttributesBuffer);
 			try {
-				
+				packet.getPathAttributes().addAll(decodePathAttributes(pathAttributesBuffer));
 			} catch(IndexOutOfBoundsException ex) {
 				throw new MalformedAttributeListException();
 			}
@@ -110,6 +111,107 @@ public class BGPv4PacketDecoder {
 		}
 
 		return packet;
+	}
+	
+	private List<PathAttribute> decodePathAttributes(ChannelBuffer buffer) {
+		List<PathAttribute> attributes = new LinkedList<PathAttribute>();
+		
+		while(buffer.readable()) {
+			buffer.markReaderIndex();
+
+			try {
+				int flagsType = buffer.readUnsignedShort();
+				boolean optional = ((flagsType & BGPv4Constants.BGP_PATH_ATTRIBUTE_OPTIONAL_BIT) != 0);
+				boolean transitive = ((flagsType & BGPv4Constants.BGP_PATH_ATTRIBUTE_TRANSITIVE_BIT) != 0);
+				boolean partial = ((flagsType & BGPv4Constants.BGP_PATH_ATTRIBUTE_PARTIAL_BIT) != 0);
+				int typeCode = (flagsType & BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MASK);
+				int valueLength = 0;
+
+				if ((flagsType & BGPv4Constants.BGP_PATH_ATTRIBUTE_EXTENDED_LENGTH_BIT) != 0)
+					valueLength = buffer.readUnsignedShort();
+				else
+					valueLength = buffer.readUnsignedByte();
+
+				ChannelBuffer valueBuffer = ChannelBuffers.buffer(valueLength);
+
+				buffer.readBytes(valueBuffer);
+
+				PathAttribute attr = null;
+			
+				switch (typeCode) {
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ATOMIC_AGGREGATE:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_COMMUNITIES:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_LOCAL_PREF:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_NEXT_HOP:
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN:
+					attr = decodeOriginPathAttribute(valueBuffer);
+					break;
+				default:
+					attr = new UnknownPathAttribute(typeCode, valueBuffer);
+					break;
+				}
+				attr.setOptional(optional);
+				attr.setTransitive(transitive);
+				attr.setPartial(partial);
+				
+				attributes.add(attr);
+			} catch(PathAttributeException ex) {
+				int endReadIndex = buffer.readerIndex();
+				
+				buffer.resetReaderIndex();
+				
+				int attributeLength = endReadIndex - buffer.readerIndex();
+				byte[] packet = new byte[attributeLength];
+				
+				buffer.readBytes(packet);
+				ex.setOffendingAttribute(packet);
+				
+				throw ex;
+			} catch(IndexOutOfBoundsException ex) {
+				int endReadIndex = buffer.readerIndex();
+				
+				buffer.resetReaderIndex();
+				
+				int attributeLength = endReadIndex - buffer.readerIndex();
+				byte[] packet = new byte[attributeLength];
+				
+				buffer.readBytes(packet);
+
+				throw new PathAttributeLengthException(packet);
+			}
+			
+		}
+		
+		return attributes;
+	}
+	
+	private OriginPathAttribute decodeOriginPathAttribute(ChannelBuffer buffer) {
+		OriginPathAttribute attr = new OriginPathAttribute();
+		
+		if(buffer.readableBytes() != 1)
+			throw new PathAttributeLengthException();
+		
+		try {
+			attr.setOrigin(Origin.fromCode(buffer.readUnsignedByte()));
+		} catch(IllegalArgumentException e) {
+			throw new InvalidOriginException(e);
+		}
+		
+		return attr;
 	}
 	
 	private List<WithdrawnRoute> decodeWithdrawnRoutes(ChannelBuffer buffer)  {
