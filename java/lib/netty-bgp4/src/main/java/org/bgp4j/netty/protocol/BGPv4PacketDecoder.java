@@ -144,8 +144,10 @@ public class BGPv4PacketDecoder {
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR:
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH:
+					attr = decodeASPathAttribute(valueBuffer, true);
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH:
+					attr = decodeASPathAttribute(valueBuffer, false);
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ATOMIC_AGGREGATE:
 					break;
@@ -209,6 +211,37 @@ public class BGPv4PacketDecoder {
 			attr.setOrigin(Origin.fromCode(buffer.readUnsignedByte()));
 		} catch(IllegalArgumentException e) {
 			throw new InvalidOriginException(e);
+		}
+		
+		return attr;
+	}
+	
+	private ASPathAttribute decodeASPathAttribute(ChannelBuffer buffer, boolean fourByteASNumbers) {
+		ASPathAttribute attr = new ASPathAttribute(fourByteASNumbers);
+		
+		try {
+			attr.setType(ASPathAttribute.Type.fromCode(buffer.readUnsignedByte()));
+			
+			int asCount = buffer.readUnsignedByte();
+			
+			for(int i=0; i<asCount; i++) {
+				int as;
+				
+				if(fourByteASNumbers)
+					as = (int)buffer.readUnsignedInt();
+				else
+					as = buffer.readUnsignedShort();
+				
+				attr.getAses().add(as);
+			}
+
+			// if there are more octets to read at this point, the packet is malformed
+			if(buffer.readable())
+				throw new MalformedASPathAttributeException();
+		} catch(IllegalArgumentException e) {
+			throw new MalformedASPathAttributeException(e);
+		} catch(IndexOutOfBoundsException e) {
+			throw new MalformedASPathAttributeException(e);
 		}
 		
 		return attr;
