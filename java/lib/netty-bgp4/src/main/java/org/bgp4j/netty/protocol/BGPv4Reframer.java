@@ -56,8 +56,9 @@ public class BGPv4Reframer extends FrameDecoder {
 		if(length < BGPv4Constants.BGP_PACKET_MIN_LENGTH || length > BGPv4Constants.BGP_PACKET_MAX_LENGTH) {
 			log.error("received illegal packet size {}, must be between {} and {}. closing connection", 
 					new Object[] { length, BGPv4Constants.BGP_PACKET_MIN_LENGTH, BGPv4Constants.BGP_PACKET_MAX_LENGTH });
+
+			NotificationHelper.sendNotificationAndCloseChannel(channel, new BadMessageLengthNotificationPacket());
 			
-			channel.close();
 			return null;
 		}
 		
