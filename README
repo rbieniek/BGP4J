@@ -1,0 +1,36 @@
+This the BGP4J project, an implementation of the BGP4 protocol in Java. 
+
+Rationale:
+----------
+This projected was initiated by the need to manipulate routing tables in a fairly exotic use case. 
+
+The first attempt was to talk to a specific routing daemon (quagga) and to reimplement the internal protocol in Java. This protocol is not
+well-documented and it turned out that there was the need to reverse-engineer the quagga code. 
+The reverse engineering could not be done in a feasible timeframe and an alternative approach was chosen.
+
+BGP4 protocol support:
+----------------------
+The BGP4j project tries to implement the following standards or recommendations defined in:
+- RFC 1997: BGP Communities attribute
+- RFC 2858: Multiprotocol extensions for BGP-4
+- RFC 2918: Route refreshment capability for BGP-4
+- RFC 3065: Autonomous System Confederations for BGP
+- RFC 3392: Capability advertisement in BGP-4
+- RFC 4271: Border Gateway Protocol 4
+- RFC 4893: BGP support for four-octet AS Numbers
+- RFC 5668: 4-Octet AS Specific BGP Extended Community
+
+License model:
+--------------
+This software is published under the Apache License 2.0. For details see the included LICENSE file.
+
+External dependencies:
+----------------------
+The project has the following external dependencies:
+- Weld CDI framework (see http://www.seamframework/Weld), licensed under Apache 2.0
+- SLF4J logging framework (see http://www.slf4j.org), licensed under MIT License
+- LOG4j logging framework (see http://logging.apache.org/log4j/), licensed under Apache 2.0
+- Commons CLI (see http://commons.apache.org/cli), licensed under Apache 2.0
+- Commons Lang (see http://commons.apache.org/lang), licensed under Apache 2.0
+- Netty network programming framework (see http://netty.io/), licensed under Apache 2.0
+- SNMP4J (see http://www.snmp4j.org/), licensed under Apache 2.0
