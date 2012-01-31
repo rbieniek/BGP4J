@@ -82,8 +82,8 @@
 	      <extraJvmArguments>-XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:CMSInitiatingOccupancyFraction=80</extraJvmArguments>
               <programs>
         	<program>
-        	  <mainClass>org.bgp4j.apps.dumper.PacketDumper</mainClass>
-        	  <name>PacketDumper</name>
+        	  <mainClass>org.bgp4j.apps.bgpd.BgpDaemon</mainClass>
+        	  <name>BgpDaemon</name>
         	</program>
               </programs>
             </configuration>

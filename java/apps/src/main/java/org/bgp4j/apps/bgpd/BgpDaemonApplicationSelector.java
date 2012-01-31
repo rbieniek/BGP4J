@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.apps.dumper;
+package org.bgp4j.apps.bgpd;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,6 +27,6 @@ import javax.inject.Qualifier;
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DumperApplicationSelector {
+public @interface BgpDaemonApplicationSelector {
 
 }

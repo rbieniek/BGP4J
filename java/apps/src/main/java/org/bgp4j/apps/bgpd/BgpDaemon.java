@@ -13,34 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *  
+ *  File: org.bgp4j.apps.bgpd.BgpDaemon.java
  */
-package org.bgp4j.weld;
+package org.bgp4j.apps.bgpd;
 
-import javax.inject.Singleton;
+import javax.enterprise.util.AnnotationLiteral;
+
+import org.bgp4j.weld.SeApplicationBootstrap;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Singleton
-public class Configuration {
-	public static final int DEFAULT_ZEBRA_PORT = 2600;
-	
-	private int zebraPort = DEFAULT_ZEBRA_PORT;
-
-	/**
-	 * @return the zebraPort
-	 */
-	public int getZebraPort() {
-		return zebraPort;
+public class BgpDaemon {
+	public static void main(String[] args) {
+		SeApplicationBootstrap.bootstrapApplication(args, new AnnotationLiteral<BgpDaemonApplicationSelector>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 4333688934371320506L;
+			
+		});
 	}
 
-	/**
-	 * @param zebraPort the zebraPort to set
-	 */
-	public void setZebraPort(int zebraPort) {
-		this.zebraPort = zebraPort;
-	}
-
-	
 }

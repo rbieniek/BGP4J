@@ -14,22 +14,30 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.weld;
+package org.bgp4j.apps.bgpd;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 
-import javax.inject.Qualifier;
+import org.bgp4j.weld.SeApplicationStartEvent;
+import org.jboss.weld.environment.se.bindings.Parameters;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Qualifier
-@Target( { ElementType.FIELD, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Config {
+public class BgpDaemonApplicationListener {
+	private @Inject Logger log;
+	private @Inject @Parameters String[] commandLine;
 
+	
+	public void listen(@Observes @BgpDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
+		try {
+		} catch(Exception e) {
+			log.error("failed to run client", e);
+			
+			throw e;
+		}
+	}
 }
