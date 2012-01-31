@@ -15,7 +15,6 @@
 
   <modules>
     <module>common-weld</module>
-    <module>netty-quagga</module>
     <module>netty-bgp4</module>
     <module>snmp4j-easybox</module>
   </modules>

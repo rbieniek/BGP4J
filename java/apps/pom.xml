@@ -27,12 +27,6 @@
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
-      <artifactId>netty-quagga</artifactId>
-      <version>${version.de.urb.quagga}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>de.urb.quagga</groupId>
       <artifactId>netty-bgp4</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>
@@ -88,7 +82,7 @@
 	      <extraJvmArguments>-XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:CMSInitiatingOccupancyFraction=80</extraJvmArguments>
               <programs>
         	<program>
-        	  <mainClass>de.urb.quagga.apps.dumper.PacketDumper</mainClass>
+        	  <mainClass>org.bgp4j.apps.dumper.PacketDumper</mainClass>
         	  <name>PacketDumper</name>
         	</program>
               </programs>
