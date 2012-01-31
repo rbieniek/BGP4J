@@ -48,6 +48,10 @@ public class MockChannelSink implements ChannelSink {
 		if(!events.isEmpty())
 			return (T)events.remove(0);
 		else
-			return null;
+			throw new IllegalStateException("empty event queue");
+	}
+	
+	public int getWaitingEventNumber() {
+		return this.events.size();
 	}
 }

@@ -8,6 +8,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -25,7 +26,6 @@ import de.urb.quagga.netty.protocol.ZServInterfaceAddressAddPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceAddressDeletePacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceDownPacket;
 import de.urb.quagga.netty.protocol.ZServInterfaceUpPacket;
-import de.urb.quagga.weld.WeldTestCaseBase;
 
 /**
  * @author rainer

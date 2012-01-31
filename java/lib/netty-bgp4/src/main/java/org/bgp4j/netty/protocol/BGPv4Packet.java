@@ -20,7 +20,7 @@ public abstract class BGPv4Packet {
 	 * @return the encoded packet
 	 */
 	public ChannelBuffer encodePacket() {
-		return wrapBufferHeader(encodePacket(), getType());
+		return wrapBufferHeader(encodePayload(), getType());
 	}
 	
 	/**
@@ -52,6 +52,8 @@ public abstract class BGPv4Packet {
 			buffer.writeByte(0xff);
 		
 		buffer.writeShort(wrappedSize + BGPv4Constants.BGP_PACKET_HEADER_LENGTH);
+		buffer.writeByte(type);
+		
 		if(wrapped != null)
 			buffer.writeBytes(wrapped);
 		

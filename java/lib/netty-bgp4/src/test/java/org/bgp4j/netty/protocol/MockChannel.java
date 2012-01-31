@@ -8,6 +8,7 @@ import java.net.SocketAddress;
 import org.jboss.netty.channel.AbstractChannel;
 import org.jboss.netty.channel.ChannelConfig;
 import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.DefaultChannelConfig;
 
 /**
  * @author rainer
@@ -15,6 +16,12 @@ import org.jboss.netty.channel.ChannelPipeline;
  */
 public class MockChannel extends AbstractChannel {
 
+	private class MockChannelConfig extends DefaultChannelConfig {
+		
+	}
+	
+	private MockChannelConfig config = new MockChannelConfig();
+	
 	public MockChannel(ChannelPipeline pipeline, MockChannelSink sink) {
 		super(null, null, pipeline, sink);
 	}
@@ -24,8 +31,7 @@ public class MockChannel extends AbstractChannel {
 	 */
 	@Override
 	public ChannelConfig getConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return config;
 	}
 
 	/* (non-Javadoc)

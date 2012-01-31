@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.urb.quagga.weld;
+package org.bgp4j.weld;
 
 import javax.enterprise.inject.spi.BeanManager;
 
