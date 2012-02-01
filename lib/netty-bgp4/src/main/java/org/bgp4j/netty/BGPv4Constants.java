@@ -209,6 +209,12 @@ public class BGPv4Constants {
 	/** 4-byte Autonomous System numbers capability (RFC 4893) */
 	public static final int BGP_CAPABILITY_TYPE_AS4_NUMBERS = 65;
 	
+	/** MULTIPROTOCOL capability (RFC 2858) */
+	public static final int BGP_CAPABILITY_TYPE_MULTIPROTOCOL = 1;
+	
+	/** MULTIPROTOCOL capability length (RFC 2858) */
+	public static final int BGP_CAPABILITY_LENGTH_MULTIPROTOCOL = 4;
+	
 	/** ROUTE-REFRESH capability (RFC 2918) */
 	public static final int BGP_CAPABILITY_TYPE_ROUTE_REFRESH = 2;
 	

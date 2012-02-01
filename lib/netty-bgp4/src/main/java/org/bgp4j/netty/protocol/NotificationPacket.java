@@ -40,6 +40,11 @@ public class NotificationPacket extends BGPv4Packet {
 		buffer.writeByte(errorCode);
 		buffer.writeByte(errorSubcode);
 		
+		ChannelBuffer additionalPayload = encodeAdditionalPayload();
+		
+		if(additionalPayload != null)
+			buffer.writeBytes(additionalPayload);
+		
 		return buffer;
 	}
 
@@ -62,5 +67,7 @@ public class NotificationPacket extends BGPv4Packet {
 		return errorSubcode;
 	}	
 	
-	
+	protected ChannelBuffer encodeAdditionalPayload() {
+		return null;
+	}
 }

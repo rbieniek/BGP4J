@@ -62,22 +62,41 @@ public abstract class Capability {
 	}
 	
 	public static Capability decodeCapability(ChannelBuffer buffer) { 
-		int type = buffer.readUnsignedByte();
 		Capability cap = null;
+		int start = buffer.readerIndex();
 		
-		switch(type) {
-		case BGPv4Constants.BGP_CAPABILITY_TYPE_ROUTE_REFRESH:
-			cap = new RouteRefreshCapability();
-			break;
-		case BGPv4Constants.BGP_CAPABILITY_TYPE_AS4_NUMBERS:
-			cap = new AutonomousSystem4Capability();
-			break;
-		default:
-			cap = new UnknownCapability();
-			break;
+		try {
+			buffer.markReaderIndex();
+			
+			int type = buffer.readUnsignedByte();
+			
+			switch(type) {
+			case BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL:
+				cap = new MultiProtocolCapability();
+				break;
+			case BGPv4Constants.BGP_CAPABILITY_TYPE_ROUTE_REFRESH:
+				cap = new RouteRefreshCapability();
+				break;
+			case BGPv4Constants.BGP_CAPABILITY_TYPE_AS4_NUMBERS:
+				cap = new AutonomousSystem4Capability();
+				break;
+			default:
+				cap = new UnknownCapability();
+				break;
+			}
+			
+			cap.decodeParameterValue(buffer);
+		} catch(CapabilityException e) {
+			int length = buffer.readerIndex() - start;
+			
+			buffer.resetReaderIndex();
+			
+			byte[] capPacket = new byte[length];
+			
+			buffer.readBytes(capPacket);
+
+			throw new CapabilityException(e, capPacket);
 		}
-		
-		cap.decodeParameterValue(buffer);
 		
 		return cap;
 	}

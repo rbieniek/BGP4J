@@ -12,38 +12,37 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.CapabilityTest.java 
  */
 package org.bgp4j.netty.protocol;
 
+import junit.framework.Assert;
+
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
+public class CapabilityTest {
 
-	private BGPv4PacketDecoder decoder;
-	
-	@Before
-	public void before() {
-		decoder = obtainInstance(BGPv4PacketDecoder.class);
-	}
-	
-	@After
-	public void after() {
-		decoder = null;
-	}
-	
 	@Test
-	public void testBasicOpenPacket() {
+	public void testMultiProtocolCapability() {
+		byte[] packet = new byte[] { 0x01, 0x04, 0x00, 0x01, 0x00, 0x01 };
+		ChannelBuffer buffer = ChannelBuffers.buffer(packet.length);
 		
+		buffer.writeBytes(packet);
+		
+		Capability cap = Capability.decodeCapability(buffer);
+		
+		Assert.assertEquals(cap.getClass(), MultiProtocolCapability.class);
+		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL);
+		Assert.assertEquals(((MultiProtocolCapability)cap).getAfi(), BGPv4Constants.AddressFamily.IPv4);
+		Assert.assertEquals(((MultiProtocolCapability)cap).getSafi(), BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 	}
+	
 }
