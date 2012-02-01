@@ -206,17 +206,29 @@ public class BGPv4Constants {
 	/** REFRESH packet type code (RFC 2918) */
 	public static final int BGP_PACKET_TYPE_ROUTE_REFRESH = 5;
 	
-	/** 4-byte Autonomous System numbers capability (RFC 4893) */
-	public static final int BGP_CAPABILITY_TYPE_AS4_NUMBERS = 65;
-	
 	/** MULTIPROTOCOL capability (RFC 2858) */
 	public static final int BGP_CAPABILITY_TYPE_MULTIPROTOCOL = 1;
+	
+	/** ROUTE-REFRESH capability (RFC 2918) */
+	public static final int BGP_CAPABILITY_TYPE_ROUTE_REFRESH = 2;
+
+	/** Outbound route filtering capability (RFC 5291) */
+	public static final int BGP_CAPABILITY_TYPE_OUTBOUND_ROUTE_FILTERING = 3;
+
+	/** Multiplte routes to destination capability (RFC 3107) */
+	public static final int BGP_CAPABILITY_TYPE_MULTIPLE_ROUTES_TO_DESTINATION = 4;
+
+	/** Extended next hop encoding capability (RFC 5549) */
+	public static final int BGP_CAPABILITY_TYPE_EXTENDED_NEXT_HOP_ENCODING = 5;
+
+	/** 4-byte Autonomous System numbers capability (RFC 4893) */
+	public static final int BGP_CAPABILITY_TYPE_AS4_NUMBERS = 65;
 	
 	/** MULTIPROTOCOL capability length (RFC 2858) */
 	public static final int BGP_CAPABILITY_LENGTH_MULTIPROTOCOL = 4;
 	
-	/** ROUTE-REFRESH capability (RFC 2918) */
-	public static final int BGP_CAPABILITY_TYPE_ROUTE_REFRESH = 2;
+	/** MULTIPROTOCOL capability length (RFC 4893) */
+	public static final int BGP_CAPABILITY_LENGTH_AS4_NUMBERS = 4;
 	
 	/** Minimum OPEN packet size including header (RFC 4271) */
 	public static final int BGP_PACKET_MIN_SIZE_OPEN = 29;

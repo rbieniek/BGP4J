@@ -121,4 +121,11 @@ public abstract class Capability {
 		if(parameterLength != 0)
 			throw new ProtocolPacketFormatException("Expected zero-length parameter, got " + parameterLength + " octets");
 	}
+
+	protected void assertFixedLength(ChannelBuffer buffer, int length) {
+		int parameterLength = buffer.readUnsignedByte();
+		
+		if(parameterLength != length)
+			throw new CapabilityLengthException("Expected " + length + " octets parameter, got " + parameterLength + " octets");
+	}
 }

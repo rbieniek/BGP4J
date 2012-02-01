@@ -67,10 +67,7 @@ public class MultiProtocolCapability extends Capability {
 	 */
 	@Override
 	protected void decodeParameterValue(ChannelBuffer buffer) {
-		int length = buffer.readUnsignedByte();
-		
-		if(length != BGPv4Constants.BGP_CAPABILITY_LENGTH_MULTIPROTOCOL)
-			throw new CapabilityLengthException();
+		assertFixedLength(buffer, BGPv4Constants.BGP_CAPABILITY_LENGTH_MULTIPROTOCOL);
 		
 		setAfi(AddressFamily.fromCode(buffer.readShort()));
 		buffer.readByte(); // reserved

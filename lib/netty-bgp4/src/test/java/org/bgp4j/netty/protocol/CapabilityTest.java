@@ -41,8 +41,34 @@ public class CapabilityTest {
 		
 		Assert.assertEquals(cap.getClass(), MultiProtocolCapability.class);
 		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL);
-		Assert.assertEquals(((MultiProtocolCapability)cap).getAfi(), BGPv4Constants.AddressFamily.IPv4);
-		Assert.assertEquals(((MultiProtocolCapability)cap).getSafi(), BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		Assert.assertEquals(BGPv4Constants.AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
+		Assert.assertEquals(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
+	}
+	
+	@Test
+	public void testAutonomousSystem4Capability() {
+		byte[] packet = new byte[] { 0x41, 0x04, 0x00, 0x00, (byte)0xfc, 0x00 };
+		ChannelBuffer buffer = ChannelBuffers.buffer(packet.length);
+		
+		buffer.writeBytes(packet);
+		
+		Capability cap = Capability.decodeCapability(buffer);
+		
+		Assert.assertEquals(cap.getClass(), AutonomousSystem4Capability.class);
+		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_AS4_NUMBERS);
+		Assert.assertEquals(((AutonomousSystem4Capability)cap).getAutonomousSystem(), 64512);
+	}
+	
+	@Test
+	public void testRouteRefreshCapability() {
+		byte[] packet = new byte[] { 0x02, 0x00 };
+		ChannelBuffer buffer = ChannelBuffers.buffer(packet.length);
+		
+		buffer.writeBytes(packet);
+		
+		Capability cap = Capability.decodeCapability(buffer);
+		
+		Assert.assertEquals(cap.getClass(), RouteRefreshCapability.class);
 	}
 	
 }

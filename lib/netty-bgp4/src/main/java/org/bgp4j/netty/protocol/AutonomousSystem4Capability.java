@@ -53,6 +53,8 @@ public class AutonomousSystem4Capability extends Capability {
 	 */
 	@Override
 	protected void decodeParameterValue(ChannelBuffer buffer) {
+		assertFixedLength(buffer, BGPv4Constants.BGP_CAPABILITY_LENGTH_AS4_NUMBERS);
+
 		setAutonomousSystem((int)buffer.readUnsignedInt());
 	}
 
