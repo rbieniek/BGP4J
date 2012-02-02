@@ -25,7 +25,6 @@ import junit.framework.Assert;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
-import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
@@ -34,7 +33,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CapabilityTest extends WeldTestCaseBase {
+public class CapabilityTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testDecodeMultiProtocolCapability() {
