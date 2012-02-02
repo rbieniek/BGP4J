@@ -116,10 +116,14 @@ public class OpenPacket extends BGPv4Packet {
 		
 		ChannelBuffer capabilities = Capability.encodeCapabilities(getCapabilities());
 		
-		buffer.writeByte(capabilities.readableBytes());
-		if(capabilities.readableBytes() > 0)
+		if(capabilities.readableBytes() > 0) {
+			buffer.writeByte(capabilities.readableBytes() + 2); // cap length + type byte + parameter length byte
+			buffer.writeByte(BGPv4Constants.BGP_OPEN_PARAMETER_TYPE_CAPABILITY); // type byte
+			buffer.writeByte(capabilities.readableBytes()); // parameter length
 			buffer.writeBytes(capabilities);
-		
+		} else {
+			buffer.writeByte(0); // no capabilites encoded --> optional parameter length equals 0
+		}
 		return buffer;
 	}
 
