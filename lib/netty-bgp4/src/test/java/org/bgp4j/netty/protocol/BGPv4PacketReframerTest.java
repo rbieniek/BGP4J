@@ -22,7 +22,6 @@ import java.net.InetSocketAddress;
 import junit.framework.Assert;
 
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandler;
@@ -39,7 +38,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4PacketReframerTest extends WeldTestCaseBase {
+public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 
 	@Before
 	public void before() {
@@ -83,13 +82,7 @@ public class BGPv4PacketReframerTest extends WeldTestCaseBase {
 		Assert.assertEquals(0, sink.getWaitingEventNumber());
 		Assert.assertEquals(1, handler.getWaitingEventNumber());
 		
-		MessageEvent result = handler.nextEvent();
-		ChannelBuffer resultBuffer = (ChannelBuffer)result.getMessage();
-		byte[] resultPacket = new byte[resultBuffer.readableBytes()];
-		
-		resultBuffer.readBytes(resultPacket);
-		
-		assertArraysEquals(new byte[] { 0x04 }, resultPacket);
+		assertChannelEventContents(new byte[] { 0x04 }, handler.nextEvent());
 	}
 
 	@Test
@@ -117,14 +110,8 @@ public class BGPv4PacketReframerTest extends WeldTestCaseBase {
 
 		Assert.assertEquals(0, sink.getWaitingEventNumber());
 		Assert.assertEquals(1, handler.getWaitingEventNumber());
-
-		MessageEvent result = handler.nextEvent();
-		ChannelBuffer resultBuffer = (ChannelBuffer)result.getMessage();
-		byte[] resultPacket = new byte[resultBuffer.readableBytes()];
 		
-		resultBuffer.readBytes(resultPacket);
-		
-		assertArraysEquals(new byte[] { 0x04 }, resultPacket);
+		assertChannelEventContents(new byte[] { 0x04 }, handler.nextEvent());
 	}	
 
 	@Test
@@ -149,19 +136,13 @@ public class BGPv4PacketReframerTest extends WeldTestCaseBase {
 		Assert.assertEquals(1, sink.getWaitingEventNumber());
 		Assert.assertEquals(0, handler.getWaitingEventNumber());
 
-		MessageEvent notityEvent = sink.nextEvent();
-		ChannelBuffer notifyBuffer = (ChannelBuffer)notityEvent.getMessage();		
-		byte[] notifyPacket = new byte[notifyBuffer.readableBytes()];
-		
-		notifyBuffer.readBytes(notifyPacket);
-		
-		assertArraysEquals(new byte[] { 
-			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
-			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-			0x00, 0x15, // length
-			0x03,       // notification type code
-			0x01, 0x01, // Error code: Message Header Error, Error subcode: Connection not synchronized
-			}, notifyPacket);
+		assertChannelEventContents(new byte[] { 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x15, // length
+				0x03,       // notification type code
+				0x01, 0x01, // Error code: Message Header Error, Error subcode: Connection not synchronized
+				}, sink.nextEvent());
 	}
 
 	@Test
@@ -185,20 +166,14 @@ public class BGPv4PacketReframerTest extends WeldTestCaseBase {
 		Assert.assertEquals(1, sink.getWaitingEventNumber());
 		Assert.assertEquals(0, handler.getWaitingEventNumber());
 
-		MessageEvent notityEvent = sink.nextEvent();
-		ChannelBuffer notifyBuffer = (ChannelBuffer)notityEvent.getMessage();		
-		byte[] notifyPacket = new byte[notifyBuffer.readableBytes()];
-		
-		notifyBuffer.readBytes(notifyPacket);
-		
-		assertArraysEquals(new byte[] { 
-			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
-			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-			0x00, 0x17, // length
-			0x03,       // notification type code
-			0x01, 0x02, // Error code: Message Header Error, Error subcode: Bad message length
-			0x00, 0x10  // Data: Broken length field
-			}, notifyPacket);
+		assertChannelEventContents(new byte[] { 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x17, // length
+				0x03,       // notification type code
+				0x01, 0x02, // Error code: Message Header Error, Error subcode: Bad message length
+				0x00, 0x10  // Data: Broken length field
+				}, sink.nextEvent());
 	}
 
 	@Test

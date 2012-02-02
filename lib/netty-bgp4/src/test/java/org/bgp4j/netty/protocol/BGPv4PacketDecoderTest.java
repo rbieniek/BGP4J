@@ -20,9 +20,6 @@ import junit.framework.Assert;
 
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
-import org.bgp4j.weld.WeldTestCaseBase;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +28,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
+public class BGPv4PacketDecoderTest extends ProtocolPacketTestBase {
 
 	private BGPv4PacketDecoder decoder;
 	
@@ -47,24 +44,14 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 	
 	@Test
 	public void testDecodeBasicOpenPacket() {
-		byte[] packet = new byte[] {
+		OpenPacket open = safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x04, // BGP version 4 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
 				(byte)0x00, (byte)0xb4, // hold time 180 seconds
 				(byte)0xc0, (byte)0xa8, (byte)0x09, (byte)0x01, /// BGP identifier 192.168.9.1 
 				(byte)0x0, // optional parameter length 0 
-		};
-		
-		ChannelBuffer packetBuffer = ChannelBuffers.buffer(packet.length);
-		
-		packetBuffer.writeBytes(packet);
-		
-		BGPv4Packet bgpPacket = decoder.decodePacket(packetBuffer);
-		
-		Assert.assertEquals(OpenPacket.class, bgpPacket.getClass());
-		
-		OpenPacket open = (OpenPacket)bgpPacket;
+		})), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -76,18 +63,13 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 	@Test
 	public void testEncodeBasicOpenPacket() {
 		OpenPacket open = new OpenPacket();
-		byte[] packet;
-		ChannelBuffer buffer;
 
 		open.setProtocolVersion(4);
 		open.setAutonomousSystem(64512);
 		open.setHoldTime(180);
 		open.setBgpIdentifier(((192<<24) | (168 << 16) | (9 << 8) | 1));
 		
-		buffer = open.encodePacket();
-		packet = new byte[buffer.readableBytes()];
-		buffer.readBytes(packet);
-		assertArraysEquals(new byte[] { 
+		assertBufferContents(new byte[] { 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0x00, (byte)0x1d, // length 29
@@ -97,15 +79,13 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 				(byte)0x00, (byte)0xb4, // hold time 180 seconds
 				(byte)0xc0, (byte)0xa8, (byte)0x09, (byte)0x01, /// BGP identifier 192.168.9.1 
 				(byte)0x0, // optional parameter length 0 
-				}, packet);
-
+				}, open.encodePacket());
 	}
 	
 	@Test
 	public void testDecodeFullOpenPacket() {
 		Capability cap; 
-
-		byte[] packet = new byte[] {
+		OpenPacket open = safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
 				/*
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -125,17 +105,7 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 				(byte)0x02, (byte)0x00, // Route-Refresh capability, length 0 octets
 				(byte)0x02, (byte)0x06, // parameter type 2 (capability), length 6 octets
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512
-		};
-		
-		ChannelBuffer packetBuffer = ChannelBuffers.buffer(packet.length);
-		
-		packetBuffer.writeBytes(packet);
-		
-		BGPv4Packet bgpPacket = decoder.decodePacket(packetBuffer);
-		
-		Assert.assertEquals(OpenPacket.class, bgpPacket.getClass());
-		
-		OpenPacket open = (OpenPacket)bgpPacket;
+		})), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -162,8 +132,7 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 	@Test
 	public void testDecodeFullOpenPacketOneParameter() {
 		Capability cap; 
-
-		byte[] packet = new byte[] {
+		OpenPacket open = safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
 				/*
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -179,17 +148,7 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 				(byte)0x01, (byte)0x04, (byte)0x00, (byte)0x01, (byte)0x00, (byte)0x01, // Multi-Protocol capability (type 1), IPv4, Unicast  
 				(byte)0x02, (byte)0x00, // Route-Refresh capability, length 0 octets
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512				
-		};
-		
-		ChannelBuffer packetBuffer = ChannelBuffers.buffer(packet.length);
-		
-		packetBuffer.writeBytes(packet);
-		
-		BGPv4Packet bgpPacket = decoder.decodePacket(packetBuffer);
-		
-		Assert.assertEquals(OpenPacket.class, bgpPacket.getClass());
-		
-		OpenPacket open = (OpenPacket)bgpPacket;
+		})), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -216,8 +175,6 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 		MultiProtocolCapability multiCap = new MultiProtocolCapability();
 		RouteRefreshCapability routeRefreshCap = new RouteRefreshCapability();
 		AutonomousSystem4Capability as4cap = new AutonomousSystem4Capability();
-		ChannelBuffer openBuffer;
-		byte[] packet;
 		
 		open.setProtocolVersion(4);
 		open.setAutonomousSystem(64512);
@@ -233,11 +190,7 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 		as4cap.setAutonomousSystem(64512);
 		open.getCapabilities().add(as4cap);
 		
-		openBuffer = open.encodePacket();
-		packet = new byte[openBuffer.readableBytes()];
-		openBuffer.readBytes(packet);
-		
-		assertArraysEquals(new byte[] {
+		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0x00, (byte)0x2d, // length 53
@@ -251,6 +204,6 @@ public class BGPv4PacketDecoderTest extends WeldTestCaseBase {
 				(byte)0x01, (byte)0x04, (byte)0x00, (byte)0x01, (byte)0x00, (byte)0x01, // Multi-Protocol capability (type 1), IPv4, Unicast  
 				(byte)0x02, (byte)0x00, // Route-Refresh capability, length 0 octets
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512				
-		}, packet);
+		}, open.encodePacket());
 	}
 }
