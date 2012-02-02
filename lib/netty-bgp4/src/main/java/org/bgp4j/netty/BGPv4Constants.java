@@ -304,5 +304,10 @@ public class BGPv4Constants {
 	
 	/** PATH ATTRIBUTE type code mask (based on 16 bit flags / type code value) */
 	public static  final int BGP_PATH_ATTRIBUTE_TYPE_MASK = 0x00ff;
-}
 
+	/** OPEN packet AUTH parameter type (RFC 5492) */
+	public static final int BGP_OPEN_PARAMETER_TYPE_AUTH = 1;
+	
+	/** OPEN packet CAPABILITY parameter type (RFC 5492) */
+	public static final int BGP_OPEN_PARAMETER_TYPE_CAPABILITY = 2;
+}

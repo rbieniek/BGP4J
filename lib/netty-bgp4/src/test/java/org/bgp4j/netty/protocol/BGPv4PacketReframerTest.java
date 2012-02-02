@@ -237,12 +237,4 @@ public class BGPv4PacketReframerTest extends WeldTestCaseBase {
 			0x14, 0x13  // Data: Broken length field
 			}, notifyPacket);
 	}
-
-	private void assertArraysEquals(byte[] a, byte[] b) {
-		Assert.assertEquals("buffer length", a.length, b.length);
-		
-		for(int i=0; i<a.length; i++) {
-			Assert.assertEquals("buffer position " + i, a[i], b[i]);
-		}
-	}
 }

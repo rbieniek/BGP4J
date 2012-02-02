@@ -389,13 +389,28 @@ public class BGPv4PacketDecoder {
 		packet.setProtocolVersion(buffer.readUnsignedByte());
 		packet.setAutonomousSystem(buffer.readUnsignedShort());
 		packet.setHoldTime(buffer.readUnsignedShort());
-		packet.setAutonomousSystem(buffer.readInt());
+		packet.setBgpIdentifier(buffer.readInt());
 		
-		int capabilitiesLength = buffer.readUnsignedByte();
+		int parameterLength = buffer.readUnsignedByte();
 		
-		if(capabilitiesLength > 0) {
+		if(parameterLength > 0) {
 			while(buffer.readable()) {
-				packet.getCapabilities().add(Capability.decodeCapability(buffer));
+				int parameterType = buffer.readUnsignedByte();
+				int paramLength = buffer.readUnsignedByte();
+
+				ChannelBuffer valueBuffer = ChannelBuffers.buffer(paramLength);
+				
+				buffer.readBytes(valueBuffer);
+
+				switch(parameterType) {
+				case BGPv4Constants.BGP_OPEN_PARAMETER_TYPE_AUTH:
+					break;
+				case BGPv4Constants.BGP_OPEN_PARAMETER_TYPE_CAPABILITY:
+					packet.getCapabilities().addAll(Capability.decodeCapabilities(valueBuffer));
+					break;
+				default:
+					break;
+				}
 			}
 		}
 		

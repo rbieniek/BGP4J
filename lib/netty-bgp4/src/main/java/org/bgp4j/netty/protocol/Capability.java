@@ -17,6 +17,8 @@
 package org.bgp4j.netty.protocol;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -61,10 +63,19 @@ public abstract class Capability {
 		return buffer;
 	}
 	
+	public static List<Capability> decodeCapabilities(ChannelBuffer buffer) {
+		List<Capability> caps = new LinkedList<Capability>();
+		
+		while(buffer.readable()) {
+			caps.add(decodeCapability(buffer));
+		}
+		
+		return caps;
+	}
+	
 	public static Capability decodeCapability(ChannelBuffer buffer) { 
 		Capability cap = null;
-		int start = buffer.readerIndex();
-		
+
 		try {
 			buffer.markReaderIndex();
 			
@@ -82,20 +93,25 @@ public abstract class Capability {
 				break;
 			default:
 				cap = new UnknownCapability();
+				((UnknownCapability)cap).setCapabilityType(type);
 				break;
 			}
 			
 			cap.decodeParameterValue(buffer);
 		} catch(CapabilityException e) {
-			int length = buffer.readerIndex() - start;
-			
 			buffer.resetReaderIndex();
 			
-			byte[] capPacket = new byte[length];
+			int type = buffer.readUnsignedByte();
+			int capLength = buffer.readUnsignedByte();
 			
-			buffer.readBytes(capPacket);
-
-			throw new CapabilityException(e, capPacket);
+			byte[] capPacket = new byte[capLength+2];
+			
+			buffer.readBytes(capPacket, 2, capLength);
+			capPacket[0] = (byte)type;
+			capPacket[1] = (byte)capLength;
+			
+			e.setCapability(capPacket);
+			throw e;
 		}
 		
 		return cap;
