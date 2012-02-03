@@ -30,7 +30,7 @@ public class NetworkLayerReachabilityInformation {
 	private int prefixLength;
 	private Inet4Address prefix;
 	
-	ChannelBuffer encodeWithdrawnRoute() {
+	public ChannelBuffer encodeRoute() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(5);
 		
 		buffer.writeByte(prefixLength);
@@ -51,7 +51,7 @@ public class NetworkLayerReachabilityInformation {
 		return buffer;
 	}
 
-	int calculatePacketSize() {
+	public int calculatePacketSize() {
 		int size = 1;
 		
 		if(prefixLength > 0)

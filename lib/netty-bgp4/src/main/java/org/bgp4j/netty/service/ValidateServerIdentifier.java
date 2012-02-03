@@ -19,7 +19,7 @@ package org.bgp4j.netty.service;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4PeerConfiguration;
-import org.bgp4j.netty.protocol.OpenPacket;
+import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;

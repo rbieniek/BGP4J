@@ -19,6 +19,7 @@ package org.bgp4j.netty.protocol;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
