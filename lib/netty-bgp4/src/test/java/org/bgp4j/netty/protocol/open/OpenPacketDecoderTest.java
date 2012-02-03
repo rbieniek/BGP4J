@@ -110,7 +110,7 @@ public class OpenPacketDecoderTest extends ProtocolPacketTestBase {
 						(byte)0x04, // BGP version 4 
 						(byte)0xfc, (byte)0x00, // Autonomous system 64512 
 						(byte)0x00, (byte)0xb4, // hold time 180 seconds
-						(byte)0xe0, (byte)0x0, (byte)0x0, (byte)0x01, /// BGP identifier 224.0.0.1 (Multicast IP) 
+						(byte)0xc0, (byte)0xa8, (byte)0x09, (byte)0x01, /// BGP identifier 192.168.9.1 
 						(byte)0x2, // optional parameter length 0
 						(byte)0x03, (byte)0x00 // bogus optional parameter type code 3
 				})), OpenPacket.class);

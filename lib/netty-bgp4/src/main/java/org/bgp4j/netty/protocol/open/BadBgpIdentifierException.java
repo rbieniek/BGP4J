@@ -31,21 +31,6 @@ public class BadBgpIdentifierException extends OpenPacketException {
 	private static final long serialVersionUID = -7669781009811724080L;
 
 	/**
-	 * @param message
-	 * @param cause
-	 */
-	public BadBgpIdentifierException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public BadBgpIdentifierException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
 	 * 
 	 */
 	public BadBgpIdentifierException() {

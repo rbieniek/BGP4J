@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.CapabilityTest.java 
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty.protocol.open;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +25,7 @@ import junit.framework.Assert;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;

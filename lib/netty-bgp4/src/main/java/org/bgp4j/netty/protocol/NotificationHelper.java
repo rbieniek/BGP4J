@@ -46,7 +46,7 @@ public class NotificationHelper {
 	 * @param notification the notification to send
 	 */
 	public static void sendNotificationAndCloseChannel(Channel channel, NotificationPacket notification) {
-		channel.write(notification.encodePacket()).addListener(new ChannelFutureListener() {
+		channel.write(notification).addListener(new ChannelFutureListener() {
 			
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {

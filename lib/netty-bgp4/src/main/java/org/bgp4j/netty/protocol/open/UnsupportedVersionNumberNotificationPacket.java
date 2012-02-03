@@ -26,7 +26,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class UnsupportedVersionNumberNotificationPacket extends	OpenNotificationPacket {
 
-	private int version = BGPv4Constants.BGP_VERSION;
+	private int supportedProtocolVersion = BGPv4Constants.BGP_VERSION;
 	
 	public UnsupportedVersionNumberNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_VERSION_NUMBER);
@@ -35,7 +35,7 @@ public class UnsupportedVersionNumberNotificationPacket extends	OpenNotification
 	public UnsupportedVersionNumberNotificationPacket(int version) {
 		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_VERSION_NUMBER);
 		
-		this.version = version;
+		this.supportedProtocolVersion = version;
 	}
 
 	/* (non-Javadoc)
@@ -45,9 +45,16 @@ public class UnsupportedVersionNumberNotificationPacket extends	OpenNotification
 	protected ChannelBuffer encodeAdditionalPayload() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(2);
 		
-		buffer.writeShort(this.version);
+		buffer.writeShort(this.supportedProtocolVersion);
 		
 		return buffer;
+	}
+
+	/**
+	 * @return the version
+	 */
+	public int getSupportedProtocolVersion() {
+		return supportedProtocolVersion;
 	}
 
 }

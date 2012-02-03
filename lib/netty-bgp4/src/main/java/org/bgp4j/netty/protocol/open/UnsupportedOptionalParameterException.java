@@ -33,16 +33,8 @@ public class UnsupportedOptionalParameterException extends OpenPacketException {
 	public UnsupportedOptionalParameterException() {
 	}
 
-	public UnsupportedOptionalParameterException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 	public UnsupportedOptionalParameterException(String message) {
 		super(message);
-	}
-
-	public UnsupportedOptionalParameterException(Throwable cause) {
-		super(cause);
 	}
 
 	@Override

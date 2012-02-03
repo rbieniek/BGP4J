@@ -62,6 +62,8 @@ public class OpenPacketDecoder {
 		return packet;
 	}
 
+	private static int IPV4_MULTICAST_MASK = 0xe0000000;
+	
 	/**
 	 * decode the OPEN network packet. The passed channel buffer MUST point to the first packet octet AFTER the packet type and the buffer 
 	 * must be at least 9 octets large at this point.
@@ -75,9 +77,13 @@ public class OpenPacketDecoder {
 		ProtocolPacketUtils.verifyPacketSize(buffer, BGPv4Constants.BGP_PACKET_MIN_SIZE_OPEN, -1);
 		
 		packet.setProtocolVersion(buffer.readUnsignedByte());
+		if(packet.getProtocolVersion() != BGPv4Constants.BGP_VERSION)
+			throw new UnsupportedVersionNumberException(BGPv4Constants.BGP_VERSION);
 		packet.setAutonomousSystem(buffer.readUnsignedShort());
 		packet.setHoldTime(buffer.readUnsignedShort());
 		packet.setBgpIdentifier(buffer.readInt());
+		if((packet.getBgpIdentifier() & IPV4_MULTICAST_MASK) == IPV4_MULTICAST_MASK)
+			throw new BadBgpIdentifierException();
 		
 		int parameterLength = buffer.readUnsignedByte();
 		
@@ -97,7 +103,7 @@ public class OpenPacketDecoder {
 					packet.getCapabilities().addAll(Capability.decodeCapabilities(valueBuffer));
 					break;
 				default:
-					break;
+					throw new UnsupportedOptionalParameterException();
 				}
 			}
 		}

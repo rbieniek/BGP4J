@@ -33,7 +33,6 @@ public class UnsupportedVersionNumberException extends OpenPacketException {
 	private static final long serialVersionUID = -6258258151952280005L;
 
 	public UnsupportedVersionNumberException() {
-		super();
 	}
 
 	public UnsupportedVersionNumberException(int supportedProtocolVersion) {
