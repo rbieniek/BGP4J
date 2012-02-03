@@ -17,6 +17,7 @@
 package org.bgp4j.netty.protocol;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -26,10 +27,6 @@ public class BadMessageLengthNotificationPacket extends MessageHeaderErrorNotifi
 
 	private int length;
 	
-	public BadMessageLengthNotificationPacket() {
-		super(MessageHeaderErrorNotificationPacket.SUBCODE_BAD_MESSAGE_LENGTH);
-	}
-
 	public BadMessageLengthNotificationPacket(int length) {
 		super(MessageHeaderErrorNotificationPacket.SUBCODE_BAD_MESSAGE_LENGTH);
 		
@@ -54,8 +51,8 @@ public class BadMessageLengthNotificationPacket extends MessageHeaderErrorNotifi
 	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodePayload()
 	 */
 	@Override
-	protected ChannelBuffer encodePayload() {
-		ChannelBuffer buffer = super.encodePayload();
+	protected ChannelBuffer encodeAdditionalPayload() {
+		ChannelBuffer buffer = ChannelBuffers.buffer(2);
 		
 		buffer.writeShort(getLength());
 		

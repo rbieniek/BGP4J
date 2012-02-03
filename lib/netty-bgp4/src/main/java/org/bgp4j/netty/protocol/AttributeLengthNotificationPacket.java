@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.PathAttributeLengthNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,26 +21,13 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ProtocolPacketFormatException extends RuntimeException {
+public class AttributeLengthNotificationPacket extends AttributeNotificationPacket {
 
 	/**
-	 * 
+	 * @param subcode
 	 */
-	private static final long serialVersionUID = -973351159524540205L;
-
-	public ProtocolPacketFormatException(String message, Throwable cause) {
-		super(message, cause);
+	public AttributeLengthNotificationPacket(byte[] offendingAttribute) {
+		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_LENGTH_ERROR, offendingAttribute);
 	}
 
-	public ProtocolPacketFormatException(Throwable cause) {
-		super(cause);
-	}
-
-	public ProtocolPacketFormatException() {
-		super();
-	}
-
-	public ProtocolPacketFormatException(String message) {
-		super(message);
-	}
 }

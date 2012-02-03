@@ -17,6 +17,7 @@
 package org.bgp4j.netty.protocol;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -24,38 +25,38 @@ import org.jboss.netty.buffer.ChannelBuffer;
  */
 public class BadMessageTypeNotificationPacket extends MessageHeaderErrorNotificationPacket {
 
-	private int type;
+	private int unknownMessageType;
 	
 	public BadMessageTypeNotificationPacket() {
 		super(MessageHeaderErrorNotificationPacket.SUBCODE_BAD_MESSAGE_LENGTH);
 	}
 
-	public BadMessageTypeNotificationPacket(int length) {
+	public BadMessageTypeNotificationPacket(int type) {
 		super(MessageHeaderErrorNotificationPacket.SUBCODE_BAD_MESSAGE_LENGTH);
 		
-		setType(length);
+		setUnknownMessageType(type);
 	}
 
 	/**
 	 * @return the length
 	 */
-	public int getType() {
-		return type;
+	public int getUnknownMessageType() {
+		return unknownMessageType;
 	}
 
 	/**
 	 * @param length the length to set
 	 */
-	public void setType(int length) {
-		this.type = length;
+	public void setUnknownMessageType(int length) {
+		this.unknownMessageType = length;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodePayload()
 	 */
 	@Override
-	protected ChannelBuffer encodePayload() {
-		ChannelBuffer buffer = super.encodePayload();
+	protected ChannelBuffer encodeAdditionalPayload() {
+		ChannelBuffer buffer = ChannelBuffers.buffer(1);
 		
 		buffer.writeByte(getType());
 		

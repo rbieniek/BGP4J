@@ -17,11 +17,13 @@
  */
 package org.bgp4j.netty.protocol;
 
+import java.util.Collection;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CapabilityLengthException extends CapabilityException {
+public class UnsupportedCapabilityException extends CapabilityException {
 
 	/**
 	 * 
@@ -31,55 +33,59 @@ public class CapabilityLengthException extends CapabilityException {
 	/**
 	 * 
 	 */
-	public CapabilityLengthException() {
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public CapabilityLengthException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * @param message
-	 */
-	public CapabilityLengthException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public CapabilityLengthException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 * @param capability
-	 */
-	public CapabilityLengthException(String message, Throwable cause,
-			byte[] capability) {
-		super(message, cause, capability);
+	public UnsupportedCapabilityException() {
 	}
 
 	/**
 	 * @param message
 	 * @param capability
 	 */
-	public CapabilityLengthException(String message, byte[] capability) {
+	public UnsupportedCapabilityException(String message, byte[] capability) {
 		super(message, capability);
 	}
 
 	/**
+	 * @param message
+	 * @param capability
+	 */
+	public UnsupportedCapabilityException(String message, Capability cap) {
+		super(message, cap);
+	}
+
+	/**
+	 * @param message
+	 * @param capability
+	 */
+	public UnsupportedCapabilityException(String message, Collection<Capability> caps) {
+		super(message, caps);
+	}
+
+	/**
 	 * @param cause
 	 * @param capability
 	 */
-	public CapabilityLengthException(Throwable cause, byte[] capability) {
-		super(cause, capability);
+	public UnsupportedCapabilityException(byte[] capability) {
+		super(capability);
 	}
 
+	/**
+	 * @param message
+	 * @param capability
+	 */
+	public UnsupportedCapabilityException(Capability cap) {
+		super(cap);
+	}
+
+	/**
+	 * @param message
+	 * @param capability
+	 */
+	public UnsupportedCapabilityException(Collection<Capability> caps) {
+		super(caps);
+	}
+
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		return new UnsupportedCapabilityNotificationPacket(getCapability());
+	}
 }

@@ -21,7 +21,7 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OpenPacketException extends ProtocolPacketFormatException {
+public abstract class OpenPacketException extends ProtocolPacketException {
 
 	/**
 	 * 

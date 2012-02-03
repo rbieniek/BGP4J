@@ -20,7 +20,7 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class InvalidNextHopException extends PathAttributeException {
+public class InvalidNextHopException extends AttributeException {
 
 	/**
 	 * 
@@ -42,50 +42,16 @@ public class InvalidNextHopException extends PathAttributeException {
 
 	/**
 	 * @param message
-	 */
-	public InvalidNextHopException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public InvalidNextHopException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public InvalidNextHopException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * @param message
 	 * @param offendingAttribute
 	 */
 	public InvalidNextHopException(String message, byte[] offendingAttribute) {
 		super(message, offendingAttribute);
 	}
 
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 * @param cause
-	 */
-	public InvalidNextHopException(String message, byte[] offendingAttribute,
-			Throwable cause) {
-		super(message, offendingAttribute, cause);
-	}
-
-	/**
-	 * @param offendingAttribute
-	 * @param cause
-	 */
-	public InvalidNextHopException(byte[] offendingAttribute, Throwable cause) {
-		super(offendingAttribute, cause);
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

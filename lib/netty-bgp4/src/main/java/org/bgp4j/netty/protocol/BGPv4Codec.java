@@ -54,22 +54,10 @@ public class BGPv4Codec extends SimpleChannelHandler {
 				if(packet != null) {
 					ctx.sendUpstream(new UpstreamMessageEvent(e.getChannel(), packet, e.getRemoteAddress()));
 				}
-			} catch(MessageLengthException ex) {
-				log.error("received malformed protocol packet, closing connection", ex);
-
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadMessageLengthNotificationPacket(ex.getLength()));
-			} catch(ProtocolTypeException ex) {
-				log.error("received malformed protocol packet, closing connection", ex);
-
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadMessageTypeNotificationPacket(ex.getType()));
-			} catch(MalformedAttributeListException ex) {
-				// TODO handle malformed attribute list
-			} catch(PathAttributeException ex) {
-				// TODO handle path attribute exceptions 
-			} catch(ProtocolPacketFormatException ex) {
+			} catch(ProtocolPacketException ex) {
 				log.error("received malformed protocol packet, closing connection", ex);
 				
-				ctx.getChannel().close();
+				NotificationHelper.sendNotificationAndCloseChannel(ctx, ex.toNotificationPacket());
 			} catch(Exception ex) {
 				log.error("generic decoding exception, closing connection", ex);
 				

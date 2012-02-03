@@ -21,16 +21,20 @@ import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.OriginPathAttribute.Origin;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class BGPv4PacketDecoder {
+	private @Inject Logger log;
 
 	BGPv4Packet decodePacket(ChannelBuffer buffer) {
 		int type = buffer.readUnsignedByte();
@@ -52,7 +56,7 @@ public class BGPv4PacketDecoder {
 		case BGPv4Constants.BGP_PACKET_TYPE_ROUTE_REFRESH:
 			break;
 		default:
-			throw new ProtocolTypeException(type);
+			throw new BadMessageTypeException(type);
 		}
 		
 		return packet;
@@ -76,7 +80,7 @@ public class BGPv4PacketDecoder {
 			try {
 				packet.getWithdrawnRoutes().addAll(decodeWithdrawnRoutes(withdrawnBuffer));
 			} catch(IndexOutOfBoundsException e) {
-				throw new MessageLengthException(withdrawnOctets);
+				throw new BadMessageLengthException(withdrawnOctets);
 			}
 		}
 		
@@ -120,14 +124,14 @@ public class BGPv4PacketDecoder {
 				
 			}
 		} catch (IndexOutOfBoundsException e) {
-			throw new MessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
+			throw new BadMessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
 		}
 
 		return packet;
 	}
 	
-	private List<PathAttribute> decodePathAttributes(ChannelBuffer buffer) {
-		List<PathAttribute> attributes = new LinkedList<PathAttribute>();
+	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
+		List<Attribute> attributes = new LinkedList<Attribute>();
 		
 		while(buffer.readable()) {
 			buffer.markReaderIndex();
@@ -149,7 +153,7 @@ public class BGPv4PacketDecoder {
 
 				buffer.readBytes(valueBuffer);
 
-				PathAttribute attr = null;
+				Attribute attr = null;
 			
 				switch (typeCode) {
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR:
@@ -184,7 +188,7 @@ public class BGPv4PacketDecoder {
 				attr.setPartial(partial);
 				
 				attributes.add(attr);
-			} catch(PathAttributeException ex) {
+			} catch(AttributeException ex) {
 				int endReadIndex = buffer.readerIndex();
 				
 				buffer.resetReaderIndex();
@@ -206,7 +210,7 @@ public class BGPv4PacketDecoder {
 				
 				buffer.readBytes(packet);
 
-				throw new PathAttributeLengthException(packet);
+				throw new AttributeLengthException(packet);
 			}
 			
 		}
@@ -218,12 +222,14 @@ public class BGPv4PacketDecoder {
 		OriginPathAttribute attr = new OriginPathAttribute();
 		
 		if(buffer.readableBytes() != 1)
-			throw new PathAttributeLengthException();
+			throw new AttributeLengthException();
 		
 		try {
 			attr.setOrigin(Origin.fromCode(buffer.readUnsignedByte()));
 		} catch(IllegalArgumentException e) {
-			throw new InvalidOriginException(e);
+			log.error("cannot convert ORIGIN code", e);
+			
+			throw new InvalidOriginException();
 		}
 		
 		return attr;
@@ -252,9 +258,13 @@ public class BGPv4PacketDecoder {
 			if(buffer.readable())
 				throw new MalformedASPathAttributeException();
 		} catch(IllegalArgumentException e) {
-			throw new MalformedASPathAttributeException(e);
+			log.error("cannot convert AS_PATH type", e);
+			
+			throw new MalformedASPathAttributeException();
 		} catch(IndexOutOfBoundsException e) {
-			throw new MalformedASPathAttributeException(e);
+			log.error("short AS_PATH attribute", e);
+			
+			throw new MalformedASPathAttributeException();
 		}
 		
 		return attr;
@@ -446,13 +456,13 @@ public class BGPv4PacketDecoder {
 	private void verifyPacketSize(ChannelBuffer buffer, int minimumPacketSize, int maximumPacketSize) {
 		if(minimumPacketSize != -1) {
 			if(buffer.readableBytes() < (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new MessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+				throw new BadMessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
 						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
 			}
 		}
 		if(maximumPacketSize != -1) {
 			if(buffer.readableBytes() > (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new MessageLengthException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+				throw new BadMessageLengthException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
 						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
 			}
 		}

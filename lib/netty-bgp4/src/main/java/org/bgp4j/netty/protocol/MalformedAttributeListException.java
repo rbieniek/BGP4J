@@ -20,7 +20,7 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedAttributeListException extends ProtocolPacketFormatException {
+public class MalformedAttributeListException extends ProtocolPacketException {
 
 	/**
 	 * 
@@ -38,6 +38,11 @@ public class MalformedAttributeListException extends ProtocolPacketFormatExcepti
 	 */
 	public MalformedAttributeListException(String message) {
 		super(message);
+	}
+
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		return new MalformedAttributeListNotificationPacket();
 	}
 
 }

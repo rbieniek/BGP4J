@@ -16,7 +16,6 @@
  */
 package org.bgp4j.netty.protocol;
 
-import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -26,9 +25,9 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class UnsupportedCapabilityNotificationPacket extends OpenNotificationPacket {
 
-	private ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
+	private byte[] capability;
 	
-	protected UnsupportedCapabilityNotificationPacket() {
+	protected UnsupportedCapabilityNotificationPacket(byte[] capability) {
 		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_CAPABILITY);
 	}
 
@@ -37,11 +36,11 @@ public class UnsupportedCapabilityNotificationPacket extends OpenNotificationPac
 	 */
 	@Override
 	protected ChannelBuffer encodeAdditionalPayload() {
+		ChannelBuffer buffer = ChannelBuffers.buffer(capability.length);
+		
+		buffer.writeBytes(capability);
+		
 		return buffer;
 	}
 
-	public void addCapabilityPacket(byte[] packet) {
-		buffer.writeBytes(packet);
-	}
-	
 }

@@ -116,8 +116,7 @@ public class CapabilityTest extends ProtocolPacketTestBase {
 
 		try {
 			Capability.decodeCapability(buffer);
-		} catch(CapabilityLengthException e) {
-			assertArraysEquals(packet, e.getCapability());
+		} catch(UnspecificOpenPacketException e) {
 			caught = true;
 		}
 		

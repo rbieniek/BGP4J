@@ -16,19 +16,14 @@
  */
 package org.bgp4j.netty.protocol;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
 import junit.framework.Assert;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.UpstreamMessageEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +58,6 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 	
 	@Test
 	public void testValidPacket() throws Exception {
-		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		byte[] packet = new byte[19];
 		
 		// KEEP alive packet
@@ -73,11 +67,7 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		buffer.writeBytes(packet);
-
-		UpstreamMessageEvent me = new UpstreamMessageEvent(channel, buffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		
-		pipeline.sendUpstream(me);
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet));
 		
 		Assert.assertEquals(0, sink.getWaitingEventNumber());
 		Assert.assertEquals(1, handler.getWaitingEventNumber());
@@ -87,26 +77,17 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testValidPacketTwoParts() throws Exception {
-		ChannelBuffer firstBuffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
-		ChannelBuffer secondBuffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
-		byte[] packet = new byte[19];
-		
-		// KEEP alive packet
-		for(int i=0; i<BGPv4Constants.BGP_PACKET_MARKER_LENGTH; i++)
-			packet[i] = (byte)0xff;
-		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH]     = 0x00;
-		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
-		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
-		
-		firstBuffer.writeBytes(packet, 0, 15);
-		secondBuffer.writeBytes(packet, 15, 4);
+		byte[] packet1 = new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,  
+		};
+		byte[] packet2 = new byte[] {
+				(byte)0xff, (byte)0xff,
+				0x00, 0x13, 0x04
+		};
 
-		UpstreamMessageEvent me;
-		
-		me = new UpstreamMessageEvent(channel, firstBuffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		pipeline.sendUpstream(me);
-		me = new UpstreamMessageEvent(channel, secondBuffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		pipeline.sendUpstream(me);
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet1));
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet2));
 
 		Assert.assertEquals(0, sink.getWaitingEventNumber());
 		Assert.assertEquals(1, handler.getWaitingEventNumber());
@@ -116,7 +97,6 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testBrokenMarker() throws Exception {
-		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		byte[] packet = new byte[19];
 		
 		// KEEP alive packet
@@ -127,11 +107,7 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		buffer.writeBytes(packet);
-
-		UpstreamMessageEvent me = new UpstreamMessageEvent(channel, buffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		
-		pipeline.sendUpstream(me);
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet));
 		
 		Assert.assertEquals(1, sink.getWaitingEventNumber());
 		Assert.assertEquals(0, handler.getWaitingEventNumber());
@@ -147,7 +123,6 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testBrokenLengthShortPacket() throws Exception {
-		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		byte[] packet = new byte[19];
 		
 		// KEEP alive packet
@@ -157,11 +132,7 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x10;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		buffer.writeBytes(packet);
-
-		UpstreamMessageEvent me = new UpstreamMessageEvent(channel, buffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		
-		pipeline.sendUpstream(me);
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet));
 		
 		Assert.assertEquals(1, sink.getWaitingEventNumber());
 		Assert.assertEquals(0, handler.getWaitingEventNumber());
@@ -178,7 +149,6 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testBrokenLengthGiantPacket() throws Exception {
-		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		byte[] packet = new byte[19];
 		
 		// KEEP alive packet
@@ -188,11 +158,7 @@ public class BGPv4PacketReframerTest extends ProtocolPacketTestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		buffer.writeBytes(packet);
-
-		UpstreamMessageEvent me = new UpstreamMessageEvent(channel, buffer, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-		
-		pipeline.sendUpstream(me);
+		pipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(channel, packet));
 		
 		Assert.assertEquals(1, sink.getWaitingEventNumber());
 		Assert.assertEquals(0, handler.getWaitingEventNumber());

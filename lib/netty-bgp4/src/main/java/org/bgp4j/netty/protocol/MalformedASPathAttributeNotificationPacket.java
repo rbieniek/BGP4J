@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.BgpProtocolVersionException.java 
+ * File: org.bgp4j.netty.protocol.MalformedASPathAttributeNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -21,6 +21,15 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BgpProtocolVersionException extends OpenPacketException {
+public class MalformedASPathAttributeNotificationPacket extends
+		AttributeNotificationPacket {
+
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public MalformedASPathAttributeNotificationPacket(byte[] offendingAttribute) {
+		super(UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH, offendingAttribute);
+	}
 
 }

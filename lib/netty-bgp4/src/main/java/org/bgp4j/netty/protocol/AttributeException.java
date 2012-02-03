@@ -22,7 +22,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class PathAttributeException extends ProtocolPacketFormatException {
+public abstract class AttributeException extends UpdatePacketException {
 
 	/**
 	 * 
@@ -34,54 +34,41 @@ public class PathAttributeException extends ProtocolPacketFormatException {
 	/**
 	 * 
 	 */
-	public PathAttributeException() {
+	public AttributeException() {
 	}
 
 	/**
 	 * 
 	 */
-	public PathAttributeException(byte[] offendingAttribute) {
-		this.offendingAttribute = offendingAttribute;
+	public AttributeException(byte[] offendingAttribute) {
+		setOffendingAttribute(offendingAttribute);
 	}
 
 	/**
 	 * @param message
 	 */
-	public PathAttributeException(String message) {
+	public AttributeException(String message, byte[] offendingAttribute) {
 		super(message);
+
+		setOffendingAttribute(offendingAttribute);
 	}
 
-	public PathAttributeException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public PathAttributeException(Throwable cause) {
-		super(cause);
+	/**
+	 * 
+	 */
+	public AttributeException(ChannelBuffer buffer) {
+		setOffendingAttribute(buffer);
 	}
 
 	/**
 	 * @param message
 	 */
-	public PathAttributeException(String message, byte[] offendingAttribute) {
+	public AttributeException(String message, ChannelBuffer buffer) {
 		super(message);
 
-		this.offendingAttribute = offendingAttribute;
+		setOffendingAttribute(buffer);
 	}
 
-	public PathAttributeException(String message, byte[] offendingAttribute, Throwable cause) {
-		super(message, cause);
-
-		this.offendingAttribute = offendingAttribute;
-	}
-
-	public PathAttributeException(byte[] offendingAttribute, Throwable cause) {
-		super(cause);
-
-		this.offendingAttribute = offendingAttribute;
-	}
-
-
-	
 	/**
 	 * @return the offendingAttribute
 	 */

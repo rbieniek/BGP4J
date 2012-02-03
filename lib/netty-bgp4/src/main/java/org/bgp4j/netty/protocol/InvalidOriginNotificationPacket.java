@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.InvalidOriginNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,14 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class InvalidOriginNotificationPacket extends AttributeNotificationPacket {
 
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 835955227257193451L;
-
-	/**
-	 * 
-	 */
-	public MalformedASPathAttributeException() {
-	}
-
-	/**
+	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public InvalidOriginNotificationPacket(byte[] offendingAttribute) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_ORIGIN_ATTRIBUTE, offendingAttribute);
 	}
-
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
-	}
-
-	@Override
-	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
-	}
-
 
 }

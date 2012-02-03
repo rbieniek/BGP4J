@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.InvalidNextHopNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,42 +21,14 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ProtocolTypeException extends ProtocolPacketFormatException {
+public class InvalidNextHopNotificationPacket extends AttributeNotificationPacket {
 
 	/**
-	 * 
+	 * @param subcode
+	 * @param offendingAttribute
 	 */
-	private static final long serialVersionUID = -1997353015198092763L;
-	
-	private int type;
-	
-	/**
-	 * 
-	 */
-	public ProtocolTypeException() {
-	}
-
-	/**
-	 * 
-	 */
-	public ProtocolTypeException(int type) {
-		this.type = type;
-	}
-
-	/**
-	 * @param message
-	 */
-	public ProtocolTypeException(String message, int type) {
-		super(message);
-		
-		this.type = type;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public int getType() {
-		return type;
+	public InvalidNextHopNotificationPacket(byte[] offendingAttribute) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_NEXT_HOP_ATTRIBUTE, offendingAttribute);
 	}
 
 }

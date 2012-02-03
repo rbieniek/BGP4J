@@ -23,7 +23,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnknownPathAttribute extends PathAttribute {
+public class UnknownPathAttribute extends Attribute {
 
 	private int typeCode;
 	private ChannelBuffer value;

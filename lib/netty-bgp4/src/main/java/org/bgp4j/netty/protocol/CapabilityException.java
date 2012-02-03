@@ -17,12 +17,18 @@
  */
 package org.bgp4j.netty.protocol;
 
+import java.util.Collection;
+
+import org.bgp4j.netty.BGPv4Constants;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CapabilityException extends ProtocolPacketFormatException {
+public abstract class CapabilityException extends OpenPacketException {
 
 	/**
 	 * 
@@ -31,38 +37,38 @@ public class CapabilityException extends ProtocolPacketFormatException {
 
 	private byte[] capability;
 	
-	public CapabilityException() {
+	protected CapabilityException() {
 		super();
 	}
 
-	public CapabilityException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public CapabilityException(String message) {
-		super(message);
-	}
-
-	public CapabilityException(Throwable cause) {
-		super(cause);
-	}
-
-	public CapabilityException(String message, Throwable cause, byte[] capability) {
-		super(message, cause);
-		
+	protected CapabilityException(byte[] capability) {
 		this.capability = capability;
 	}
 
-	public CapabilityException(String message, byte[] capability) {
+	protected CapabilityException(Capability cap) {
+		this.capability = encondeCapability(cap);
+	}
+
+	protected CapabilityException(Collection<Capability> caps) {
+		this.capability = encondeCapabilities(caps);
+	}
+
+	protected CapabilityException(String message, byte[] capability) {
 		super(message);
 		
 		this.capability = capability;
 	}
 
-	public CapabilityException(Throwable cause, byte[] capability) {
-		super(cause);
+	protected CapabilityException(String message, Capability cap) {
+		super(message);
 		
-		this.capability = capability;
+		this.capability = encondeCapability(cap);
+	}
+
+	protected CapabilityException(String message, Collection<Capability> caps) {
+		super(message);
+		
+		this.capability = encondeCapabilities(caps);
 	}
 
 	/**
@@ -79,4 +85,25 @@ public class CapabilityException extends ProtocolPacketFormatException {
 		this.capability = capability;
 	}
 
+	private byte[] encondeCapability(Capability cap) {
+		ChannelBuffer buffer = cap.encodeCapability();
+		byte[] packet  = new byte[buffer.readableBytes()];
+		
+		buffer.readBytes(this.capability);
+		
+		return packet;
+	}
+
+	private byte[] encondeCapabilities(Collection<Capability> caps) {
+		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
+		
+		for(Capability cap : caps)
+			buffer.writeBytes(cap.encodeCapability());
+		
+		byte[] packet  = new byte[buffer.readableBytes()];
+		
+		buffer.readBytes(this.capability);
+		
+		return packet;
+	}
 }

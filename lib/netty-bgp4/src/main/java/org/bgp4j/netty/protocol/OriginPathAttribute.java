@@ -26,7 +26,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OriginPathAttribute extends PathAttribute {
+public class OriginPathAttribute extends Attribute {
 
 	/**
 	 * Discrete origin types as specified in RFC 4271

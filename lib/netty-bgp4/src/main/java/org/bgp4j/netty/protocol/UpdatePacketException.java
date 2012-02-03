@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.UpdatePacketException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,21 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public abstract class UpdatePacketException extends ProtocolPacketException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = 755683737903202898L;
 
 	/**
 	 * 
 	 */
-	public MalformedASPathAttributeException() {
+	public UpdatePacketException() {
 	}
 
-	/**
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public UpdatePacketException(String message) {
+		super(message);
 	}
-
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
-	}
-
-	@Override
-	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
-	}
-
 
 }

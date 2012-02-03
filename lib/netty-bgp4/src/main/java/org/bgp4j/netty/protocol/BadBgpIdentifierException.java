@@ -24,12 +24,16 @@ package org.bgp4j.netty.protocol;
 public class BadBgpIdentifierException extends OpenPacketException {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7669781009811724080L;
+
+	/**
 	 * @param message
 	 * @param cause
 	 */
 	public BadBgpIdentifierException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -37,14 +41,12 @@ public class BadBgpIdentifierException extends OpenPacketException {
 	 */
 	public BadBgpIdentifierException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * 
 	 */
 	public BadBgpIdentifierException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -52,7 +54,11 @@ public class BadBgpIdentifierException extends OpenPacketException {
 	 */
 	public BadBgpIdentifierException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		return new BadBgpIdentifierNotificationPacket();
 	}
 
 }

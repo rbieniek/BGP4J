@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.MissingWellKnownAttributeException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,37 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
-
+public class MissingWellKnownAttributeException extends UpdatePacketException {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = 6006146463252407190L;
 
-	/**
-	 * 
-	 */
-	public MalformedASPathAttributeException() {
+	private int attributeCode;
+	
+	public MissingWellKnownAttributeException() {
 	}
 
-	/**
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public MissingWellKnownAttributeException(int attributeCode) {
+		this.attributeCode = attributeCode;
 	}
 
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public MissingWellKnownAttributeException(String message, int attributeCode) {
+		super(message);
+
+		this.attributeCode = attributeCode;
 	}
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+		return new MissingWellKnownAttributeNotificationPacket(this.attributeCode);
 	}
 
+	/**
+	 * @return the attributeCode
+	 */
+	public int getAttributeCode() {
+		return attributeCode;
+	}
 
 }

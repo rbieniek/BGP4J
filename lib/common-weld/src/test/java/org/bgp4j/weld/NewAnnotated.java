@@ -17,10 +17,30 @@
  */
 package org.bgp4j.weld;
 
+import javax.enterprise.inject.New;
+import javax.inject.Inject;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class NewAnnotated {
 
+	private @Inject @New DummyBean instance1;
+	private @Inject @New DummyBean instance2;
+	
+	/**
+	 * @return the instance1
+	 */
+	public DummyBean getInstance1() {
+		return instance1;
+	}
+	/**
+	 * @return the instance2
+	 */
+	public DummyBean getInstance2() {
+		return instance2;
+	}
+	
+	
 }

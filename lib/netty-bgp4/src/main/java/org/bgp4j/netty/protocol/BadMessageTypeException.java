@@ -20,39 +20,47 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class BadMessageTypeException extends ProtocolPacketException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
-
+	private static final long serialVersionUID = -1997353015198092763L;
+	
+	private int type;
+	
 	/**
 	 * 
 	 */
-	public MalformedASPathAttributeException() {
+	public BadMessageTypeException() {
 	}
 
 	/**
-	 * @param offendingAttribute
+	 * 
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public BadMessageTypeException(int type) {
+		this.type = type;
 	}
 
 	/**
 	 * @param message
-	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public BadMessageTypeException(String message, int type) {
+		super(message);
+		
+		this.type = type;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public int getType() {
+		return type;
 	}
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+		return new BadMessageTypeNotificationPacket(this.type);
 	}
-
 
 }

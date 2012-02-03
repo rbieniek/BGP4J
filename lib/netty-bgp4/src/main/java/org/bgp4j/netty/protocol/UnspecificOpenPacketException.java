@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.UnspecificOpenPacketException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,47 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class UnspecificOpenPacketException extends OpenPacketException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = -2310805310691844533L;
 
 	/**
-	 * 
+	 * @param message
+	 * @param cause
 	 */
-	public MalformedASPathAttributeException() {
+	public UnspecificOpenPacketException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 	/**
-	 * @param offendingAttribute
+	 * @param cause
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public UnspecificOpenPacketException(Throwable cause) {
+		super(cause);
+	}
+
+	/**
+	 * 
+	 */
+	public UnspecificOpenPacketException() {
 	}
 
 	/**
 	 * @param message
-	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public UnspecificOpenPacketException(String message) {
+		super(message);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.ProtocolPacketFormatException#toNotificationPacket()
+	 */
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+		return new UnspecificOpenNotificationPacket();
 	}
-
 
 }

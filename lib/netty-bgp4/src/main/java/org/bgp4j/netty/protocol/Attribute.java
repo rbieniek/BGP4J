@@ -26,7 +26,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public abstract class PathAttribute {
+public abstract class Attribute {
 
 	private boolean optional;
 	private boolean transitive;

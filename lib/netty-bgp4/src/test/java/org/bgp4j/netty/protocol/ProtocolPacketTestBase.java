@@ -17,11 +17,16 @@
  */
 package org.bgp4j.netty.protocol;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.UpstreamMessageEvent;
 import org.junit.Assert;
 
 /**
@@ -59,13 +64,33 @@ public class ProtocolPacketTestBase extends WeldTestCaseBase {
 		
 		return buffer;
 	}
+
+	protected UpstreamMessageEvent buildProtocolPacketUpstreamMessageEvent(Channel channel, byte[] packet)throws Exception  {
+		return new UpstreamMessageEvent(channel, buildProtocolPacket(packet), new InetSocketAddress(InetAddress.getLocalHost(), 1));
+	}
 	
+
 	@SuppressWarnings("unchecked")
 	protected <T extends BGPv4Packet> T safeDowncast(BGPv4Packet packet, Class<? extends T> downcastedTo) {
 		Assert.assertEquals(downcastedTo, packet.getClass());
 		
 		return (T)packet;
 	}
+	
+	protected BGPv4Packet safeExtractChannelEvent(ChannelEvent ce) {
+		Assert.assertTrue("expected class " + ce.getClass().getName() + " is assignable from " + MessageEvent.class.getName(),
+				MessageEvent.class.isAssignableFrom(ce.getClass()));
+		
+		return safeExtractMessageEvent((MessageEvent)ce);
+	}
+	
+	protected BGPv4Packet safeExtractMessageEvent(MessageEvent me) {
+		Assert.assertTrue("expected class " + me.getMessage().getClass().getName() + " is assignable from " + BGPv4Packet.class.getName(), 
+				BGPv4Packet.class.isAssignableFrom(me.getMessage().getClass()));
+		
+		return (BGPv4Packet)me.getMessage();
+	}
+	
 	
 	protected void assertArraysEquals(byte[] a, byte[] b) {
 		Assert.assertEquals("buffer length", a.length, b.length);
@@ -75,4 +100,27 @@ public class ProtocolPacketTestBase extends WeldTestCaseBase {
 		}
 	}
 
+	public abstract class AssertExecption {
+		@SuppressWarnings("unchecked")
+		public final <T extends Exception> T  execute(Class<T> exceptionClass) throws Exception {
+			boolean caught = false;
+			T caughtException = null;
+			
+			try {
+				doExecute();
+			} catch(Exception e) {
+				if(exceptionClass.isAssignableFrom(e.getClass())) {
+					caught = true;
+					caughtException = (T)e;
+				} else
+					throw e;
+			}
+			
+			Assert.assertTrue("expected to catch exception of type " + exceptionClass.getName(), caught);
+			
+			return caughtException;
+		}
+		
+		protected abstract void doExecute();
+	}
 }

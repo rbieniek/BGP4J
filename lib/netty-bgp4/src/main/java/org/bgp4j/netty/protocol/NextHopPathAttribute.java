@@ -26,7 +26,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NextHopPathAttribute extends PathAttribute {
+public class NextHopPathAttribute extends Attribute {
 
 	private Inet4Address nextHop;
 	

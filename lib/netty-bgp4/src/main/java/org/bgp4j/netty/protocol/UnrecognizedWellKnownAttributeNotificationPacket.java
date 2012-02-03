@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.UnrecognizedWellKnownAttributeNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,32 +21,15 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class PathAttributeLengthException extends PathAttributeException {
+public class UnrecognizedWellKnownAttributeNotificationPacket extends
+		AttributeNotificationPacket {
 
 	/**
-	 * 
+	 * @param subcode
+	 * @param offendingAttribute
 	 */
-	private static final long serialVersionUID = -3386494133413403227L;
-
-	/**
-	 * 
-	 */
-	public PathAttributeLengthException() {
-	}
-
-	/**
-	 * @param message
-	 */
-	public PathAttributeLengthException(String message) {
-		super(message);
-	}
-
-	public PathAttributeLengthException(byte[] offendingAttribute) {
-		super(offendingAttribute);
-	}
-
-	public PathAttributeLengthException(String message, byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public UnrecognizedWellKnownAttributeNotificationPacket(byte[] offendingAttribute) {
+		super(UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE, offendingAttribute);
 	}
 
 }

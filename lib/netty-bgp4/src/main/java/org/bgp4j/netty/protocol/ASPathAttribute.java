@@ -27,7 +27,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ASPathAttribute extends PathAttribute {
+public class ASPathAttribute extends Attribute {
 
 	private static final int AS_SET_CODE = 1;
 	private static final int AS_SEQUENCE_CODE = 2;

@@ -16,9 +16,10 @@
  */
 package org.bgp4j.weld;
 
+import javax.enterprise.inject.New;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.util.AnnotationLiteral;
 
-import junit.framework.Assert;
 
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -60,8 +61,8 @@ public class WeldTestCaseBase {
 	protected BeanManager getBeanManager() {
 		return beanManager;
 	}
-	
-	protected <T> T obtainInstance(Class<T> clazz) {
+		
+	protected <T> T obtainInstance(final Class<T> clazz) {
 		return weldContainer.instance().select(clazz).get();
 	}
 }

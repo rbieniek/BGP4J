@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.BgpProtocolVersionException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,38 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class UnsupportedVersionNumberException extends OpenPacketException {
 
+	private int supportedProtocolVersion;
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = -6258258151952280005L;
 
-	/**
-	 * 
-	 */
-	public MalformedASPathAttributeException() {
+	public UnsupportedVersionNumberException() {
+		super();
+	}
+
+	public UnsupportedVersionNumberException(int supportedProtocolVersion) {
+		this.supportedProtocolVersion = supportedProtocolVersion;
+	}
+
+	public UnsupportedVersionNumberException(String message, int supportedProtocolVersion) {
+		super(message);
+		
+		this.supportedProtocolVersion = supportedProtocolVersion;
 	}
 
 	/**
-	 * @param offendingAttribute
+	 * @return the supportedProtocolVersion
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
-	}
-
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public int getSupportedProtocolVersion() {
+		return supportedProtocolVersion;
 	}
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+		return new UnsupportedVersionNumberNotificationPacket(supportedProtocolVersion);
 	}
-
-
 }

@@ -12,7 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.UnacceptableHoldTimerException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -20,39 +21,47 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class UnacceptableHoldTimerException extends OpenPacketException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = -2100244665501484800L;
 
 	/**
-	 * 
+	 * @param message
+	 * @param cause
 	 */
-	public MalformedASPathAttributeException() {
+	public UnacceptableHoldTimerException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 	/**
-	 * @param offendingAttribute
+	 * @param cause
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public UnacceptableHoldTimerException(Throwable cause) {
+		super(cause);
+	}
+
+	/**
+	 * 
+	 */
+	public UnacceptableHoldTimerException() {
 	}
 
 	/**
 	 * @param message
-	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public UnacceptableHoldTimerException(String message) {
+		super(message);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.ProtocolPacketFormatException#toNotificationPacket()
+	 */
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+		return new UnacceptableHoldTimerNotificationPacket();
 	}
-
 
 }

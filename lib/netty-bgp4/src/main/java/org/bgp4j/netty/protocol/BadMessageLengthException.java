@@ -12,43 +12,53 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.BadMessageLengthException.java 
  */
 package org.bgp4j.netty.protocol;
 
 /**
- * @author Rainer.Bieniek@web.de
+ * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MessageLengthException extends ProtocolPacketFormatException {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9163595214018114221L;
+public class BadMessageLengthException extends ProtocolPacketException {
 
 	private int length;
 	
 	/**
 	 * 
 	 */
-	public MessageLengthException() {
+	private static final long serialVersionUID = 4333191817393984978L;
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public BadMessageLengthException(int length) {
+		this.length = length;
 	}
 
 	/**
 	 * 
 	 */
-	public MessageLengthException(int length) {
-		this.length = length;
+	public BadMessageLengthException() {
 	}
 
 	/**
 	 * @param message
 	 */
-	public MessageLengthException(String message, int length) {
+	public BadMessageLengthException(String message, int length) {
 		super(message);
 		
 		this.length = length;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.ProtocolPacketFormatException#toNotificationPacket()
+	 */
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		return new BadMessageLengthNotificationPacket(this.length);
 	}
 
 	/**

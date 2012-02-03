@@ -12,11 +12,11 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.PathAttributeLengthNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
 
-import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -24,30 +24,32 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnsupportedVersionNumberNotificationPacket extends	OpenNotificationPacket {
+public class AttributeNotificationPacket extends UpdateNotificationPacket {
 
-	private int version = BGPv4Constants.BGP_VERSION;
+	private byte[] offendingAttribute;
 	
-	public UnsupportedVersionNumberNotificationPacket() {
-		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_VERSION_NUMBER);
-	}
-
-	public UnsupportedVersionNumberNotificationPacket(int version) {
-		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_VERSION_NUMBER);
+	/**
+	 * @param subcode
+	 */
+	protected AttributeNotificationPacket(int subcode, byte[] offendingAttribute) {
+		super(subcode);
 		
-		this.version = version;
+		this.offendingAttribute = offendingAttribute;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodePayload()
+	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodeAdditionalPayload()
 	 */
 	@Override
-	protected ChannelBuffer encodeAdditionalPayload() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(2);
+	protected final ChannelBuffer encodeAdditionalPayload() {
+		ChannelBuffer buffer = null;
 		
-		buffer.writeShort(this.version);
+		if(offendingAttribute != null)  {
+			buffer = ChannelBuffers.buffer(offendingAttribute.length);
+			
+			buffer.writeBytes(offendingAttribute);
+		}
 		
 		return buffer;
 	}
-
 }

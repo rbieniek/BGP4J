@@ -135,13 +135,13 @@ public abstract class Capability {
 		int parameterLength = buffer.readUnsignedByte();
 		
 		if(parameterLength != 0)
-			throw new ProtocolPacketFormatException("Expected zero-length parameter, got " + parameterLength + " octets");
+			throw new UnspecificOpenPacketException("Expected zero-length parameter, got " + parameterLength + " octets");
 	}
 
 	protected void assertFixedLength(ChannelBuffer buffer, int length) {
 		int parameterLength = buffer.readUnsignedByte();
 		
 		if(parameterLength != length)
-			throw new CapabilityLengthException("Expected " + length + " octets parameter, got " + parameterLength + " octets");
+			throw new UnspecificOpenPacketException("Expected " + length + " octets parameter, got " + parameterLength + " octets");
 	}
 }

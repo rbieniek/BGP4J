@@ -17,10 +17,13 @@
  */
 package org.bgp4j.weld;
 
+import javax.inject.Singleton;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@Singleton
 public class DummyBean {
 
 }

@@ -34,7 +34,7 @@ public class NotificationPacket extends BGPv4Packet {
 	}
 	
 	@Override
-	protected ChannelBuffer encodePayload() {
+	protected final ChannelBuffer encodePayload() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		
 		buffer.writeByte(errorCode);
@@ -49,21 +49,21 @@ public class NotificationPacket extends BGPv4Packet {
 	}
 
 	@Override
-	protected int getType() {
+	protected final int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_NOTIFICATION;
 	}
 
 	/**
 	 * @return the errorCode
 	 */
-	public int getErrorCode() {
+	public final int getErrorCode() {
 		return errorCode;
 	}
 
 	/**
 	 * @return the errorSubcode
 	 */
-	public int getErrorSubcode() {
+	public final int getErrorSubcode() {
 		return errorSubcode;
 	}	
 	

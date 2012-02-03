@@ -12,47 +12,38 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.WellKnownAttributeMissingNotificationPacket.java 
  */
 package org.bgp4j.netty.protocol;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class MissingWellKnownAttributeNotificationPacket extends UpdateNotificationPacket {
 
+	private int attributeCode;
+	
 	/**
-	 * 
+	 * @param attributeCode 
+	 * @param subcode
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
-
-	/**
-	 * 
-	 */
-	public MalformedASPathAttributeException() {
+	public MissingWellKnownAttributeNotificationPacket(int attributeCode) {
+		super(UpdateNotificationPacket.SUBCODE_MISSING_WELL_KNOWN_ATTRIBUTE);
+		
+		this.attributeCode = attributeCode;
 	}
 
-	/**
-	 * @param offendingAttribute
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodeAdditionalPayload()
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
-	}
-
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
-	}
-
 	@Override
-	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+	protected ChannelBuffer encodeAdditionalPayload() {
+		// TODO Auto-generated method stub
+		return super.encodeAdditionalPayload();
 	}
-
 
 }

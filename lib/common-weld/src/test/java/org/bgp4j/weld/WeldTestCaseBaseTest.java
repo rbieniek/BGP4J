@@ -17,10 +17,28 @@
  */
 package org.bgp4j.weld;
 
+import junit.framework.Assert;
+
+import org.junit.Test;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class WeldTestCaseBaseTest extends WeldTestCaseBase {
+
+	@Test
+	public void testMultipleInstance() {
+		NewAnnotated cont = obtainInstance(NewAnnotated.class);
+		
+		Assert.assertNotSame(cont.getInstance1(), cont.getInstance2());
+	}
+
+	@Test
+	public void testSingleInstance() {
+		NotNewAnnotated cont = obtainInstance(NotNewAnnotated.class);
+		
+		Assert.assertSame(cont.getInstance1(), cont.getInstance2());
+	}
 
 }

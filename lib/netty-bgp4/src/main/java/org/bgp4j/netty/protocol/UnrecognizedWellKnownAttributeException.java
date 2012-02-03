@@ -12,47 +12,69 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.UnrecognizedAttributeException.java 
  */
 package org.bgp4j.netty.protocol;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedASPathAttributeException extends AttributeException {
+public class UnrecognizedWellKnownAttributeException extends AttributeException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 835955227257193451L;
+	private static final long serialVersionUID = -8298311237342239339L;
 
 	/**
 	 * 
 	 */
-	public MalformedASPathAttributeException() {
+	public UnrecognizedWellKnownAttributeException() {
 	}
 
 	/**
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
+	public UnrecognizedWellKnownAttributeException(byte[] offendingAttribute) {
 		super(offendingAttribute);
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param message
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(String message,
+	public UnrecognizedWellKnownAttributeException(String message,
 			byte[] offendingAttribute) {
 		super(message, offendingAttribute);
 	}
 
-	@Override
-	public NotificationPacket toNotificationPacket() {
-		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+	/**
+	 * @param buffer
+	 */
+	public UnrecognizedWellKnownAttributeException(ChannelBuffer buffer) {
+		super(buffer);
 	}
 
+	/**
+	 * @param message
+	 * @param buffer
+	 */
+	public UnrecognizedWellKnownAttributeException(String message, ChannelBuffer buffer) {
+		super(message, buffer);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.ProtocolPacketException#toNotificationPacket()
+	 */
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

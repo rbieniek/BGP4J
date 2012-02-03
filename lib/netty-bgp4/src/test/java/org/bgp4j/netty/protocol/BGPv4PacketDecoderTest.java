@@ -18,6 +18,7 @@ package org.bgp4j.netty.protocol;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.junit.After;
@@ -58,6 +59,63 @@ public class BGPv4PacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(180, open.getHoldTime());
 		Assert.assertEquals(0, open.getCapabilities().size());
 		Assert.assertEquals(((192<<24) | (168 << 16) | (9 << 8) | 1), open.getBgpIdentifier());
+	}
+
+	@Test
+	public void testDecodeBasicOpenPacketBadProtocolVersion() throws Exception {
+		UnsupportedVersionNumberException ex = (new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
+						(byte)0x01, // type code OPEN
+						(byte)0x04, // BGP version 4 
+						(byte)0xfc, (byte)0x00, // Autonomous system 64512 
+						(byte)0x00, (byte)0xb4, // hold time 180 seconds
+						(byte)0xc0, (byte)0xa8, (byte)0x09, (byte)0x01, /// BGP identifier 192.168.9.1 
+						(byte)0x0, // optional parameter length 0 
+				})), OpenPacket.class);
+			}
+		}).execute(UnsupportedVersionNumberException.class);
+		
+		Assert.assertEquals(4, ex.getSupportedProtocolVersion());
+	}
+
+	@Test
+	public void testDecodeBasicOpenPacketBadBgpIdentifier() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
+						(byte)0x01, // type code OPEN
+						(byte)0x04, // BGP version 4 
+						(byte)0xfc, (byte)0x00, // Autonomous system 64512 
+						(byte)0x00, (byte)0xb4, // hold time 180 seconds
+						(byte)0xe0, (byte)0x0, (byte)0x0, (byte)0x01, /// BGP identifier 224.0.0.1 (Multicast IP) 
+						(byte)0x0, // optional parameter length 0 
+				})), OpenPacket.class);
+			}
+		}).execute(BadBgpIdentifierException.class);
+	}
+
+	@Test
+	public void testDecodeBasicOpenPacketUnsupportedOptionaParameter() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
+						(byte)0x01, // type code OPEN
+						(byte)0x04, // BGP version 4 
+						(byte)0xfc, (byte)0x00, // Autonomous system 64512 
+						(byte)0x00, (byte)0xb4, // hold time 180 seconds
+						(byte)0xe0, (byte)0x0, (byte)0x0, (byte)0x01, /// BGP identifier 224.0.0.1 (Multicast IP) 
+						(byte)0x2, // optional parameter length 0
+						(byte)0x03, (byte)0x00 // bogus optional parameter type code 3
+				})), OpenPacket.class);
+			}
+		}).execute(UnsupportedOptionalParameterException.class);
 	}
 
 	@Test

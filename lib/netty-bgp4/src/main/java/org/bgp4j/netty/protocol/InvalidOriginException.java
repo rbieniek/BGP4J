@@ -20,19 +20,11 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class InvalidOriginException extends PathAttributeException {
+public class InvalidOriginException extends AttributeException {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4983725877677879162L;
-
-	public InvalidOriginException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public InvalidOriginException(Throwable cause) {
-		super(cause);
-	}
 
 	/**
 	 * 
@@ -50,25 +42,14 @@ public class InvalidOriginException extends PathAttributeException {
 	/**
 	 * @param message
 	 */
-	public InvalidOriginException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param message
-	 * @param offendingAttribute
-	 */
 	public InvalidOriginException(String message, byte[] offendingAttribute) {
 		super(message, offendingAttribute);
 	}
 
-	public InvalidOriginException(byte[] offendingAttribute, Throwable cause) {
-		super(offendingAttribute, cause);
+	@Override
+	public NotificationPacket toNotificationPacket() {
+		return new InvalidOriginNotificationPacket(getOffendingAttribute());
 	}
 
-	public InvalidOriginException(String message, byte[] offendingAttribute,
-			Throwable cause) {
-		super(message, offendingAttribute, cause);
-	}
 
 }

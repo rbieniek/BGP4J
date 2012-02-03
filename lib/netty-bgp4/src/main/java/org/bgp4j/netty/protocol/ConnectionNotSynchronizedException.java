@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.UnsupportedOptionalParameterException.java 
+ * File: org.bgp4j.netty.protocol.ConnectionNotSynchronizedException.java 
  */
 package org.bgp4j.netty.protocol;
 
@@ -21,31 +21,39 @@ package org.bgp4j.netty.protocol;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnsupportedOptionalParameterException extends OpenPacketException {
+public class ConnectionNotSynchronizedException extends
+		ProtocolPacketException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 6193635931471963435L;
+	private static final long serialVersionUID = 988239317361192202L;
 
-	public UnsupportedOptionalParameterException() {
+	public ConnectionNotSynchronizedException() {
+		// TODO Auto-generated constructor stub
 	}
 
-	public UnsupportedOptionalParameterException(String message, Throwable cause) {
+	public ConnectionNotSynchronizedException(String message, Throwable cause) {
 		super(message, cause);
+		// TODO Auto-generated constructor stub
 	}
 
-	public UnsupportedOptionalParameterException(String message) {
+	public ConnectionNotSynchronizedException(String message) {
 		super(message);
+		// TODO Auto-generated constructor stub
 	}
 
-	public UnsupportedOptionalParameterException(Throwable cause) {
+	public ConnectionNotSynchronizedException(Throwable cause) {
 		super(cause);
+		// TODO Auto-generated constructor stub
 	}
 
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.ProtocolPacketFormatException#toNotificationPacket()
+	 */
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new UnsupportedOptionalParameterNotificationPacket();
+		return new ConnectionNotSynchronizedNotificationPacket();
 	}
 
 }
