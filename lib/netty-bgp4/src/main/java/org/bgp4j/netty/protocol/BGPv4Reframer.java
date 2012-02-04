@@ -60,7 +60,7 @@ public class BGPv4Reframer extends FrameDecoder {
 			if(marker[i] != (byte)0xff) {
 				log.error("received invalid marker {}, closing connection", marker[i]);
 				
-				NotificationHelper.sendNotificationAndCloseChannel(channel, new ConnectionNotSynchronizedNotificationPacket());
+				NotificationHelper.sendEncodedNotificationAndCloseChannel(channel, new ConnectionNotSynchronizedNotificationPacket());
 				
 				return null;				
 			}
@@ -71,7 +71,7 @@ public class BGPv4Reframer extends FrameDecoder {
 			log.error("received illegal packet size {}, must be between {} and {}. closing connection", 
 					new Object[] { length, BGPv4Constants.BGP_PACKET_MIN_LENGTH, BGPv4Constants.BGP_PACKET_MAX_LENGTH });
 
-			NotificationHelper.sendNotificationAndCloseChannel(channel, new BadMessageLengthNotificationPacket(length));
+			NotificationHelper.sendEncodedNotificationAndCloseChannel(channel, new BadMessageLengthNotificationPacket(length));
 			
 			return null;
 		}

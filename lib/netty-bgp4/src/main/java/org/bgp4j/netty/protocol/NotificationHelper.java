@@ -54,4 +54,30 @@ public class NotificationHelper {
 			}
 		});
 	}
+
+	/**
+	 * send a notification and close the channel after the message was sent.
+	 * 
+	 * @param ctx the channel handler context containing the channel.
+	 * @param notification the notification to send
+	 */
+	public static void sendEncodedNotificationAndCloseChannel(ChannelHandlerContext ctx, NotificationPacket notification) {
+		sendEncodedNotificationAndCloseChannel(ctx.getChannel(), notification);
+	}
+	
+	/**
+	 * send a notification and close the channel after the message was sent.
+	 * 
+	 * @param channel the channel.
+	 * @param notification the notification to send
+	 */
+	public static void sendEncodedNotificationAndCloseChannel(Channel channel, NotificationPacket notification) {
+		channel.write(notification.encodePacket()).addListener(new ChannelFutureListener() {
+			
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				future.getChannel().close();
+			}
+		});
+	}
 }
