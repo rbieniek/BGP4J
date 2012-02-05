@@ -30,6 +30,8 @@ import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
+import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegment;
+import org.bgp4j.netty.protocol.update.ASPathAttribute.PathType;
 import org.bgp4j.netty.protocol.update.CommunityPathAttribute.CommunityMember;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -130,43 +132,37 @@ public class UpdatePacketDecoder {
 	private ASPathAttribute decodeASPathAttribute(ChannelBuffer buffer, ASType asType) {
 		ASPathAttribute attr = new ASPathAttribute(asType);
 
-		/*
-		 * If an IBGP speaker announces an internal INCOMPLETE route, the AS_PATH attribute is empty
-		 */
-		if(buffer.readable()) {
+		while(buffer.readable()) {
+			if(buffer.readableBytes() < 2)
+				throw new MalformedASPathAttributeException();
+			
+			int segmentType = buffer.readUnsignedByte();
+			int pathLength = buffer.readUnsignedByte();
+			int pathOctetLength = (pathLength * (asType == ASType.AS_NUMBER_4OCTETS ? 4 : 2));
+			
+			if(buffer.readableBytes() < pathOctetLength)
+				throw new MalformedASPathAttributeException();
+			
+			PathSegment segment =  new PathSegment(asType);
+
 			try {
-				attr.setPathType(ASPathAttribute.PathType.fromCode(buffer
-						.readUnsignedByte()));
-
-				int asCount = buffer.readUnsignedByte();
-
-				for (int i = 0; i < asCount; i++) {
-					int as;
-
-					if (asType == ASType.AS_NUMBER_4OCTETS)
-						as = (int) buffer.readUnsignedInt();
-					else
-						as = buffer.readUnsignedShort();
-
-					attr.getAses().add(as);
-				}
-
-				// if there are more octets to read at this point, the packet is
-				// malformed
-				if (buffer.readable())
-					throw new MalformedASPathAttributeException();
+				segment.setPathType(PathType.fromCode(segmentType));
 			} catch (IllegalArgumentException e) {
 				log.error("cannot convert AS_PATH type", e);
 
 				throw new MalformedASPathAttributeException();
-			} catch (IndexOutOfBoundsException e) {
-				log.error("short AS_PATH attribute", e);
-
-				throw new MalformedASPathAttributeException();
 			}
-		} else {
 			
+			for(int i=0; i<pathLength; i++) {
+				if(asType == ASType.AS_NUMBER_4OCTETS)
+					segment.getAses().add((int)buffer.readUnsignedInt());
+				else
+					segment.getAses().add(buffer.readUnsignedShort());
+			}
+			
+			attr.getPathSegments().add(segment);
 		}
+		
 		return attr;
 	}
 

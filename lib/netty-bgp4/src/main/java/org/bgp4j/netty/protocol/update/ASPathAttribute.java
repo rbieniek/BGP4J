@@ -61,9 +61,84 @@ public class ASPathAttribute extends Attribute {
 		}
 	}
 	
+	public static class PathSegment {
+		private ASType asType;
+		private List<Integer> ases = new LinkedList<Integer>(); 
+		private PathType pathType;
+		
+		public PathSegment(ASType asType) {
+			this.asType = asType;
+		}
+		
+		/**
+		 * @return the asType
+		 */
+		public ASType getAsType() {
+			return asType;
+		}
+
+		/**
+		 * @return the ases
+		 */
+		public List<Integer> getAses() {
+			return ases;
+		}
+
+		/**
+		 * @param ases the ases to set
+		 */
+		public void setAses(List<Integer> ases) {
+			this.ases = ases;
+		}
+
+		/**
+		 * @return the type
+		 */
+		public PathType getPathType() {
+			return pathType;
+		}
+
+		/**
+		 * @param type the type to set
+		 */
+		public void setPathType(PathType type) {
+			this.pathType = type;
+		}
+
+		private int getValueLength() {
+			int size = 2; // type + length field
+
+			if(this.ases != null && this.ases.size() > 0) {
+				size += this.ases.size() * (asType == ASType.AS_NUMBER_4OCTETS ? 4 : 2);
+			}
+			
+			return size;
+		}
+
+		private ChannelBuffer encodeValue() {
+			ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
+			
+			buffer.writeByte(this.pathType.toCode());
+			if(this.ases != null && this.ases.size() > 0) {
+				buffer.writeByte(this.ases.size());
+				
+				for(int as : this.ases) {
+					if(asType == ASType.AS_NUMBER_4OCTETS) 
+						buffer.writeInt(as);
+					else
+						buffer.writeShort(as);
+				}
+					
+				
+			} else {
+				buffer.writeByte(0);
+			}
+			return buffer;
+		}
+	}
+	
 	private ASType asType;
-	private List<Integer> ases = new LinkedList<Integer>(); 
-	private PathType pathType;
+	private List<PathSegment> pathSegments = new LinkedList<PathSegment>(); 
 
 	public ASPathAttribute(ASType asType) {
 		this.asType = asType;
@@ -80,8 +155,10 @@ public class ASPathAttribute extends Attribute {
 	protected int getValueLength() {
 		int size = 2; // type + length field
 
-		if(this.ases != null)
-			size += this.ases.size() * (isFourByteASNumber() ? 4 : 2);
+		if(this.pathSegments!= null) {
+			for(PathSegment seg : this.pathSegments)
+				size += seg.getValueLength();
+		}
 		
 		return size;
 	}
@@ -90,19 +167,10 @@ public class ASPathAttribute extends Attribute {
 	protected ChannelBuffer encodeValue() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
 		
-		buffer.writeByte(getPathType().toCode());
-		
-		if(this.ases != null && this.ases.size() > 0) {
-			buffer.writeByte(this.ases.size());
-			
-			for (int as : this.ases) {
-				if(isFourByteASNumber())
-					buffer.writeInt(as);
-				else
-					buffer.writeShort(as);
-			}
-		} else
-			buffer.writeByte(0);
+		if(this.pathSegments != null && this.pathSegments.size() > 0) {
+			for(PathSegment seg : this.pathSegments)
+				buffer.writeBytes(seg.encodeValue());
+		}
 		
 		return buffer;
 	}
@@ -115,38 +183,25 @@ public class ASPathAttribute extends Attribute {
 	}
 
 	/**
+	 * @return the pathSegments
+	 */
+	public List<PathSegment> getPathSegments() {
+		return pathSegments;
+	}
+
+	/**
+	 * @param pathSegments the pathSegments to set
+	 */
+	public void setPathSegments(List<PathSegment> pathSegments) {
+		this.pathSegments = pathSegments;
+	}
+
+	/**
 	 * @return the asType
 	 */
 	public ASType getAsType() {
 		return asType;
 	}
 
-	/**
-	 * @return the ases
-	 */
-	public List<Integer> getAses() {
-		return ases;
-	}
-
-	/**
-	 * @param ases the ases to set
-	 */
-	public void setAses(List<Integer> ases) {
-		this.ases = ases;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public PathType getPathType() {
-		return pathType;
-	}
-
-	/**
-	 * @param type the type to set
-	 */
-	public void setPathType(PathType type) {
-		this.pathType = type;
-	}
 
 }

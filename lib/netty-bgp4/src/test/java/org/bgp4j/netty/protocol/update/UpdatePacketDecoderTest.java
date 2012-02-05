@@ -26,7 +26,6 @@ import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.BadMessageLengthException;
 import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
-import org.bgp4j.netty.protocol.update.ASPathAttribute.PathType;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.junit.After;
 import org.junit.Before;
@@ -96,8 +95,7 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(Origin.INCOMPLETE, origin.getOrigin());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, asPath.getTypeCode());
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
-		Assert.assertEquals(PathType.AS_SEQUENCE, asPath.getPathType());
-		Assert.assertEquals(0, asPath.getAses().size());
+		Assert.assertEquals(0, asPath.getPathSegments().size());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_NEXT_HOP, nextHop.getTypeCode());
 		Assert.assertEquals(Inet4Address.getByAddress(new byte[] {(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC, multiExitDisc.getTypeCode());
