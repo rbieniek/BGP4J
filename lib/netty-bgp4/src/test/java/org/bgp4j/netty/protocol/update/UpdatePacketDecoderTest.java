@@ -259,4 +259,134 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		}).execute(MalformedAttributeListException.class);
 	}
 
+	@Test
+	public void testOriginIgpPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x04, // path attributes length (29 octets)
+				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN IGP  
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		OriginPathAttribute origin = (OriginPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN, origin.getTypeCode());
+		Assert.assertEquals(Origin.IGP, origin.getOrigin());
+	}
+	
+	@Test
+	public void testOriginEgpPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x04, // path attributes length (29 octets)
+				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x01, // Path attribute: ORIGIN EGP  
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		OriginPathAttribute origin = (OriginPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN, origin.getTypeCode());
+		Assert.assertEquals(Origin.EGP, origin.getOrigin());
+	}
+	
+	@Test
+	public void testOriginIncompletePacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x04, // path attributes length (29 octets)
+				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE  
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		OriginPathAttribute origin = (OriginPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN, origin.getTypeCode());
+		Assert.assertEquals(Origin.INCOMPLETE, origin.getOrigin());
+	}
+	
+	@Test
+	public void testOriginInvalidPacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+						// (byte)0x00, (byte)0x35, // length 53 octets 
+						// (byte)0x02, // type code 2 (UPDATE) 
+						(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+						(byte)0x00, (byte)0x04, // path attributes length (29 octets)
+						(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x04, // Path attribute: ORIGIN INCOMPLETE  
+				})), UpdatePacket.class);
+			}
+		}).execute(InvalidOriginException.class);
+	}
+
+	@Test
+	public void testOriginShortPacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+						// (byte)0x00, (byte)0x35, // length 53 octets 
+						// (byte)0x02, // type code 2 (UPDATE) 
+						(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+						(byte)0x00, (byte)0x03, // path attributes length (29 octets)
+						(byte)0x40, (byte)0x01, (byte)0x00, // Path attribute:   
+				})), UpdatePacket.class);
+			}
+		}).execute(AttributeLengthException.class);
+	}
+
+	@Test
+	public void testASPathEmptyPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x04, // path attributes length (29 octets)
+				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x00, // Path attribute: AS_PATH emtpy 
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, asPath.getTypeCode());
+		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
+		Assert.assertEquals(0, asPath.getPathSegments().size());
+	}
 }
