@@ -310,4 +310,13 @@ public class BGPv4Constants {
 	
 	/** OPEN packet CAPABILITY parameter type (RFC 5492) */
 	public static final int BGP_OPEN_PARAMETER_TYPE_CAPABILITY = 2;
+	
+	/** Well-known BGP community value NO_EXPORT (RFC 1997) */
+	public static final int BGP_COMMUNITY_NO_EXPORT = 0xFFFFFF01;
+	
+	/** Well-known BGP community value NO_ADVERTISE (RFC 1997) */
+	public static final int BGP_COMMUNITY_NO_ADVERTISE = 0xFFFFFF02;
+	
+	/** Well-known BGP community value NO_EXPORT_SUBCONFED (RFC 1997) */
+	public static final int BGP_COMMUNITY_NO_EXPORT_SUBCONFED = 0xFFFFFF03;
 }

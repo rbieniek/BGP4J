@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.protocol.ASType;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -33,7 +34,7 @@ public class ASPathAttribute extends Attribute {
 	private static final int AS_SEQUENCE_CODE = 2;
 	
 	
-	public enum Type {
+	public enum PathType {
 		AS_SET,      // unordered set of ASes a route in the UPDATE message has traversed
 		AS_SEQUENCE; // ordered set of ASes a route in the UPDATE message has traversed
 		
@@ -48,7 +49,7 @@ public class ASPathAttribute extends Attribute {
 			}
 		}
 		
-		static Type fromCode(int code) {
+		static PathType fromCode(int code) {
 			switch(code) {
 			case AS_SET_CODE:
 				return AS_SET;
@@ -60,12 +61,12 @@ public class ASPathAttribute extends Attribute {
 		}
 	}
 	
-	private boolean fourByteASNumber;
+	private ASType asType;
 	private List<Integer> ases = new LinkedList<Integer>(); 
-	private Type type;
+	private PathType pathType;
 
-	public ASPathAttribute(boolean fourByteASNumber) {
-		this.fourByteASNumber = fourByteASNumber;
+	public ASPathAttribute(ASType asType) {
+		this.asType = asType;
 	}
 	
 	@Override
@@ -89,9 +90,9 @@ public class ASPathAttribute extends Attribute {
 	protected ChannelBuffer encodeValue() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
 		
-		buffer.writeByte(getType().toCode());
+		buffer.writeByte(getPathType().toCode());
 		
-		if(this.ases != null) {
+		if(this.ases != null && this.ases.size() > 0) {
 			buffer.writeByte(this.ases.size());
 			
 			for (int as : this.ases) {
@@ -110,14 +111,14 @@ public class ASPathAttribute extends Attribute {
 	 * @return the fourByteASNumber
 	 */
 	public boolean isFourByteASNumber() {
-		return fourByteASNumber;
+		return (this.asType == ASType.AS_NUMBER_4OCTETS);
 	}
 
 	/**
-	 * @param fourByteASNumber the fourByteASNumber to set
+	 * @return the asType
 	 */
-	public void setFourByteASNumber(boolean fourByteASNumber) {
-		this.fourByteASNumber = fourByteASNumber;
+	public ASType getAsType() {
+		return asType;
 	}
 
 	/**
@@ -137,15 +138,15 @@ public class ASPathAttribute extends Attribute {
 	/**
 	 * @return the type
 	 */
-	public Type getType() {
-		return type;
+	public PathType getPathType() {
+		return pathType;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(Type type) {
-		this.type = type;
+	public void setPathType(PathType type) {
+		this.pathType = type;
 	}
 
 }

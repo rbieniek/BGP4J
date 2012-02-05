@@ -36,7 +36,7 @@ public class ProtocolPacketUtils {
 		if(minimumPacketSize != -1) {
 			if(buffer.readableBytes() < (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
 				throw new BadMessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
-						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
+						+ " octest, received " + buffer.readableBytes() + " octets", buffer.readableBytes());
 			}
 		}
 		if(maximumPacketSize != -1) {

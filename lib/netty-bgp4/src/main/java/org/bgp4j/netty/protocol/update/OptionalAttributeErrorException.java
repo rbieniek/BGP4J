@@ -24,7 +24,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnrecognizedWellKnownAttributeException extends AttributeException {
+public class OptionalAttributeErrorException extends AttributeException {
 
 	/**
 	 * 
@@ -34,13 +34,13 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	/**
 	 * 
 	 */
-	public UnrecognizedWellKnownAttributeException() {
+	public OptionalAttributeErrorException() {
 	}
 
 	/**
 	 * @param offendingAttribute
 	 */
-	public UnrecognizedWellKnownAttributeException(byte[] offendingAttribute) {
+	public OptionalAttributeErrorException(byte[] offendingAttribute) {
 		super(offendingAttribute);
 		// TODO Auto-generated constructor stub
 	}
@@ -49,7 +49,7 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	 * @param message
 	 * @param offendingAttribute
 	 */
-	public UnrecognizedWellKnownAttributeException(String message,
+	public OptionalAttributeErrorException(String message,
 			byte[] offendingAttribute) {
 		super(message, offendingAttribute);
 	}
@@ -57,7 +57,7 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	/**
 	 * @param buffer
 	 */
-	public UnrecognizedWellKnownAttributeException(ChannelBuffer buffer) {
+	public OptionalAttributeErrorException(ChannelBuffer buffer) {
 		super(buffer);
 	}
 
@@ -65,7 +65,7 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	 * @param message
 	 * @param buffer
 	 */
-	public UnrecognizedWellKnownAttributeException(String message, ChannelBuffer buffer) {
+	public OptionalAttributeErrorException(String message, ChannelBuffer buffer) {
 		super(message, buffer);
 	}
 
@@ -74,7 +74,7 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	 */
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new UnrecognizedWellKnownAttributeNotificationPacket(getOffendingAttribute());
+		return new OptionalAttributeErrorNotificationPacket(getOffendingAttribute());
 	}
 
 }

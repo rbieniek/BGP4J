@@ -30,7 +30,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
 public class OpenPacketDecoder {
 
 	/**
-	 * decode the OPEN network packet. The passed channel buffer MUST point to the first packet octet AFTER the error type.
+	 * decode the OPEN network packet. The passed channel buffer MUST point to the first packet octet AFTER the type octet.
 	 * 
 	 * @param buffer the buffer containing the data. 
 	 * @return
