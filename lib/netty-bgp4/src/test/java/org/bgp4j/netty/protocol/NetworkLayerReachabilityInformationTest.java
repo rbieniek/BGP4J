@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NetworkLayerReachabiityInformationTest extends ProtocolPacketTestBase {
+public class NetworkLayerReachabilityInformationTest extends ProtocolPacketTestBase {
 
 	@Test
 	public void testEncodinglength() {
@@ -290,4 +290,215 @@ public class NetworkLayerReachabiityInformationTest extends ProtocolPacketTestBa
 		Assert.assertTrue(first.isPrefixOf(second));
 		Assert.assertFalse(second.isPrefixOf(first));
 	}	
+	
+	@Test
+	public void testCompareEqualsFourBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		
+		Assert.assertEquals(0, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareEqualsGreaterBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xd0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareEqualsSmallerBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xd0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareEqualsTwelveBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xf0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xf0 });
+		
+		Assert.assertEquals(0, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareGreaterTwelveBitsFirst() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xd0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareGreaterTwelveBitsSecond() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xd0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+	
+	
+	@Test
+	public void testCompareSmallerTwelveBitsFirst() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xd0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareSmallerTwelveBitsSecond() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0x00 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xd0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareEqualsTwentyBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xf0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xf0, (byte)0xc0 });
+		
+		Assert.assertEquals(0, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareGreaterTwentyBitsFirst() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xd0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareGreaterTwentyBitsSecond() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xd0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareGreaterTwentyBitsThird() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xd0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareSmallerTwentyBitsFirst() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xd0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareSmallerTwentyBitsSecond() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xd0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareSmallerTwentyBitsThird() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xd0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+	}
+	
+	@Test
+	public void testCompareSmallersFourFiveBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(5, new byte[] { (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareGreaterFiveForBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(5, new byte[] { (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareSmallerTwelveThirteenBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(13, new byte[] { (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+		
+	}
+	
+	@Test
+	public void testCompareGreaterThirteenTwelveBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(13, new byte[] { (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+		
+	}
+
+	@Test
+	public void testCompareSmallerTwentyTwentyoneBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(21, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+	}
+	
+	@Test
+	public void testCompareGreaterTwentyoneTwentyBits() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(21, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(1, first.compareTo(second));
+	}
+	
+	@Test
+	public void testZeroNonZero() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(0, null);
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		
+		Assert.assertEquals(-1, first.compareTo(second));
+	}
+	
+	@Test
+	public void testNonZeroZero() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(20, new byte[] { (byte)0xc0, (byte)0xc0, (byte)0xc0 });
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(0, null);
+		
+		Assert.assertEquals(1, first.compareTo(second));
+	}
+	
+	@Test
+	public void testZeroZero() {
+		NetworkLayerReachabilityInformation first = new NetworkLayerReachabilityInformation(0, null);
+		NetworkLayerReachabilityInformation second = new NetworkLayerReachabilityInformation(0, null);
+		
+		Assert.assertEquals(0, first.compareTo(second));
+	}
 }

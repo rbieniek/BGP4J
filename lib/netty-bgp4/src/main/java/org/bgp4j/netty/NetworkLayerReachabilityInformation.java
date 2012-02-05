@@ -39,7 +39,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NetworkLayerReachabilityInformation implements Serializable  {
+public class NetworkLayerReachabilityInformation implements Serializable, Comparable<NetworkLayerReachabilityInformation>  {
 
 	/**
 	 * 
@@ -221,6 +221,68 @@ public class NetworkLayerReachabilityInformation implements Serializable  {
 		if (!Arrays.equals(prefix, other.prefix))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(NetworkLayerReachabilityInformation other) {
+		int result = 0;
+		
+		if(this.prefixLength == 0 && other.prefixLength > 0) {
+			result = -1;
+		} else if(this.prefixLength > 0 && other.prefixLength == 0) {
+			result = 1;
+		} else if(this.prefixLength == 0 && other.prefixLength == 0) {
+			result = 0;
+		} else {
+			int byteLen = calculatePacketSize();
+			int otherByteLen = other.calculatePacketSize();
+			int commonByteLen = (byteLen > otherByteLen) ? otherByteLen : byteLen;
+			int commonPrefixLen = (prefixLength > other.prefixLength) ? other.prefixLength : prefixLength;
+			
+			for (int i = 0; i < commonByteLen - 1; i++) {
+				if (this.prefix[i] > other.prefix[i]) {
+					result = 1;
+					break;
+				} else if(this.prefix[i] < other.prefix[i]) {
+					result = -1;
+					break;
+				}
+			}
+			
+			if(result == 0) {
+				int bitsToCheck = commonPrefixLen% 8;
+
+				if (bitsToCheck == 0) {
+					if(this.prefix[commonByteLen - 1] > other.prefix[commonByteLen - 1]) {
+						result = 1;
+					} else if(this.prefix[commonByteLen - 1] < other.prefix[commonByteLen - 1]) {
+						result = -1;
+					}
+				} else {
+					for (int i = 0; i < bitsToCheck; i++) {
+						int mask = 1 << (7 - i);
+
+						if ((this.prefix[commonByteLen - 1] & mask) > (other.prefix[commonByteLen - 1] & mask)) {
+							result = 1;
+							break;
+						} else if ((this.prefix[commonByteLen - 1] & mask) < (other.prefix[commonByteLen - 1] & mask)) {
+							result = -1;
+							break;
+						}
+					}
+				}
+				
+				if(result == 0) {
+					if(prefixLength > other.prefixLength)
+						result = 1;
+					else if(prefixLength < other.prefixLength)
+						result = -1;
+				}
+			}
+
+		}
+		
+		return result;
 	}
 	
 }
