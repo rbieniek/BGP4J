@@ -20,9 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
-import org.bgp4j.netty.protocol.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.protocol.WithdrawnRoute;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -32,7 +31,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class UpdatePacket extends BGPv4Packet {
 
-	private List<WithdrawnRoute> withdrawnRoutes = new LinkedList<WithdrawnRoute>();
+	private List<NetworkLayerReachabilityInformation> withdrawnRoutes = new LinkedList<NetworkLayerReachabilityInformation>();
 	private List<NetworkLayerReachabilityInformation> nlris = new LinkedList<NetworkLayerReachabilityInformation>();
 	private List<Attribute> pathAttributes = new LinkedList<Attribute>();
 	
@@ -68,8 +67,8 @@ public class UpdatePacket extends BGPv4Packet {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 
 		if(this.withdrawnRoutes != null) {
-			for (WithdrawnRoute route : withdrawnRoutes) {
-				buffer.writeBytes(route.encodeWithdrawnRoute());
+			for (NetworkLayerReachabilityInformation route : withdrawnRoutes) {
+				buffer.writeBytes(route.encodeNLRI());
 			}
 		}
 		
@@ -93,7 +92,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 		if(this.nlris != null) {
 			for (NetworkLayerReachabilityInformation nlri : nlris) {
-				buffer.writeBytes(nlri.encodeRoute());
+				buffer.writeBytes(nlri.encodeNLRI());
 			}
 		}
 		
@@ -104,7 +103,7 @@ public class UpdatePacket extends BGPv4Packet {
 		int size = 0;
 
 		if(this.withdrawnRoutes != null) {
-			for (WithdrawnRoute route : withdrawnRoutes) {
+			for (NetworkLayerReachabilityInformation route : withdrawnRoutes) {
 				size += route.calculatePacketSize();
 			}
 		}
@@ -146,14 +145,14 @@ public class UpdatePacket extends BGPv4Packet {
 	/**
 	 * @return the withdrawnRoutes
 	 */
-	public List<WithdrawnRoute> getWithdrawnRoutes() {
+	public List<NetworkLayerReachabilityInformation> getWithdrawnRoutes() {
 		return withdrawnRoutes;
 	}
 
 	/**
 	 * @param withdrawnRoutes the withdrawnRoutes to set
 	 */
-	public void setWithdrawnRoutes(List<WithdrawnRoute> withdrawnRoutes) {
+	public void setWithdrawnRoutes(List<NetworkLayerReachabilityInformation> withdrawnRoutes) {
 		this.withdrawnRoutes = withdrawnRoutes;
 	}
 

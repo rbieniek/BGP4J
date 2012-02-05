@@ -17,20 +17,17 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.BadMessageLengthException;
-import org.bgp4j.netty.protocol.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
-import org.bgp4j.netty.protocol.WithdrawnRoute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -224,25 +221,7 @@ public class UpdatePacketDecoder {
 		// handle network layer reachability information
 		try {
 			while(buffer.readable()) {
-				int prefixLength = buffer.readUnsignedByte();
-				NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation();
-				
-				nlri.setPrefixLength(prefixLength);
-				
-				if(prefixLength > 0) {
-					int prefixBytes = ((prefixLength-1)/8)+1;
-					byte[] addressBytes = new byte[4];
-					
-					buffer.readBytes(addressBytes, 0, prefixBytes);
-					
-					try {
-						nlri.setPrefix((Inet4Address)Inet4Address.getByAddress(addressBytes));
-					} catch (UnknownHostException e) {
-					}
-				}
-				
-				packet.getNlris().add(nlri);
-				
+				packet.getNlris().add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
 			}
 		} catch (IndexOutOfBoundsException e) {
 			throw new BadMessageLengthException(totalAvailable - (withdrawnOctets + pathAttributeOctets));
@@ -251,29 +230,11 @@ public class UpdatePacketDecoder {
 		return packet;
 	}
 
-	private List<WithdrawnRoute> decodeWithdrawnRoutes(ChannelBuffer buffer)  {
-		List<WithdrawnRoute> routes = new LinkedList<WithdrawnRoute>();
+	private List<NetworkLayerReachabilityInformation> decodeWithdrawnRoutes(ChannelBuffer buffer)  {
+		List<NetworkLayerReachabilityInformation> routes = new LinkedList<NetworkLayerReachabilityInformation>();
 		
 		while(buffer.readable()) {
-			int prefixLength = buffer.readUnsignedByte();
-			WithdrawnRoute route = new WithdrawnRoute();
-			
-			route.setPrefixLength(prefixLength);
-			
-			if(prefixLength > 0) {
-				int prefixBytes = ((prefixLength-1)/8)+1;
-				byte[] addressBytes = new byte[4];
-				
-				buffer.readBytes(addressBytes, 0, prefixBytes);
-				
-				try {
-					route.setPrefix((Inet4Address)Inet4Address.getByAddress(addressBytes));
-				} catch (UnknownHostException e) {
-				}
-			}
-			
-			routes.add(route);
-			
+			routes.add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));			
 		}
 		return routes;
 	}
