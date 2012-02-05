@@ -34,7 +34,7 @@ public class LocalPrefPathAttribute extends Attribute {
 	 */
 	@Override
 	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC;
+		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_LOCAL_PREF;
 	}
 
 	/* (non-Javadoc)

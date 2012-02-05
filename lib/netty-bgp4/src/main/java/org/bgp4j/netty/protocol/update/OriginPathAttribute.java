@@ -48,11 +48,11 @@ public class OriginPathAttribute extends Attribute {
 		int toCode() {
 			switch(this) {
 				case IGP:
-					return 1;
+					return 0;
 				case EGP:
-					return 2;
+					return 1;
 				case INCOMPLETE:
-					return 3;
+					return 2;
 				default:
 					throw new IllegalArgumentException("unknown origin code: " +this);
 			}
@@ -60,11 +60,11 @@ public class OriginPathAttribute extends Attribute {
 		
 		static Origin fromCode(int code) {
 			switch(code) {
-			case 1:
+			case 0:
 				return IGP;
-			case 2:
+			case 1:
 				return EGP;
-			case 3:
+			case 2:
 				return INCOMPLETE;
 			default:
 				throw new IllegalArgumentException("unknown origin code: " + code);
