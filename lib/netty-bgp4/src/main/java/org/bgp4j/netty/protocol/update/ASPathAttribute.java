@@ -34,7 +34,7 @@ public class ASPathAttribute extends Attribute {
 	private static final int AS_SEQUENCE_CODE = 2;
 	
 	
-	public enum PathType {
+	public enum PathSegmentType {
 		AS_SET,      // unordered set of ASes a route in the UPDATE message has traversed
 		AS_SEQUENCE; // ordered set of ASes a route in the UPDATE message has traversed
 		
@@ -49,7 +49,7 @@ public class ASPathAttribute extends Attribute {
 			}
 		}
 		
-		static PathType fromCode(int code) {
+		static PathSegmentType fromCode(int code) {
 			switch(code) {
 			case AS_SET_CODE:
 				return AS_SET;
@@ -64,7 +64,7 @@ public class ASPathAttribute extends Attribute {
 	public static class PathSegment {
 		private ASType asType;
 		private List<Integer> ases = new LinkedList<Integer>(); 
-		private PathType pathType;
+		private PathSegmentType pathSegmentType;
 		
 		public PathSegment(ASType asType) {
 			this.asType = asType;
@@ -94,15 +94,15 @@ public class ASPathAttribute extends Attribute {
 		/**
 		 * @return the type
 		 */
-		public PathType getPathType() {
-			return pathType;
+		public PathSegmentType getPathSegmentType() {
+			return pathSegmentType;
 		}
 
 		/**
 		 * @param type the type to set
 		 */
-		public void setPathType(PathType type) {
-			this.pathType = type;
+		public void setPathSegmentType(PathSegmentType type) {
+			this.pathSegmentType = type;
 		}
 
 		private int getValueLength() {
@@ -118,7 +118,7 @@ public class ASPathAttribute extends Attribute {
 		private ChannelBuffer encodeValue() {
 			ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
 			
-			buffer.writeByte(this.pathType.toCode());
+			buffer.writeByte(this.pathSegmentType.toCode());
 			if(this.ases != null && this.ases.size() > 0) {
 				buffer.writeByte(this.ases.size());
 				
