@@ -35,6 +35,8 @@ public class AggregatorPathAttribute extends Attribute {
 	private Inet4Address aggregator;
 
 	public AggregatorPathAttribute(ASType asType) {
+		super(Category.OPTIONAL_TRANSITIVE);
+
 		this.asType = asType;
 	}
 

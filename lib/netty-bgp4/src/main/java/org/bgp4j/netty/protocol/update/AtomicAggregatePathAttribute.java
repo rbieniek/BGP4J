@@ -26,6 +26,10 @@ import org.jboss.netty.buffer.ChannelBuffer;
  */
 public class AtomicAggregatePathAttribute extends Attribute {
 	
+	public AtomicAggregatePathAttribute() {
+		super(Category.WELL_KNOWN_DISCRETIONARY);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
 	 */

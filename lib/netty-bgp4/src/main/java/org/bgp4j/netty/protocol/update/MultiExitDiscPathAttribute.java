@@ -27,6 +27,16 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class MultiExitDiscPathAttribute extends Attribute {
 
+	public MultiExitDiscPathAttribute() {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
+	}
+
+	public MultiExitDiscPathAttribute(int discriminator) {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
+		
+		this.discriminator = discriminator;
+	}
+
 	private int discriminator;
 	
 	/* (non-Javadoc)

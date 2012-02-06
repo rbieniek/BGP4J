@@ -29,6 +29,8 @@ public class UnknownPathAttribute extends Attribute {
 	private ChannelBuffer value;
 	
 	public UnknownPathAttribute(int typeCode, ChannelBuffer valueBuffer) {
+		super(Category.OPTIONAL_TRANSITIVE);
+		
 		this.typeCode = typeCode;
 		this.value = valueBuffer;
 	}

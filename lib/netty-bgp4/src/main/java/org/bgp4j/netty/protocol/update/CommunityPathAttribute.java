@@ -30,6 +30,10 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class CommunityPathAttribute extends Attribute {
 
+	public CommunityPathAttribute() {
+		super(Category.OPTIONAL_TRANSITIVE);
+	}
+
 	public static class CommunityMember {
 		private int asNumber;
 		private int memberFlags;

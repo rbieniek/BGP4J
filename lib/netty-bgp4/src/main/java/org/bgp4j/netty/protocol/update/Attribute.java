@@ -28,9 +28,44 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public abstract class Attribute {
 
+	/**
+	 * @author Rainer Bieniek (Rainer.Bieniek@web.de)
+	 *
+	 */
+	public enum Category {
+		WELL_KNOWN_MANDATORY,
+		WELL_KNOWN_DISCRETIONARY,
+		OPTIONAL_TRANSITIVE,
+		OPTIONAL_NON_TRANSITIVE,
+	}
+
 	private boolean optional;
 	private boolean transitive;
 	private boolean partial;
+	private Category category;
+	
+	protected Attribute(Category category) {
+		this.category = category;
+		
+		switch(category) {
+		case OPTIONAL_NON_TRANSITIVE:
+			setTransitive(false);
+			setOptional(true);
+			break;
+		case OPTIONAL_TRANSITIVE:
+			setTransitive(true);
+			setOptional(true);
+			break;
+		case WELL_KNOWN_DISCRETIONARY:
+			setTransitive(true);
+			setOptional(false);
+			break;
+		case WELL_KNOWN_MANDATORY:
+			setTransitive(true);
+			setOptional(false);
+			break;
+		}
+	}
 	
 	/**
 	 * encode the path attribute for network transmission
@@ -150,6 +185,12 @@ public abstract class Attribute {
 	public void setTransitive(boolean transitive) {
 		this.transitive = transitive;
 	}
-	
+
+	/**
+	 * @return the category
+	 */
+	public Category getCategory() {
+		return category;
+	}
 	
 }

@@ -70,6 +70,15 @@ public class ASPathAttribute extends Attribute {
 			this.asType = asType;
 		}
 		
+		public PathSegment(ASType asType, PathSegmentType pathSegmentType, int[] asArray) {
+			this(asType);
+
+			this.pathSegmentType = pathSegmentType;
+			
+			for(int as : asArray)
+				ases.add(as);
+		}
+
 		/**
 		 * @return the asType
 		 */
@@ -141,9 +150,19 @@ public class ASPathAttribute extends Attribute {
 	private List<PathSegment> pathSegments = new LinkedList<PathSegment>(); 
 
 	public ASPathAttribute(ASType asType) {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
 		this.asType = asType;
 	}
 	
+	public ASPathAttribute(ASType asType, PathSegment[] segs) {
+		this(asType);
+		
+		for(PathSegment seg : segs) {
+			this.pathSegments.add(seg);
+		}
+	}
+
 	@Override
 	protected int getTypeCode() {
 		return (isFourByteASNumber() 
@@ -153,7 +172,7 @@ public class ASPathAttribute extends Attribute {
 
 	@Override
 	protected int getValueLength() {
-		int size = 2; // type + length field
+		int size = 0; // type + length field
 
 		if(this.pathSegments!= null) {
 			for(PathSegment seg : this.pathSegments)

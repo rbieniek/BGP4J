@@ -27,6 +27,16 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class LocalPrefPathAttribute extends Attribute {
 
+	public LocalPrefPathAttribute() {
+		super(Category.WELL_KNOWN_DISCRETIONARY);
+	}
+
+	public LocalPrefPathAttribute(int localPreference) {
+		super(Category.WELL_KNOWN_DISCRETIONARY);
+		
+		this.localPreference = localPreference;
+	}
+
 	private int localPreference;
 	
 	/* (non-Javadoc)

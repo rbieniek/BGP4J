@@ -74,6 +74,18 @@ public class OriginPathAttribute extends Attribute {
 
 	private Origin origin;
 	
+	public OriginPathAttribute() {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
+		origin = Origin.INCOMPLETE;
+	}
+	
+	public OriginPathAttribute(Origin origin) {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
+		this.origin = origin;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.PathAttribute#getTypeCode()
 	 */

@@ -28,6 +28,16 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class NextHopPathAttribute extends Attribute {
 
+	public NextHopPathAttribute() {
+		super(Category.WELL_KNOWN_MANDATORY);
+	}
+
+	public NextHopPathAttribute(Inet4Address nextHop) {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
+		this.nextHop = nextHop;
+	}
+
 	private Inet4Address nextHop;
 	
 	/* (non-Javadoc)
