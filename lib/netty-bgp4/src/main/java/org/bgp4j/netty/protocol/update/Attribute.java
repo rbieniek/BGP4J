@@ -98,7 +98,8 @@ public abstract class Attribute {
 		else
 			buffer.writeByte(valueLength);
 		
-		buffer.writeBytes(encodeValue());
+		if(valueLength > 0)
+			buffer.writeBytes(encodeValue());
 		
 		return buffer;
 	}

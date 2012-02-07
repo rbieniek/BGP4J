@@ -3055,4 +3055,44 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, }), aggregator.getAggregator());
 	}
 
+	
+	@Test
+	public void testEncodeAtomicAggregatePathAttribute() throws Exception {
+		UpdatePacket update = new UpdatePacket();
+
+		update.getPathAttributes().add(new AtomicAggregatePathAttribute());
+
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1a, // length 26
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x03, // path attributes length (5 octets)
+				(byte)0x40, (byte)0x06, (byte)0x00, // Path attribute: ATOMIC_AGGREGATE
+		}, update.encodePacket());
+	}
+	
+	@Test
+	public void testDecodeAtomiAcggregatePathAttribute() throws Exception {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x03, // path attributes length (9 octets)
+				(byte)0x40, (byte)0x06, (byte)0x00, // Path attribute: ATOMIC_AGGREGATE
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		Assert.assertTrue(packet.getPathAttributes().remove(0) instanceof AtomicAggregatePathAttribute);
+		
+	}
 }
