@@ -40,6 +40,13 @@ public class AggregatorPathAttribute extends Attribute {
 		this.asType = asType;
 	}
 
+	public AggregatorPathAttribute(ASType asType, int asNumber, Inet4Address aggregator) {
+		this(asType);
+		
+		this.asNumber = asNumber;
+		this.aggregator = aggregator;
+	}
+
 	/**
 	 * @return the fourByteASNumber
 	 */
@@ -60,8 +67,8 @@ public class AggregatorPathAttribute extends Attribute {
 	@Override
 	protected int getTypeCode() {
 		return (isFourByteASNumber() 
-				? BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR 
-						: BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR);
+				? BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR 
+						: BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR);
 	}
 
 	/* (non-Javadoc)
@@ -83,6 +90,8 @@ public class AggregatorPathAttribute extends Attribute {
 			buffer.writeInt(this.asNumber);
 		else
 			buffer.writeShort(this.asNumber);
+		
+		buffer.writeBytes(aggregator.getAddress());
 		
 		return buffer;
 	}
