@@ -3055,7 +3055,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, }), aggregator.getAggregator());
 	}
 
-	
 	@Test
 	public void testEncodeAtomicAggregatePathAttribute() throws Exception {
 		UpdatePacket update = new UpdatePacket();
@@ -3092,7 +3091,50 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(1, packet.getPathAttributes().size());
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
-		Assert.assertTrue(packet.getPathAttributes().remove(0) instanceof AtomicAggregatePathAttribute);
+		Assert.assertTrue(packet.getPathAttributes().remove(0) instanceof AtomicAggregatePathAttribute);	
+	}
+
+	@Test
+	public void testEncodeLocalPrefPathAttribute() throws Exception {
+		UpdatePacket update = new UpdatePacket();
+
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1e, // length 30
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x07, // path attributes length (5 octets)
+				(byte)0x40, (byte)0x05, (byte)0x04, // Path attribute: LOCAL_PREF
+				0x00, 0x00, 0x00, 0x64, // LOCAL_PREF 100
+		}, update.encodePacket());
+	}
+	
+	@Test
+	public void testDecodeLocalPrefPathAttribute() throws Exception {
+		UpdatePacket packet; 
+		LocalPrefPathAttribute localPref;
 		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x07, // path attributes length (9 octets)
+				(byte)0x40, (byte)0x05, (byte)0x04, // Path attribute: LOCAL_PREF
+				0x00, 0x00, 0x00, 0x64, // LOCAL_PREF 100
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		localPref = (LocalPrefPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(100, localPref.getLocalPreference());
 	}
 }
