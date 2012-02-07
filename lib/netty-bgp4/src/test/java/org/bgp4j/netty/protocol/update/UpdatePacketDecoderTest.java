@@ -24,7 +24,7 @@ import junit.framework.Assert;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.ASType;
-import org.bgp4j.netty.protocol.BadMessageLengthException;
+import org.bgp4j.netty.protocol.ConnectionNotSynchronizedException;
 import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegmentType;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
@@ -160,6 +160,25 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		NextHopPathAttribute nextHop = (NextHopPathAttribute)packet.getPathAttributes().remove(0);
 		
 		Assert.assertEquals(Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop());
+	}
+	
+	@Test
+	public void testDecodeNextHopPacketIpMulticastNextHop() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+						// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+						// (byte)0x00, (byte)0x35, // length 53 octets 
+						// (byte)0x02, // type code 2 (UPDATE) 
+						(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+						(byte)0x00, (byte)0x07, // path attributes length (29 octets)
+						(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xe0, (byte)0x00, (byte)0x00, (byte)0x01, // Path attribute: NEXT_HOP 224.0.0.1
+				})), UpdatePacket.class);
+		}
+		}).execute(InvalidNextHopException.class);
 	}
 	
 	@Test
@@ -577,7 +596,7 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 						0x00, 0x00, // bad withdrawn routes length (2 octets), points to end of packet 
 				}));
 			}
-		}).execute(BadMessageLengthException.class);
+		}).execute(ConnectionNotSynchronizedException.class);
 	}
 
 	@Test
@@ -1952,10 +1971,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		}).execute(MalformedASPathAttributeException.class);
 	}
 
-	/*
-	 * ------------------------------------------------------------------------------------------------------------------------ 
-	 */
-	
 	@Test
 	public void testEncodeEmptyUpdatePacket() {
 		UpdatePacket update = new UpdatePacket();

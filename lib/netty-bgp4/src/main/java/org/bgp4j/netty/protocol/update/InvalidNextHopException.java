@@ -52,8 +52,7 @@ public class InvalidNextHopException extends AttributeException {
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		// TODO Auto-generated method stub
-		return null;
+		return new InvalidNextHopNotificationPacket(getOffendingAttribute());
 	}
 
 }

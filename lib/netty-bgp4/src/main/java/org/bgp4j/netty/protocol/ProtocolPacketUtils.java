@@ -35,14 +35,14 @@ public class ProtocolPacketUtils {
 	public static void verifyPacketSize(ChannelBuffer buffer, int minimumPacketSize, int maximumPacketSize) {
 		if(minimumPacketSize != -1) {
 			if(buffer.readableBytes() < (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new BadMessageLengthException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
-						+ " octest, received " + buffer.readableBytes() + " octets", buffer.readableBytes());
+				throw new ConnectionNotSynchronizedException("expected minimum " + (minimumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+						+ " octest, received " + buffer.readableBytes() + " octets");
 			}
 		}
 		if(maximumPacketSize != -1) {
 			if(buffer.readableBytes() > (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)) {
-				throw new BadMessageLengthException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
-						+ "octest, received " + buffer.readableBytes() + "octets", buffer.readableBytes());
+				throw new ConnectionNotSynchronizedException("expected maximum " + (maximumPacketSize - BGPv4Constants.BGP_PACKET_HEADER_LENGTH) 
+						+ "octest, received " + buffer.readableBytes() + "octets");
 			}
 		}
 	}

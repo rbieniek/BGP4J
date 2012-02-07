@@ -35,7 +35,7 @@ public class NextHopPathAttribute extends Attribute {
 	public NextHopPathAttribute(Inet4Address nextHop) {
 		super(Category.WELL_KNOWN_MANDATORY);
 		
-		this.nextHop = nextHop;
+		setNextHop(nextHop);
 	}
 
 	private Inet4Address nextHop;
@@ -76,9 +76,15 @@ public class NextHopPathAttribute extends Attribute {
 	}
 
 	/**
-	 * @param nextHop the nextHop to set
+	 * set the next hop. If the next hop is semantically invalid, an exception is raised.
+	 * 
+	 * @param nextHop the nextHop to set, MUST NOT be an IP multicast address
+	 * @throws InvalidNextHopException next hop address is a multicast address.
 	 */
 	public void setNextHop(Inet4Address nextHop) {
+		if(nextHop.isMulticastAddress())
+			throw new InvalidNextHopException();
+		
 		this.nextHop = nextHop;
 	}
 
