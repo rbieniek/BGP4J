@@ -16,35 +16,19 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.netty.protocol.NotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedAttributeListException extends UpdatePacketException {
+public class InvalidNetworkFieldNotificationPacket extends
+		UpdateNotificationPacket {
 
 	/**
-	 * 
+	 * @param subcode
 	 */
-	private static final long serialVersionUID = -3338743494817410009L;
-
-	/**
-	 * 
-	 */
-	public MalformedAttributeListException() {
-	}
-
-	/**
-	 * @param message
-	 */
-	public MalformedAttributeListException(String message) {
-		super(message);
-	}
-
-	@Override
-	public NotificationPacket toNotificationPacket() {
-		return new MalformedAttributeListNotificationPacket();
+	public InvalidNetworkFieldNotificationPacket() {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_NETWORK_FIELD);
 	}
 
 }

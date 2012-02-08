@@ -446,8 +446,8 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(0, packet.getPathAttributes().size());
 		Assert.assertEquals(0, packet.getNlris().size());
 	}	
-	@Test
 	
+	@Test	
 	public void testDecodeCompletePacket() throws Exception {
 		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
 				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
@@ -3151,5 +3151,109 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		localPref = (LocalPrefPathAttribute)packet.getPathAttributes().remove(0);
 		
 		Assert.assertEquals(100, localPref.getLocalPreference());
+	}
+
+	@Test
+	public void testDecodeOneNlriUpdatePacket() {
+		UpdatePacket packet; 
+		NetworkLayerReachabilityInformation nlri;
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x00, // Total path attributes length  (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16 
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(0, packet.getPathAttributes().size());
+		Assert.assertEquals(1, packet.getNlris().size());
+		
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(16, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xac, 0x10} , nlri.getPrefix());
+	}	
+
+	@Test
+	public void testDecodeTwoNlriUpdatePacket() {
+		UpdatePacket packet; 
+		NetworkLayerReachabilityInformation nlri;
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x00, // Total path attributes length  (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0, // NLRI 192.168.32.0/28
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(0, packet.getPathAttributes().size());
+		Assert.assertEquals(2, packet.getNlris().size());
+		
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(16, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xac, 0x10} , nlri.getPrefix());
+		
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(28, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x20, 0} , nlri.getPrefix());
+	}	
+	
+	@Test
+	public void testDecodeBogusNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {			
+			@Override
+			protected void doExecute() {
+				safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x00, // Total path attributes length  (0 octets)
+						0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+						0x1c, (byte)0xc0, (byte)0xa8, 0x20,  // NLRI 192.168.32/28 bogus one octet missing
+				})), UpdatePacket.class);			}
+		}).execute(InvalidNetworkFieldException.class);
+	}	
+	
+	@Test
+	public void testEncodeOneNlriUpdatePacket() throws Exception {
+		UpdatePacket update = new UpdatePacket();
+
+		update.getNlris().add(new NetworkLayerReachabilityInformation(16, new byte[] {(byte)0xac, 0x10, }));
+
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1a, // length 26
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+		}, update.encodePacket());
+	}
+
+	
+	@Test
+	public void testEncodeTwoNlriUpdatePacket() throws Exception {
+		UpdatePacket update = new UpdatePacket();
+
+		update.getNlris().add(new NetworkLayerReachabilityInformation(16, new byte[] {(byte)0xac, 0x10, }));
+		update.getNlris().add(new NetworkLayerReachabilityInformation(28, new byte[] {(byte)0xc0, (byte)0xa8, 0x20, 0 }));
+
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1f, // length 31
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0x00 // NLRI 192.168.32/28 bogus one octet missing
+		}, update.encodePacket());
 	}
 }

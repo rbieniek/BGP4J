@@ -24,7 +24,6 @@ import junit.framework.Assert;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.protocol.ProtocolPacketTestBase.AssertExecption;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
@@ -32,7 +31,6 @@ import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.netty.protocol.open.RouteRefreshCapability;
 import org.bgp4j.netty.protocol.open.UnknownCapability;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
-import org.bgp4j.netty.protocol.update.InvalidNextHopException;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
 import org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
@@ -668,5 +666,91 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 		}, completeSink.nextEvent());		
 	}
 	
+	@Test
+	public void testDecodeOneNlri() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x1a, // length 26 octets
+				(byte)0x02, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x00, // Total path attributes length  (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16 
+		}));
 
+		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		NetworkLayerReachabilityInformation nlri;
+		
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(0, packet.getPathAttributes().size());
+		Assert.assertEquals(1, packet.getNlris().size());
+		
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(16, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xac, 0x10} , nlri.getPrefix());
+	}
+	
+	@Test
+	public void testDecodeTwoNlri() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x1f, // length 31 octets
+				(byte)0x02, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x00, // Total path attributes length  (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0, // NLRI 192.168.32.0/28
+		}));
+
+		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		NetworkLayerReachabilityInformation nlri;
+		
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(0, packet.getPathAttributes().size());
+		Assert.assertEquals(2, packet.getNlris().size());
+		
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(16, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xac, 0x10} , nlri.getPrefix());
+
+		nlri = packet.getNlris().remove(0);
+
+		Assert.assertEquals(28, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x20, 0} , nlri.getPrefix());
+	}
+
+	@Test
+	public void testDecodeBogusNlri() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x1e, // length 30 octets
+				(byte)0x02, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x00, // Total path attributes length  (0 octets)
+				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
+				0x1c, (byte)0xc0, (byte)0xa8, 0x20,  // NLRI 192.168.32/28 bogus one octet missing
+		}));
+
+		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+
+		assertChannelEventContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x15, // length 21 octets
+				(byte)0x03, // type code NOTIFICATION
+				(byte)0x03, // Update message error
+				(byte)0x0a, // Invalid network field
+		}, completeSink.nextEvent());		
+	}
 }

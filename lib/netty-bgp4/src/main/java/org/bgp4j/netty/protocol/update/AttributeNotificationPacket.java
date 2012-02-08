@@ -52,4 +52,18 @@ public class AttributeNotificationPacket extends UpdateNotificationPacket {
 		
 		return buffer;
 	}
+
+	/**
+	 * @return the offendingAttribute
+	 */
+	public byte[] getOffendingAttribute() {
+		return offendingAttribute;
+	}
+
+	/**
+	 * @param offendingAttribute the offendingAttribute to set
+	 */
+	void setOffendingAttribute(byte[] offendingAttribute) {
+		this.offendingAttribute = offendingAttribute;
+	}
 }

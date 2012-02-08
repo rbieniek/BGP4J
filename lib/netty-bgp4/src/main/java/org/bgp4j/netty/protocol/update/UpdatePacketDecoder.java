@@ -46,7 +46,7 @@ public class UpdatePacketDecoder {
 	private @Inject Logger log;
 
 	/**
-	 * decode the OPEN network packet. The passed channel buffer MUST point to the first packet octet AFTER the type octet.
+	 * decode the UPDATE network packet. The passed channel buffer MUST point to the first packet octet AFTER the type octet.
 	 * 
 	 * @param buffer the buffer containing the data. 
 	 * @return
@@ -118,15 +118,65 @@ public class UpdatePacketDecoder {
 									.decodeNLRI(buffer));
 				}
 			} catch (IndexOutOfBoundsException e) {
-				throw new MalformedAttributeListException();
+				throw new InvalidNetworkFieldException();
+			} catch(IllegalArgumentException e) {
+				throw new InvalidNetworkFieldException();				
 			}
 		}
 		
 		return packet;
 	}
 
+	/**
+	 * decode a NOTIFICATION packet that corresponds to UPDATE apckets. The passed channel buffer MUST point to the first packet octet AFTER the terror sub code.
+	 * 
+	 * @param buffer the buffer containing the data. 
+	 * @return
+	 */
 	public NotificationPacket decodeUpdateNotification(ChannelBuffer buffer, int errorSubcode) {
-		return null;
+		UpdateNotificationPacket packet = null;
+		byte[] offendingAttribute = null;
+
+		if(buffer.readable()) {
+			offendingAttribute = new byte[buffer.readableBytes()];
+
+			buffer.readBytes(offendingAttribute);
+		}
+
+		switch(errorSubcode) {
+		case UpdateNotificationPacket.SUBCODE_MALFORMED_ATTRIBUTE_LIST:
+			packet = new MalformedAttributeListNotificationPacket();
+			break;
+		case UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE:
+			packet = new UnrecognizedWellKnownAttributeNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_MISSING_WELL_KNOWN_ATTRIBUTE:
+			packet = new MissingWellKnownAttributeNotificationPacket(0);
+			break;
+		case UpdateNotificationPacket.SUBCODE_ATTRIBUTE_FLAGS_ERROR:
+			packet = new AttributeFlagsNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_ATTRIBUTE_LENGTH_ERROR:
+			packet = new AttributeLengthNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_INVALID_ORIGIN_ATTRIBUTE:
+			packet = new InvalidOriginNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_INVALID_NEXT_HOP_ATTRIBUTE:
+			packet = new InvalidNextHopNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR:
+			packet = new OptionalAttributeErrorNotificationPacket(offendingAttribute);
+			break;
+		case UpdateNotificationPacket.SUBCODE_INVALID_NETWORK_FIELD:
+			packet = new InvalidNetworkFieldNotificationPacket();
+			break;
+		case UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH:
+			packet = new MalformedASPathAttributeNotificationPacket(offendingAttribute);
+			break;
+		}
+		
+		return packet;
 	}
 
 	private ASPathAttribute decodeASPathAttribute(ChannelBuffer buffer, ASType asType) {

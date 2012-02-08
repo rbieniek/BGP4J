@@ -22,7 +22,7 @@ import org.bgp4j.netty.protocol.NotificationPacket;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MalformedAttributeListException extends UpdatePacketException {
+public class InvalidNetworkFieldException extends UpdatePacketException {
 
 	/**
 	 * 
@@ -32,19 +32,19 @@ public class MalformedAttributeListException extends UpdatePacketException {
 	/**
 	 * 
 	 */
-	public MalformedAttributeListException() {
+	public InvalidNetworkFieldException() {
 	}
 
 	/**
 	 * @param message
 	 */
-	public MalformedAttributeListException(String message) {
+	public InvalidNetworkFieldException(String message) {
 		super(message);
 	}
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new MalformedAttributeListNotificationPacket();
+		return new InvalidNetworkFieldNotificationPacket();
 	}
 
 }
