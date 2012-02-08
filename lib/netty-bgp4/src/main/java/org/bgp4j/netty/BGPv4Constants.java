@@ -281,16 +281,25 @@ public class BGPv4Constants {
 	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4271) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR = 7;
 	
-	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 1997) */
+	/** PATH ATTRIBUTE COMMUNITIES type code (RFC 1997) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_COMMUNITIES = 8;
 	
-	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 1997) */
+	/** PATH ATTRIBUTE ORIGINATOR_ID type code (RFC 4456) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_ORIGINATOR_ID = 9;
+	
+	/** PATH ATTRIBUTE CLUSTER_LIST type code (RFC 4456) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_CLUSTER_LIST = 10;
+	
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4760) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_MP_REACH_NLRI = 14;
 	
-	/** PATH ATTRIBUTE AS PATH type code (RFC 4271) */
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4760) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_MP_UNREACH_NLRI = 15;
+	
+	/** PATH ATTRIBUTE AS PATH type code (RFC 4893) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH = 17;
 
-	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4271) */
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 4893) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR = 18;
 	
 	/** PATH ATTRIBUTE FLAG for OPTIONAL bit (based on 16 bit flags / type code value) */

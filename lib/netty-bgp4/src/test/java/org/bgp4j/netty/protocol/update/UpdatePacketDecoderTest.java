@@ -2119,7 +2119,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		}).execute(OptionalAttributeErrorException.class);		
 	}	
 
-
 	@Test
 	public void testDecodeBadNlriMpReachNlriUpdatePacket() throws Exception {
 		(new AssertExecption() {
@@ -2140,4 +2139,115 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 			}
 		}).execute(OptionalAttributeErrorException.class);		
 	}
+	
+	@Test
+	public void testDecodeValidMpUnreachNlriZeroNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x06, // Total path attributes length  (8 octets)
+				(byte)0x80, 0x0f, 0x03, // Path Attribute MP_UNREACH_NLRI
+				0x00, 0x01, // AFI(IPv4)
+				0x01, // SAFI(UNICAT_ROUTING)
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolUnreachableNLRI mp = (MultiProtocolUnreachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		Assert.assertEquals(0, mp.getNlris().size());
+	}	
+
+	@Test
+	public void testDecodeValidMpUnreachNlriOneNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x09, // Total path attributes length  (9 octets)
+				(byte)0x80, 0x0f, 0x06, // Path Attribute MP_UNREACH_NLRI
+				0x00, 0x01, // AFI(IPv4)
+				0x01, // SAFI(UNICAT_ROUTING)
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16.0.0/12
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolUnreachableNLRI mp = (MultiProtocolUnreachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		Assert.assertEquals(1, mp.getNlris().size());
+
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+	}	
+
+	@Test
+	public void testDecodeValidMpUnreachNlriTwoNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x0d, // Total path attributes length  (13 octets)
+				(byte)0x80, 0x0f, 0x0a, // Path Attribute MP_UNREACH_NLRI
+				0x00, 0x01, // AFI(IPv4)
+				0x01, // SAFI(UNICAT_ROUTING)
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16.0.0/12
+				0x14, (byte)0xc0, (byte)0xa8, (byte)0xf0, //  NLRI 192.168.255.0/20
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolUnreachableNLRI mp = (MultiProtocolUnreachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		Assert.assertEquals(2, mp.getNlris().size());
+
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+		
+		nlri = mp.getNlris().remove(0);
+		Assert.assertEquals(20, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0xf0, } , nlri.getPrefix());
+	}
+	
+	@Test
+	public void testDecodeBadNlriMpUnreachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x08, // Total path attributes length  (8 octets)
+						(byte)0x80, 0x0f, 0x05, // Path Attribute MP_UNREACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x01, // SAFI(Unicast routing)
+						0x0c, (byte)0xab, // one octet missing on NLRI
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+	}	
 }

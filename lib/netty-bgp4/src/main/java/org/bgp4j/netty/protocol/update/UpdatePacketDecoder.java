@@ -356,6 +356,25 @@ public class UpdatePacketDecoder {
 		return attr;
 	}
 	
+	private MultiProtocolUnreachableNLRI decodeMpUnreachNlriPathAttribute(ChannelBuffer buffer) {
+		MultiProtocolUnreachableNLRI attr = new MultiProtocolUnreachableNLRI();
+		
+		try {
+			attr.setAddressFamily(AddressFamily.fromCode(buffer.readUnsignedShort()));
+			attr.setSubsequentAddressFamily(SubsequentAddressFamily.fromCode(buffer.readUnsignedByte()));
+			
+			while(buffer.readable()) {
+				attr.getNlris().add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
+			}
+		} catch(RuntimeException e) {
+			log.error("failed to decode MP_UNREACH_NLRI path attribute", e);
+			
+			throw new OptionalAttributeErrorException();
+		}
+		
+		return attr;
+	}
+	
 	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
 		List<Attribute> attributes = new LinkedList<Attribute>();
 		
@@ -414,6 +433,9 @@ public class UpdatePacketDecoder {
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MP_REACH_NLRI:
 					attr = decodeMpReachNlriPathAttribute(valueBuffer);
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MP_UNREACH_NLRI:
+					attr = decodeMpUnreachNlriPathAttribute(valueBuffer);
 					break;
 				default:
 					attr = new UnknownPathAttribute(typeCode, valueBuffer);

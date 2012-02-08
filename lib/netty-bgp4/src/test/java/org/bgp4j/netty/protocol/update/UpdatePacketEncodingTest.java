@@ -1551,4 +1551,73 @@ public class UpdatePacketEncodingTest extends ProtocolPacketTestBase {
 		}, update.encodePacket());
 	}
 
+	@Test
+	public void testEncodeMpUnreachNlriUpdatePacketHopOneNlri() {
+		UpdatePacket update = new UpdatePacket();
+	
+		update.getPathAttributes().add(new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, 
+				SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xac, (byte)0x10, }),
+		}));
+		
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x20, // length 32
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
+				(byte)0x80, 0x0f, 0x06, // MP_REACH_NLRI attribute (6 octets)
+				0x00, 0x01, // AFI IPv4
+				0x01, // safi unicast routing
+				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
+		}, update.encodePacket());
+	}
+
+	@Test
+	public void testEncodeMpUnreachNlriUpdatePacketHopTwoNlri() {
+		UpdatePacket update = new UpdatePacket();
+	
+		update.getPathAttributes().add(new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, 
+				SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xac, (byte)0x10, }),
+				new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xac, (byte)0x20, }),
+		}));
+		
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x23, // length 35
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x0c, // path attributes length (12 octets)
+				(byte)0x80, 0x0f, 0x09, // MP_REACH_NLRI attribute (9 octets)
+				0x00, 0x01, // AFI IPv4
+				0x01, // safi unicast routing
+				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
+				0x0c, (byte)0xac, (byte)0x20, // NLRI 172.32.0.0/12
+		}, update.encodePacket());
+	}
+
+	@Test
+	public void testEncodeMpUnreachNlriUpdatePacketZeroNlri() {
+		UpdatePacket update = new UpdatePacket();
+	
+		update.getPathAttributes().add(new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		
+		assertBufferContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1d, // length 39
+				(byte)0x02, // type code UPDATE
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x06, // path attributes length (6 octets)
+				(byte)0x80, 0x0f, 0x03, // MP_REACH_NLRI attribute (3 octets)
+				0x00, 0x01, // AFI IPv4
+				0x01, // safi unicast routing
+		}, update.encodePacket());
+	}
+
 }
