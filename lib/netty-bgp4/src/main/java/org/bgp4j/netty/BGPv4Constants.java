@@ -284,6 +284,9 @@ public class BGPv4Constants {
 	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 1997) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_COMMUNITIES = 8;
 	
+	/** PATH ATTRIBUTE AGGREGATOR type code (RFC 1997) */
+	public static final int BGP_PATH_ATTRIBUTE_TYPE_MP_REACH_NLRI = 14;
+	
 	/** PATH ATTRIBUTE AS PATH type code (RFC 4271) */
 	public static final int BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH = 17;
 

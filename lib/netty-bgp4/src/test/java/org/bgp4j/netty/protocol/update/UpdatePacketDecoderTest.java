@@ -22,11 +22,12 @@ import java.net.Inet4Address;
 import junit.framework.Assert;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.ConnectionNotSynchronizedException;
 import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
-import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegmentType;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.junit.After;
 import org.junit.Before;
@@ -49,21 +50,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		decoder = null;
 	}
 
-	@Test
-	public void testEncodeOriginPathAttribute() {
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN IGP
-		}, (new OriginPathAttribute(Origin.IGP)).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x01, // Path attribute: ORIGIN EGP
-		}, (new OriginPathAttribute(Origin.EGP)).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE
-		}, (new OriginPathAttribute(Origin.INCOMPLETE)).encodePathAttribute());
-	}
-	
 	@Test
 	public void testDecodeOriginIgpPacket() throws Exception {
 		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
@@ -134,13 +120,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 	}
 	
 	@Test
-	public void testEncodeNextHopPathAttribute() throws Exception {
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: NEXT_HOP 192.168.4.2
-		}, (new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 })).encodePathAttribute()));
-	}
-
-	@Test
 	public void testDecodeNextHopPacket() throws Exception {
 		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
 				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
@@ -181,258 +160,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		}).execute(InvalidNextHopException.class);
 	}
 	
-	@Test
-	public void testEncodeMultiExitDiscPathAttribute() {
-		assertBufferContents(new byte[] {
-				(byte)0x80, (byte)0x04, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x08, (byte)0x00, // Path attribute: MULT_EXIT_DISC 2048
-		}, (new MultiExitDiscPathAttribute(2048)).encodePathAttribute());
-		
-	}
-	
-	@Test
-	public void testEncodeAS2PathAttribute() {
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x00, // Path attribute: AS_PATH emtpy 
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS)).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
-				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x1234
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
-				0x01, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x1234, 0x5678
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
-				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
-				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x1234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x5678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
-				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
-				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x1234, 0x9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x5678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
-				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
-				0x01, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x1234, 0x9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x5678, 0x9abc,
-				}),
-		})).encodePathAttribute());
-		
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
-				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x1234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
-				0x02, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SEQUENCE 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x5678
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
-				0x02, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
-				0x02, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
-				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
-				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
-				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
-				0x02, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 0x9abc,
-				}),
-		})).encodePathAttribute());
-
-	}
-
-	@Test
-	public void testEncodeAS4PathAttribute() {
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x00, // Path attribute: AS4_PATH emtpy 
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS)).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
-				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x12341234
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
-				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SET 2 AS 0x12341234 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x12341234, 0x56785678
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
-				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
-				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x12341234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x56785678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
-				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x12341234 0x9abc9abc 
-				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x12341234, 0x9abc9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x56785678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
-				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
-				0x01, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x12341234, 0x9abc9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
-						0x56785678, 0x9abc9abc,
-				}),
-		})).encodePathAttribute());
-		
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
-				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x12341234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x12341234
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
-				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 2 AS 0x12341234 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x12341234, 0x56785678
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
-				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
-				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x12341234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x56785678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
-				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc 9abc
-				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x12341234, 0x9abc9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x56785678, 
-				}),
-		})).encodePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
-				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc9abc 
-				0x02, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x56785678 0x9abc9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x12341234, 0x9abc9abc,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
-						0x56785678, 0x9abc9abc,
-				}),
-		})).encodePathAttribute());
-
-	}
-
 	@Test
 	public void testDecodeEmptyUpdatePacket() {
 		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
@@ -1972,1051 +1699,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 	}
 
 	@Test
-	public void testEncodeEmptyUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x17, // length 23
-				(byte)0x02, // type code UPDATE
-				0x00, 0x00, // withdrawn routes length (0 octets)
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeCompletePacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
-		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 })));
-		update.getPathAttributes().add(new MultiExitDiscPathAttribute(2048));
-		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
-		update.getNlris().add(new NetworkLayerReachabilityInformation(0, null));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x34, // length 52
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x1c, // path attributes length (28 octets)
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE  
-				(byte)0x40, (byte)0x02, (byte)0x00, // Path attribute: AS_PATH emtpy 
-				(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: NEXT_HOP 192.168.4.2
-				(byte)0x80, (byte)0x04, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x08, (byte)0x00, // Path attribute: MULT_EXIT_DISC 2048
-				(byte)0x40, (byte)0x05, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x64, // Path attribute: LOCAL_PREF 100
-				(byte)0x00 // NLRI: 0.0.0.0/0	
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeWithdrawnDefaultPrefixUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getWithdrawnRoutes().add(new NetworkLayerReachabilityInformation(0, null));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x18, // length 24
-				(byte)0x02, // type code UPDATE
-				0x00, 0x01, // withdrawn routes length (1 octets)
-				0x00,       // withdrawn 0/0 prefix
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeWithdrawnFourBitPrefixPrefixUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getWithdrawnRoutes().add(new NetworkLayerReachabilityInformation(4, new byte[] { (byte)0xc0 }));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x19, // length 25
-				(byte)0x02, // type code UPDATE
-				0x00, 0x02, // withdrawn routes length (2 octets)
-				0x04, (byte)0xc0, // withdrawn 192.0.0.0/4 prefix
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeWithdrawnEightBitPrefixPrefixUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getWithdrawnRoutes().add(new NetworkLayerReachabilityInformation(8, new byte[] { (byte)0xc8 }));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x19, // length 25
-				(byte)0x02, // type code UPDATE
-				0x00, 0x02, // withdrawn routes length (2 octets)
-				0x08, (byte)0xc8, // withdrawn 200.0.0.0/8 prefix
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeWithdrawnTwelveBitPrefixPrefixUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getWithdrawnRoutes().add(new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xc0, (byte)0xe0, }));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				0x00, 0x03, // withdrawn routes length (3 octets)
-				0x0c, (byte)0xc0, (byte)0xe0, // withdrawn 192.224.0.0/12 prefix
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeWithdrawnSixteenBitPrefixPrefixUpdatePacket() {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getWithdrawnRoutes().add(new NetworkLayerReachabilityInformation(16, new byte[] { (byte)0xc0, (byte)0xef, }));
-		
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				0x00, 0x03, // withdrawn routes length (3 octets)
-				0x10, (byte)0xc0, (byte)0xef, // withdrawn 192.239.0.0/12 prefix
-				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update.encodePacket());
-	}	
-	
-	@Test
-	public void testEncodeOriginIgpPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new OriginPathAttribute(Origin.IGP));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1b, // length 27
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN IGP  
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeOriginEgpPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new OriginPathAttribute(Origin.EGP));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1b, // length 27
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x01, // Path attribute: ORIGIN EGP  
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeOriginIncompletePacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1b, // length 27
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
-				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE  
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeASPath4EmptyPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x03, // path attributes length (3 octets)
-				(byte)0x40, (byte)0x11, (byte)0x00, // Path attribute: AS4_PATH emtpy 
-		}, update.encodePacket());
-		
-	}
-
-	@Test
-	public void testEncodeASPath4ASSequenceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234,
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x20, // length 32
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
-				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: 6 octets AS_PATH 
-				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x00001234 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSequenceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 0x00005678
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: 10 octets AS4_PATH 
-				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x1234 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234,
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x20, // length 32
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
-				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: 6 octets AS4_PATH 
-				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234, 0x00005678
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: 10 octets AS4_PATH 
-				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x1234 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS4_PATH
-				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234
-				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 0x000089ab
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 0x000089ab
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 0x0000cdef
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2e, // length 46
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x17, // path attributes length (23 octets)
-				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
-				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 0x0000cdef
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234 
-				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeASPath4ASSeqeunceOneASNumberASSetOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00005678, 
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS_PATH
-				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234
-				0x01, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSetASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 0x000089ab
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00005678, 
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x01, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234, 0x000089ab
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00005678, 0x0000cdef
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2e, // length 46
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x17, // path attributes length (23 octets)
-				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
-				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x01, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSeqeunceOneASNumberASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00001234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00005678, 0x0000cdef
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234 
-				0x01, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS4_PATH
-				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234
-				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234, 0x000089ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
-				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234, 0x000089ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 0x0000cdef,
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2e, // length 46
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x17, // path attributes length (23 octets)
-				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
-				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
-				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath4ASSetOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x00001234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x00005678, 0x0000cdef,
-				})
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x2a, // length 42
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x13, // path attributes length (19 octets)
-				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
-				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
-				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeASPath2EmptyPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x03, // path attributes length (3 octets)
-				(byte)0x40, (byte)0x02, (byte)0x00, // Path attribute: AS_PATH emtpy 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSequenceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1e, // length 30
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
-				(byte)0x40, (byte)0x02, (byte)0x04, 0x02, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SEQUENCE 0x1234 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSequenceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x5678,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x20, // length 32
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
-				(byte)0x40, (byte)0x02, (byte)0x06, 0x02, 0x02, 0x12, 0x34, 0x56, 0x78, // Path attribute: 6 octets AS_PATH AS_SEQUENCE 0x1234 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1e, // length 30
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
-				(byte)0x40, (byte)0x02, (byte)0x04, 0x01, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SET 0x1234 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1e, // length 30
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
-				(byte)0x40, (byte)0x02, (byte)0x04, 0x01, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SET 0x1234 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x22, // length 34
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0b, // path attributes length (11 octets)
-				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 7 octets AS_PATH
-				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234
-				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
-				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234 
-				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeASPath2ASSeqeunceOneASNumberASSetOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x5678, 
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x22, // length 34
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0b, // path attributes length (11 octets)
-				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 8 octets AS_PATH
-				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234
-				0x01, 0x01, 0x56, 0x78, // AS_SET 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSetASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x5678, 
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x01, 0x01, 0x56, 0x78, // AS_SET 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
-				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
-				0x01, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSeqeunceOneASNumberASSetTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x1234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234 
-				0x01, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234, 
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x22, // length 34
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0b, // path attributes length (11 octets)
-				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 8 octets AS_PATH
-				0x01, 0x01, 0x12, 0x34, // AS_SET 0x1234
-				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x01, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
-				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234, 0x89ab,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x26, // length 38
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0f, // path attributes length (15 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
-				0x01, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
-				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-
-	@Test
-	public void testEncodeASPath2ASSetOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SET, new int[] {
-						0x1234,
-				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, ASPathAttribute.PathSegmentType.AS_SEQUENCE, new int[] {
-						0x5678, 0xcdef,
-				}),
-		}));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x24, // length 36
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
-				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
-				0x01, 0x01, 0x12, 0x34, // AS_SET 0x1234 
-				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update.encodePacket());
-	}
-	
-	@Test
-	public void testEncodeAggregatorPathAttribute() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-
-		update.getPathAttributes().add(new AggregatorPathAttribute(ASType.AS_NUMBER_2OCTETS,0x1234, 
-				(Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, })));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x20, // length 32
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x09, // path attributes length (5 octets)
-				(byte)0xc0, (byte)0x07, (byte)0x06, // Path attribute: AS_AGGREGATOR 
-				0x12, 0x34, // AS Number 0x1234
-				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Aggregator IP 192.168.4.2
-		}, update.encodePacket());
-	
-		update = new UpdatePacket();
-
-		update.getPathAttributes().add(new AggregatorPathAttribute(ASType.AS_NUMBER_4OCTETS,0x56781234, 
-				(Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, })));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x22, // length 34
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x0b, // path attributes length (7 octets)
-				(byte)0xc0, (byte)0x12, (byte)0x08,  // Path attribute: AS4_AGGREGATOR 
-				0x56, 0x78, 0x12, 0x34, // AS Number 0x56781234
-				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Aggregator IP 192.168.4.2
-		}, update.encodePacket());
-	}
-	
-	@Test
 	public void testDecodeAggregatorPathAttribute() throws Exception {
 		UpdatePacket packet; 
 		AggregatorPathAttribute aggregator;
@@ -3071,23 +1753,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 	}
 
 	@Test
-	public void testEncodeAtomicAggregatePathAttribute() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-
-		update.getPathAttributes().add(new AtomicAggregatePathAttribute());
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x03, // path attributes length (5 octets)
-				(byte)0x40, (byte)0x06, (byte)0x00, // Path attribute: ATOMIC_AGGREGATE
-		}, update.encodePacket());
-	}
-	
-	@Test
 	public void testDecodeAtomiAcggregatePathAttribute() throws Exception {
 		UpdatePacket packet; 
 		
@@ -3109,24 +1774,6 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		Assert.assertTrue(packet.getPathAttributes().remove(0) instanceof AtomicAggregatePathAttribute);	
 	}
 
-	@Test
-	public void testEncodeLocalPrefPathAttribute() throws Exception {
-		UpdatePacket update = new UpdatePacket();
-
-		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
-
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1e, // length 30
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x07, // path attributes length (5 octets)
-				(byte)0x40, (byte)0x05, (byte)0x04, // Path attribute: LOCAL_PREF
-				0x00, 0x00, 0x00, 0x64, // LOCAL_PREF 100
-		}, update.encodePacket());
-	}
-	
 	@Test
 	public void testDecodeLocalPrefPathAttribute() throws Exception {
 		UpdatePacket packet; 
@@ -3221,39 +1868,276 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 	}	
 	
 	@Test
-	public void testEncodeOneNlriUpdatePacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
+	public void testDecodeValidMpReachNlriNullNextHopZeroNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x08, // Total path attributes length  (8 octets)
+				(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, 0x00, 0x00, // AFI(IPv4) SAFI(UNICAT_ROUTING) NEXT_HOP length 0, null NLRI
+		})), UpdatePacket.class);
 
-		update.getNlris().add(new NetworkLayerReachabilityInformation(16, new byte[] {(byte)0xac, 0x10, }));
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
 
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1a, // length 26
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
-				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
-		}, update.encodePacket());
-	}
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		Assert.assertNull(mp.getNextHopAddress());
+		Assert.assertEquals(0, mp.getNlris().size());
+	}	
 
+	@Test
+	public void testDecodeValidMpReachNlriFourByteNextHopZeroNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x0c, // Total path attributes length  (12 octets)
+				(byte)0x80, 0x0e, 0x09, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, 0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, 0x00, // AFI(IPv4) SAFI(UNICAT_ROUTING) NEXT_HOP 4 octets 192.168.4.2, null NLRI
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		Assert.assertEquals(0, mp.getNlris().size());
+	}	
+
+	@Test
+	public void testDecodeValidMpReachNlriFourByteNextHopOneNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x0f, // Total path attributes length  (15 octets)
+				(byte)0x80, 0x0e, 0x0c, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, // AFI(IPv4) SAFI(UNICAT_ROUTING) 
+				0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, // NEXT_HOP 4 octets 192.168.4.2, 
+				0x00, // reserved 
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16/12
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		Assert.assertEquals(1, mp.getNlris().size());
+		
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+	}	
+
+	@Test
+	public void testDecodeValidMpReachNlriFourByteNextHopTwoNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x13, // Total path attributes length  (19 octets)
+				(byte)0x80, 0x0e, 0x10, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, // AFI(IPv4) SAFI(UNICAT_ROUTING) 
+				0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, // NEXT_HOP 4 octets 192.168.4.2, 
+				0x00, // reserved 
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16.0.0/12
+				0x14, (byte)0xc0, (byte)0xa8, (byte)0xf0, //  NLRI 192.168.255.0/20
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		Assert.assertEquals(2, mp.getNlris().size());
+
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+		
+		nlri = mp.getNlris().remove(0);
+		Assert.assertEquals(20, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0xf0, } , nlri.getPrefix());
+	}	
+
+
+	@Test
+	public void testDecodeValidMpReachNlriNullNextHopOneNlriUpdatePacket() {
+		UpdatePacket packet; 
+		
+		packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0x03, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x0b, // Total path attributes length  (11 octets)
+				(byte)0x80, 0x0e, 0x08, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, // AFI(IPv4) SAFI(UNICAT_ROUTING) 
+				0x00, // NEXT_HOP 0 octets  
+				0x00, // reserved 
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16/12
+		})), UpdatePacket.class);
+
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());
+
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		Assert.assertNull(mp.getNextHopAddress());
+		Assert.assertEquals(1, mp.getNlris().size());
+		
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+	}	
 	
 	@Test
-	public void testEncodeTwoNlriUpdatePacket() throws Exception {
-		UpdatePacket update = new UpdatePacket();
+	public void testDecodeBogusAfiMpReachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x08, // Total path attributes length  (8 octets)
+						(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0xF1, // Bogus AFI 
+						0x01, // SAFI(UNICAT_ROUTING) 
+						0x00, // NEXT_HOP length 0
+						0x00, // reserved
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+	}	
 
-		update.getNlris().add(new NetworkLayerReachabilityInformation(16, new byte[] {(byte)0xac, 0x10, }));
-		update.getNlris().add(new NetworkLayerReachabilityInformation(28, new byte[] {(byte)0xc0, (byte)0xa8, 0x20, 0 }));
+	@Test
+	public void testDecodeBogusSafiMpReachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x08, // Total path attributes length  (8 octets)
+						(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x04, // Bogus SAFI 
+						0x00, // NEXT_HOP length 0
+						0x00, // reserved
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+	}	
 
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
-				(byte)0x00, (byte)0x1f, // length 31
-				(byte)0x02, // type code UPDATE
-				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
-				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
-				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
-				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0x00 // NLRI 192.168.32/28 bogus one octet missing
-		}, update.encodePacket());
+	@Test
+	public void testDecodeBogusNextHopMpReachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x08, // Total path attributes length  (8 octets)
+						(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x01, // SAFI(Unicast routing)
+						0x02, // NEXT_HOP length 2
+						0x00, // reserved
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+	}	
+
+	@Test
+	public void testDecodeMissingReservedMpReachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x07, // Total path attributes length  (8 octets)
+						(byte)0x80, 0x0e, 0x04, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x01, // SAFI(Unicast routing)
+						0x00, // NEXT_HOP length 0
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x0c, // Total path attributes length  (12 octets)
+						(byte)0x80, 0x0e, 0x09, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x01, // SAFI(Unicast routing)
+						0x02, // NEXT_HOP length 2
+						0x00, 0x00,
+						0x0c, (byte)0xab, 0x10, //  NLRI 172.16/12
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
+	}	
+
+
+	@Test
+	public void testDecodeBadNlriMpReachNlriUpdatePacket() throws Exception {
+		(new AssertExecption() {
+			
+			@Override
+			protected void doExecute() {
+				decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+						// (byte)0x03, // type code UPDATE
+						0x00, 0x00, // withdrawn routes length (0 octets)
+						0x00, 0x0a, // Total path attributes length  (10 octets)
+						(byte)0x80, 0x0e, 0x07, // Path Attribute MP_REACH_NLRI
+						0x00, (byte)0x01, // AFI(IPv4) 
+						0x01, // SAFI(Unicast routing)
+						0x00, // NEXT_HOP length 0
+						0x00, // reserved
+						0x0c, (byte)0xab, // one octet missing on NLRI
+				}));
+			}
+		}).execute(OptionalAttributeErrorException.class);		
 	}
 }

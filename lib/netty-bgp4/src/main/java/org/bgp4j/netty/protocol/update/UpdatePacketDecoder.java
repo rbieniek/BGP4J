@@ -25,6 +25,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.BGPv4Constants.AddressFamily;
+import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.BGPv4Packet;
@@ -323,6 +325,36 @@ public class UpdatePacketDecoder {
 		
 		return attr;
 	}
+
+	private MultiProtocolReachableNLRI decodeMpReachNlriPathAttribute(ChannelBuffer buffer) {
+		MultiProtocolReachableNLRI attr = new MultiProtocolReachableNLRI();
+		
+		try {
+			attr.setAddressFamily(AddressFamily.fromCode(buffer.readUnsignedShort()));
+			attr.setSubsequentAddressFamily(SubsequentAddressFamily.fromCode(buffer.readUnsignedByte()));
+			
+			int nextHopLength = buffer.readUnsignedByte();
+			
+			if(nextHopLength > 0) {
+				byte[] nextHop = new byte[nextHopLength];
+				
+				buffer.readBytes(nextHop);
+				attr.setNextHopAddress(nextHop);
+			}
+			
+			buffer.readByte(); // reserved
+			
+			while(buffer.readable()) {
+				attr.getNlris().add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
+			}
+		} catch(RuntimeException e) {
+			log.error("failed to decode MP_REACH_NLRI path attribute", e);
+			
+			throw new OptionalAttributeErrorException();
+		}
+		
+		return attr;
+	}
 	
 	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
 		List<Attribute> attributes = new LinkedList<Attribute>();
@@ -379,6 +411,9 @@ public class UpdatePacketDecoder {
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN:
 					attr = decodeOriginPathAttribute(valueBuffer);
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MP_REACH_NLRI:
+					attr = decodeMpReachNlriPathAttribute(valueBuffer);
 					break;
 				default:
 					attr = new UnknownPathAttribute(typeCode, valueBuffer);

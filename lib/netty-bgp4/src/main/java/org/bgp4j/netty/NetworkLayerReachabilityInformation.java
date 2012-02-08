@@ -88,6 +88,10 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 		return calculateOctetsForPrefixLength(this.prefixLength);
 	}
 	
+	public int getEncodedNLRILength() {
+		return calculateOctetsForPrefixLength(this.prefixLength) + 1;
+	}
+	
 	/**
 	 * @return the prefixLength
 	 */
