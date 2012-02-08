@@ -381,7 +381,7 @@ public class UpdatePacketDecoder {
 		try {
 			attr.setOriginatorID((int)buffer.readUnsignedInt());
 		} catch(RuntimeException e) {
-			log.error("", e);
+			log.error("failed to decode ORIGINATOR_ID attribute", e);
 			
 			throw new OptionalAttributeErrorException();
 		}
@@ -389,7 +389,21 @@ public class UpdatePacketDecoder {
 		return attr;
 	}
 
-
+	private ClusterListPathAttribute decodeClusterListPathAttribute(ChannelBuffer buffer) {
+		ClusterListPathAttribute attr = new ClusterListPathAttribute();
+		
+		try {
+			while(buffer.readable()) {
+				attr.getClusterIds().add((int)buffer.readUnsignedInt());
+			}
+		} catch(RuntimeException e) {
+			log.error("failed to decode ORIGINATOR_ID attribute", e);
+			
+			throw new OptionalAttributeErrorException();
+		}
+		return attr;
+	}
+	 
 	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
 		List<Attribute> attributes = new LinkedList<Attribute>();
 		
@@ -454,6 +468,9 @@ public class UpdatePacketDecoder {
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGINATOR_ID:
 					attr = decodeOriginatorIDPathAttribute(valueBuffer);
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_CLUSTER_LIST:
+					attr = decodeClusterListPathAttribute(valueBuffer);
 					break;
 				default:
 					attr = new UnknownPathAttribute(typeCode, valueBuffer);

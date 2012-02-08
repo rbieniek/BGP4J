@@ -1627,4 +1627,20 @@ public class UpdatePacketEncodingTest extends ProtocolPacketTestBase {
 		}, (new OriginatorIDPathAttribute(0xc0a80402)).encodePathAttribute());
 	}
 
+	@Test
+	public void testEncodeClusterListPathAttributeOneClusterID() throws Exception {
+		assertBufferContents(new byte[] {
+				(byte)0x80, (byte)0x0a, (byte)0x04, // Path attribute CLUSTER_LIST (4 octets)
+				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Cluster ID NEXT_HOP 192.168.4.2
+		}, (new ClusterListPathAttribute(new int[] { 0xc0a80402 })).encodePathAttribute());
+	}
+
+	@Test
+	public void testEncodeClusterListPathAttributeTwoClusterID() throws Exception {
+		assertBufferContents(new byte[] {
+				(byte)0x80, (byte)0x0a, (byte)0x08, // Path attribute CLUSTER_LIST (4 octets)
+				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Cluster ID NEXT_HOP 192.168.4.2
+				(byte)0xc0, (byte)0xa8, (byte)0x05, (byte)0x03, // Cluster ID NEXT_HOP 192.168.5.3
+		}, (new ClusterListPathAttribute(new int[] { 0xc0a80402, 0xc0a80503 })).encodePathAttribute());
+	}
 }
