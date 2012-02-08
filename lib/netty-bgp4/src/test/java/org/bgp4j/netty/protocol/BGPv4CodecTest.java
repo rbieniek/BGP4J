@@ -33,6 +33,7 @@ import org.bgp4j.netty.protocol.open.UnknownCapability;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
 import org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute;
+import org.bgp4j.netty.protocol.update.MultiProtocolReachableNLRI;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
@@ -753,4 +754,82 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 				(byte)0x0a, // Invalid network field
 		}, completeSink.nextEvent());		
 	}
+	
+	@Test
+	public void testDecodeValidMpReachNlriFourByteNextHopTwoNlri() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x2a, // length 42 octets
+				(byte)0x02, // type code 2 (UPDATE) 
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x13, // Total path attributes length  (19 octets)
+				(byte)0x80, 0x0e, 0x10, // Path Attribute MP_REACH_NLRI
+				0x00, 0x01, 0x01, // AFI(IPv4) SAFI(UNICAT_ROUTING) 
+				0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, // NEXT_HOP 4 octets 192.168.4.2, 
+				0x00, // reserved 
+				0x0c, (byte)0xab, 0x10, //  NLRI 172.16.0.0/12
+				0x14, (byte)0xc0, (byte)0xa8, (byte)0xf0, //  NLRI 192.168.255.0/20
+		}));
+
+		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+	
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		MultiProtocolReachableNLRI mp = (MultiProtocolReachableNLRI)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		Assert.assertEquals(2, mp.getNlris().size());
+
+		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
+		
+		Assert.assertEquals(12, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xab, 0x10, } , nlri.getPrefix());
+		
+		nlri = mp.getNlris().remove(0);
+		Assert.assertEquals(20, nlri.getPrefixLength());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0xf0, } , nlri.getPrefix());
+	}
+
+	@Test
+	public void testDecodeBogusSafiMpReachNlri() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x1f, // length 31 octets
+				(byte)0x02, // type code UPDATE
+				0x00, 0x00, // withdrawn routes length (0 octets)
+				0x00, 0x08, // Total path attributes length  (8 octets)
+				(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+				0x00, (byte)0x01, // AFI(IPv4) 
+				0x04, // Bogus SAFI 
+				0x00, // NEXT_HOP length 0
+				0x00, // reserved
+		}));
+
+		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+
+		assertChannelEventContents(new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				(byte)0x00, (byte)0x1d, // length 29 octets
+				(byte)0x03, // type code NOTIFICATION
+				(byte)0x03, // Update message error
+				(byte)0x09, // Invalid Optional Attribute Error
+				(byte)0x80, 0x0e, 0x05, // Path Attribute MP_REACH_NLRI
+				0x00, (byte)0x01, // AFI(IPv4) 
+				0x04, // Bogus SAFI 
+				0x00, // NEXT_HOP length 0
+				0x00, // reserved
+		}, completeSink.nextEvent());		
+	}
+	
 }

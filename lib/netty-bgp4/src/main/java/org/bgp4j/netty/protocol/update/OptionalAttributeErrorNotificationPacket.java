@@ -30,7 +30,7 @@ public class OptionalAttributeErrorNotificationPacket extends
 	 * @param offendingAttribute
 	 */
 	public OptionalAttributeErrorNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE, offendingAttribute);
+		super(UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR, offendingAttribute);
 	}
 
 }
