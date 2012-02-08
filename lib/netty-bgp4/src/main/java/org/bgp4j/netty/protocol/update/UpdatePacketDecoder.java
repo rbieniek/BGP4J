@@ -375,6 +375,21 @@ public class UpdatePacketDecoder {
 		return attr;
 	}
 	
+	private OriginatorIDPathAttribute decodeOriginatorIDPathAttribute(ChannelBuffer buffer) {
+		OriginatorIDPathAttribute attr = new OriginatorIDPathAttribute();
+		
+		try {
+			attr.setOriginatorID((int)buffer.readUnsignedInt());
+		} catch(RuntimeException e) {
+			log.error("", e);
+			
+			throw new OptionalAttributeErrorException();
+		}
+		
+		return attr;
+	}
+
+
 	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
 		List<Attribute> attributes = new LinkedList<Attribute>();
 		
@@ -436,6 +451,9 @@ public class UpdatePacketDecoder {
 					break;
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MP_UNREACH_NLRI:
 					attr = decodeMpUnreachNlriPathAttribute(valueBuffer);
+					break;
+				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGINATOR_ID:
+					attr = decodeOriginatorIDPathAttribute(valueBuffer);
 					break;
 				default:
 					attr = new UnknownPathAttribute(typeCode, valueBuffer);

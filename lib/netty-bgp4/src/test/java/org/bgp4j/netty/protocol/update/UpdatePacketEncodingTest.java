@@ -1620,4 +1620,11 @@ public class UpdatePacketEncodingTest extends ProtocolPacketTestBase {
 		}, update.encodePacket());
 	}
 
+	@Test
+	public void testEncodeOriginatorIDPathAttribute() throws Exception {
+		assertBufferContents(new byte[] {
+				(byte)0x80, (byte)0x09, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: NEXT_HOP 192.168.4.2
+		}, (new OriginatorIDPathAttribute(0xc0a80402)).encodePathAttribute());
+	}
+
 }

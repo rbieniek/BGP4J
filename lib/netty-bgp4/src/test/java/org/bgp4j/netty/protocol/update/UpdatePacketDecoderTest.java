@@ -2250,4 +2250,27 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 			}
 		}).execute(OptionalAttributeErrorException.class);		
 	}	
+	
+	@Test
+	public void testDecodeOriginatorIDPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x07, // path attributes length (29 octets)
+				(byte)0x80, (byte)0x09, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: ORIGINATOR_ID 0xc0a80402
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		OriginatorIDPathAttribute originator = (OriginatorIDPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(0xc0a80402, originator.getOriginatorID());
+	}
+
 }
