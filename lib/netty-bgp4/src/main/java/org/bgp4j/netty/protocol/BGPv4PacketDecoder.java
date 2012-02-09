@@ -20,15 +20,19 @@ package org.bgp4j.netty.protocol;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.BGPv4Constants.AddressFamily;
+import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.open.OpenPacketDecoder;
 import org.bgp4j.netty.protocol.update.UpdatePacketDecoder;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class BGPv4PacketDecoder {
+	private @Inject Logger log;
 	private @Inject OpenPacketDecoder openPacketDecoder;
 	private @Inject UpdatePacketDecoder updatePacketDecoder;
 	
@@ -89,7 +93,7 @@ public class BGPv4PacketDecoder {
 			packet = new FiniteStateMachineErrorNotificationPacket();
 			break;
 		case BGPv4Constants.BGP_ERROR_CODE_CEASE:
-			packet = new CeaseNotificationPacket();
+			packet = decodeCeaseNotificationPacket(buffer, errorSubcode);
 			break;
 		}
 		
@@ -114,6 +118,60 @@ public class BGPv4PacketDecoder {
 			break;
 		case MessageHeaderErrorNotificationPacket.SUBCODE_BAD_MESSAGE_TYPE:
 			packet = new BadMessageTypeNotificationPacket(buffer.readUnsignedByte());
+			break;
+		}
+		
+		return packet;
+	}
+
+	/**
+	 * decode the NOTIFICATION network packet for error code "Cease". 
+	 * 
+	 * @param buffer the buffer containing the data. 
+	 * @return
+	 */
+	private NotificationPacket decodeCeaseNotificationPacket(ChannelBuffer buffer, int errorSubcode) {
+		NotificationPacket packet = null;
+		
+		switch(errorSubcode) {
+		default:
+			log.info("cannot handle cease notification subcode {}", errorSubcode);
+		case CeaseNotificationPacket.SUBCODE_UNSPECIFIC:
+			packet = new UnspecifiedCeaseNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_MAXIMUM_NUMBER_OF_PREFIXES_REACHED:
+			packet = new MaximumNumberOfPrefixesReachedNotificationPacket();
+
+			try {
+				AddressFamily afi = AddressFamily.fromCode(buffer.readUnsignedShort());
+				SubsequentAddressFamily safi = SubsequentAddressFamily.fromCode(buffer.readUnsignedByte());
+				int prefixUpperBounds = (int)buffer.readUnsignedInt();
+				
+				packet = new MaximumNumberOfPrefixesReachedNotificationPacket(afi, safi, prefixUpperBounds);
+			} catch(RuntimeException e) {
+				log.info("cannot decode specific reason for CEASE maximum number of prefixes reached notification", e);
+			}
+			break;
+		case CeaseNotificationPacket.SUBCODE_ADMINSTRATIVE_SHUTDOWN:
+			packet = new AdministrativeShutdownNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_PEER_DECONFIGURED:
+			packet = new PeerDeconfiguredNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_ADMINSTRATIVE_RESET:
+			packet = new AdministrativeResetNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_CONNECTION_REJECTED:
+			packet = new ConnectionRejectedNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_OTHER_CONFIGURATION_CHANGE:
+			packet = new OtherConfigurationChangeNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_CONNECTION_COLLISION_RESOLUTION:
+			packet = new ConnectionCollisionResolutionNotificationPacket();
+			break;
+		case CeaseNotificationPacket.SUBCODE_OUT_OF_RESOURCES:
+			packet = new OutOfResourcesNotificationPacket();
 			break;
 		}
 		

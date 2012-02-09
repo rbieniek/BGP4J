@@ -67,14 +67,4 @@ public class BGPv4PacketDecoderTest extends ProtocolPacketTestBase {
 		
 		Assert.assertNotNull(keep);
 	}
-
-	@Test
-	public void encodeKeepalivePacket() {
-		assertBufferContents(new byte[] {
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
-				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
-				0x00, 0x13,
-				(byte)0x04, // type code KEEP				
-		}, (new KeepalivePacket()).encodePacket());
-	}
 }

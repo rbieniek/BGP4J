@@ -24,12 +24,22 @@ import org.bgp4j.netty.BGPv4Constants;
  */
 public class CeaseNotificationPacket extends NotificationPacket {
 
+	protected static final int SUBCODE_UNSPECIFIC = 0;
+	protected static final int SUBCODE_MAXIMUM_NUMBER_OF_PREFIXES_REACHED = 1;
+	protected static final int SUBCODE_ADMINSTRATIVE_SHUTDOWN = 2;
+	protected static final int SUBCODE_PEER_DECONFIGURED = 3;
+	protected static final int SUBCODE_ADMINSTRATIVE_RESET = 4;
+	protected static final int SUBCODE_CONNECTION_REJECTED = 5;
+	protected static final int SUBCODE_OTHER_CONFIGURATION_CHANGE = 6;
+	protected static final int SUBCODE_CONNECTION_COLLISION_RESOLUTION = 7;
+	protected static final int SUBCODE_OUT_OF_RESOURCES = 8;
+
 	/**
 	 * @param errorCode
 	 * @param errorSubcode
 	 */
-	public CeaseNotificationPacket() {
-		super(BGPv4Constants.BGP_ERROR_CODE_HOLD_TIMER_EXPIRED, 0);
+	protected CeaseNotificationPacket(int subcode) {
+		super(BGPv4Constants.BGP_ERROR_CODE_CEASE, subcode);
 	}
 
 }
