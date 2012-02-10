@@ -31,6 +31,8 @@ import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
 import org.bgp4j.netty.protocol.open.RouteRefreshCapability;
 import org.bgp4j.netty.protocol.open.UnspecificOpenPacketException;
+import org.bgp4j.netty.protocol.open.OutboundRouteFilteringCapability.SendReceive;
+import org.bgp4j.netty.protocol.refresh.ORFType;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
@@ -182,7 +184,7 @@ public class CapabilityTest extends ProtocolPacketTestBase {
 	}
 	
 	@Test
-	public void testDecodeMultiProtocolCapabilityAutonomousSystem4Capabilit() {
+	public void testDecodeMultiProtocolCapabilityAutonomousSystem4Capability() {
 		byte[] packet = new byte[] { 0x01, 0x04, 0x00, 0x01, 0x00, 0x01, 0x41, 0x04, 0x00, 0x00, (byte)0xfc, 0x00  };
 		ChannelBuffer buffer = ChannelBuffers.buffer(packet.length);
 		
@@ -205,7 +207,7 @@ public class CapabilityTest extends ProtocolPacketTestBase {
 	}
 
 	@Test
-	public void testEncodeMultiProtocolCapabilityAutonomousSystem4Capabilit() {
+	public void testEncodeMultiProtocolCapabilityAutonomousSystem4Capability() {
 		List<Capability> caps = new LinkedList<Capability>();
 		MultiProtocolCapability cap1 = new MultiProtocolCapability();
 		AutonomousSystem4Capability cap2 = new AutonomousSystem4Capability();
@@ -251,4 +253,63 @@ public class CapabilityTest extends ProtocolPacketTestBase {
 		Assert.assertEquals(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
 	}
 	
+	@Test
+	public void testDecodeOutboundRouteFilterCapability() {
+		byte[] packet = new byte[] { 
+				0x03, // Capability Outbound Route Filtering 
+				0x07, // length 0 octets
+				0x00, 0x01, // AFI IPv4
+				0x00, // reserved
+				0x01, // SAFI Unicast
+				0x01, // One ORF
+				0x40, 0x03, // Address Prefix based ORF, Send/Receive
+				};
+		ChannelBuffer buffer = ChannelBuffers.buffer(packet.length);
+		
+		buffer.writeBytes(packet);		
+
+		List<Capability> caps = Capability.decodeCapabilities(buffer);
+
+		Assert.assertEquals(1, caps.size());
+
+		Capability cap; 
+		cap = caps.remove(0);
+		Assert.assertEquals(cap.getClass(), OutboundRouteFilteringCapability.class);
+		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_OUTBOUND_ROUTE_FILTERING);
+		
+		OutboundRouteFilteringCapability orfCap = (OutboundRouteFilteringCapability)cap;
+		
+		Assert.assertEquals(AddressFamily.IPv4, orfCap.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, orfCap.getSubsequentAddressFamily());
+		Assert.assertEquals(1, orfCap.getFilters().size());
+		
+		SendReceive sr = orfCap.getFilters().get(ORFType.ADDRESS_PREFIX_BASED);
+		
+		Assert.assertEquals(SendReceive.BOTH, sr);
+	}
+	
+	@Test
+	public void testEncodeOutboundRouteFilterCapability() {
+		List<Capability> caps = new LinkedList<Capability>();
+		OutboundRouteFilteringCapability cap = new OutboundRouteFilteringCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		byte[] packet;
+		ChannelBuffer buffer;
+
+		cap.getFilters().put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.BOTH);
+		caps.add(cap);
+	
+		buffer = Capability.encodeCapabilities(caps);
+		packet = new byte[buffer.readableBytes()];
+		buffer.readBytes(packet);
+		assertArraysEquals(new byte[] { 0x03, // Capability Outbound Route Filtering 
+				0x07, // length 0 octets
+				0x00, 0x01, // AFI IPv4
+				0x00, // reserved
+				0x01, // SAFI Unicast
+				0x01, // One ORF
+				0x40, 0x03, // Address Prefix based ORF, Send/Receive
+		}, packet);
+
+	}
+
 }

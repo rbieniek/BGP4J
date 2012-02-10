@@ -91,6 +91,9 @@ public abstract class Capability {
 			case BGPv4Constants.BGP_CAPABILITY_TYPE_AS4_NUMBERS:
 				cap = new AutonomousSystem4Capability();
 				break;
+			case BGPv4Constants.BGP_CAPABILITY_TYPE_OUTBOUND_ROUTE_FILTERING:
+				cap = new OutboundRouteFilteringCapability();
+				break;
 			default:
 				cap = new UnknownCapability();
 				((UnknownCapability)cap).setCapabilityType(type);
@@ -127,21 +130,28 @@ public abstract class Capability {
 	/**
 	 * decode the passed parameter value
 	 * 
-	 * @param buffer
+	 * @param buffer the buffer pointing to the parameter length octet.
 	 */
 	protected abstract void decodeParameterValue(ChannelBuffer buffer);
 	
-	protected void assertEmptyParameter(ChannelBuffer buffer) {
+	protected final void assertEmptyParameter(ChannelBuffer buffer) {
 		int parameterLength = buffer.readUnsignedByte();
 		
 		if(parameterLength != 0)
 			throw new UnspecificOpenPacketException("Expected zero-length parameter, got " + parameterLength + " octets");
 	}
 
-	protected void assertFixedLength(ChannelBuffer buffer, int length) {
+	protected final void assertFixedLength(ChannelBuffer buffer, int length) {
 		int parameterLength = buffer.readUnsignedByte();
 		
 		if(parameterLength != length)
+			throw new UnspecificOpenPacketException("Expected " + length + " octets parameter, got " + parameterLength + " octets");
+	}
+
+	protected final void assertMinimalLength(ChannelBuffer buffer, int length) {
+		int parameterLength = buffer.readUnsignedByte();
+		
+		if(parameterLength < length)
 			throw new UnspecificOpenPacketException("Expected " + length + " octets parameter, got " + parameterLength + " octets");
 	}
 }

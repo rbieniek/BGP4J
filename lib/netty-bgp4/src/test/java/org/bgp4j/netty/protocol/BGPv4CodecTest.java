@@ -18,6 +18,7 @@
 package org.bgp4j.netty.protocol;
 
 import java.net.Inet4Address;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -30,6 +31,14 @@ import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.netty.protocol.open.RouteRefreshCapability;
 import org.bgp4j.netty.protocol.open.UnknownCapability;
+import org.bgp4j.netty.protocol.refresh.AddressPrefixBasedORFEntry;
+import org.bgp4j.netty.protocol.refresh.ORFAction;
+import org.bgp4j.netty.protocol.refresh.ORFEntry;
+import org.bgp4j.netty.protocol.refresh.ORFMatch;
+import org.bgp4j.netty.protocol.refresh.ORFRefreshType;
+import org.bgp4j.netty.protocol.refresh.ORFType;
+import org.bgp4j.netty.protocol.refresh.OutboundRouteFilter;
+import org.bgp4j.netty.protocol.refresh.RouteRefreshPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
 import org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute;
@@ -903,4 +912,62 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 		}, completeSink.nextEvent());		
 	}
 	
+	@Test
+	public void testCompleteFullRouteRefreshPacket() throws Exception {
+		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				0x00, 0x24, // length 36 octets
+				(byte)0x05, // type code 5 (ROUTE REFRESH)
+				(byte)0x00, (byte)0x01, // AFI IPv4
+				(byte)0x00, // reserved
+				(byte)0x01, // SAFI Unicast forwarding
+				(byte)0x01, // IMMEDIATE REFRESH
+				(byte)0x40, // Address Prefix Based ORF
+				(byte)0x00, (byte)0x9, // ORF entries length 9 octets
+				(byte)0x80, // Action REMOVE-ALL
+				(byte)0x00, // Action ADD Match PERMIT
+				(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01, // sequence number 1
+				(byte)0x0, // min length 0
+				(byte)0x00, // max length 0
+				(byte)0x0, // prefix 0.0.0.0/0
+		}));
+
+		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
+		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+	
+		RouteRefreshPacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), RouteRefreshPacket.class);
+		
+		Assert.assertEquals(AddressFamily.IPv4, packet.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, packet.getSubsequentAddressFamily());
+		
+		OutboundRouteFilter orf = packet.getOutboundRouteFilter(); 
+		Assert.assertNotNull(orf);
+		Assert.assertEquals(AddressFamily.IPv4, orf.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, orf.getSubsequentAddressFamily());
+		Assert.assertEquals(ORFRefreshType.IMMEDIATE, orf.getRefreshType());
+		Assert.assertEquals(1, orf.getEntries().size());
+		
+		AddressPrefixBasedORFEntry entry;
+		List<ORFEntry> entries = orf.getEntries().get(ORFType.ADDRESS_PREFIX_BASED);
+
+		Assert.assertEquals(2, entries.size());
+
+		entry = (AddressPrefixBasedORFEntry)entries.remove(0);
+		Assert.assertEquals(ORFAction.REMOVE_ALL, entry.getAction());
+		Assert.assertEquals(ORFMatch.PERMIT, entry.getMatch());
+		Assert.assertEquals(0, entry.getSequence());
+		Assert.assertEquals(0, entry.getMinLength());
+		Assert.assertEquals(0, entry.getMaxLength());
+		Assert.assertNull(entry.getPrefix());
+
+		entry = (AddressPrefixBasedORFEntry)entries.remove(0);
+		Assert.assertEquals(ORFAction.ADD, entry.getAction());
+		Assert.assertEquals(ORFMatch.PERMIT, entry.getMatch());
+		Assert.assertEquals(1, entry.getSequence());
+		Assert.assertEquals(0, entry.getMinLength());
+		Assert.assertEquals(0, entry.getMaxLength());
+		Assert.assertEquals(new NetworkLayerReachabilityInformation(0, null), entry.getPrefix());
+	}
+
 }

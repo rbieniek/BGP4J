@@ -331,4 +331,7 @@ public class BGPv4Constants {
 	
 	/** Well-known BGP community value NO_EXPORT_SUBCONFED (RFC 1997) */
 	public static final int BGP_COMMUNITY_NO_EXPORT_SUBCONFED = 0xFFFFFF03;
+	
+	/** Address prefix based outbound route filter type (RFC 5292) */
+	public static final int BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED = 64;
 }

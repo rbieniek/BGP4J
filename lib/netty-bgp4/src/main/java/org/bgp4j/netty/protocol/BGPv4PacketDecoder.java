@@ -23,6 +23,7 @@ import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.open.OpenPacketDecoder;
+import org.bgp4j.netty.protocol.refresh.RouteRefreshPacketDecoder;
 import org.bgp4j.netty.protocol.update.UpdatePacketDecoder;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class BGPv4PacketDecoder {
 	private @Inject Logger log;
 	private @Inject OpenPacketDecoder openPacketDecoder;
 	private @Inject UpdatePacketDecoder updatePacketDecoder;
+	private @Inject RouteRefreshPacketDecoder routeRefreshPacketDecoder;
 	
 	BGPv4Packet decodePacket(ChannelBuffer buffer) {
 		int type = buffer.readUnsignedByte();
@@ -54,6 +56,7 @@ public class BGPv4PacketDecoder {
 			packet = decodeKeepalivePacket(buffer);
 			break;
 		case BGPv4Constants.BGP_PACKET_TYPE_ROUTE_REFRESH:
+			packet = routeRefreshPacketDecoder.decodeRouteRefreshPacket(buffer);
 			break;
 		default:
 			throw new BadMessageTypeException(type);
