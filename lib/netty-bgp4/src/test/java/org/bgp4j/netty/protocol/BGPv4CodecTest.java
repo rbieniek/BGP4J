@@ -544,7 +544,7 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x0a, // path attributes length (10 octets)
 				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06, // Path attribute: 6 octets AS_PATH  
-				0x03, 0x01, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
+				0x05, 0x01, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
 		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
@@ -557,7 +557,7 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
-				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06,  0x03, 0x01, 0x00, 0x00, 0x12, 0x34, 
+				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06,  0x05, 0x01, 0x00, 0x00, 0x12, 0x34, 
 		}, completeSink.nextEvent());
 	}
 
@@ -598,7 +598,7 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x08, // path attributes length (8 octets)
 				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, // Path attribute: 4 octets AS_PATH  
-				0x03, 0x01, 0x12, 0x34, // Invalid 0x1234 
+				0x05, 0x01, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
 		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
@@ -611,7 +611,7 @@ public class BGPv4CodecTest extends ProtocolPacketTestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
-				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, 0x03, 0x01, 0x12, 0x34, 
+				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, 0x05, 0x01, 0x12, 0x34, 
 		}, completeSink.nextEvent());		
 	}
 
