@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.NotificationPacket;
@@ -40,12 +42,15 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
  *
  */
 public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {	
+	private @Inject Logger log;
+	
 	private Set<Class<? extends Attribute>> mandatoryIBGPAttributes = new HashSet<Class<? extends Attribute>>();
 	private Set<Class<? extends Attribute>> mandatoryEBGPAttributes = new HashSet<Class<? extends Attribute>>();
 	private Map<Class<? extends Attribute>, Integer> as2ClazzCodeMap = new HashMap<Class<? extends Attribute>, Integer>();
@@ -102,8 +107,11 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					break;
 				}
 				
-				if(badAttr)
+				if(badAttr) {
+					log.info("detected attribute " + attribute + " with invlaid flags");
+					
 					attributeFlagsErrorList.add(attribute);
+				}
 			}
 			
 			// if we have any bad attribute, generate notification message and leave
@@ -139,8 +147,12 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					else
 						codeMap = as2ClazzCodeMap;
 						
-					for(Class<? extends Attribute> attrClass : missingWellKnownList)
-						notifications.add(new MissingWellKnownAttributeNotificationPacket(codeMap.get(attrClass)));
+					for(Class<? extends Attribute> attrClass : missingWellKnownList) {
+						int code = codeMap.get(attrClass);
+						
+						log.info("detected missing well-known atribute, type " + code);
+						notifications.add(new MissingWellKnownAttributeNotificationPacket(code));
+					}
 				} else
 					sentUpstream = true;
 			}

@@ -70,6 +70,9 @@ public class BGPv4TestBase extends WeldTestCaseBase {
 		return new UpstreamMessageEvent(channel, buildProtocolPacket(packet), new InetSocketAddress(InetAddress.getLocalHost(), 1));
 	}
 	
+	protected UpstreamMessageEvent buildUpstreamBgpMessageEvent(Channel channel, BGPv4Packet packet)throws Exception  {
+		return new UpstreamMessageEvent(channel, packet, new InetSocketAddress(InetAddress.getLocalHost(), 1));
+	}
 
 	@SuppressWarnings("unchecked")
 	protected <T extends BGPv4Packet> T safeDowncast(BGPv4Packet packet, Class<? extends T> downcastedTo) {
