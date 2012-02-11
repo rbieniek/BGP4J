@@ -128,7 +128,7 @@ public class UpdatePacket extends BGPv4Packet {
 		
 		if(this.pathAttributes != null) {
 			for(Attribute  attr : pathAttributes)
-				size += attr.calculatePacketSize();
+				size += attr.calculateEncodedPathAttributeLength();
 		}
 		
 		return size;
