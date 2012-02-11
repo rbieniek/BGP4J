@@ -20,14 +20,14 @@ package org.bgp4j.netty.protocol.refresh;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.Test;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class RouteRefreshPacketEncodingTest extends ProtocolPacketTestBase {
+public class RouteRefreshPacketEncodingTest extends BGPv4TestBase {
 	
 	@Test
 	public void testEncodeSimpleRouteRefreshPacket() throws Exception {

@@ -19,6 +19,7 @@ package org.bgp4j.netty.protocol;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.junit.After;
@@ -30,7 +31,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CeaseNotificationPacketTest extends ProtocolPacketTestBase {
+public class CeaseNotificationPacketTest extends BGPv4TestBase {
 
 	private BGPv4PacketDecoder decoder;
 	

@@ -20,13 +20,14 @@ package org.bgp4j.netty.protocol;
 import junit.framework.Assert;
 
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.Test;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NetworkLayerReachabilityInformationTest extends ProtocolPacketTestBase {
+public class NetworkLayerReachabilityInformationTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodinglength() {

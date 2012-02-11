@@ -14,10 +14,11 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty.handlers;
 
 import java.util.Collection;
 
+import org.bgp4j.netty.protocol.NotificationPacket;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;

@@ -14,11 +14,14 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty.handlers;
 
 
 import javax.inject.Inject;
 
+import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.netty.protocol.BGPv4PacketDecoder;
+import org.bgp4j.netty.protocol.ProtocolPacketException;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.DownstreamMessageEvent;

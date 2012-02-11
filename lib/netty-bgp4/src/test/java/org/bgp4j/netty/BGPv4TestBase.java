@@ -15,11 +15,12 @@
  * 
  * File: org.bgp4j.netty.protocol.ProtocolPacketTestBase.java 
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -33,7 +34,7 @@ import org.junit.Assert;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ProtocolPacketTestBase extends WeldTestCaseBase {
+public class BGPv4TestBase extends WeldTestCaseBase {
 
 	protected void assertBufferContents(byte[] expected, ChannelBuffer buffer) {
 		byte[] packet = new byte[buffer.readableBytes()];

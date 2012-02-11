@@ -23,9 +23,9 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
-import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
@@ -41,7 +41,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CapabilityTest extends ProtocolPacketTestBase {
+public class CapabilityTest extends BGPv4TestBase {
 
 	@Test
 	public void testDecodeMultiProtocolCapability() {

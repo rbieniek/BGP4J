@@ -38,7 +38,7 @@ public class BGPv4PacketDecoder {
 	private @Inject UpdatePacketDecoder updatePacketDecoder;
 	private @Inject RouteRefreshPacketDecoder routeRefreshPacketDecoder;
 	
-	BGPv4Packet decodePacket(ChannelBuffer buffer) {
+	public BGPv4Packet decodePacket(ChannelBuffer buffer) {
 		int type = buffer.readUnsignedByte();
 		BGPv4Packet packet = null;
 		

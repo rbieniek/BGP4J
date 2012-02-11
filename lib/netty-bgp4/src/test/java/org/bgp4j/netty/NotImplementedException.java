@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

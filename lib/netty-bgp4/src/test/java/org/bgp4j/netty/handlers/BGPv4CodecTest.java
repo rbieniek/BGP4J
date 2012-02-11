@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.BGPv4CodecTest.java 
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty.handlers;
 
 import java.net.Inet4Address;
 import java.util.List;
@@ -25,7 +25,13 @@ import junit.framework.Assert;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.ASType;
+import org.bgp4j.netty.MockChannel;
+import org.bgp4j.netty.MockChannelHandler;
+import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.handlers.BGPv4Codec;
+import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
@@ -60,7 +66,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4CodecTest extends ProtocolPacketTestBase {
+public class BGPv4CodecTest extends BGPv4TestBase {
 	@Before
 	public void before() {
 		codecOnlyHandler = obtainInstance(MockChannelHandler.class);

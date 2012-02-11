@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.UpdateAttributeChecker.java 
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.netty.handlers;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.Attribute;
 import org.bgp4j.netty.protocol.update.AttributeFlagsNotificationPacket;

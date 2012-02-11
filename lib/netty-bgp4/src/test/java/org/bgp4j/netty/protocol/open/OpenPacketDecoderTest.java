@@ -18,9 +18,9 @@ package org.bgp4j.netty.protocol.open;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
-import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OpenPacketDecoderTest extends ProtocolPacketTestBase {
+public class OpenPacketDecoderTest extends BGPv4TestBase {
 
 	private OpenPacketDecoder decoder;
 	

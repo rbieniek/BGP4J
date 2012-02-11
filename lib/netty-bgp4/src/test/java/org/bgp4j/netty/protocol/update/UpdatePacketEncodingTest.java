@@ -23,7 +23,7 @@ import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegmentType;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UpdatePacketEncodingTest extends ProtocolPacketTestBase {
+public class UpdatePacketEncodingTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeAggregatorPathAttribute() throws Exception {
