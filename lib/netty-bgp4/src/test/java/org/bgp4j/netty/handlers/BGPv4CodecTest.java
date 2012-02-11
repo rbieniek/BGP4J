@@ -92,6 +92,11 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 		codecOnlySink = null;
 		codecOnlyPipeline = null;
 		codecOnlyChannel = null;
+
+		completeChannel = null;
+		completeHandler = null;
+		completeSink = null;
+		completePipeline = null;
 	}
 
 	// channel setup with only the codec in the chain
