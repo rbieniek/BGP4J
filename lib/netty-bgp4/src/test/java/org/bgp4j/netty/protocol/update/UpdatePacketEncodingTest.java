@@ -21,8 +21,8 @@ import java.net.Inet4Address;
 
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegmentType;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
@@ -91,6 +91,24 @@ public class UpdatePacketEncodingTest extends ProtocolPacketTestBase {
 				0x01, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
 		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+						0x1234, 0x5678
+				}),
+		})).encodePathAttribute());
+	
+		assertBufferContents(new byte[] {
+				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
+				0x03, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_CONFED_SEQUENCE 2 AS 0x1234 0x5678
+		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SEQUENCE, new int[] {
+						0x1234, 0x5678
+				}),
+		})).encodePathAttribute());
+	
+		assertBufferContents(new byte[] {
+				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
+				0x04, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
+		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SET, new int[] {
 						0x1234, 0x5678
 				}),
 		})).encodePathAttribute());

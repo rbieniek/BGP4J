@@ -72,7 +72,7 @@ public abstract class Attribute {
 	 * 
 	 * @return an encoded formatted path attribute
 	 */
-	ChannelBuffer encodePathAttribute()  {
+	public ChannelBuffer encodePathAttribute()  {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		int valueLength = getValueLength();
 		int attrFlagsCode = 0;
@@ -104,7 +104,7 @@ public abstract class Attribute {
 		return buffer;
 	}
 	
-	int calculatePacketSize() {
+	public int calculateEncodedPathAttributeLength() {
 		int size = 2; // attribute flags + type field;
 		int valueLength = getValueLength();
 		

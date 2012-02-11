@@ -21,11 +21,11 @@ import java.net.Inet4Address;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.protocol.ASType;
 import org.bgp4j.netty.protocol.ConnectionNotSynchronizedException;
 import org.bgp4j.netty.protocol.ProtocolPacketTestBase;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
@@ -524,6 +524,68 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(ASPathAttribute.PathSegmentType.AS_SET, segment.getPathSegmentType());
+		Assert.assertEquals(1, segment.getAses().size());
+		Assert.assertEquals((Integer)0x1234, segment.getAses().remove(0));
+	}
+
+	@Test
+	public void testDecodeASPath4ASConfedSequenceOneASNumberPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x0a, // path attributes length (10 octets)
+				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06, // Path attribute: 6 octets AS4_PATH 
+				0x03, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, asPath.getTypeCode());
+		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
+		Assert.assertEquals(1, asPath.getPathSegments().size());
+		
+		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		
+		Assert.assertEquals(ASPathAttribute.PathSegmentType.AS_CONFED_SEQUENCE, segment.getPathSegmentType());
+		Assert.assertEquals(1, segment.getAses().size());
+		Assert.assertEquals((Integer)0x1234, segment.getAses().remove(0));
+	}
+
+	@Test
+	public void testDecodeASPath4ASConfedSetOneASNumberPacket() throws Exception {
+		UpdatePacket packet = safeDowncast(decoder.decodeUpdatePacket(buildProtocolPacket(new byte[] {
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
+				// (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
+				// (byte)0x00, (byte)0x35, // length 53 octets 
+				// (byte)0x02, // type code 2 (UPDATE) 
+				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
+				(byte)0x00, (byte)0x0a, // path attributes length (10 octets)
+				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06, // Path attribute: 6 octets AS4_PATH 
+				0x04, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
+		})), UpdatePacket.class);
+		
+		Assert.assertEquals(2, packet.getType());
+		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+		Assert.assertEquals(1, packet.getPathAttributes().size());
+		Assert.assertEquals(0, packet.getNlris().size());		
+		
+		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
+		
+		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, asPath.getTypeCode());
+		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
+		Assert.assertEquals(1, asPath.getPathSegments().size());
+		
+		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		
+		Assert.assertEquals(ASPathAttribute.PathSegmentType.AS_CONFED_SET, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
 		Assert.assertEquals((Integer)0x1234, segment.getAses().remove(0));
 	}
@@ -1030,7 +1092,7 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 						(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 						(byte)0x00, (byte)0x0a, // path attributes length (10 octets)
 						(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06, // Path attribute: 6 octets AS_PATH  
-						0x03, 0x01, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
+						0x05, 0x01, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
 				})), UpdatePacket.class);	
 			}
 		}).execute(MalformedASPathAttributeException.class);
@@ -1672,7 +1734,7 @@ public class UpdatePacketDecoderTest extends ProtocolPacketTestBase {
 						(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 						(byte)0x00, (byte)0x08, // path attributes length (8 octets)
 						(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, // Path attribute: 4 octets AS_PATH  
-						0x03, 0x01, 0x12, 0x34, // Invalid 0x1234 
+						0x05, 0x01, 0x12, 0x34, // Invalid 0x1234 
 				})), UpdatePacket.class);	
 			}
 		}).execute(MalformedASPathAttributeException.class);

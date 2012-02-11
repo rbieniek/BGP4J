@@ -19,8 +19,8 @@ package org.bgp4j.netty.protocol.update;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.protocol.ASType;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -32,11 +32,14 @@ public class ASPathAttribute extends Attribute {
 
 	private static final int AS_SET_CODE = 1;
 	private static final int AS_SEQUENCE_CODE = 2;
-	
+	private static final int AS_CONFED_SEQUENCE_CODE = 3;
+	private static final int AS_CONFED_SET_CODE = 4;	
 	
 	public enum PathSegmentType {
-		AS_SET,      // unordered set of ASes a route in the UPDATE message has traversed
-		AS_SEQUENCE; // ordered set of ASes a route in the UPDATE message has traversed
+		AS_SET,             // unordered set of ASes a route in the UPDATE message has traversed
+		AS_SEQUENCE,        // ordered set of ASes a route in the UPDATE message has traversed
+		AS_CONFED_SEQUENCE, // ordered set of ASes in a confederation a route in the UPDATE message has traversed
+		AS_CONFED_SET;      // unordered set of ASes in a confederation a route in the UPDATE message has traversed
 		
 		int toCode() {
 			switch(this) {
@@ -44,6 +47,10 @@ public class ASPathAttribute extends Attribute {
 				return AS_SET_CODE;
 			case AS_SEQUENCE:
 				return AS_SEQUENCE_CODE;
+			case AS_CONFED_SEQUENCE:
+				return AS_CONFED_SEQUENCE_CODE;
+			case AS_CONFED_SET:
+				return AS_CONFED_SET_CODE;
 			default:
 				throw new IllegalArgumentException("illegal AS_PATH type" + this);
 			}
@@ -55,6 +62,10 @@ public class ASPathAttribute extends Attribute {
 				return AS_SET;
 			case AS_SEQUENCE_CODE:
 				return AS_SEQUENCE;
+			case AS_CONFED_SEQUENCE_CODE:
+				return AS_CONFED_SEQUENCE;
+			case AS_CONFED_SET_CODE:
+				return AS_CONFED_SET;
 			default:
 				throw new IllegalArgumentException("illegal AS_PATH type" + code);				
 			}
@@ -221,6 +232,4 @@ public class ASPathAttribute extends Attribute {
 	public ASType getAsType() {
 		return asType;
 	}
-
-
 }
