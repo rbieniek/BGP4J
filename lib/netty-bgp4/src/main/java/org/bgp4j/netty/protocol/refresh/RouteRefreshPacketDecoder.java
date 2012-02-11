@@ -28,7 +28,6 @@ import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.shrinkwrap.resolver.api.maven.filter.AcceptAllFilter;
 import org.slf4j.Logger;
 
 /**
