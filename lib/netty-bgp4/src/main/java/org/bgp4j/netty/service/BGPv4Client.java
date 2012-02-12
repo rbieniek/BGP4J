@@ -26,6 +26,7 @@ import org.bgp4j.netty.BGPv4PeerConfiguration;
 import org.bgp4j.netty.fsm.BGPv4FSM;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
+import org.bgp4j.netty.handlers.ValidateServerIdentifier;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;

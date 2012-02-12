@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.service;
+package org.bgp4j.netty.handlers;
 
 import javax.inject.Inject;
 
