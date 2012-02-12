@@ -28,11 +28,16 @@ import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
+import org.bgp4j.netty.protocol.update.AggregatorPathAttribute;
+import org.bgp4j.netty.protocol.update.Attribute;
+import org.bgp4j.netty.protocol.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
+import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
+import org.bgp4j.netty.protocol.update.OriginatorIDPathAttribute;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -186,5 +191,225 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
 	}
 	
+	@Test
+	public void testPassOneRequiredAttributesMissing4OctetsASIBGPConnection() throws Exception {
+		UpdatePacket update;
 
+		peerInfo.setAsType(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		
+		update = new UpdatePacket();
+		// update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		// update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
+		// update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		// update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+	}
+
+	
+	@Test
+	public void testPassOneRequiredAttributesMissing2OctetsASIBGPConnection() throws Exception {
+		UpdatePacket update;
+
+		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		
+		update = new UpdatePacket();
+		// update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		// update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
+		// update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		// update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+	}
+	
+	@Test
+	public void testInvalidAttributeFlags() throws Exception {
+		UpdatePacket update;
+		Attribute attr;
+		
+		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		
+		// well-known mandatory
+		update = new UpdatePacket();
+		attr = new LocalPrefPathAttribute(100);
+		attr.setTransitive(false); // bogus flag, must be true according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		// well-known mandatory
+		update = new UpdatePacket();
+		attr = new LocalPrefPathAttribute(100);
+		attr.setOptional(true); // bogus flag, must be false according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+
+		// optional transitive
+		update = new UpdatePacket();
+		attr = new AggregatorPathAttribute(ASType.AS_NUMBER_2OCTETS, 64173, (Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x01 } ));
+		attr.setTransitive(false); // bogus flag, must be true according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		
+		// optional transitive
+		update = new UpdatePacket();
+		attr = new AggregatorPathAttribute(ASType.AS_NUMBER_2OCTETS, 64173, (Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x01 } ));
+		attr.setOptional(false); // bogus flag, must be true according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+
+		// optional non-transitive
+		update = new UpdatePacket();
+		attr = new OriginatorIDPathAttribute(1);
+		attr.setOptional(false); // bogus flag, must be true according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+
+		// optional non-transitive
+		update = new UpdatePacket();
+		attr = new OriginatorIDPathAttribute(1);
+		attr.setTransitive(true); // bogus flag, must be false according to RFC 4271
+		update.getPathAttributes().add(attr);
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+	}
+	
+	@Test
+	public void testMismatchASNumberSizesFlags() throws Exception {
+		UpdatePacket update;
+		
+		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		
+		update = new UpdatePacket();
+		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
+		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
+		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
+		update.getPathAttributes().add(new AggregatorPathAttribute(ASType.AS_NUMBER_4OCTETS));
+
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MalformedAttributeListNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+	}
 }

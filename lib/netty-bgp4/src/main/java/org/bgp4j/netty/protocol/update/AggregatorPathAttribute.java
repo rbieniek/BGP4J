@@ -28,7 +28,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AggregatorPathAttribute extends Attribute {
+public class AggregatorPathAttribute extends Attribute implements ASTypeAware {
 
 	private ASType asType;
 	private int asNumber;

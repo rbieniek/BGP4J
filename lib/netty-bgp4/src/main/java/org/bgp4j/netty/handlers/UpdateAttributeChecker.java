@@ -30,9 +30,11 @@ import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
+import org.bgp4j.netty.protocol.update.ASTypeAware;
 import org.bgp4j.netty.protocol.update.Attribute;
 import org.bgp4j.netty.protocol.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
+import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
@@ -108,7 +110,7 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 				}
 				
 				if(badAttr) {
-					log.info("detected attribute " + attribute + " with invlaid flags");
+					log.info("detected attribute " + attribute + " with invalid flags");
 					
 					attributeFlagsErrorList.add(attribute);
 				}
@@ -155,8 +157,23 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					}
 					
 					NotificationHelper.sendNotificationsAndCloseChannel(ctx, notifications);
-				} else
-					sentUpstream = true;
+				} else {
+					boolean haveBougsWidth = false;
+					
+					// check path attributes for AS number width (2 or 4) settings which mismatch the connection configuration
+					for(Attribute attribute : update.getPathAttributes()) {
+						if(attribute instanceof ASTypeAware) {
+							if(((ASTypeAware)attribute).getAsType() != connInfo.getAsType()) {
+								haveBougsWidth = true;
+							}
+						}
+					}
+					
+					if(haveBougsWidth) {
+						NotificationHelper.sendNotificationAndCloseChannel(ctx, new MalformedAttributeListNotificationPacket());
+					} else
+						sentUpstream = true;
+				}
 			}
 		} else
 			sentUpstream = true;

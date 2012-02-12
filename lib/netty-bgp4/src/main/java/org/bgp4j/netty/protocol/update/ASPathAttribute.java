@@ -28,7 +28,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ASPathAttribute extends Attribute {
+public class ASPathAttribute extends Attribute implements ASTypeAware {
 
 	private static final int AS_SET_CODE = 1;
 	private static final int AS_SEQUENCE_CODE = 2;
@@ -226,9 +226,10 @@ public class ASPathAttribute extends Attribute {
 		this.pathSegments = pathSegments;
 	}
 
-	/**
-	 * @return the asType
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.update.ASTypeAware#getAsType()
 	 */
+	@Override
 	public ASType getAsType() {
 		return asType;
 	}

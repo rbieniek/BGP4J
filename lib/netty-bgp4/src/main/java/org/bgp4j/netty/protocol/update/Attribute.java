@@ -162,7 +162,7 @@ public abstract class Attribute {
 	/**
 	 * @param optional the optional to set
 	 */
-	protected void setOptional(boolean optional) {
+	public void setOptional(boolean optional) {
 		this.optional = optional;
 	}
 
