@@ -153,6 +153,8 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 						log.info("detected missing well-known atribute, type " + code);
 						notifications.add(new MissingWellKnownAttributeNotificationPacket(code));
 					}
+					
+					NotificationHelper.sendNotificationsAndCloseChannel(ctx, notifications);
 				} else
 					sentUpstream = true;
 			}

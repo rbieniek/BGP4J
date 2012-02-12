@@ -44,6 +44,32 @@ public class NotificationHelper {
 		
 	}
 	
+	private static class ConcatenatedWriteOrCloseFuture implements ChannelFutureListener {
+		private NotificationPacket notification;
+		private ConcatenatedWriteOrCloseFuture next;
+		
+		private ConcatenatedWriteOrCloseFuture(NotificationPacket notification, ConcatenatedWriteOrCloseFuture next) {
+			this.next = next;
+			this.notification = notification;
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.jboss.netty.channel.ChannelFutureListener#operationComplete(org.jboss.netty.channel.ChannelFuture)
+		 */
+		@Override
+		public void operationComplete(ChannelFuture future) throws Exception {
+			if(notification != null) {
+				future.getChannel().write(notification).addListener(next);
+			} else {
+				future.getChannel().close();
+			}
+		}
+		
+		private void send(Channel channel) {
+			channel.write(notification).addListener(next);
+		}
+	}
+	
 	/**
 	 * send a notification and close the channel after the message was sent.
 	 * 
@@ -70,8 +96,26 @@ public class NotificationHelper {
 	 * @param channel the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendNotificationAndCloseChannel(Channel channel, Collection<NotificationPacket> notifications) {
-		// TODO implement
+	public static void sendNotificationsAndCloseChannel(Channel channel, Collection<NotificationPacket> notifications) {
+		ConcatenatedWriteOrCloseFuture next = new ConcatenatedWriteOrCloseFuture(null, null);
+
+		for(NotificationPacket notification : notifications) {
+			ConcatenatedWriteOrCloseFuture current = new ConcatenatedWriteOrCloseFuture(notification, next);
+			
+			next = current;
+		}
+		
+		next.send(channel);
+	}
+
+	/**
+	 * send a list of notifications and close the channel after the last message was sent.
+	 * 
+	 * @param channel the channel.
+	 * @param notification the notification to send
+	 */
+	public static void sendNotificationsAndCloseChannel(ChannelHandlerContext ctx, Collection<NotificationPacket> notifications) {
+		sendNotificationsAndCloseChannel(ctx.getChannel(), notifications);
 	}
 
 	/**

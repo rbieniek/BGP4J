@@ -29,6 +29,7 @@ import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
+import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
@@ -168,4 +169,22 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 
 		Assert.assertEquals(3, consumed.getPathAttributes().size());
 	}
+	
+	@Test
+	public void testPassAllRequiredAttributesMissing2OctetsASIBGPConnection() throws Exception {
+		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		
+		UpdatePacket update = new UpdatePacket();
+		
+		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, update));
+		
+		Assert.assertEquals(1, sink.getWaitingEventNumber());
+		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+	
+		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+	}
+	
+
 }

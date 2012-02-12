@@ -25,6 +25,8 @@ import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineException;
 import org.jboss.netty.channel.ChannelSink;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.MessageEvent;
 import org.slf4j.Logger;
 
 /**
@@ -39,6 +41,9 @@ public class MockChannelSink implements ChannelSink {
 	@Override
 	public void eventSunk(ChannelPipeline pipeline, ChannelEvent e) throws Exception {
 		events.add(e);
+		
+		if(e instanceof MessageEvent)
+			Channels.fireWriteComplete(e.getChannel(), 1);
 	}
 
 	@Override
