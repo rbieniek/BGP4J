@@ -86,7 +86,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassAllRequiredAttributes2OctetsASIBGPConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -109,7 +109,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassAllRequiredAttributes4OctetsASIBGPConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -133,7 +133,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassAllRequiredAttributes2OctetsASEBGPConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64173);
 		
@@ -155,7 +155,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassAllRequiredAttributes4OctetsASEBGPConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64173);
 		
@@ -177,7 +177,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassAllRequiredAttributesMissing2OctetsASIBGPConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -195,7 +195,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	public void testPassOneRequiredAttributesMissing4OctetsASIBGPConnection() throws Exception {
 		UpdatePacket update;
 
-		peerInfo.setAsType(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -257,7 +257,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	public void testPassOneRequiredAttributesMissing2OctetsASIBGPConnection() throws Exception {
 		UpdatePacket update;
 
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -319,7 +319,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 		UpdatePacket update;
 		Attribute attr;
 		
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		
@@ -394,7 +394,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	public void testMismatchASNumberSizesFlags() throws Exception {
 		UpdatePacket update;
 		
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		

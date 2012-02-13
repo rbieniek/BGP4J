@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 /**
  * This registry maps from an InetAddress to a client instance.
  * 
@@ -31,6 +33,7 @@ import java.util.Map;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@Singleton
 public class ClientRegistry {
 
 	private Map<InetAddress, BGPv4Client> clientMap = new HashMap<InetAddress, BGPv4Client>();

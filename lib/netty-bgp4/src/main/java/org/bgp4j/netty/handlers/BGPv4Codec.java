@@ -18,6 +18,7 @@ package org.bgp4j.netty.handlers;
 
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.BGPv4PacketDecoder;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@Singleton
 public class BGPv4Codec extends SimpleChannelHandler {
 	public static final String HANDLER_NAME = "BGP4-Codec";
 	

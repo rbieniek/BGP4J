@@ -76,7 +76,7 @@ public class ValidateServerIdentifierTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassOpenMessage() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		peerInfo.setRemoteBgpIdentifier(12345);
@@ -99,7 +99,7 @@ public class ValidateServerIdentifierTest extends BGPv4TestBase {
 	
 	@Test
 	public void testPassOpenAS4Message() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
 		peerInfo.setLocalAS(641720);
 		peerInfo.setRemoteAS(641720);
 		peerInfo.setRemoteBgpIdentifier(12345);
@@ -123,7 +123,7 @@ public class ValidateServerIdentifierTest extends BGPv4TestBase {
 	
 	@Test
 	public void testASNumberMismatchConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		peerInfo.setRemoteBgpIdentifier(12345);
@@ -143,7 +143,7 @@ public class ValidateServerIdentifierTest extends BGPv4TestBase {
 	
 	@Test
 	public void testBgpIdentifierMismatchConnection() throws Exception {
-		peerInfo.setAsType(ASType.AS_NUMBER_2OCTETS);
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);
 		peerInfo.setRemoteAS(64172);
 		peerInfo.setRemoteBgpIdentifier(12345);

@@ -16,11 +16,54 @@
  */
 package org.bgp4j.netty.fsm;
 
+import java.net.InetAddress;
+
+import javax.inject.Inject;
+
+import org.bgp4j.netty.ASType;
+import org.bgp4j.netty.BGPv4PeerConfiguration;
+import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.jboss.netty.channel.Channel;
+import org.slf4j.Logger;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class BGPv4FSM {
+
+	private @Inject Logger log;
+	
+	private InetAddress remotePeerAddress;
+	private PeerConnectionInformation pci = new PeerConnectionInformation();
+	
+	public void configure(BGPv4PeerConfiguration peerConfig) {
+		this.remotePeerAddress = peerConfig.getRemotePeerAddress().getAddress();
+
+		pci.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS); // default value, subject to negotiation
+		pci.setLocalAS(peerConfig.getLocalAutonomousSystem());
+		pci.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
+		pci.setRemoteAS(peerConfig.getRemoteAutonomousSystem());
+		pci.setRemoteBgpIdentifier(peerConfig.getRemoteBgpIdentitifer());
+	}
+
+	public InetAddress getRemotePeerAddress() {
+		return this.remotePeerAddress;
+	}
+
+	public PeerConnectionInformation getPeerConnectionInformation() {
+		return pci;
+	}
+	
+	public void destroyFSM() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleMessage(Channel channel, BGPv4Packet message) {
+		log.info("received message " + message);
+	}
 
 }

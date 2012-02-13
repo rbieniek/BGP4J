@@ -17,6 +17,7 @@
 package org.bgp4j.netty.handlers;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BadMessageLengthNotificationPacket;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@Singleton
 public class BGPv4Reframer extends FrameDecoder {
 	private @Inject Logger log;
 

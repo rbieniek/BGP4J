@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import org.bgp4j.netty.BGPv4Configuration;
 import org.bgp4j.netty.BGPv4PeerConfiguration;
 import org.bgp4j.netty.PeerConfigurationChangedListener;
+import org.bgp4j.netty.fsm.FSMRegistry;
 import org.slf4j.Logger;
 
 
@@ -105,6 +106,7 @@ public class BGPv4Service {
 	private @Inject @New Instance<BGPv4Client> clientProvider;
 	private @Inject Instance<BGPv4Server> serverProvider;
 	private @Inject ClientRegistry clientRegistry;
+	private @Inject FSMRegistry fsmRegistry;
 	
 	private BGPv4Server serverInstance;
 	private List<ReconnectSchedule> scheduledReconnectInstances = new LinkedList<ReconnectSchedule>();
@@ -116,6 +118,8 @@ public class BGPv4Service {
 	 * @param configuration the initial service configuration
 	 */
 	public void startService(BGPv4Configuration configuration) {
+		fsmRegistry.createRegistry(configuration);
+		
 		configuration.addListener(new ClientManagerListener());
 		
 		timer.scheduleAtFixedRate(new ReconnectClientTask(), 5000L, 5000L);
@@ -150,6 +154,7 @@ public class BGPv4Service {
 		for(InetAddress addr : clientRegistry.listRemotePeerAddresses())
 			clientRegistry.unregisterClient(addr).stopClient();
 		
+		fsmRegistry.destroyRegistry();
 	}
 	
 	public void handleReconnectNeeded(@Observes ClientNeedReconnectEvent event) {

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
@@ -52,6 +53,7 @@ import org.slf4j.Logger;
  *
  */
 @PeerConnectionInformationAware
+@Singleton
 public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {	
 	private @Inject Logger log;
 	
@@ -165,7 +167,7 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					// check path attributes for AS number width (2 or 4) settings which mismatch the connection configuration
 					for(Attribute attribute : update.getPathAttributes()) {
 						if(attribute instanceof ASTypeAware) {
-							if(((ASTypeAware)attribute).getAsType() != connInfo.getAsType()) {
+							if(((ASTypeAware)attribute).getAsType() != connInfo.getAsTypeInUse()) {
 								haveBougsWidth = true;
 							}
 						}

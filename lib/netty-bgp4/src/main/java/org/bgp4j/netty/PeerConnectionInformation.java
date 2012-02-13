@@ -28,14 +28,14 @@ public class PeerConnectionInformation {
 	private int remoteAS;
 	private int localBgpIdentifier;
 	private int remoteBgpIdentifier;
-	private ASType asType = ASType.AS_NUMBER_2OCTETS;
+	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
 	
-	public ASType getAsType() {
-		return asType;
+	public ASType getAsTypeInUse() {
+		return asTypeInUse;
 	}
 
-	public void setAsType(ASType asType) {
-		this.asType = asType;
+	public void setAsTypeInUse(ASType asType) {
+		this.asTypeInUse = asType;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class PeerConnectionInformation {
 	 * @return
 	 */
 	public boolean isAS4OctetsInUse() {
-		return (this.asType == ASType.AS_NUMBER_4OCTETS);
+		return (this.asTypeInUse == ASType.AS_NUMBER_4OCTETS);
 	}
 
 	/**
@@ -123,5 +123,22 @@ public class PeerConnectionInformation {
 	 */
 	public void setRemoteBgpIdentifier(int remoteBgpIdentifier) {
 		this.remoteBgpIdentifier = remoteBgpIdentifier;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PeerConnectionInformation [localAS=").append(localAS)
+				.append(", remoteAS=").append(remoteAS)
+				.append(", localBgpIdentifier=").append(localBgpIdentifier)
+				.append(", remoteBgpIdentifier=").append(remoteBgpIdentifier)
+				.append(", ");
+		if (asTypeInUse != null)
+			builder.append("asTypeInUse=").append(asTypeInUse);
+		builder.append("]");
+		return builder.toString();
 	}
 }
