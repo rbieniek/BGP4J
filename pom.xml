@@ -117,10 +117,17 @@
   </build>
 
   <properties>
-    <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
+    <version.commons.beanutils>1.8.3</version.commons.beanutils>
     <version.commons.cli>1.2</version.commons.cli>
     <version.commons.codec>1.4</version.commons.codec>
+    <version.commons.collections>3.2.1</version.commons.collections>
+    <version.commons.configuration>1.8</version.commons.configuration>
+    <version.commons.digester>1.8.1</version.commons.digester>
+    <version.commons.jxpath>1.3</version.commons.jxpath>
     <version.commons.lang>3.0.1</version.commons.lang>
+    <version.commons.jexl>2.1.1</version.commons.jexl>
+    <version.commons.vfs>2.0</version.commons.vfs>
+    <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
     <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
     <version.log4j>1.2.16</version.log4j>
     <version.org.apache.maven.plugins.maven_jar_plugin>2.3.2</version.org.apache.maven.plugins.maven_jar_plugin>
@@ -157,6 +164,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+	<groupId>commons-beanutils</groupId>
+	<artifactId>commons-beanutils</artifactId>
+	<version>${version.commons.beanutils}</version>
+      </dependency>
+      <dependency>
 	<groupId>commons-codec</groupId>
 	<artifactId>commons-codec</artifactId>
 	<version>${version.commons.codec}</version>
@@ -165,6 +177,26 @@
 	<groupId>commons-cli</groupId>
 	<artifactId>commons-cli</artifactId>
 	<version>${version.commons.cli}</version>
+      </dependency>
+      <dependency>
+	<groupId>commons-configuration</groupId>
+	<artifactId>commons-configuration</artifactId>
+	<version>${version.commons.configuration}</version>
+      </dependency>
+      <dependency>
+	<groupId>commons-collections</groupId>
+	<artifactId>commons-collections</artifactId>
+	<version>${version.commons.collections}</version>
+      </dependency>
+      <dependency>
+	<groupId>commons-digester</groupId>
+	<artifactId>commons-digester</artifactId>
+	<version>${version.commons.digester}</version>
+      </dependency>
+      <dependency>
+	<groupId>commons-jxpath</groupId>
+	<artifactId>commons-jxpath</artifactId>
+	<version>${version.commons.jxpath}</version> 
       </dependency>
       <dependency> 
 	<groupId>junit</groupId> 
@@ -176,6 +208,16 @@
 	<artifactId>log4j</artifactId> 
 	<version>${version.log4j}</version> 
       </dependency> 
+      <dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-jexl</artifactId>
+	<version>${version.commons.jexl}</version> 
+      </dependency>
+      <dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-vfs2</artifactId>
+	<version>${version.commons.vfs}</version> 
+      </dependency>
       <dependency>
 	<groupId>org.hibernate</groupId>
 	<artifactId>hibernate-validator</artifactId>
