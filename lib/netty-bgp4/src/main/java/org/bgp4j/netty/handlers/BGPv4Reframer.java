@@ -35,7 +35,6 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Singleton
 public class BGPv4Reframer extends FrameDecoder {
 	private @Inject Logger log;
 
