@@ -22,10 +22,10 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.bgp4j.netty.AddressFamily;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;

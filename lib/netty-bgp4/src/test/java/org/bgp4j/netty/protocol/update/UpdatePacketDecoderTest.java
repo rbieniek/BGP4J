@@ -21,12 +21,12 @@ import java.net.Inet4Address;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.ASType;
-import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.ConnectionNotSynchronizedException;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.junit.After;

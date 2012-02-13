@@ -1,4 +1,4 @@
-package org.bgp4j.netty;
+package org.bgp4j.net;
 
 /**
  * Address families as defined in RFC 1700

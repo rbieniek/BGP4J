@@ -46,6 +46,12 @@
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
+      <artifactId>common-network</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
       <artifactId>common-weld</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>
@@ -53,6 +59,12 @@
     <dependency>
       <groupId>de.urb.quagga</groupId>
       <artifactId>netty-bgp4</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>routing</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>
 

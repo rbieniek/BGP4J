@@ -22,10 +22,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.bgp4j.netty.AddressFamily;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.NLRICodec;
-import org.bgp4j.netty.NetworkLayerReachabilityInformation;
-import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;

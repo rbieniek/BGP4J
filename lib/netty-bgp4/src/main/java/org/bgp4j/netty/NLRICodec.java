@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty;
 
+import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 

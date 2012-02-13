@@ -19,9 +19,9 @@ package org.bgp4j.netty.protocol;
 
 import javax.inject.Inject;
 
-import org.bgp4j.netty.AddressFamily;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.open.OpenPacketDecoder;
 import org.bgp4j.netty.protocol.refresh.RouteRefreshPacketDecoder;
 import org.bgp4j.netty.protocol.update.UpdatePacketDecoder;

@@ -1,4 +1,4 @@
-package org.bgp4j.netty;
+package org.bgp4j.net;
 
 /**
  * Subsequent address family as defined in RFC 2858

@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.bgp4j.netty.AddressFamily;
-import org.bgp4j.netty.SubsequentAddressFamily;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.SubsequentAddressFamily;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

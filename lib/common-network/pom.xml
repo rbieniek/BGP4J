@@ -12,45 +12,16 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>netty-bgp4</artifactId>
+  <artifactId>common-network</artifactId>
   <version>${version.de.urb.quagga}</version>
-  <name>Netty BGPv4 implementation</name>
-  <description>Netty BGPv4 implementation</description>
+  <name>Common network objects</name>
+  <description>Common network objects</description>
 
   <dependencies>
 
     <dependency>
-      <groupId>de.urb.quagga</groupId>
-      <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-ext</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>de.urb.quagga</groupId>
-      <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
 
     <dependency> 
@@ -58,18 +29,6 @@
       <artifactId>junit</artifactId> 
       <scope>test</scope> 
     </dependency> 
-
-    <dependency>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
 
   </dependencies>
 

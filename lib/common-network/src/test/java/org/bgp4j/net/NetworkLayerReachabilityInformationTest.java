@@ -15,11 +15,10 @@
  * 
  * File: org.bgp4j.netty.protocol.NetworkLayerReachabiityInformationTest.java 
  */
-package org.bgp4j.netty.protocol;
+package org.bgp4j.net;
 
 import junit.framework.Assert;
 
-import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.junit.Test;
 
 /**
