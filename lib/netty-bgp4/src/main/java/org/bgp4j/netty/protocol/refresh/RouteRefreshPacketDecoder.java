@@ -22,9 +22,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.AddressFamily;
+import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -112,7 +113,7 @@ public class RouteRefreshPacketDecoder {
 			entry.setSequence((int)buffer.readUnsignedInt());
 			entry.setMinLength(buffer.readUnsignedByte());
 			entry.setMaxLength(buffer.readUnsignedByte());
-			entry.setPrefix(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
+			entry.setPrefix(NLRICodec.decodeNLRI(buffer));
 		}
 		
  		return entry;

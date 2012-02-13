@@ -19,9 +19,9 @@ package org.bgp4j.netty.protocol;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

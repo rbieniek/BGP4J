@@ -17,9 +17,9 @@
  */
 package org.bgp4j.netty.protocol.open;
 
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -29,8 +29,8 @@ import org.jboss.netty.buffer.ChannelBuffers;
  */
 public class MultiProtocolCapability extends Capability {
 
-	private BGPv4Constants.AddressFamily afi;
-	private BGPv4Constants.SubsequentAddressFamily safi;
+	private AddressFamily afi;
+	private SubsequentAddressFamily safi;
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.Capability#getCapabilityType()
@@ -50,7 +50,7 @@ public class MultiProtocolCapability extends Capability {
 		if(afi != null)
 			buffer.writeShort(afi.toCode());
 		else
-			buffer.writeShort(BGPv4Constants.AddressFamily.RESERVED.toCode());
+			buffer.writeShort(AddressFamily.RESERVED.toCode());
 		
 		buffer.writeByte(0); // reserved
 		
@@ -77,28 +77,28 @@ public class MultiProtocolCapability extends Capability {
 	/**
 	 * @return the afi
 	 */
-	public BGPv4Constants.AddressFamily getAfi() {
+	public AddressFamily getAfi() {
 		return afi;
 	}
 
 	/**
 	 * @param afi the afi to set
 	 */
-	public void setAfi(BGPv4Constants.AddressFamily afi) {
+	public void setAfi(AddressFamily afi) {
 		this.afi = afi;
 	}
 
 	/**
 	 * @return the safi
 	 */
-	public BGPv4Constants.SubsequentAddressFamily getSafi() {
+	public SubsequentAddressFamily getSafi() {
 		return safi;
 	}
 
 	/**
 	 * @param safi the safi to set
 	 */
-	public void setSafi(BGPv4Constants.SubsequentAddressFamily safi) {
+	public void setSafi(SubsequentAddressFamily safi) {
 		this.safi = safi;
 	}
 

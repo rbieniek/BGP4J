@@ -22,10 +22,10 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.Capability;
 import org.bgp4j.netty.protocol.open.MultiProtocolCapability;
@@ -54,8 +54,8 @@ public class CapabilityTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(cap.getClass(), MultiProtocolCapability.class);
 		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL);
-		Assert.assertEquals(BGPv4Constants.AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
-		Assert.assertEquals(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
+		Assert.assertEquals(AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
 	}
 
 	@Test
@@ -197,8 +197,8 @@ public class CapabilityTest extends BGPv4TestBase {
 		Capability cap = caps.remove(0);
 		Assert.assertEquals(cap.getClass(), MultiProtocolCapability.class);
 		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL);
-		Assert.assertEquals(BGPv4Constants.AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
-		Assert.assertEquals(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
+		Assert.assertEquals(AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
 
 		cap = caps.remove(0);
 		Assert.assertEquals(cap.getClass(), AutonomousSystem4Capability.class);
@@ -214,8 +214,8 @@ public class CapabilityTest extends BGPv4TestBase {
 		byte[] packet;
 		ChannelBuffer buffer;
 		
-		cap1.setAfi(BGPv4Constants.AddressFamily.IPv4);
-		cap1.setSafi(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		cap1.setAfi(AddressFamily.IPv4);
+		cap1.setSafi(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 		caps.add(cap1);
 		
 		cap2.setAutonomousSystem(64512);
@@ -249,8 +249,8 @@ public class CapabilityTest extends BGPv4TestBase {
 		cap = caps.remove(0);
 		Assert.assertEquals(cap.getClass(), MultiProtocolCapability.class);
 		Assert.assertEquals(cap.getCapabilityType(), BGPv4Constants.BGP_CAPABILITY_TYPE_MULTIPROTOCOL);
-		Assert.assertEquals(BGPv4Constants.AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
-		Assert.assertEquals(BGPv4Constants.SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
+		Assert.assertEquals(AddressFamily.IPv4, ((MultiProtocolCapability)cap).getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, ((MultiProtocolCapability)cap).getSafi());
 	}
 	
 	@Test

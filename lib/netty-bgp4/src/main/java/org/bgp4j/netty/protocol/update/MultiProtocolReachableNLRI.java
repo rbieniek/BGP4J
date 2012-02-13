@@ -20,10 +20,11 @@ package org.bgp4j.netty.protocol.update;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
@@ -95,7 +96,7 @@ public class MultiProtocolReachableNLRI extends Attribute {
 		
 		if(this.nlris != null) {
 			for(NetworkLayerReachabilityInformation nlri : this.nlris)
-				size += nlri.getEncodedNLRILength();
+				size += NLRICodec.calculateEncodedNLRILength(nlri);
 		}
 		
 		return size;
@@ -122,7 +123,7 @@ public class MultiProtocolReachableNLRI extends Attribute {
 
 		if(this.nlris != null) {
 			for(NetworkLayerReachabilityInformation nlri : this.nlris)
-				buffer.writeBytes(nlri.encodeNLRI());
+				buffer.writeBytes(NLRICodec.encodeNLRI(nlri));
 		}
 
 		return buffer;

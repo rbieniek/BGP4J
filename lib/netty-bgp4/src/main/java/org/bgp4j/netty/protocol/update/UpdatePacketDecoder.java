@@ -25,10 +25,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.ASType;
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
@@ -115,9 +116,7 @@ public class UpdatePacketDecoder {
 		if(buffer.readableBytes() > 0) {
 			try {
 				while (buffer.readable()) {
-					packet.getNlris().add(
-							NetworkLayerReachabilityInformation
-									.decodeNLRI(buffer));
+					packet.getNlris().add(NLRICodec.decodeNLRI(buffer));
 				}
 			} catch (IndexOutOfBoundsException e) {
 				throw new InvalidNetworkFieldException();
@@ -345,7 +344,7 @@ public class UpdatePacketDecoder {
 			buffer.readByte(); // reserved
 			
 			while(buffer.readable()) {
-				attr.getNlris().add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
+				attr.getNlris().add(NLRICodec.decodeNLRI(buffer));
 			}
 		} catch(RuntimeException e) {
 			log.error("failed to decode MP_REACH_NLRI path attribute", e);
@@ -364,7 +363,7 @@ public class UpdatePacketDecoder {
 			attr.setSubsequentAddressFamily(SubsequentAddressFamily.fromCode(buffer.readUnsignedByte()));
 			
 			while(buffer.readable()) {
-				attr.getNlris().add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));
+				attr.getNlris().add(NLRICodec.decodeNLRI(buffer));
 			}
 		} catch(RuntimeException e) {
 			log.error("failed to decode MP_UNREACH_NLRI path attribute", e);
@@ -515,7 +514,7 @@ public class UpdatePacketDecoder {
 		List<NetworkLayerReachabilityInformation> routes = new LinkedList<NetworkLayerReachabilityInformation>();
 		
 		while(buffer.readable()) {
-			routes.add(NetworkLayerReachabilityInformation.decodeNLRI(buffer));			
+			routes.add(NLRICodec.decodeNLRI(buffer));			
 		}
 		return routes;
 	}

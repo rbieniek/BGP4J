@@ -17,10 +17,10 @@
  */
 package org.bgp4j.netty.protocol.refresh;
 
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.AddressFamily;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.junit.Test;
 
 /**

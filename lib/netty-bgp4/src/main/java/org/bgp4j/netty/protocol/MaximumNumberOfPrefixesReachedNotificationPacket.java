@@ -17,8 +17,8 @@
  */
 package org.bgp4j.netty.protocol;
 
-import org.bgp4j.netty.BGPv4Constants.AddressFamily;
-import org.bgp4j.netty.BGPv4Constants.SubsequentAddressFamily;
+import org.bgp4j.netty.AddressFamily;
+import org.bgp4j.netty.SubsequentAddressFamily;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 

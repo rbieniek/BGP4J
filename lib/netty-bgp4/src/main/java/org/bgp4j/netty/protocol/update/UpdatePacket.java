@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -68,7 +69,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 		if(this.withdrawnRoutes != null) {
 			for (NetworkLayerReachabilityInformation route : withdrawnRoutes) {
-				buffer.writeBytes(route.encodeNLRI());
+				buffer.writeBytes(NLRICodec.encodeNLRI(route));
 			}
 		}
 		
@@ -92,7 +93,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 		if(this.nlris != null) {
 			for (NetworkLayerReachabilityInformation nlri : nlris) {
-				buffer.writeBytes(nlri.encodeNLRI());
+				buffer.writeBytes(NLRICodec.encodeNLRI(nlri));
 			}
 		}
 		
@@ -104,7 +105,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 		if(this.withdrawnRoutes != null) {
 			for (NetworkLayerReachabilityInformation route : withdrawnRoutes) {
-				size += route.calculatePacketSize();
+				size += NLRICodec.calculateEncodedNLRILength(route);
 			}
 		}
 
@@ -116,7 +117,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 		if(this.nlris != null) {
 			for (NetworkLayerReachabilityInformation nlri : nlris) {
-				size += nlri.calculatePacketSize();
+				size += NLRICodec.calculateEncodedNLRILength(nlri);
 			}
 		}
 

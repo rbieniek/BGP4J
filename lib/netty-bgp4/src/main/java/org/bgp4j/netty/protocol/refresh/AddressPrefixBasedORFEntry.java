@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.protocol.refresh;
 
+import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.NetworkLayerReachabilityInformation;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -111,7 +112,7 @@ public class AddressPrefixBasedORFEntry extends ORFEntry {
 		int size = 0;
 		
 		if(getAction() != ORFAction.REMOVE_ALL)
-			size += 6 + prefix.getEncodedNLRILength(); // 4 octet sequence + 1 octet min length + 1 octet max length + prefix length
+			size += 6 + NLRICodec.calculateEncodedNLRILength(this.prefix); // 4 octet sequence + 1 octet min length + 1 octet max length + prefix length
 		
 		return size;
 	}
@@ -126,7 +127,7 @@ public class AddressPrefixBasedORFEntry extends ORFEntry {
 			buffer.writeInt(sequence);
 			buffer.writeByte(minLength);
 			buffer.writeByte(maxLength);
-			buffer.writeBytes(prefix.encodeNLRI());
+			buffer.writeBytes(NLRICodec.encodeNLRI(this.prefix));
 		}
 		
 		return buffer;

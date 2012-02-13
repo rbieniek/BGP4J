@@ -19,8 +19,6 @@ package org.bgp4j.netty;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * This class models the generic network layer reachabibility information as defined in RFC 4271 and RFC 2858.
@@ -48,48 +46,10 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	private int prefixLength;
 	private byte[] prefix;
 	
-	public static final int calculateOctetsForPrefixLength(int prefixLength) {
-		return (prefixLength / 8) + (prefixLength % 8 > 0 ? 1 :0);		
-	}
-	
-	public static NetworkLayerReachabilityInformation decodeNLRI(ChannelBuffer buffer) {
-		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation();
-		int prefixLength = buffer.readUnsignedByte();
-		byte[] prefixBytes = null;
-		
-		if(prefixLength > 0) {
-			prefixBytes = new byte[calculateOctetsForPrefixLength(prefixLength)];
-			
-			buffer.readBytes(prefixBytes);
-		}
-		nlri.setPrefix(prefixLength, prefixBytes);
-		
-		return nlri;
-	}
-	
 	public NetworkLayerReachabilityInformation() {}
 	
 	public NetworkLayerReachabilityInformation(int prefixLength, byte[] prefix) {
 		setPrefix(prefixLength, prefix);
-	}
-	
-	public ChannelBuffer encodeNLRI() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(calculatePacketSize()+1);
-		
-		buffer.writeByte(prefixLength);
-		if(prefixLength > 0) {
-			buffer.writeBytes(prefix);
-		}
-		
-		return buffer;
-	}
-
-	public int calculatePacketSize() {
-		return calculateOctetsForPrefixLength(this.prefixLength);
-	}
-	
-	public int getEncodedNLRILength() {
-		return calculateOctetsForPrefixLength(this.prefixLength) + 1;
 	}
 	
 	/**
@@ -120,7 +80,7 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 			if(prefixLength != 0)
 				throw new IllegalArgumentException("cannot set null prefix if prefix length greater 0");
 		} else {			
-			int prefixSize = calculatePacketSize();
+			int prefixSize = calculateOctetsForPrefixLength(this.prefixLength);
 			
 			if(prefix.length != prefixSize)
 				throw new IllegalArgumentException("expected a prefix with " + prefixSize + " octets but got " + prefix.length + " octets");
@@ -156,7 +116,7 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 		if(prefixLength > 0) {
 			if (other.prefixLength > 0
 					&& other.prefixLength > this.prefixLength) {
-				int byteLength = calculatePacketSize();
+				int byteLength = calculateOctetsForPrefixLength(this.prefixLength);
 				boolean match = true;
 
 				// test the full prefix octets
@@ -238,8 +198,8 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 		} else if(this.prefixLength == 0 && other.prefixLength == 0) {
 			result = 0;
 		} else {
-			int byteLen = calculatePacketSize();
-			int otherByteLen = other.calculatePacketSize();
+			int byteLen = calculateOctetsForPrefixLength(this.prefixLength);
+			int otherByteLen = calculateOctetsForPrefixLength(other.prefixLength);
 			int commonByteLen = (byteLen > otherByteLen) ? otherByteLen : byteLen;
 			int commonPrefixLen = (prefixLength > other.prefixLength) ? other.prefixLength : prefixLength;
 			
@@ -287,6 +247,10 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 		}
 		
 		return result;
+	}
+
+	public static final int calculateOctetsForPrefixLength(int prefixLength) {
+		return (prefixLength / 8) + (prefixLength % 8 > 0 ? 1 :0);		
 	}
 	
 }
