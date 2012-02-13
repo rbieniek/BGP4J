@@ -24,7 +24,7 @@ package org.bgp4j.netty.protocol.open;
  */
 public class BadBgpIdentifierNotificationPacket extends	OpenNotificationPacket {
 
-	protected BadBgpIdentifierNotificationPacket() {
+	public BadBgpIdentifierNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_BAD_BGP_IDENTIFIER);
 	}
 

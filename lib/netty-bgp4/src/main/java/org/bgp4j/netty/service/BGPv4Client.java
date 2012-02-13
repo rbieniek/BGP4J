@@ -19,13 +19,13 @@ package org.bgp4j.netty.service;
 import java.util.UUID;
 
 import javax.enterprise.event.Event;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4PeerConfiguration;
-import org.bgp4j.netty.fsm.BGPv4FSM;
+import org.bgp4j.netty.handlers.BGPv4ClientEndpoint;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
+import org.bgp4j.netty.handlers.InboundOpenCapabilitiesProcessor;
 import org.bgp4j.netty.handlers.ValidateServerIdentifier;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -45,11 +45,11 @@ import org.slf4j.Logger;
 public class BGPv4Client {
 	private @Inject Logger log;
 
-	private @Inject @New BGPv4FSM bgp4fsm;
+	private @Inject BGPv4ClientEndpoint clientEndpoint;
 	private @Inject BGPv4Codec codec;
+	private @Inject InboundOpenCapabilitiesProcessor inboundOpenCapProcessor;
 	private @Inject ValidateServerIdentifier validateServer;
 	private @Inject BGPv4Reframer reframer;
-	private @Inject DuplicateConnectionBlocker duplicateBlocker;
 	private @Inject Event<ClientNeedReconnectEvent> reconnectEvent;
 	private @Inject @ClientFactory ChannelFactory channelFactory;
 	
@@ -59,21 +59,21 @@ public class BGPv4Client {
 	private boolean closed = false;
 
 	void startClient() {
-		validateServer.setConfiguration(peerConfiguration);
-		
 		ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
 
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(
-						duplicateBlocker,
-						reframer,
-						codec,
-						validateServer,
-						bgp4fsm
-						);
+				ChannelPipeline pipeline = Channels.pipeline();
+				
+				pipeline.addLast(BGPv4Reframer.HANDLER_NAME, reframer);
+				pipeline.addLast(BGPv4Codec.HANDLER_NAME, codec);
+				pipeline.addLast(InboundOpenCapabilitiesProcessor.HANDLER_NAME, inboundOpenCapProcessor);
+				pipeline.addLast(ValidateServerIdentifier.HANDLER_NAME, validateServer);
+				pipeline.addLast(BGPv4ClientEndpoint.HANDLER_NAME, clientEndpoint);
+				
+				return pipeline;
 			}
 		});
 

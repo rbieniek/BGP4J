@@ -22,9 +22,9 @@ package org.bgp4j.netty.protocol.open;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BadPeerASNotificationPacket extends	OpenNotificationPacket {
+public class BadPeerASNotificationPacket extends OpenNotificationPacket {
 
-	protected BadPeerASNotificationPacket() {
+	public BadPeerASNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_BAD_PEER_AS);
 	}
 

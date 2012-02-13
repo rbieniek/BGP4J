@@ -16,12 +16,11 @@
  */
 package org.bgp4j.netty.fsm;
 
-import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4FSM extends SimpleChannelHandler {
+public class BGPv4FSM {
 
 }

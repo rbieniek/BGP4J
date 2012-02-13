@@ -38,6 +38,8 @@ import org.slf4j.Logger;
  *
  */
 public class BGPv4Codec extends SimpleChannelHandler {
+	public static final String HANDLER_NAME = "BGP4-Codec";
+	
 	private @Inject Logger log;
 	private @Inject BGPv4PacketDecoder packetDecoder;
 

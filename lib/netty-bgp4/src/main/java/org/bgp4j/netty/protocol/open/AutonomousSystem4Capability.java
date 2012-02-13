@@ -27,6 +27,13 @@ import org.jboss.netty.buffer.ChannelBuffers;
 public class AutonomousSystem4Capability extends Capability {
 
 	private int autonomousSystem;
+
+	public AutonomousSystem4Capability() {
+	}
+
+	public AutonomousSystem4Capability(int autonomousSystem) {
+		this.autonomousSystem = autonomousSystem;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.Capability#getCapabilityType()

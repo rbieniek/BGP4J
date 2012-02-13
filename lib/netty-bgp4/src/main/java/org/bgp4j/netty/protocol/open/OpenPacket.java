@@ -160,4 +160,25 @@ public class OpenPacket extends BGPv4Packet {
 		else
 			return getAutonomousSystem();
 	}
+	
+	/**
+	 * look up a specific capability in the list of provided capabilities
+	 * 
+	 * @param clazzToFind the class of the capability to find
+	 * @return the capability or null if the capability is not passed along in the OPEN packet
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Capability> T findCapability(Class<T> clazzToFind) {
+		T cap = null;
+		
+		if(this.capabilities != null) {
+			for(Capability c : this.capabilities) {
+				if(c.getClass().equals(clazzToFind)) {
+					cap = (T)c;
+					break;
+				}
+			}
+		}
+		return cap;
+	}
 }

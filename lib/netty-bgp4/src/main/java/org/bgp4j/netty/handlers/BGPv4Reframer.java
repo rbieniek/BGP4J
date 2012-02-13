@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 public class BGPv4Reframer extends FrameDecoder {
 	private @Inject Logger log;
 
+	public static final String HANDLER_NAME = "BGP4-REFRAMER";
+	
 	/**
 	 * reframe the received packet to completely contain the next BGPv4 packet. It peeks into the first four bytes of the 
 	 * TCP stream which contain a 16-bit marker and a 16-bit length field. 
