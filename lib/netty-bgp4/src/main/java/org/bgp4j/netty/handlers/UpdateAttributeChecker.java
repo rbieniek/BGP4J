@@ -28,6 +28,7 @@ import javax.inject.Inject;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.PeerConnectionInformationAware;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.ASTypeAware;
@@ -50,6 +51,7 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (rainer@bgp4j.org)
  *
  */
+@PeerConnectionInformationAware
 public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {	
 	private @Inject Logger log;
 	

@@ -48,5 +48,6 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		
 	}
 }

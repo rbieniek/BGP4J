@@ -19,6 +19,7 @@ package org.bgp4j.netty.handlers;
 import javax.inject.Inject;
 
 import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.PeerConnectionInformationAware;
 import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
@@ -36,6 +37,7 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@PeerConnectionInformationAware
 public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 	public static final String HANDLER_NAME ="BGP4-ValidateServerIdentifier";
 	

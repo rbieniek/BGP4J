@@ -16,10 +16,9 @@
  */
 package org.bgp4j.netty.service;
 
-import java.util.HashMap;
+import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,14 +39,14 @@ import org.slf4j.Logger;
  */
 public class BGPv4Service {
 	
-	private class ConfigurationChangeListener implements PeerConfigurationChangedListener {
+	private class ClientManagerListener implements PeerConfigurationChangedListener {
 
 		@Override
 		public void peerAdded(BGPv4PeerConfiguration peerConfiguration) {
 			BGPv4Client client = clientProvider.get();
 			
 			client.setPeerConfiguration(peerConfiguration);
-			peerInstances.put(client.getClientUuid(), client);
+			clientRegistry.registerClient(client);
 
 			client.startClient();
 		}
@@ -67,17 +66,10 @@ public class BGPv4Service {
 				}
 			}
 		
-			List<String> removedClientIds = new LinkedList<String>();
+			BGPv4Client client = clientRegistry.unregisterClient(peerConfiguration.getRemotePeerAddress().getAddress());
 			
-			for(String clientUuid : peerInstances.keySet()) {
-				if(peerInstances.get(clientUuid).getPeerConfiguration().equals(peerConfiguration))
-					removedClientIds.add(clientUuid);
-			}
-			
-			for(String clientUuid : removedClientIds) {
-				peerInstances.get(clientUuid).stopClient();
-				peerInstances.remove(clientUuid);
-			}
+			if(client != null)
+				client.stopClient();
 		}		
 	}
 	
@@ -98,10 +90,8 @@ public class BGPv4Service {
 				for(ReconnectSchedule schedule : dueInstances) {
 					BGPv4Client client = schedule.getClient();
 					
-					if(!peerConnectionRegistry.isPeerRegistered(client.getPeerConfiguration().getRemotePeerAddress())) {
-						log.info("attempt to reconnect client " + client.getClientUuid());
-						client.startClient();
-					}
+					log.info("attempt to reconnect client " + client.getPeerConfiguration().getRemotePeerAddress().getAddress());
+					client.startClient();
 					
 					scheduledReconnectInstances.remove(schedule);
 				}
@@ -114,9 +104,8 @@ public class BGPv4Service {
 
 	private @Inject @New Instance<BGPv4Client> clientProvider;
 	private @Inject Instance<BGPv4Server> serverProvider;
-	private @Inject PeerConnectionRegistry peerConnectionRegistry;
+	private @Inject ClientRegistry clientRegistry;
 	
-	private Map<String, BGPv4Client> peerInstances = new HashMap<String, BGPv4Client>();
 	private BGPv4Server serverInstance;
 	private List<ReconnectSchedule> scheduledReconnectInstances = new LinkedList<ReconnectSchedule>();
 	private Timer timer = new Timer(true);
@@ -127,7 +116,7 @@ public class BGPv4Service {
 	 * @param configuration the initial service configuration
 	 */
 	public void startService(BGPv4Configuration configuration) {
-		configuration.addListener(new ConfigurationChangeListener());
+		configuration.addListener(new ClientManagerListener());
 		
 		timer.scheduleAtFixedRate(new ReconnectClientTask(), 5000L, 5000L);
 		
@@ -144,7 +133,7 @@ public class BGPv4Service {
 			BGPv4Client client = clientProvider.get();
 			
 			client.setPeerConfiguration(peerConfiguration);
-			peerInstances.put(client.getClientUuid(), client);
+			clientRegistry.registerClient(client);
 
 			client.startClient();
 		}
@@ -158,21 +147,15 @@ public class BGPv4Service {
 		if(serverInstance != null)
 			serverInstance.stopServer();
 
-		List<String> clientUuids = new LinkedList<String>(peerInstances.keySet());
-		
-		for(String clientUuid : clientUuids) {
-			BGPv4Client client = peerInstances.remove(clientUuid);
-			
-			client.stopClient();
-		}
+		for(InetAddress addr : clientRegistry.listRemotePeerAddresses())
+			clientRegistry.unregisterClient(addr).stopClient();
 		
 	}
 	
 	public void handleReconnectNeeded(@Observes ClientNeedReconnectEvent event) {
-		if(peerInstances.containsKey(event.getClientUuid())) {
-			BGPv4Client peerInstance = peerInstances.get(event.getClientUuid()); 
-			
-			this.scheduledReconnectInstances.add(new ReconnectSchedule(peerInstance));
-		}
+		BGPv4Client client = clientRegistry.lookupClient(event.getRemoteAddress());
+		
+		if(client != null)
+			scheduledReconnectInstances.add(new ReconnectSchedule(client));
 	}
 }

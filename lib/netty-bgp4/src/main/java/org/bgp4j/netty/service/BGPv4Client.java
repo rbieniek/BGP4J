@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.service;
 
+import java.net.InetAddress;
 import java.util.UUID;
 
 import javax.enterprise.event.Event;
@@ -55,7 +56,6 @@ public class BGPv4Client {
 	
 	private Channel clientChannel;
 	private BGPv4PeerConfiguration peerConfiguration;
-	private String clientUuid = UUID.randomUUID().toString();
 	private boolean closed = false;
 
 	void startClient() {
@@ -97,7 +97,7 @@ public class BGPv4Client {
 							log.info("connection closed: " + printablePeer());
 
 							if(!closed) {
-								reconnectEvent.fire(new ClientNeedReconnectEvent(clientUuid));
+								reconnectEvent.fire(new ClientNeedReconnectEvent(getRemotePeerAddress()));
 							}
 						}
 					});
@@ -107,7 +107,7 @@ public class BGPv4Client {
 					log.info("cant connect: " + printablePeer());
 
 					if(!closed)
-						reconnectEvent.fire(new ClientNeedReconnectEvent(clientUuid));					
+						reconnectEvent.fire(new ClientNeedReconnectEvent(getRemotePeerAddress()));					
 				}
 			}
 		});		
@@ -136,18 +136,15 @@ public class BGPv4Client {
 		this.peerConfiguration = peerConfiguration;
 	}
 
-	/**
-	 * @return the clientUuid
-	 */
-	public String getClientUuid() {
-		return clientUuid;
+	public InetAddress getRemotePeerAddress() {
+		return getPeerConfiguration().getRemotePeerAddress().getAddress();
 	}
 	
 	private String printablePeer() {
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("client UUID: ");
-		builder.append(clientUuid);
+		builder.append("Peer address: ");
+		builder.append(peerConfiguration.getRemotePeerAddress().getAddress());
 		
 		builder.append("| local BGP identifier: ");
 		builder.append(peerConfiguration.getLocalBgpIdentifier());		
