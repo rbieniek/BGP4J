@@ -12,12 +12,17 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>routing</artifactId>
+  <artifactId>common-config</artifactId>
   <version>${version.de.urb.quagga}</version>
-  <name>RIB implementation</name>
-  <description>RIB implementation</description>
+  <name>Common configuration support</name>
+  <description>Common configuration support</description>
 
   <dependencies>
+
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
