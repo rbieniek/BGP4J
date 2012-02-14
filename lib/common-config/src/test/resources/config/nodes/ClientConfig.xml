@@ -3,16 +3,15 @@
     Unit test file, Root element does not matter
  -->
 <Config>
-    <!-- empty server object with default configuration: Listen to any adddress on port 0 -->
-    <Server />
-    
-    <!-- empty server object with configuration: Listen to any adddress on port 17179-->
-    <Server port="17179"/>
-    
     <!-- empty server object with configuration: Listen to adddress 192.168.4.1 on port 0 -->
-    <Server listen="192.168.4.1"/>
+    <Client remote="192.168.4.1"/>
     
     <!-- empty server object with default configuration: Listen to adddress 192.168.4.1 on port 17179-->
-    <Server listen="192.168.4.1" port="17179"/>
+    <Client remote="192.168.4.1" port="17179"/>
     
+    <!-- bogus, no remote address given -->
+    <Client port="17179" />
+    
+    <!-- bogus, no remote address given -->
+    <Client />
 </Config>
