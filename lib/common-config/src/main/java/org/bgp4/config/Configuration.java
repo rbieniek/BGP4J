@@ -17,7 +17,10 @@
  */
 package org.bgp4.config;
 
+import java.util.Set;
+
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
  * Configuration object of the BGP daemon.
@@ -33,4 +36,16 @@ public interface Configuration {
 	 * @return
 	 */
 	public BgpServerConfiguration getBgpServerConfiguration();
+	
+	/**
+	 * list peer names
+	 * 
+	 * @return
+	 */
+	public Set<String> listPeerNames();
+	
+	/**
+	 * 
+	 */
+	public PeerConfiguration getPeer(String peerName);
 }

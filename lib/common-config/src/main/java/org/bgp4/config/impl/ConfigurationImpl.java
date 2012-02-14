@@ -17,8 +17,15 @@
  */
 package org.bgp4.config.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -27,6 +34,7 @@ import org.bgp4.config.nodes.BgpServerConfiguration;
 public class ConfigurationImpl implements Configuration {
 
 	private BgpServerConfiguration bgpServerConfigImpl;
+	private Map<String, PeerConfiguration> peerMap = new HashMap<String, PeerConfiguration>();
 	
 	@Override
 	public BgpServerConfiguration getBgpServerConfiguration() {
@@ -35,5 +43,22 @@ public class ConfigurationImpl implements Configuration {
 	
 	void setBgpServerConfiguration(BgpServerConfiguration bgpServerConfigImpl) {
 		this.bgpServerConfigImpl = bgpServerConfigImpl;
+	}
+
+	@Override
+	public Set<String> listPeerNames() {
+		return Collections.unmodifiableSet(peerMap.keySet());
+	}
+
+	@Override
+	public PeerConfiguration getPeer(String peerName) {
+		return peerMap.get(peerName);
+	}
+	
+	void addPeer(PeerConfiguration peerConfig) throws ConfigurationException {
+		if(peerMap.containsKey(peerConfig.getPeerName()))
+				throw new ConfigurationException("duplicate pper name " + peerConfig.getPeerName());
+		
+		peerMap.put(peerConfig.getPeerName(), peerConfig);
 	}
 }

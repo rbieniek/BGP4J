@@ -24,6 +24,7 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.ConfigTestBase;
 import org.bgp4.config.Configuration;
+import org.bgp4.config.nodes.PeerConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,5 +71,35 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		Assert.assertNotNull(config.getBgpServerConfiguration());
 		Assert.assertEquals(17179, config.getBgpServerConfiguration().getServerConfiguration().getListenAddress().getPort());
 		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), config.getBgpServerConfiguration().getServerConfiguration().getListenAddress().getAddress());
+	}
+	
+	@Test
+	public void testConfigurationWithTwoBgpPeers() throws Exception {
+		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-BgpPeers.xml"));
+		PeerConfiguration peerConfig;
+		
+		Assert.assertEquals(2, config.listPeerNames().size());
+		
+		peerConfig = config.getPeer("foo1");
+		Assert.assertNotNull(peerConfig);
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(10, peerConfig.getLocalAS());
+		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo1", peerConfig.getPeerName());
+		
+		peerConfig = config.getPeer("foo2");
+		Assert.assertNotNull(peerConfig);
+		Assert.assertEquals(InetAddress.getByName("192.168.4.2"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(12, peerConfig.getLocalAS());
+		Assert.assertEquals(13, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo2", peerConfig.getPeerName());
+	}
+
+	@Test(expected=ConfigurationException.class)
+	public void testConfigurationWithTwoBgpPeersDuplicatePeer() throws Exception {
+		@SuppressWarnings("unused")
+		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-BgpPeers-DuplicatePeer.xml"));
 	}
 }
