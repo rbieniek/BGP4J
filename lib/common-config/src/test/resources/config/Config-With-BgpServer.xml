@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <BgpServer>
+        <Server listen="192.168.4.1" port="17179" />
+    </BgpServer>
+</Config>

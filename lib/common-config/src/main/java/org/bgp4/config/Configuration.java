@@ -17,10 +17,20 @@
  */
 package org.bgp4.config;
 
+import org.bgp4.config.nodes.BgpServerConfiguration;
+
 /**
+ * Configuration object of the BGP daemon.
+ * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public interface Configuration {
-
+	
+	/**
+	 * get the server configuration
+	 * 
+	 * @return
+	 */
+	public BgpServerConfiguration getBgpServerConfiguration();
 }

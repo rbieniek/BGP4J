@@ -13,25 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.ConfigurationParser.java 
+ * File: org.bgp4.config.impl.ConfigurationImpl.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.impl;
 
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.impl.ConfigurationParserImpl;
+import org.bgp4.config.Configuration;
+import org.bgp4.config.nodes.BgpServerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ConfigurationParser {
+public class ConfigurationImpl implements Configuration {
 
-	private @Inject ConfigurationParserImpl parserImpl;
+	private BgpServerConfiguration bgpServerConfigImpl;
 	
-	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
-		return parserImpl.parseConfiguration(configuration);
+	@Override
+	public BgpServerConfiguration getBgpServerConfiguration() {
+		return bgpServerConfigImpl;
+	}
+	
+	void setBgpServerConfiguration(BgpServerConfiguration bgpServerConfigImpl) {
+		this.bgpServerConfigImpl = bgpServerConfigImpl;
 	}
 }

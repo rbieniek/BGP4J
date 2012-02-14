@@ -71,7 +71,6 @@ public class ServerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(0, serverConfig.getListenAddress().getPort());
 		Assert.assertEquals("192.168.4.1", serverConfig.getListenAddress().getHostName());
 	}
-
 	
 	@Test
 	public void testAddressPortServerConfig() throws ConfigurationException {

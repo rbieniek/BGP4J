@@ -13,25 +13,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.ConfigurationParser.java 
+ * File: org.bgp4.config.impl.ConfigurationParserImpl.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.impl;
+
+import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.impl.ConfigurationParserImpl;
+import org.bgp4.config.Configuration;
+import org.bgp4.config.nodes.impl.BgpServerConfigurationParser;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ConfigurationParser {
+@Singleton
+public class ConfigurationParserImpl {
 
-	private @Inject ConfigurationParserImpl parserImpl;
+	private @Inject BgpServerConfigurationParser bgpServerConfigurationParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
-		return parserImpl.parseConfiguration(configuration);
+		ConfigurationImpl configImpl = new ConfigurationImpl();
+		List<HierarchicalConfiguration> bgpServerNodes = configuration.configurationsAt("BgpServer");
+		
+		if(bgpServerNodes.size() > 1)
+			throw new ConfigurationException("Duplicate <BgpServer /> element");
+		else if(bgpServerNodes.size() == 1)
+			configImpl.setBgpServerConfiguration(bgpServerConfigurationParser.parseConfiguration(bgpServerNodes.get(0)));
+		
+		return configImpl;
 	}
+
 }

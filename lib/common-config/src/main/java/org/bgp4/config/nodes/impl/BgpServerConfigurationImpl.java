@@ -13,25 +13,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.ConfigurationParser.java 
+ * File: org.bgp4.config.impl.BgpServerConfigurationImpl.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.nodes.impl;
 
-import javax.inject.Inject;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.impl.ConfigurationParserImpl;
+import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.ServerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ConfigurationParser {
+public class BgpServerConfigurationImpl implements BgpServerConfiguration {
 
-	private @Inject ConfigurationParserImpl parserImpl;
+	private ServerConfiguration serverConfiguration;
 	
-	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
-		return parserImpl.parseConfiguration(configuration);
+	@Override
+	public ServerConfiguration getServerConfiguration() {
+		return this.serverConfiguration;
+	}
+
+	void setServerConfiguration(ServerConfiguration config) {
+		if(!(config instanceof BgpServerPortConfigurationDecorator))
+			config = new BgpServerPortConfigurationDecorator(config);
+		
+		this.serverConfiguration = config;
 	}
 }

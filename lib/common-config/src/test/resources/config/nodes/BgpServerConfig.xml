@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <BgpServer>
+        <!-- no <Server/> element given -->
+    </BgpServer>
+    
+    <BgpServer>
+        <!-- explizit <Server/> element given -->
+        <Server />
+    </BgpServer>
+    
+    <BgpServer>
+        <!-- explizit <Server/> element w/ port given -->
+        <Server port="17179" />
+    </BgpServer>
+
+    <BgpServer>
+        <!-- bogus, only one xplizit <Server/> element allowed -->
+        <Server port="17179" />
+        <Server port="17178" />
+    </BgpServer>
+    
+    
+</Config>
