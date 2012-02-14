@@ -17,6 +17,7 @@
  */
 package org.bgp4.config.nodes.impl;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.bgp4.config.nodes.ServerConfiguration;
@@ -31,13 +32,21 @@ public class ServerConfigurationImpl implements ServerConfiguration {
 	
 
 	public ServerConfigurationImpl() {
-		
+		this.listenAddress = new InetSocketAddress(0);
+	}
+
+	public ServerConfigurationImpl(InetAddress addr) {
+		this.listenAddress = new InetSocketAddress(addr, 0);
+	}
+	
+	public ServerConfigurationImpl(InetAddress addr, int port) {
+		this.listenAddress = new InetSocketAddress(addr, port);
 	}
 	
 	public ServerConfigurationImpl(InetSocketAddress listenAddress) {
-		super();
 		this.listenAddress = listenAddress;
 	}
+	
 	@Override
 	public InetSocketAddress getListenAddress() {
 		return listenAddress;
