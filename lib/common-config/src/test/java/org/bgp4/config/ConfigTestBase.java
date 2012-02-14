@@ -13,14 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.Dummy.java 
+ * File: org.bgp4.config.ConfigTestBase.java 
  */
 package org.bgp4.config;
+
+import org.apache.commons.configuration.XMLConfiguration;
+import org.bgp4j.weld.WeldTestCaseBase;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class Dummy {
+public class ConfigTestBase extends WeldTestCaseBase {
 
+	protected XMLConfiguration loadConfiguration(String fileName) throws Exception{
+		return new XMLConfiguration(fileName);
+	}
 }
