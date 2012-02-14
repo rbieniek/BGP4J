@@ -44,4 +44,10 @@ public interface PeerConfiguration {
 	 */
 	public int getRemoteAS();
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPeerName();
+	
 }

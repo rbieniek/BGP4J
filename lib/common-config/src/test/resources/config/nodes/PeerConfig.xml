@@ -2,30 +2,30 @@
 <Config>
     
     <!-- working peer configuration -->
-    <BgpPeer>
+    <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" remote="11" />
     </BgpPeer>
     
     <!-- bogus peer configuration, <Client/> missing -->
-    <BgpPeer>
+    <BgpPeer name="foo">
         <AutonomousSystem local="10" remote="11" />
     </BgpPeer>
 
     <!-- bogus peer configuration, local AS missing -->
-    <BgpPeer>
+    <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem remote="11" />
     </BgpPeer>
     
     <!-- bogus peer configuration, remote AS missing -->
-    <BgpPeer>
+    <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" />
     </BgpPeer>
 
     <!-- bogus peer configuration, duplicate <Client/> element -->
-    <BgpPeer>
+    <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" remote="11" />

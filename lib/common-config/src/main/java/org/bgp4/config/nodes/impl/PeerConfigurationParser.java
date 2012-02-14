@@ -40,6 +40,12 @@ public class PeerConfigurationParser {
 		PeerConfigurationImpl peerConfig = new PeerConfigurationImpl();
 		List<HierarchicalConfiguration> clientConfigs = config.configurationsAt("Client");
 		
+		try {
+			peerConfig.setPeerName(config.getString("[@name]"));
+		} catch(NoSuchElementException e) {
+			throw new ConfigurationException("peer name not set", e);
+		}
+		
 		if(clientConfigs.size() > 1) {
 			throw new ConfigurationException("duplicate <Client/> element");
 		} else if(clientConfigs.size() == 0) {

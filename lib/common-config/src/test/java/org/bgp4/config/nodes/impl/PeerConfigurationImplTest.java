@@ -33,7 +33,7 @@ public class PeerConfigurationImplTest {
 
 	@Test
 	public void testAcceptedPeerConfiguration() throws Exception {
-		PeerConfiguration config = new PeerConfigurationImpl(new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, 11);
+		PeerConfiguration config = new PeerConfigurationImpl("foo", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, 11);
 		
 		Assert.assertEquals(10, config.getLocalAS());
 		Assert.assertEquals(11, config.getRemoteAS());
@@ -44,18 +44,24 @@ public class PeerConfigurationImplTest {
 	@Test(expected=ConfigurationException.class)
 	public void testBogusPeerConfigurationNullClientConfiguration() throws Exception {
 		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl(null, 10, 11);		
+		PeerConfiguration config = new PeerConfigurationImpl("foo", null, 10, 11);		
 	}
 
 	@Test(expected=ConfigurationException.class)
 	public void testBogusPeerConfigurationNegativeLocalAS() throws Exception {
 		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl(new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), -10, 11);		
+		PeerConfiguration config = new PeerConfigurationImpl("foo", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), -10, 11);		
 	}
 
 	@Test(expected=ConfigurationException.class)
 	public void testBogusPeerConfigurationNegativeRemoteAS() throws Exception {
 		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl(new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, -11);		
+		PeerConfiguration config = new PeerConfigurationImpl("foo", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, -11);		
+	}
+
+	@Test(expected=ConfigurationException.class)
+	public void testBogusPeerConfigurationEmptyName() throws Exception {
+		@SuppressWarnings("unused")
+		PeerConfiguration config = new PeerConfigurationImpl("", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, 11);		
 	}
 }

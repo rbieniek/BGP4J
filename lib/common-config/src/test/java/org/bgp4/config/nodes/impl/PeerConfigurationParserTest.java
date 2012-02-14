@@ -58,6 +58,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
 		Assert.assertEquals(10, peerConfig.getLocalAS());
 		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo", peerConfig.getPeerName());
 	}
 	
 	@Test(expected=ConfigurationException.class)
