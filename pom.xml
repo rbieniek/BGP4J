@@ -5,8 +5,8 @@
   <artifactId>quagga-java</artifactId>
   <packaging>pom</packaging>
   <version>${version.de.urb.quagga}</version>
-  <name>Quagga</name>
-  <description>Quagga java binding</description>
+  <name>BGP4J</name>
+  <description>BGP4 Java implementation</description>
 
   <scm>
     <connection>scm:svn:http://www.urb.de/svn/quagga-java/trunk/java</connection>
