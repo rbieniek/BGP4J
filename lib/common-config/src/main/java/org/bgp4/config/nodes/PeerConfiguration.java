@@ -18,9 +18,30 @@
 package org.bgp4.config.nodes;
 
 /**
+ * Configuration block of a BGP peer
+ * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public interface PeerConfiguration {
 
+	/**
+	 * get the client configuration.
+	 * 
+	 * @return
+	 */
+	public ClientConfiguration getClientConfig();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getLocalAS();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getRemoteAS();
+	
 }

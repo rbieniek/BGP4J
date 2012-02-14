@@ -48,4 +48,23 @@ public class ClientConfigurationImplTest {
 		@SuppressWarnings("unused")
 		ClientConfiguration config = new ClientConfigurationImpl(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), 0));
 	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testNegativePortNumber() throws Exception {
+		@SuppressWarnings("unused")
+		ClientConfiguration config = new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1"), -10);
+	}
+
+	@Test(expected=ConfigurationException.class)
+	public void testLargePortNumber() throws Exception {
+		@SuppressWarnings("unused")
+		ClientConfiguration config = new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1"), 70000);
+	}
+
+	@Test
+	public void testAcceptedPortNumber() throws Exception {
+		@SuppressWarnings("unused")
+		ClientConfiguration config = new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1"), 2048);
+	}
+	
 }

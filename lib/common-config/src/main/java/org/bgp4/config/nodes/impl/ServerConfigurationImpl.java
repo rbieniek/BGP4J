@@ -20,6 +20,7 @@ package org.bgp4.config.nodes.impl;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.nodes.ServerConfiguration;
 
 /**
@@ -39,7 +40,10 @@ public class ServerConfigurationImpl implements ServerConfiguration {
 		this.listenAddress = new InetSocketAddress(addr, 0);
 	}
 	
-	public ServerConfigurationImpl(InetAddress addr, int port) {
+	public ServerConfigurationImpl(InetAddress addr, int port) throws ConfigurationException {
+		if(port < 0 || port > 65535)
+			throw new ConfigurationException("port " + port + " not allowed");
+		
 		this.listenAddress = new InetSocketAddress(addr, port);
 	}
 	

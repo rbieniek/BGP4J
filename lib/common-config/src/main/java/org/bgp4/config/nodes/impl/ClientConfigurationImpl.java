@@ -40,6 +40,8 @@ public class ClientConfigurationImpl implements ClientConfiguration {
 			throw new ConfigurationException("null remote address not allowed");
 		if(addr.isAnyLocalAddress())
 			throw new ConfigurationException("wildcard remote address not allowed");
+		if(port < 0 || port > 65535)
+			throw new ConfigurationException("port " + port + " not allowed");
 			
 		this.remoteAddress = new InetSocketAddress(addr, port);
 	}

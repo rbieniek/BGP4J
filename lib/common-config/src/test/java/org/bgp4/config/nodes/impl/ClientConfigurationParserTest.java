@@ -32,7 +32,6 @@ import org.junit.Test;
  *
  */
 public class ClientConfigurationParserTest extends ConfigTestBase {
-
 	@Before
 	public void before() throws Exception {
 		this.config = loadConfiguration("config/nodes/ClientConfig.xml");

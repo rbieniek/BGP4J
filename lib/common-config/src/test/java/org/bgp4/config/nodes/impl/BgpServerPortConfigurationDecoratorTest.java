@@ -48,7 +48,7 @@ public class BgpServerPortConfigurationDecoratorTest {
 	}
 
 	@Test
-	public void testOtherPortNoAddress() throws UnknownHostException {
+	public void testOtherPortNoAddress() throws Exception {
 		ServerConfigurationImpl impl = new ServerConfigurationImpl(null, 17179);
 		BgpServerPortConfigurationDecorator decorator = new BgpServerPortConfigurationDecorator(impl);
 		
@@ -57,7 +57,7 @@ public class BgpServerPortConfigurationDecoratorTest {
 	}
 
 	@Test
-	public void testOtherPortGivenAddress() throws UnknownHostException {
+	public void testOtherPortGivenAddress() throws Exception {
 		ServerConfigurationImpl impl = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 17179);
 		BgpServerPortConfigurationDecorator decorator = new BgpServerPortConfigurationDecorator(impl);
 		
