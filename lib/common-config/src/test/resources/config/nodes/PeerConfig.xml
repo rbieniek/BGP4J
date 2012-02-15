@@ -5,23 +5,27 @@
     <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" remote="300" />
     </BgpPeer>
     
     <!-- bogus peer configuration, <Client/> missing -->
     <BgpPeer name="foo">
         <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" remote="300" />
     </BgpPeer>
 
     <!-- bogus peer configuration, local AS missing -->
     <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem remote="11" />
+        <BgpIdentifier local="200" remote="300" />
     </BgpPeer>
     
     <!-- bogus peer configuration, remote AS missing -->
     <BgpPeer name="foo">
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" />
+        <BgpIdentifier local="200" remote="300" />
     </BgpPeer>
 
     <!-- bogus peer configuration, duplicate <Client/> element -->
@@ -29,5 +33,34 @@
         <Client remote="192.168.4.1" />
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" remote="300" />
+    </BgpPeer>
+    
+    <!-- bogus peer configuration, BGP identifier missing -->
+    <BgpPeer name="foo">
+        <Client remote="192.168.4.1" />
+        <AutonomousSystem local="10" remote="11" />
+    </BgpPeer>
+    
+    <!-- bogus peer configuration, local BGP identifier missing -->
+    <BgpPeer name="foo">
+        <Client remote="192.168.4.1" />
+        <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier remote="300" />
+    </BgpPeer>
+    
+    <!-- bogus peer configuration, remote BGP identifier missing -->
+    <BgpPeer name="foo">
+        <Client remote="192.168.4.1" />
+        <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" />
+    </BgpPeer>
+
+    <!-- working peer configuration with configured timers -->
+    <BgpPeer name="foo">
+        <Client remote="192.168.4.1" />
+        <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" remote="300" />
+        <Timers holdTime="30" connectRetryInterval="300" />
     </BgpPeer>
 </Config>

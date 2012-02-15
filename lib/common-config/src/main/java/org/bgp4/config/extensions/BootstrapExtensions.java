@@ -13,47 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.Configuration.java 
+ * File: org.bgp4.config.BootstrapConfiguration.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.extensions;
 
-import java.util.List;
-import java.util.Set;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 
-import org.bgp4.config.nodes.BgpServerConfiguration;
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
+import org.bgp4j.weld.ApplicationBootstrapEvent;
 
 /**
- * Configuration object of the BGP daemon.
+ * Handles application boostrap event
  * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface Configuration {
+public class BootstrapExtensions {
+
+	private @Inject IPv4ConverterLookup ipv4ConverterLookup;
 	
-	/**
-	 * get the server configuration
-	 * 
-	 * @return
-	 */
-	public BgpServerConfiguration getBgpServerConfiguration();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
-	 */
-	public Set<String> listPeerNames();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
-	 */
-	public List<PeerConfiguration> listPeerConfigurations();
-	
-	/**
-	 * 
-	 */
-	public PeerConfiguration getPeer(String peerName);
+	public void initConfiguration(@Observes ApplicationBootstrapEvent event) {
+		ConfigurationInterpolator.registerGlobalLookup("ipv4", ipv4ConverterLookup);
+	}
 }

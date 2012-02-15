@@ -17,15 +17,20 @@
  */
 package org.bgp4.config.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.nodes.BgpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
+import org.bgp4.config.nodes.impl.FixedDefaultsPeerConfigurationTimerDecorator;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -59,6 +64,19 @@ public class ConfigurationImpl implements Configuration {
 		if(peerMap.containsKey(peerConfig.getPeerName()))
 				throw new ConfigurationException("duplicate pper name " + peerConfig.getPeerName());
 		
+		if(!(peerConfig instanceof PeerConfigurationTimerDecorator))
+			peerConfig = new FixedDefaultsPeerConfigurationTimerDecorator(peerConfig);
+		
 		peerMap.put(peerConfig.getPeerName(), peerConfig);
+	}
+
+	@Override
+	public List<PeerConfiguration> listPeerConfigurations() {
+		List<PeerConfiguration> peers = new ArrayList<PeerConfiguration>(peerMap.size());
+		
+		for(Entry<String, PeerConfiguration> peerEntry : peerMap.entrySet())
+			peers.add(peerEntry.getValue());
+		
+		return Collections.unmodifiableList(peers);
 	}
 }

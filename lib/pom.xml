@@ -16,9 +16,9 @@
   <modules>
     <module>common-weld</module>
     <module>common-network</module>
+    <module>common-config</module>
     <module>routing</module>
     <module>netty-bgp4</module>
-    <module>common-config</module>
     <module>snmp4j-easybox</module>
   </modules>
 

@@ -59,6 +59,10 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(10, peerConfig.getLocalAS());
 		Assert.assertEquals(11, peerConfig.getRemoteAS());
 		Assert.assertEquals("foo", peerConfig.getPeerName());
+		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
+		Assert.assertEquals(0, peerConfig.getHoldTime());
+		Assert.assertEquals(0, peerConfig.getConnectRetryInterval());		
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -85,4 +89,37 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(4)"));
 	}
 	
+	@Test(expected=ConfigurationException.class)
+	public void testBogusConfigurationBgpIdentifierMissing() throws Exception {
+		@SuppressWarnings("unused")
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(5)"));
+	}
+	
+	
+	@Test(expected=ConfigurationException.class)
+	public void testBogusConfigurationLocalBgpIdentifierMissing() throws Exception {
+		@SuppressWarnings("unused")
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(6)"));
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testBogusConfigurationRemoteBgpIdentifierMissing() throws Exception {
+		@SuppressWarnings("unused")
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(7)"));
+	}
+
+	@Test
+	public void testAcceptedConfigurationWithHoldTimerAndRetryInterval() throws Exception {
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(8)"));
+		
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(10, peerConfig.getLocalAS());
+		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo", peerConfig.getPeerName());
+		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
+		Assert.assertEquals(30, peerConfig.getHoldTime());
+		Assert.assertEquals(300, peerConfig.getConnectRetryInterval());		
+	}
 }

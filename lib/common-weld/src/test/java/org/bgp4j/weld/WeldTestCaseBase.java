@@ -16,10 +16,7 @@
  */
 package org.bgp4j.weld;
 
-import javax.enterprise.inject.New;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.util.AnnotationLiteral;
-
 
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -43,6 +40,7 @@ public class WeldTestCaseBase {
 		weld = new Weld();
 		
 		weldContainer = weld.initialize();
+		weldContainer.event().select(ApplicationBootstrapEvent.class).fire(new ApplicationBootstrapEvent());
 	}
 	
 	@AfterClass

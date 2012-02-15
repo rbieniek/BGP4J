@@ -19,6 +19,16 @@ package org.bgp4j.apps.bgpd;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.xml.DOMConfigurator;
+import org.bgp4j.apps.bgpd.config.ConfigurationFileProcessor;
+import org.bgp4j.netty.BGPv4ConfigurationBean;
+import org.bgp4j.netty.service.BGPv4Service;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
 import org.slf4j.Logger;
@@ -30,10 +40,37 @@ import org.slf4j.Logger;
 public class BgpDaemonApplicationListener {
 	private @Inject Logger log;
 	private @Inject @Parameters String[] commandLine;
-
+	private @Inject ConfigurationFileProcessor configurationFileProcessor;
+	private @Inject BGPv4Service  bgpService;
 	
 	public void listen(@Observes @BgpDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
+		BasicConfigurator.configure();
+
 		try {
+			Options options = new Options();
+			Option option;
+			
+			option = new Option("c", "config-file", true, "XML configuration file (required)");
+			option.setRequired(true);
+			options.addOption(option);
+
+			option = new Option("l", "log4-file", true, "Log4J XML configuration file (optional");
+			option.setRequired(false);
+			options.addOption(option);
+			
+			CommandLine cmd = (new PosixParser()).parse(options, commandLine);
+
+			if(cmd.hasOption("l")) {
+				LogManager.resetConfiguration();
+				DOMConfigurator.configure(cmd.getOptionValue("l"));
+			}
+			
+			BGPv4ConfigurationBean configurationBean = new BGPv4ConfigurationBean();
+			configurationFileProcessor.setConfigurationBean(configurationBean);
+			
+			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
+			
+			bgpService.startService(configurationBean);
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			

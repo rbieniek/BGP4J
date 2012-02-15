@@ -63,6 +63,21 @@ public class PeerConfigurationParser {
 		} catch(NoSuchElementException e) {
 			throw new ConfigurationException("remote AS number not given", e);
 		}
+
+		
+		try {
+			peerConfig.setLocalBgpIdentifier(config.getInt("BgpIdentifier[@local]"));
+		} catch(NoSuchElementException e) {
+			throw new ConfigurationException("local BGP identifier not given", e);
+		}
+		try {
+			peerConfig.setRemoteBgpIdentifier(config.getInt("BgpIdentifier[@remote]"));
+		} catch(NoSuchElementException e) {
+			throw new ConfigurationException("remote BGP identifier not given", e);
+		}
+
+		peerConfig.setHoldTime(config.getInt("Timers[@holdTime]", 0));
+		peerConfig.setConnectRetryInterval(config.getInt("Timers[@connectRetryInterval]", 0));
 		
 		return peerConfig;
 	}

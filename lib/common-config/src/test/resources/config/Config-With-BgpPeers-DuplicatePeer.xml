@@ -4,6 +4,7 @@
         <BgpPeer name="foo1">
             <Client remote="192.168.4.1" />
             <AutonomousSystem local="10" remote="11" />
+            <BgpIdentifier local="200" remote="300" />
         </BgpPeer>
         <BgpPeer name="foo1">
             <Client remote="192.168.4.2" />

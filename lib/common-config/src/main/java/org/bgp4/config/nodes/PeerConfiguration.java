@@ -49,5 +49,28 @@ public interface PeerConfiguration {
 	 * @return
 	 */
 	public String getPeerName();
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getRemoteBgpIdentifier();
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getLocalBgpIdentifier();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getHoldTime();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getConnectRetryInterval();
 }

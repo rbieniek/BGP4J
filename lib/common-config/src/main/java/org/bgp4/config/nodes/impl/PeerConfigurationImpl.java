@@ -32,6 +32,10 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private int localAS;
 	private int remoteAS;
 	private String peerName;
+	private int localBgpIdentifier;
+	private int remoteBgpIdentifier; 
+	private int holdTime;
+	private int connectRetryInterval;
 	
 	public PeerConfigurationImpl() {
 		
@@ -111,6 +115,72 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 			throw new ConfigurationException("blank name not allowed");
 		
 		this.peerName = name;
+	}
+
+	/**
+	 * @return the localBgpIdentifier
+	 */
+	public int getLocalBgpIdentifier() {
+		return localBgpIdentifier;
+	}
+
+	/**
+	 * @param localBgpIdentifier the localBgpIdentifier to set
+	 */
+	void setLocalBgpIdentifier(int localBgpIdentifier) throws ConfigurationException  {
+		if(localBgpIdentifier <= 0)
+			throw new ConfigurationException("Illegal local BGP identifier: " + localBgpIdentifier);
+		this.localBgpIdentifier = localBgpIdentifier;
+	}
+
+	/**
+	 * @return the remoteBgpIdentifier
+	 */
+	public int getRemoteBgpIdentifier() {
+		return remoteBgpIdentifier;
+	}
+
+	/**
+	 * @param remoteBgpIdentifier the remoteBgpIdentifier to set
+	 */
+	void setRemoteBgpIdentifier(int remoteBgpIdentifier) throws ConfigurationException  {
+		if(remoteBgpIdentifier <= 0)
+			throw new ConfigurationException("Illegal remote BGP identifier: " + remoteBgpIdentifier);
+		this.remoteBgpIdentifier = remoteBgpIdentifier;
+	}
+
+	/**
+	 * @return the holdTime
+	 */
+	public int getHoldTime() {
+		return holdTime;
+	}
+
+	/**
+	 * @param holdTime the holdTime to set
+	 */
+	void setHoldTime(int holdTime)  throws ConfigurationException {
+		if(holdTime < 0)
+			throw new ConfigurationException("Illegal hold time given: " + holdTime);
+		
+		this.holdTime = holdTime;
+	}
+
+	/**
+	 * @return the connectRetryInterval
+	 */
+	public int getConnectRetryInterval() {
+		return connectRetryInterval;
+	}
+
+	/**
+	 * @param connectRetryInterval the connectRetryInterval to set
+	 */
+	void setConnectRetryInterval(int connectRetryInterval)  throws ConfigurationException {
+		if(connectRetryInterval < 0)
+			throw new ConfigurationException("Illegal connect retry interval given: " + connectRetryInterval);
+		
+		this.connectRetryInterval = connectRetryInterval;
 	}
 
 }

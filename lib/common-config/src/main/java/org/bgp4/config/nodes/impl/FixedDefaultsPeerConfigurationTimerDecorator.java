@@ -13,47 +13,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.Configuration.java 
+ * File: org.bgp4.config.nodes.impl.FixedDefaultsPeerConfigurationTimerDecorator.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.nodes.impl;
 
-import java.util.List;
-import java.util.Set;
-
-import org.bgp4.config.nodes.BgpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
 
 /**
- * Configuration object of the BGP daemon.
- * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface Configuration {
-	
-	/**
-	 * get the server configuration
-	 * 
-	 * @return
+public class FixedDefaultsPeerConfigurationTimerDecorator extends PeerConfigurationTimerDecorator {
+
+	public FixedDefaultsPeerConfigurationTimerDecorator(PeerConfiguration decorated) {
+		super(decorated);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4.config.nodes.PeerConfigurationTimerDecorator#getDefaultHoldTime()
 	 */
-	public BgpServerConfiguration getBgpServerConfiguration();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
+	@Override
+	protected int getDefaultHoldTime() {
+		return 120;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4.config.nodes.PeerConfigurationTimerDecorator#getDefaultConnectRetryInterval()
 	 */
-	public Set<String> listPeerNames();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
-	 */
-	public List<PeerConfiguration> listPeerConfigurations();
-	
-	/**
-	 * 
-	 */
-	public PeerConfiguration getPeer(String peerName);
+	@Override
+	protected int getDefaultConnectRetryInterval() {
+		return 30;
+	}
+
 }
