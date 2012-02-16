@@ -19,6 +19,9 @@ package org.bgp4.config.nodes;
 
 import java.net.InetSocketAddress;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -50,4 +53,25 @@ public abstract class ClientPortConfigurationDecorator implements ClientConfigur
 	 * @return
 	 */
 	protected abstract int getDefaultPort();
+
+	/**
+	 * @param other
+	 * @return
+	 * @see org.bgp4.config.nodes.ClientConfiguration#equals(java.lang.Object)
+	 */
+	public boolean equals(Object other) {
+		if(!(other instanceof ClientConfiguration))
+			return false;
+		
+		ClientConfiguration o = (ClientConfiguration)other;
+		return (new EqualsBuilder()).append(getRemoteAddress(), o.getRemoteAddress()).isEquals();
+	}
+
+	/**
+	 * @return
+	 * @see org.bgp4.config.nodes.ClientConfiguration#hashCode()
+	 */
+	public int hashCode() {
+		return (new HashCodeBuilder()).append(getRemoteAddress()).toHashCode();
+	}
 }

@@ -19,6 +19,8 @@ package org.bgp4.config.nodes.impl;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4.config.nodes.ClientConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
 
@@ -41,11 +43,31 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 		
 	}
 
-	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS) throws ConfigurationException {
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig) throws ConfigurationException {
 		setPeerName(peerName);
 		setClientConfig(clientConfig);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS) throws ConfigurationException {
+		this(peerName, clientConfig);
 		setLocalAS(localAS);
 		setRemoteAS(remoteAS);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS);
+		
+		setLocalBgpIdentifier(localBgpIdentifier);
+		setRemoteBgpIdentifier(remoteBgpIdentifier);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier, int holdTime, int connectRetryInterval) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier);
+
+		setHoldTime(holdTime);
+		setConnectRetryInterval(connectRetryInterval);
 	}
 
 	@Override
@@ -181,6 +203,46 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 			throw new ConfigurationException("Illegal connect retry interval given: " + connectRetryInterval);
 		
 		this.connectRetryInterval = connectRetryInterval;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return (new HashCodeBuilder())
+				.append(clientConfig)
+				.append(connectRetryInterval)
+				.append(holdTime)
+				.append(localAS)
+				.append(localBgpIdentifier)
+				.append(peerName)
+				.append(remoteAS)
+				.append(remoteBgpIdentifier)
+				.toHashCode();
+				
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if(getClass() != obj.getClass())
+			return false;
+		
+		PeerConfigurationImpl o = (PeerConfigurationImpl)obj;
+		
+		return (new EqualsBuilder())
+				.append(clientConfig, o.clientConfig)
+				.append(connectRetryInterval, o.connectRetryInterval)
+				.append(holdTime, o.holdTime)
+				.append(localAS, o.localAS)
+				.append(localBgpIdentifier, o.localBgpIdentifier)
+				.append(peerName, o.peerName)
+				.append(remoteAS, o.remoteAS)
+				.append(remoteBgpIdentifier, o.remoteBgpIdentifier)
+				.isEquals();
 	}
 
 }

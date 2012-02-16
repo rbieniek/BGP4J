@@ -19,6 +19,9 @@ package org.bgp4.config.nodes;
 
 import java.net.InetSocketAddress;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -50,4 +53,25 @@ public abstract class ServerPortConfigurationDecorator implements ServerConfigur
 	 * @return
 	 */
 	protected abstract int getDefaultPort();
+
+	/**
+	 * @return
+	 * @see org.bgp4.config.nodes.ServerConfiguration#equals()
+	 */
+	public boolean equals(Object other) {
+		if(!getClass().equals(other.getClass()))
+				return false;
+		
+		ServerPortConfigurationDecorator o = (ServerPortConfigurationDecorator)other;
+		
+		return (new EqualsBuilder()).append(getListenAddress(), o.getListenAddress()).isEquals();
+	}
+
+	/**
+	 * @return
+	 * @see org.bgp4.config.nodes.ServerConfiguration#hashCode()
+	 */
+	public int hashCode() {
+		return (new HashCodeBuilder()).append(getListenAddress()).toHashCode();
+	}
 }

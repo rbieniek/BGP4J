@@ -24,6 +24,20 @@ package org.bgp4.config.nodes;
  *
  */
 public interface PeerConfiguration {
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object other);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int hashCode();
 
 	/**
 	 * get the client configuration.

@@ -64,4 +64,192 @@ public class PeerConfigurationImplTest {
 		@SuppressWarnings("unused")
 		PeerConfiguration config = new PeerConfigurationImpl("", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, 11);		
 	}
+	
+	@Test
+	public void testEquals() throws Exception {
+		PeerConfiguration c1 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c2 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c3 = new PeerConfigurationImpl("bar", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c4 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c5 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24577, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c6 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32769, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c7 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80402L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c8 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80502L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c9 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				301, // hold time
+				30); // connect retry interval
+		PeerConfiguration c10 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				31); // connect retry interval
+		
+		Assert.assertTrue(c1.equals(c2));
+		Assert.assertFalse(c1.equals(c3));
+		Assert.assertFalse(c1.equals(c4));
+		Assert.assertFalse(c1.equals(c5));
+		Assert.assertFalse(c1.equals(c6));
+		Assert.assertFalse(c1.equals(c7));
+		Assert.assertFalse(c1.equals(c8));
+		Assert.assertFalse(c1.equals(c9));
+		Assert.assertFalse(c1.equals(c10));
+	}
+
+	@Test
+	public void testHashCode() throws Exception {
+		PeerConfiguration c1 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c2 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c3 = new PeerConfigurationImpl("bar", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c4 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c5 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24577, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c6 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32769, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c7 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80402L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c8 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80502L, // remote BGP identifier
+				300, // hold time
+				30); // connect retry interval
+		PeerConfiguration c9 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				301, // hold time
+				30); // connect retry interval
+		PeerConfiguration c10 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				300, // hold time
+				31); // connect retry interval
+		
+		Assert.assertEquals(c1.hashCode(), c2.hashCode());
+		Assert.assertFalse(c1.hashCode() == c3.hashCode());
+		Assert.assertFalse(c1.hashCode() == c4.hashCode());
+		Assert.assertFalse(c1.hashCode() == c5.hashCode());
+		Assert.assertFalse(c1.hashCode() == c6.hashCode());
+		Assert.assertFalse(c1.hashCode() == c7.hashCode());
+		Assert.assertFalse(c1.hashCode() == c8.hashCode());
+		Assert.assertFalse(c1.hashCode() == c9.hashCode());
+		Assert.assertFalse(c1.hashCode() == c10.hashCode());
+	}
 }

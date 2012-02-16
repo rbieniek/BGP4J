@@ -31,4 +31,19 @@ public interface ClientConfiguration {
 	 * @return
 	 */
 	public InetSocketAddress getRemoteAddress();
+		
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object other);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int hashCode();
+
 }

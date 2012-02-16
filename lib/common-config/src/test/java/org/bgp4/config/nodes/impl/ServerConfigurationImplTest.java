@@ -19,6 +19,8 @@ package org.bgp4.config.nodes.impl;
 
 import java.net.InetAddress;
 
+import junit.framework.Assert;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
@@ -46,4 +48,27 @@ public class ServerConfigurationImplTest {
 		ServerConfigurationImpl config = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 2048);
 	}
 
+	@Test
+	public void testEquals() throws Exception {
+		ServerConfigurationImpl server1 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 100);
+		ServerConfigurationImpl server2 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 100);
+		ServerConfigurationImpl server3 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.2"), 100);
+		ServerConfigurationImpl server4 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 200);
+
+		Assert.assertTrue(server1.equals(server2));
+		Assert.assertFalse(server1.equals(server3));
+		Assert.assertFalse(server1.equals(server4));
+	}
+
+	@Test
+	public void testHashCode() throws Exception {
+		ServerConfigurationImpl server1 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 100);
+		ServerConfigurationImpl server2 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 100);
+		ServerConfigurationImpl server3 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.2"), 100);
+		ServerConfigurationImpl server4 = new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 200);
+
+		Assert.assertEquals(server1.hashCode(), server2.hashCode());
+		Assert.assertFalse(server1.hashCode() == server3.hashCode());
+		Assert.assertFalse(server1.hashCode() == server4.hashCode());
+	}
 }

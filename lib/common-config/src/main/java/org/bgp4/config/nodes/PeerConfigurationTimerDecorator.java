@@ -17,6 +17,10 @@
  */
 package org.bgp4.config.nodes;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bgp4.config.nodes.impl.PeerConfigurationImpl;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -114,4 +118,44 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	 * @return
 	 */
 	protected abstract int  getDefaultConnectRetryInterval();
+
+	/**
+	 * @param other
+	 * @return
+	 * @see org.bgp4.config.nodes.PeerConfiguration#equals(java.lang.Object)
+	 */
+	public boolean equals(Object other) {
+		if(!(other instanceof PeerConfiguration))
+			return false;
+		
+		PeerConfiguration o = (PeerConfiguration)other;
+		
+		return (new EqualsBuilder())
+				.append(getClientConfig(), o.getClientConfig())
+				.append(getConnectRetryInterval(), o.getConnectRetryInterval())
+				.append(getHoldTime(), o.getHoldTime())
+				.append(getLocalAS(), o.getLocalAS())
+				.append(getLocalBgpIdentifier(), o.getLocalBgpIdentifier())
+				.append(getPeerName(), o.getPeerName())
+				.append(getRemoteAS(), o.getRemoteAS())
+				.append(getRemoteBgpIdentifier(), o.getRemoteBgpIdentifier())
+				.isEquals();
+	}
+
+	/**
+	 * @return
+	 * @see org.bgp4.config.nodes.PeerConfiguration#hashCode()
+	 */
+	public int hashCode() {
+		return (new HashCodeBuilder())
+				.append(getClientConfig())
+				.append(getConnectRetryInterval())
+				.append(getHoldTime())
+				.append(getLocalAS())
+				.append(getLocalBgpIdentifier())
+				.append(getPeerName())
+				.append(getRemoteAS())
+				.append(getRemoteBgpIdentifier())
+				.toHashCode();
+	}
 }

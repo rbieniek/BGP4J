@@ -31,4 +31,18 @@ public interface ServerConfiguration {
 	 * @return
 	 */
 	public InetSocketAddress getListenAddress();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object other);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int hashCode();
 }

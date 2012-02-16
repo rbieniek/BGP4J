@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4.config.nodes.ClientConfiguration;
 
 /**
@@ -63,6 +64,34 @@ public class ClientConfigurationImpl implements ClientConfiguration {
 	 */
 	void setRemoteAddress(InetSocketAddress listenAddress) {
 		this.remoteAddress = listenAddress;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return (new HashCodeBuilder()).append(remoteAddress).toHashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClientConfigurationImpl other = (ClientConfigurationImpl) obj;
+		if (remoteAddress == null) {
+			if (other.remoteAddress != null)
+				return false;
+		} else if (!remoteAddress.equals(other.remoteAddress))
+			return false;
+		return true;
 	}
 
 }

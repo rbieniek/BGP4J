@@ -28,6 +28,12 @@ public class BgpServerConfigurationImpl implements BgpServerConfiguration {
 
 	private ServerConfiguration serverConfiguration;
 	
+	public BgpServerConfigurationImpl() {}
+	
+	public BgpServerConfigurationImpl(ServerConfiguration serverConfiguration) {
+		this.serverConfiguration = serverConfiguration;
+	}
+	
 	@Override
 	public ServerConfiguration getServerConfiguration() {
 		return this.serverConfiguration;
@@ -39,4 +45,39 @@ public class BgpServerConfigurationImpl implements BgpServerConfiguration {
 		
 		this.serverConfiguration = config;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((serverConfiguration == null) ? 0 : serverConfiguration
+						.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BgpServerConfigurationImpl other = (BgpServerConfigurationImpl) obj;
+		if (serverConfiguration == null) {
+			if (other.serverConfiguration != null)
+				return false;
+		} else if (!serverConfiguration.equals(other.serverConfiguration))
+			return false;
+		return true;
+	}
+
 }

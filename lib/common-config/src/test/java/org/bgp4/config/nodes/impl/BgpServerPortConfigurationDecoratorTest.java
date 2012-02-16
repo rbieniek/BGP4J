@@ -64,4 +64,32 @@ public class BgpServerPortConfigurationDecoratorTest {
 		Assert.assertEquals(17179, decorator.getListenAddress().getPort());
 		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), decorator.getListenAddress().getAddress());
 	}
+	
+	@Test
+	public void testEquals() throws Exception {
+		BgpServerPortConfigurationDecorator dec1 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 179));
+		BgpServerPortConfigurationDecorator dec2 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 179));
+		BgpServerPortConfigurationDecorator dec3 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1")));
+		BgpServerPortConfigurationDecorator dec4 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 17179));
+		BgpServerPortConfigurationDecorator dec5 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.2"), 179));
+		
+		Assert.assertTrue(dec1.equals(dec2));
+		Assert.assertTrue(dec1.equals(dec3));
+		Assert.assertFalse(dec1.equals(dec4));
+		Assert.assertFalse(dec1.equals(dec5));
+	}
+
+	@Test
+	public void testHashCode() throws Exception {
+		BgpServerPortConfigurationDecorator dec1 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 179));
+		BgpServerPortConfigurationDecorator dec2 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 179));
+		BgpServerPortConfigurationDecorator dec3 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1")));
+		BgpServerPortConfigurationDecorator dec4 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.1"), 17179));
+		BgpServerPortConfigurationDecorator dec5 = new BgpServerPortConfigurationDecorator(new ServerConfigurationImpl(InetAddress.getByName("192.168.4.2"), 179));
+		
+		Assert.assertEquals(dec1.hashCode(), dec2.hashCode());
+		Assert.assertEquals(dec1.hashCode(), dec3.hashCode());
+		Assert.assertFalse(dec1.hashCode() == dec4.hashCode());
+		Assert.assertFalse(dec1.hashCode() == dec5.hashCode());
+	}
 }
