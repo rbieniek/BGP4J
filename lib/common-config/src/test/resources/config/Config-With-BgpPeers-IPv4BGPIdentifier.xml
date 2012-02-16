@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <BgpPeers>
+        <BgpPeer name="foo1">
+            <Client remote="192.168.4.1" />
+            <AutonomousSystem local="10" remote="11" />
+            <BgpIdentifier local="${ipv4:192.168.4.1}" remote="${ipv4:192.168.4.2}" />
+        </BgpPeer>
+        <BgpPeer name="foo2">
+            <Client remote="192.168.4.2" />
+            <AutonomousSystem local="12" remote="13" />
+            <BgpIdentifier local="${IPv4:192.168.4.1}" remote="${IPv4:192.168.4.3}" />
+        </BgpPeer>
+    </BgpPeers>
+</Config>

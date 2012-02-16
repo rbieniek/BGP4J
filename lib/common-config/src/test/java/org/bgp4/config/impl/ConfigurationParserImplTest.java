@@ -97,6 +97,33 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		Assert.assertEquals("foo2", peerConfig.getPeerName());
 	}
 
+	@Test
+	public void testConfigurationWithTwoBgpPeersIPv4BGPIdentifiers() throws Exception {
+		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-BgpPeers-IPv4BGPIdentifier.xml"));
+		PeerConfiguration peerConfig;
+		
+		Assert.assertEquals(2, config.listPeerNames().size());
+		
+		peerConfig = config.getPeer("foo1");
+		Assert.assertNotNull(peerConfig);
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(10, peerConfig.getLocalAS());
+		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo1", peerConfig.getPeerName());
+		Assert.assertEquals((192L<<24)|(168L<<16)|(4L<<8)|1, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals((192L<<24)|(168L<<16)|(4L<<8)|2, peerConfig.getRemoteBgpIdentifier());
+		
+		peerConfig = config.getPeer("foo2");
+		Assert.assertNotNull(peerConfig);
+		Assert.assertEquals(InetAddress.getByName("192.168.4.2"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(12, peerConfig.getLocalAS());
+		Assert.assertEquals(13, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo2", peerConfig.getPeerName());
+		Assert.assertEquals((192L<<24)|(168L<<16)|(4<<8)|1, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals((192L<<24)|(168L<<16)|(4<<8)|3, peerConfig.getRemoteBgpIdentifier());
+	}
 	@Test(expected=ConfigurationException.class)
 	public void testConfigurationWithTwoBgpPeersDuplicatePeer() throws Exception {
 		@SuppressWarnings("unused")

@@ -33,7 +33,7 @@ public class OpenPacket extends BGPv4Packet {
 	private int autonomousSystem;
 	private int as4AutonomousSystem = -1;
 	private int holdTime;
-	private int bgpIdentifier;
+	private long bgpIdentifier;
 	private List<Capability> capabilities = new LinkedList<Capability>();
 	
 	/**
@@ -81,7 +81,7 @@ public class OpenPacket extends BGPv4Packet {
 	/**
 	 * @return the bgpIdentifier
 	 */
-	public int getBgpIdentifier() {
+	public long getBgpIdentifier() {
 		return bgpIdentifier;
 	}
 	
@@ -113,7 +113,7 @@ public class OpenPacket extends BGPv4Packet {
 		buffer.writeByte(getProtocolVersion());
 		buffer.writeShort(getAutonomousSystem());
 		buffer.writeShort(getHoldTime());
-		buffer.writeInt(getBgpIdentifier());
+		buffer.writeInt((int)getBgpIdentifier());
 		
 		ChannelBuffer capabilities = Capability.encodeCapabilities(getCapabilities());
 		

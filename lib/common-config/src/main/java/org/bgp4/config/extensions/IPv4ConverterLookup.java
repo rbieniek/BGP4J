@@ -61,7 +61,7 @@ public class IPv4ConverterLookup extends StrLookup {
 		}
 		
 		for(int i=0; i<4; i++)
-			ipAddr += parts[i] << ((3-i)*8);
+			ipAddr |= parts[i] << ((3-i)*8);
 		
 		return Long.toString(ipAddr);
 	}

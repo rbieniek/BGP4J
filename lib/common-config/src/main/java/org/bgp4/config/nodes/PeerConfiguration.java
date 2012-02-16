@@ -54,13 +54,13 @@ public interface PeerConfiguration {
 	 * 
 	 * @return
 	 */
-	public int getRemoteBgpIdentifier();
+	public long getRemoteBgpIdentifier();
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public int getLocalBgpIdentifier();
+	public long getLocalBgpIdentifier();
 	
 	/**
 	 * 

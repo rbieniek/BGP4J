@@ -65,7 +65,7 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	 * @return
 	 * @see org.bgp4.config.nodes.PeerConfiguration#getRemoteBgpIdentifier()
 	 */
-	public int getRemoteBgpIdentifier() {
+	public long getRemoteBgpIdentifier() {
 		return decorated.getRemoteBgpIdentifier();
 	}
 
@@ -73,7 +73,7 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	 * @return
 	 * @see org.bgp4.config.nodes.PeerConfiguration#getLocalBgpIdentifier()
 	 */
-	public int getLocalBgpIdentifier() {
+	public long getLocalBgpIdentifier() {
 		return decorated.getLocalBgpIdentifier();
 	}
 

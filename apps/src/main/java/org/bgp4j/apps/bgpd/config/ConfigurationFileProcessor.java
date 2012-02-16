@@ -62,10 +62,10 @@ public class ConfigurationFileProcessor {
 			
 			peerBean.setConnectRetryInterval(peerConfig.getConnectRetryInterval());
 			peerBean.setLocalAutonomousSystem(peerConfig.getLocalAS());
-			peerBean.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
+			// peerBean.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
 			peerBean.setLocalHoldTime(peerConfig.getHoldTime());
 			peerBean.setRemoteAutonomousSystem(peerConfig.getRemoteAS());
-			peerBean.setRemoteBgpIdentitifer(peerConfig.getRemoteBgpIdentifier());
+			// peerBean.setRemoteBgpIdentitifer(peerConfig.getRemoteBgpIdentifier());
 			peerBean.setRemotePeerAddress(peerConfig.getClientConfig().getRemoteAddress());
 			
 			configurationBean.addPeer(peerBean);

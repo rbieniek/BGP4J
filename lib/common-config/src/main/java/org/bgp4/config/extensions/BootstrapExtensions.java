@@ -35,5 +35,6 @@ public class BootstrapExtensions {
 	
 	public void initConfiguration(@Observes ApplicationBootstrapEvent event) {
 		ConfigurationInterpolator.registerGlobalLookup("ipv4", ipv4ConverterLookup);
+		ConfigurationInterpolator.registerGlobalLookup("IPv4", ipv4ConverterLookup);
 	}
 }

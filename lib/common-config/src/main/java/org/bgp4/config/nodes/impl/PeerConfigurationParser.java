@@ -66,12 +66,22 @@ public class PeerConfigurationParser {
 
 		
 		try {
-			peerConfig.setLocalBgpIdentifier(config.getInt("BgpIdentifier[@local]"));
+			long identifier = config.getLong("BgpIdentifier[@local]");
+			
+			if(!isValidBgpIdentifier(identifier))
+				throw new ConfigurationException("Invalid local BGP identifier: " + identifier);
+			
+			peerConfig.setLocalBgpIdentifier(identifier);
 		} catch(NoSuchElementException e) {
 			throw new ConfigurationException("local BGP identifier not given", e);
 		}
 		try {
-			peerConfig.setRemoteBgpIdentifier(config.getInt("BgpIdentifier[@remote]"));
+			long identifier = config.getLong("BgpIdentifier[@remote]");
+			
+			if(!isValidBgpIdentifier(identifier))
+				throw new ConfigurationException("Invalid remote BGP identifier: " + identifier);
+			
+			peerConfig.setRemoteBgpIdentifier(identifier);
 		} catch(NoSuchElementException e) {
 			throw new ConfigurationException("remote BGP identifier not given", e);
 		}
@@ -80,5 +90,9 @@ public class PeerConfigurationParser {
 		peerConfig.setConnectRetryInterval(config.getInt("Timers[@connectRetryInterval]", 0));
 		
 		return peerConfig;
+	}
+	
+	private boolean isValidBgpIdentifier(long id) {
+		return ((id > 0) && (id < 0x00000000ffffffffL));
 	}
 }

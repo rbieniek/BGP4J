@@ -32,8 +32,8 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private int localAS;
 	private int remoteAS;
 	private String peerName;
-	private int localBgpIdentifier;
-	private int remoteBgpIdentifier; 
+	private long localBgpIdentifier;
+	private long remoteBgpIdentifier; 
 	private int holdTime;
 	private int connectRetryInterval;
 	
@@ -120,14 +120,14 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	/**
 	 * @return the localBgpIdentifier
 	 */
-	public int getLocalBgpIdentifier() {
+	public long getLocalBgpIdentifier() {
 		return localBgpIdentifier;
 	}
 
 	/**
 	 * @param localBgpIdentifier the localBgpIdentifier to set
 	 */
-	void setLocalBgpIdentifier(int localBgpIdentifier) throws ConfigurationException  {
+	void setLocalBgpIdentifier(long localBgpIdentifier) throws ConfigurationException  {
 		if(localBgpIdentifier <= 0)
 			throw new ConfigurationException("Illegal local BGP identifier: " + localBgpIdentifier);
 		this.localBgpIdentifier = localBgpIdentifier;
@@ -136,14 +136,14 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	/**
 	 * @return the remoteBgpIdentifier
 	 */
-	public int getRemoteBgpIdentifier() {
+	public long getRemoteBgpIdentifier() {
 		return remoteBgpIdentifier;
 	}
 
 	/**
 	 * @param remoteBgpIdentifier the remoteBgpIdentifier to set
 	 */
-	void setRemoteBgpIdentifier(int remoteBgpIdentifier) throws ConfigurationException  {
+	void setRemoteBgpIdentifier(long remoteBgpIdentifier) throws ConfigurationException  {
 		if(remoteBgpIdentifier <= 0)
 			throw new ConfigurationException("Illegal remote BGP identifier: " + remoteBgpIdentifier);
 		this.remoteBgpIdentifier = remoteBgpIdentifier;
