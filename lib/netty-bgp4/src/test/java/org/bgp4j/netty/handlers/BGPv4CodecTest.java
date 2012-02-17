@@ -24,6 +24,7 @@ import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.Origin;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.MockChannel;
@@ -53,7 +54,6 @@ import org.bgp4j.netty.protocol.update.MultiProtocolReachableNLRI;
 import org.bgp4j.netty.protocol.update.MultiProtocolUnreachableNLRI;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
-import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;

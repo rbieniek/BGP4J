@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.Origin;
 import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockChannel;
@@ -36,7 +37,6 @@ import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
-import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.bgp4j.netty.protocol.update.OriginatorIDPathAttribute;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.jboss.netty.channel.ChannelHandler;

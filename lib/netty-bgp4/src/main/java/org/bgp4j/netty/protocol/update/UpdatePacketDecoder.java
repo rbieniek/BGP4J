@@ -34,9 +34,7 @@ import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
 import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegment;
-import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegmentType;
 import org.bgp4j.netty.protocol.update.CommunityPathAttribute.CommunityMember;
-import org.bgp4j.netty.protocol.update.OriginPathAttribute.Origin;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
@@ -197,7 +195,7 @@ public class UpdatePacketDecoder {
 			PathSegment segment =  new PathSegment(asType);
 
 			try {
-				segment.setPathSegmentType(PathSegmentType.fromCode(segmentType));
+				segment.setPathSegmentType(PathSegmentTypeCodec.fromCode(segmentType));
 			} catch (IllegalArgumentException e) {
 				log.error("cannot convert AS_PATH type", e);
 
@@ -224,7 +222,7 @@ public class UpdatePacketDecoder {
 			throw new AttributeLengthException();
 		
 		try {
-			attr.setOrigin(Origin.fromCode(buffer.readUnsignedByte()));
+			attr.setOrigin(OriginCodec.fromCode(buffer.readUnsignedByte()));
 		} catch(IllegalArgumentException e) {
 			log.error("cannot convert ORIGIN code", e);
 			

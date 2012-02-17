@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.Origin;
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -27,50 +28,6 @@ import org.jboss.netty.buffer.ChannelBuffers;
  *
  */
 public class OriginPathAttribute extends Attribute {
-
-	/**
-	 * Discrete origin types as specified in RFC 4271
-	 * 
-	 * @author rainer
-	 *
-	 */
-	public enum Origin {
-		
-		/** NLRI is interior to the originating AS (RFC 4271) */
-		IGP,
-
-		/** NLRI learned via EGP protocol (RFC 4271, RFC 904) */
-		EGP,
-		
-		/** NLRI learned by some other means (RFC 4271)*/
-		INCOMPLETE;
-		
-		int toCode() {
-			switch(this) {
-				case IGP:
-					return 0;
-				case EGP:
-					return 1;
-				case INCOMPLETE:
-					return 2;
-				default:
-					throw new IllegalArgumentException("unknown origin code: " +this);
-			}
-		}
-		
-		static Origin fromCode(int code) {
-			switch(code) {
-			case 0:
-				return IGP;
-			case 1:
-				return EGP;
-			case 2:
-				return INCOMPLETE;
-			default:
-				throw new IllegalArgumentException("unknown origin code: " + code);
-			}
-		}
-	}
 
 	private Origin origin;
 	
@@ -109,7 +66,7 @@ public class OriginPathAttribute extends Attribute {
 	protected ChannelBuffer encodeValue() {
 		ChannelBuffer buffer = ChannelBuffers.buffer(1);
 		
-		buffer.writeByte(getOrigin().toCode());
+		buffer.writeByte(OriginCodec.toCode(getOrigin()));
 		
 		return buffer;
 	}
