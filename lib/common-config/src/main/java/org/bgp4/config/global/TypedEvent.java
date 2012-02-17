@@ -13,29 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.global.BgpServerConfigurationEvent.java 
+ * File: org.bgp4.config.global.TypedEvent.java 
  */
 package org.bgp4.config.global;
-
-import org.bgp4.config.nodes.BgpServerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BgpServerConfigurationEvent extends TypedEvent {
+public class TypedEvent {
 
-	private BgpServerConfiguration configuration;
-	
-	public BgpServerConfigurationEvent(EventType type, BgpServerConfiguration configuration) {
-		super(type);
-		this.configuration = configuration;
+	protected TypedEvent(EventType type) {
+		this.type = type;
 	}
+
+	private EventType type;
 
 	/**
-	 * @return the configuration
+	 * @return the type
 	 */
-	public BgpServerConfiguration getConfiguration() {
-		return configuration;
+	public EventType getType() {
+		return type;
 	}
+
 }

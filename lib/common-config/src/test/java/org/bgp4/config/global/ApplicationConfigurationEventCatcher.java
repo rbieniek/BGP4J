@@ -21,6 +21,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Singleton;
 
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -33,16 +34,33 @@ public class ApplicationConfigurationEventCatcher {
 	private EventType bgpServerConfigurationEventType = null;
 	private BgpServerConfiguration bgpServerConfiguration = null;
 	
+	private boolean peerConfigurationEventFired = false;
+	private EventType peerConfigurationEventType = null;
+	private PeerConfiguration formerPeerConfiguration = null;
+	private PeerConfiguration currentPeerConfiguration = null;
+	
 	public void catchBgpServerConfigurationEvent(@Observes BgpServerConfigurationEvent event) {
 		bgpServerConfigurationEventFired = true;
 		bgpServerConfigurationEventType = event.getType();
 		bgpServerConfiguration = event.getConfiguration();
 	}
 
+	public void catchPeerConfigurationEvent(@Observes PeerConfigurationEvent event) {
+		peerConfigurationEventFired = true;
+		peerConfigurationEventType = event.getType();
+		formerPeerConfiguration = event.getFormer();
+		currentPeerConfiguration = event.getCurrent();
+	}
+	
 	void reset() {
 		bgpServerConfiguration = null;
 		bgpServerConfigurationEventFired = false;
 		bgpServerConfigurationEventType = null;
+
+		peerConfigurationEventFired = false;
+		peerConfigurationEventType = null;
+		formerPeerConfiguration = null;
+		currentPeerConfiguration = null;
 	}
 	
 	/**
@@ -64,5 +82,33 @@ public class ApplicationConfigurationEventCatcher {
 	 */
 	public BgpServerConfiguration getBgpServerConfiguration() {
 		return bgpServerConfiguration;
+	}
+
+	/**
+	 * @return the peerConfigurationEventFired
+	 */
+	public boolean isPeerConfigurationEventFired() {
+		return peerConfigurationEventFired;
+	}
+
+	/**
+	 * @return the peerConfigurationEventType
+	 */
+	public EventType getPeerConfigurationEventType() {
+		return peerConfigurationEventType;
+	}
+
+	/**
+	 * @return the formerPeerConfiguration
+	 */
+	public PeerConfiguration getFormerPeerConfiguration() {
+		return formerPeerConfiguration;
+	}
+
+	/**
+	 * @return the currentPeerConfiguration
+	 */
+	public PeerConfiguration getCurrentPeerConfiguration() {
+		return currentPeerConfiguration;
 	}
 }

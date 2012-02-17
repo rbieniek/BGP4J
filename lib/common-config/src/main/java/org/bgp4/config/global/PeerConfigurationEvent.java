@@ -17,25 +17,35 @@
  */
 package org.bgp4.config.global;
 
-import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BgpServerConfigurationEvent extends TypedEvent {
+public class PeerConfigurationEvent extends TypedEvent {
 
-	private BgpServerConfiguration configuration;
+	private PeerConfiguration former;
+	private PeerConfiguration current;
 	
-	public BgpServerConfigurationEvent(EventType type, BgpServerConfiguration configuration) {
+	public PeerConfigurationEvent(EventType type, PeerConfiguration former, PeerConfiguration current) {
 		super(type);
-		this.configuration = configuration;
+		
+		this.former = former;
+		this.current = current;
 	}
 
 	/**
 	 * @return the configuration
 	 */
-	public BgpServerConfiguration getConfiguration() {
-		return configuration;
+	public PeerConfiguration getFormer() {
+		return former;
+	}
+
+	/**
+	 * @return the current
+	 */
+	public PeerConfiguration getCurrent() {
+		return current;
 	}
 }

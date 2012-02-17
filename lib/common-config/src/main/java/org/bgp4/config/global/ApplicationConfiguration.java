@@ -17,7 +17,12 @@
  */
 package org.bgp4.config.global;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.enterprise.event.Event;
@@ -37,11 +42,14 @@ import org.bgp4.config.nodes.PeerConfiguration;
 public class ApplicationConfiguration implements ModifiableConfiguration {
 
 	private BgpServerConfiguration serverConfiguration;
+	private Map<String, PeerConfiguration> peers = new HashMap<String, PeerConfiguration>();
 	
 	private @Any @Inject Event<BgpServerConfigurationEvent> serverConfigurationEvent;
+	private @Any @Inject Event<PeerConfigurationEvent> peerConfigurationEvent;
 	
 	void resetConfiguration() {
 		this.serverConfiguration = null;
+		this.peers = new HashMap<String, PeerConfiguration>();
 	}
 	
 	/* (non-Javadoc)
@@ -67,8 +75,7 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	 */
 	@Override
 	public Set<String> listPeerNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableSet(peers.keySet());
 	}
 
 	/* (non-Javadoc)
@@ -76,8 +83,12 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	 */
 	@Override
 	public List<PeerConfiguration> listPeerConfigurations() {
-		// TODO Auto-generated method stub
-		return null;
+		List<PeerConfiguration> entries = new ArrayList<PeerConfiguration>(peers.size());
+		
+		for(Entry<String, PeerConfiguration> entry : peers.entrySet())
+			entries.add(entry.getValue());
+		
+		return Collections.unmodifiableList(entries);
 	}
 
 	/* (non-Javadoc)
@@ -85,9 +96,23 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	 */
 	@Override
 	public PeerConfiguration getPeer(String peerName) {
-		// TODO Auto-generated method stub
-		return null;
+		return peers.get(peerName);
 	}
 
-
+	public void putPeer(PeerConfiguration peer) {
+		PeerConfiguration former = getPeer(peer.getPeerName());
+		EventType type = EventType.determineEvent(former, peer);
+		
+		peers.put(peer.getPeerName(), peer);
+		
+		if(type != null)
+			peerConfigurationEvent.fire(new PeerConfigurationEvent(type, former, peer));
+	}
+	
+	public void removePeer(String peerName) {
+		PeerConfiguration peer = peers.remove(peerName);
+		
+		if(peer != null)
+			peerConfigurationEvent.fire(new PeerConfigurationEvent(EventType.CONFIGURATION_REMOVED, peer, null));
+	}
 }

@@ -19,7 +19,6 @@ package org.bgp4.config.nodes;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bgp4.config.nodes.impl.PeerConfigurationImpl;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
