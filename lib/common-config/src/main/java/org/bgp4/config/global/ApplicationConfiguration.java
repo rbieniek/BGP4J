@@ -20,6 +20,9 @@ package org.bgp4.config.global;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Any;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.bgp4.config.ModifiableConfiguration;
@@ -35,6 +38,12 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 
 	private BgpServerConfiguration serverConfiguration;
 	
+	private @Any @Inject Event<BgpServerConfigurationEvent> serverConfigurationEvent;
+	
+	void resetConfiguration() {
+		this.serverConfiguration = null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.bgp4.config.Configuration#getBgpServerConfiguration()
 	 */
@@ -45,7 +54,12 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	
 	@Override
 	public void setBgpServerConfiguration(BgpServerConfiguration serverConfiguration) {
+		EventType type = EventType.determineEvent(this.serverConfiguration, serverConfiguration);
+		
 		this.serverConfiguration = serverConfiguration;
+
+		if(type != null)
+			serverConfigurationEvent.fire(new BgpServerConfigurationEvent(type, this.serverConfiguration));
 	}
 
 	/* (non-Javadoc)
