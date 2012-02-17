@@ -63,4 +63,76 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 		Assert.assertEquals(EventType.CONFIGURATION_ADDED, catcher.getBgpServerConfigurationEventType());
 		Assert.assertEquals(config, catcher.getBgpServerConfiguration());
 	}
+
+	
+	@Test
+	public void testBgpServerNoConfigurationAdded() throws Exception {
+		Assert.assertNull(applicationConfig.getBgpServerConfiguration());
+		applicationConfig.setBgpServerConfiguration(null);
+		Assert.assertFalse(catcher.isBgpServerConfigurationEventFired());
+	}
+	
+	@Test
+	public void testBgpServerConfigurationAddedAndReadded() throws Exception {
+		BgpServerConfiguration config = new BgpServerConfigurationImpl(new ServerConfigurationImpl(InetAddress.getByName("192.168.1.1")));
+
+		Assert.assertNull(applicationConfig.getBgpServerConfiguration());
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNotNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertTrue(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertEquals(EventType.CONFIGURATION_ADDED, catcher.getBgpServerConfigurationEventType());
+		Assert.assertEquals(config, catcher.getBgpServerConfiguration());
+		
+		catcher.reset();
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNotNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertFalse(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertNull(catcher.getBgpServerConfigurationEventType());
+		Assert.assertNull(catcher.getBgpServerConfiguration());
+	}
+
+	@Test
+	public void testBgpServerConfigurationChanged() throws Exception {
+		BgpServerConfiguration config;
+
+		config = new BgpServerConfigurationImpl(new ServerConfigurationImpl(InetAddress.getByName("192.168.1.1")));
+		Assert.assertNull(applicationConfig.getBgpServerConfiguration());
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNotNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertTrue(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertEquals(EventType.CONFIGURATION_ADDED, catcher.getBgpServerConfigurationEventType());
+		Assert.assertEquals(config, catcher.getBgpServerConfiguration());
+
+		catcher.reset();
+
+		config = new BgpServerConfigurationImpl(new ServerConfigurationImpl(InetAddress.getByName("192.168.2.1")));
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNotNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertTrue(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertEquals(EventType.CONFIGURATION_CHANGED, catcher.getBgpServerConfigurationEventType());
+		Assert.assertEquals(config, catcher.getBgpServerConfiguration());
+	}
+
+
+	@Test
+	public void testBgpServerConfigurationRemoved() throws Exception {
+		BgpServerConfiguration config;
+
+		config = new BgpServerConfigurationImpl(new ServerConfigurationImpl(InetAddress.getByName("192.168.1.1")));
+		Assert.assertNull(applicationConfig.getBgpServerConfiguration());
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNotNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertTrue(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertEquals(EventType.CONFIGURATION_ADDED, catcher.getBgpServerConfigurationEventType());
+		Assert.assertEquals(config, catcher.getBgpServerConfiguration());
+
+		catcher.reset();
+
+		config = null;
+		applicationConfig.setBgpServerConfiguration(config);
+		Assert.assertNull(applicationConfig.getBgpServerConfiguration());
+		Assert.assertTrue(catcher.isBgpServerConfigurationEventFired());
+		Assert.assertEquals(EventType.CONFIGURATION_REMOVED, catcher.getBgpServerConfigurationEventType());
+		Assert.assertNull(catcher.getBgpServerConfiguration());
+	}
 }
