@@ -100,6 +100,49 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 					pipeline.getContext(handlerName).setAttachment(pci);
 				}
 			}
+			
+			fsm.handleClientConnected();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelConnected(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
+	 */
+	@Override
+	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		InetSocketAddress sa = (InetSocketAddress)e.getValue();
+		InetAddress addr = sa.getAddress();
+		
+		log.info("disconnected from client " + addr);
+		
+		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
+		
+		if(fsm == null) {
+			log.error("Internal Error: client for address " + addr + " is unknown");
+			
+			ctx.getChannel().close();
+		} else {
+			
+			fsm.handleClientDisconnected();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelClosed(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
+	 */
+	@Override
+	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		InetSocketAddress sa = (InetSocketAddress)e.getValue();
+		InetAddress addr = sa.getAddress();
+		
+		log.info("connected to client " + addr);
+		
+		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
+		
+		if(fsm == null) {
+			log.error("Internal Error: client for address " + addr + " is unknown");
+		} else {
+			fsm.handleClientClosed();
 		}
 	}
 }

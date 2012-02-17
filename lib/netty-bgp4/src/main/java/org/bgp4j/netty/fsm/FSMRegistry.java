@@ -21,14 +21,15 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4j.netty.BGPv4Configuration;
-import org.bgp4j.netty.BGPv4PeerConfiguration;
-import org.bgp4j.netty.PeerConfigurationChangedListener;
+import org.bgp4.config.global.ApplicationConfiguration;
+import org.bgp4.config.global.PeerConfigurationEvent;
+import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -37,50 +38,22 @@ import org.bgp4j.netty.PeerConfigurationChangedListener;
 @Singleton
 public class FSMRegistry {
 
-	private class FSMInstanceManagerListener implements PeerConfigurationChangedListener {
-
-		@Override
-		public void peerAdded(BGPv4PeerConfiguration peerConfig) {
-			BGPv4FSM fsm = fsmProvider.get();
-			
-			fsm.configure(peerConfig);
-			
-			synchronized (fsmMap) {
-				fsmMap.put(fsm.getRemotePeerAddress(), fsm);				
-			}
-		}
-
-		@Override
-		public void peerRemoved(BGPv4PeerConfiguration peerConfig) {
-			InetAddress remotePeerAddress = peerConfig.getRemotePeerAddress().getAddress();
-
-			BGPv4FSM fsm = null;
-			
-			synchronized (fsmMap) {
-				fsm = fsmMap.remove(remotePeerAddress);
-			}
-			
-			if(fsm != null)
-				fsm.destroyFSM();
-		}
-	}
-	
 	private Map<InetAddress, BGPv4FSM> fsmMap = new HashMap<InetAddress, BGPv4FSM>();
 	
 	private @Inject @New Instance<BGPv4FSM> fsmProvider;
+	private @Inject ApplicationConfiguration applicationConfiguration;
 	
 	public FSMRegistry() {
 		
 	}
 	
-	public void createRegistry(BGPv4Configuration config) {
-		config.addListener(new FSMInstanceManagerListener());
-		
-		for(BGPv4PeerConfiguration peerConfig : config.getPeers()) {
+	public void createRegistry() {
+		for(PeerConfiguration peerConfig : applicationConfiguration.listPeerConfigurations()) {
 			BGPv4FSM fsm = fsmProvider.get();
 			
 			fsm.configure(peerConfig);
 			fsmMap.put(fsm.getRemotePeerAddress(), fsm);
+			fsm.startFSM();
 		}
 	}
 	
@@ -95,5 +68,42 @@ public class FSMRegistry {
 			fsmMap.get(addr).destroyFSM();
 		
 		fsmMap.clear();
+	}
+	
+	public void peerChanged(@Observes PeerConfigurationEvent event) {
+		BGPv4FSM fsm = null;
+		InetAddress remotePeerAddress = null;
+		
+		switch(event.getType()) {
+		case CONFIGURATION_ADDED:
+			fsm = fsmProvider.get();
+			
+			fsm.configure(event.getCurrent());
+			
+			synchronized (fsmMap) {
+				fsmMap.put(fsm.getRemotePeerAddress(), fsm);				
+			}
+			break;
+		case CONFIGURATION_REMOVED:
+			remotePeerAddress = event.getFormer().getClientConfig().getRemoteAddress().getAddress();
+
+			synchronized (fsmMap) {
+				fsm = fsmMap.remove(remotePeerAddress);
+			}
+
+			if (fsm != null)
+				fsm.destroyFSM();
+			break;
+		}
+	}
+
+	public void startFiniteStateMachines() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void stopFiniteStateMachines() {
+		// TODO Auto-generated method stub
+		
 	}
 }

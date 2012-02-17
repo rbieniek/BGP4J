@@ -22,12 +22,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.Configuration;
 import org.bgp4.config.ConfigurationParser;
-import org.bgp4.config.nodes.BgpServerConfiguration;
-import org.bgp4.config.nodes.PeerConfiguration;
-import org.bgp4j.netty.BGPv4ConfigurationBean;
-import org.bgp4j.netty.BGPv4PeerConfigurationBean;
+import org.bgp4.config.global.ApplicationConfiguration;
 
 /**
  * This class manages the access to the configuration file provided on the command line. 
@@ -42,34 +38,10 @@ import org.bgp4j.netty.BGPv4PeerConfigurationBean;
 public class ConfigurationFileProcessor {
 
 	private @Inject ConfigurationParser configurationParser;
-	private BGPv4ConfigurationBean configurationBean;
-
-	public void setConfigurationBean(BGPv4ConfigurationBean configurationBean) {
-		this.configurationBean = configurationBean;
-	}
+	private @Inject ApplicationConfiguration applicationConfiguration;
 
 	public void processConfigFile(String configFile) throws ConfigurationException {
-		Configuration config = configurationParser.parseConfiguration(new XMLConfiguration(configFile));
-		
-		if(config.getBgpServerConfiguration() != null) {
-			BgpServerConfiguration serverConfig = config.getBgpServerConfiguration();
-			
-			configurationBean.setBgpv4Server(serverConfig.getServerConfiguration().getListenAddress());
-		}
-
-		for(PeerConfiguration peerConfig : config.listPeerConfigurations()) {
-			BGPv4PeerConfigurationBean peerBean = new BGPv4PeerConfigurationBean();
-			
-			peerBean.setConnectRetryInterval(peerConfig.getConnectRetryInterval());
-			peerBean.setLocalAutonomousSystem(peerConfig.getLocalAS());
-			// peerBean.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
-			peerBean.setLocalHoldTime(peerConfig.getHoldTime());
-			peerBean.setRemoteAutonomousSystem(peerConfig.getRemoteAS());
-			// peerBean.setRemoteBgpIdentitifer(peerConfig.getRemoteBgpIdentifier());
-			peerBean.setRemotePeerAddress(peerConfig.getClientConfig().getRemoteAddress());
-			
-			configurationBean.addPeer(peerBean);
-		}
+		applicationConfiguration.importConfiguration(configurationParser.parseConfiguration(new XMLConfiguration(configFile)));		
 	}
 	
 }

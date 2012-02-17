@@ -18,12 +18,15 @@ package org.bgp4j.netty.fsm;
 
 import java.net.InetAddress;
 
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
+import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.ASType;
-import org.bgp4j.netty.BGPv4PeerConfiguration;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.netty.service.BGPv4Client;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 
@@ -38,15 +41,16 @@ public class BGPv4FSM {
 	
 	private InetAddress remotePeerAddress;
 	private PeerConnectionInformation pci = new PeerConnectionInformation();
+	private @Inject @New Instance<BGPv4Client> clientProvider;
 	
-	public void configure(BGPv4PeerConfiguration peerConfig) {
-		this.remotePeerAddress = peerConfig.getRemotePeerAddress().getAddress();
+	public void configure(PeerConfiguration peerConfig) {
+		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
 
 		pci.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS); // default value, subject to negotiation
-		pci.setLocalAS(peerConfig.getLocalAutonomousSystem());
+		pci.setLocalAS(peerConfig.getLocalAS());
 		pci.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
-		pci.setRemoteAS(peerConfig.getRemoteAutonomousSystem());
-		pci.setRemoteBgpIdentifier(peerConfig.getRemoteBgpIdentitifer());
+		pci.setRemoteAS(peerConfig.getRemoteAS());
+		pci.setRemoteBgpIdentifier(peerConfig.getRemoteBgpIdentifier());
 	}
 
 	public InetAddress getRemotePeerAddress() {
@@ -57,6 +61,11 @@ public class BGPv4FSM {
 		return pci;
 	}
 	
+	public void startFSM() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void destroyFSM() {
 		// TODO Auto-generated method stub
 		
@@ -64,6 +73,21 @@ public class BGPv4FSM {
 
 	public void handleMessage(Channel channel, BGPv4Packet message) {
 		log.info("received message " + message);
+	}
+
+	public void handleClientConnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleClientClosed() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleClientDisconnected() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

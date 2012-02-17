@@ -26,8 +26,8 @@ package org.bgp4j.netty;
 public class PeerConnectionInformation {
 	private int localAS;
 	private int remoteAS;
-	private int localBgpIdentifier;
-	private int remoteBgpIdentifier;
+	private long localBgpIdentifier;
+	private long remoteBgpIdentifier;
 	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
 	
 	public ASType getAsTypeInUse() {
@@ -100,28 +100,28 @@ public class PeerConnectionInformation {
 	/**
 	 * @return the localBgpIdentifier
 	 */
-	public int getLocalBgpIdentifier() {
+	public long getLocalBgpIdentifier() {
 		return localBgpIdentifier;
 	}
 
 	/**
 	 * @param localBgpIdentifier the localBgpIdentifier to set
 	 */
-	public void setLocalBgpIdentifier(int localBgpIdentifier) {
+	public void setLocalBgpIdentifier(long localBgpIdentifier) {
 		this.localBgpIdentifier = localBgpIdentifier;
 	}
 
 	/**
 	 * @return the remoteBgpIdentifier
 	 */
-	public int getRemoteBgpIdentifier() {
+	public long getRemoteBgpIdentifier() {
 		return remoteBgpIdentifier;
 	}
 
 	/**
 	 * @param remoteBgpIdentifier the remoteBgpIdentifier to set
 	 */
-	public void setRemoteBgpIdentifier(int remoteBgpIdentifier) {
+	public void setRemoteBgpIdentifier(long remoteBgpIdentifier) {
 		this.remoteBgpIdentifier = remoteBgpIdentifier;
 	}
 

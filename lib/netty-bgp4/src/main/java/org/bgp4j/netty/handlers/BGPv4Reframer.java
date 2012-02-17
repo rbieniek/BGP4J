@@ -17,7 +17,6 @@
 package org.bgp4j.netty.handlers;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BadMessageLengthNotificationPacket;

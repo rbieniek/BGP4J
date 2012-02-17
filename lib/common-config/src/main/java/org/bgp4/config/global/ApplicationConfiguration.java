@@ -30,6 +30,7 @@ import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bgp4.config.Configuration;
 import org.bgp4.config.ModifiableConfiguration;
 import org.bgp4.config.nodes.BgpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
@@ -50,6 +51,13 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	void resetConfiguration() {
 		this.serverConfiguration = null;
 		this.peers = new HashMap<String, PeerConfiguration>();
+	}
+	
+	public void importConfiguration(Configuration configuration) {
+		setBgpServerConfiguration(configuration.getBgpServerConfiguration());
+		
+		for(PeerConfiguration peer : configuration.listPeerConfigurations())
+			putPeer(peer);
 	}
 	
 	/* (non-Javadoc)

@@ -27,7 +27,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.bgp4j.apps.bgpd.config.ConfigurationFileProcessor;
-import org.bgp4j.netty.BGPv4ConfigurationBean;
 import org.bgp4j.netty.service.BGPv4Service;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
@@ -65,12 +64,9 @@ public class BgpDaemonApplicationListener {
 				DOMConfigurator.configure(cmd.getOptionValue("l"));
 			}
 			
-			BGPv4ConfigurationBean configurationBean = new BGPv4ConfigurationBean();
-			configurationFileProcessor.setConfigurationBean(configurationBean);
-			
 			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
 			
-			bgpService.startService(configurationBean);
+			bgpService.startService();
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			

@@ -16,13 +16,9 @@
  */
 package org.bgp4j.netty.service;
 
-import java.net.InetAddress;
-import java.util.UUID;
-
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import org.bgp4j.netty.BGPv4PeerConfiguration;
+import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.handlers.BGPv4ClientEndpoint;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
@@ -31,8 +27,6 @@ import org.bgp4j.netty.handlers.ValidateServerIdentifier;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -51,14 +45,11 @@ public class BGPv4Client {
 	private @Inject InboundOpenCapabilitiesProcessor inboundOpenCapProcessor;
 	private @Inject ValidateServerIdentifier validateServer;
 	private @Inject BGPv4Reframer reframer;
-	private @Inject Event<ClientNeedReconnectEvent> reconnectEvent;
 	private @Inject @ClientFactory ChannelFactory channelFactory;
 	
 	private Channel clientChannel;
-	private BGPv4PeerConfiguration peerConfiguration;
-	private boolean closed = false;
 
-	void startClient() {
+	void startClient(PeerConfiguration peerConfiguration) {
 		ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
 
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
@@ -80,82 +71,13 @@ public class BGPv4Client {
 		bootstrap.setOption("tcpnoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		
-		log.info("connecting: " + printablePeer());
-		ChannelFuture future = bootstrap.connect(peerConfiguration.getRemotePeerAddress());
-
-		future.addListener(new ChannelFutureListener() {
-			
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				if(future.isSuccess()) {
-					clientChannel = future.getChannel();
-					
-					clientChannel.getCloseFuture().addListener(new ChannelFutureListener() {
-						
-						@Override
-						public void operationComplete(ChannelFuture future) throws Exception {
-							log.info("connection closed: " + printablePeer());
-
-							if(!closed) {
-								reconnectEvent.fire(new ClientNeedReconnectEvent(getRemotePeerAddress()));
-							}
-						}
-					});
-
-					log.info("connected: " + printablePeer());
-				} else {
-					log.info("cant connect: " + printablePeer());
-
-					if(!closed)
-						reconnectEvent.fire(new ClientNeedReconnectEvent(getRemotePeerAddress()));					
-				}
-			}
-		});		
+		bootstrap.connect(peerConfiguration.getClientConfig().getRemoteAddress());
 	}
 
 	void stopClient() {
-		closed = true;
-		
 		if(clientChannel != null) {
 			clientChannel.close();
 			this.clientChannel = null;
 		}
-	}
-	
-	/**
-	 * @return the peerConfiguration
-	 */
-	public BGPv4PeerConfiguration getPeerConfiguration() {
-		return peerConfiguration;
-	}
-
-	/**
-	 * @param peerConfiguration the peerConfiguration to set
-	 */
-	public void setPeerConfiguration(BGPv4PeerConfiguration peerConfiguration) {
-		this.peerConfiguration = peerConfiguration;
-	}
-
-	public InetAddress getRemotePeerAddress() {
-		return getPeerConfiguration().getRemotePeerAddress().getAddress();
-	}
-	
-	private String printablePeer() {
-		StringBuilder builder = new StringBuilder();
-		
-		builder.append("Peer address: ");
-		builder.append(peerConfiguration.getRemotePeerAddress().getAddress());
-		
-		builder.append("| local BGP identifier: ");
-		builder.append(peerConfiguration.getLocalBgpIdentifier());		
-		builder.append(", local AS: ");
-		builder.append(peerConfiguration.getLocalAutonomousSystem());
-
-		builder.append("--> remote BGP identifier: ");
-		builder.append(peerConfiguration.getRemoteBgpIdentitifer());		
-		builder.append(", remote AS: ");
-		builder.append(peerConfiguration.getRemoteAutonomousSystem());
-		
-		return builder.toString();
 	}
 }

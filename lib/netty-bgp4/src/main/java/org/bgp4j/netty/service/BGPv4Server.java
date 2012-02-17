@@ -16,7 +16,9 @@
  */
 package org.bgp4j.netty.service;
 
-import org.bgp4j.netty.BGPv4Configuration;
+import javax.inject.Inject;
+
+import org.bgp4.config.global.ApplicationConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -24,12 +26,8 @@ import org.bgp4j.netty.BGPv4Configuration;
  */
 public class BGPv4Server {
 
-	private BGPv4Configuration configuration;
+	private @Inject ApplicationConfiguration applicationConfiguration;
 	
-	public void setConfiguration(BGPv4Configuration configuration) {
-		this.configuration = configuration;
-	}
-
 	public void startServer() {
 		// TODO Auto-generated method stub
 		
