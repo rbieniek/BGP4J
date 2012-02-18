@@ -20,6 +20,9 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertEquals(120, decorator.getHoldTime());
 		Assert.assertEquals(0, decorated.getIdleHoldTime());
 		Assert.assertEquals(30, decorator.getIdleHoldTime());
+
+		Assert.assertEquals(0, decorated.getDelayOpenTime());
+		Assert.assertEquals(15, decorator.getDelayOpenTime());
 	}
 	
 	@Test
@@ -29,11 +32,14 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		
 		decorated.setHoldTime(45);
 		decorated.setIdleHoldTime(300);
+		decorated.setDelayOpenTime(60);
 		
 		Assert.assertEquals(45, decorated.getHoldTime());
 		Assert.assertEquals(45, decorator.getHoldTime());
 		Assert.assertEquals(300, decorated.getIdleHoldTime());
 		Assert.assertEquals(300, decorator.getIdleHoldTime());
+		Assert.assertEquals(60, decorated.getDelayOpenTime());
+		Assert.assertEquals(60, decorator.getDelayOpenTime());
 	}
 	
 	@Test
@@ -125,7 +131,14 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
 				300, // hold time
-				30); // connect retry interval
+				30, // connect retry interval
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
 		
 		Assert.assertTrue(c1.equals(c2));
 		Assert.assertTrue(c1.equals(c11));
@@ -228,7 +241,14 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
 				300, // hold time
-				30); // connect retry interval
+				30, // connect retry interval
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
 		
 		Assert.assertEquals(c1.hashCode(), c2.hashCode());
 		Assert.assertEquals(c1.hashCode(), c11.hashCode());

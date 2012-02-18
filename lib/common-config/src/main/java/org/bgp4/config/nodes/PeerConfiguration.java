@@ -87,4 +87,46 @@ public interface PeerConfiguration {
 	 * @return
 	 */
 	public int getIdleHoldTime();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isAllowAutomaticStart();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isAllowAutomaticStop();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isDampPeerOscillation();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isPassiveTcpEstablishment();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isDelayOpen();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getDelayOpenTime();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCollisionDetectEstablishedState();
 }

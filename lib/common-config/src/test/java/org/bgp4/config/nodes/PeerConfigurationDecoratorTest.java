@@ -1,158 +1,25 @@
-/**
- *  Copyright 2012 Rainer Bieniek (Rainer.Bieniek@web.de)
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * 
- * File: org.bgp4.config.nodes.impl.PeerConfigurationImplTest.java 
- */
-package org.bgp4.config.nodes.impl;
+package org.bgp4.config.nodes;
 
 import java.net.InetAddress;
 
 import junit.framework.Assert;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4.config.nodes.PeerConfigurationDecorator;
+import org.bgp4.config.nodes.impl.ClientConfigurationImpl;
+import org.bgp4.config.nodes.impl.PeerConfigurationImpl;
 import org.junit.Test;
 
-/**
- * @author Rainer Bieniek (Rainer.Bieniek@web.de)
- *
- */
-public class PeerConfigurationImplTest {
-
-	@Test
-	public void testAcceptedPeerConfiguration() throws Exception {
-		PeerConfiguration config =  new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30, // connect retry interval
-				true, // allow automatic start
-				true, // allow automatic stop
-				true, // damp peer oscillation
-				true, // passive tcp establishment
-				true, // delay open
-				180, // delay open time
-				true); // collision detect established state
-		
-		Assert.assertEquals(24576, config.getLocalAS());
-		Assert.assertEquals(32768, config.getRemoteAS());
-		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), config.getClientConfig().getRemoteAddress().getAddress());
-		Assert.assertEquals(179, config.getClientConfig().getRemoteAddress().getPort());
-		Assert.assertEquals(0xc0a80401L, config.getLocalBgpIdentifier());
-		Assert.assertEquals(0xc0a80501L, config.getRemoteBgpIdentifier());
-		Assert.assertEquals(300, config.getHoldTime());
-		Assert.assertEquals(30, config.getIdleHoldTime());
-		Assert.assertTrue(config.isAllowAutomaticStart());
-		Assert.assertTrue(config.isAllowAutomaticStop());
-		Assert.assertTrue(config.isDampPeerOscillation());
-		Assert.assertTrue(config.isPassiveTcpEstablishment());
-		Assert.assertTrue(config.isDelayOpen());
-		Assert.assertEquals(180, config.getDelayOpenTime());
-		Assert.assertTrue(config.isCollisionDetectEstablishedState());
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNullClientConfiguration() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl("foo", null, 10, 11);		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNegativeLocalAS() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl("foo", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), -10, 11);		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNegativeRemoteAS() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl("foo", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, -11);		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNegativeDelayOpenTime() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config =  new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30, // connect retry interval
-				true, // allow automatic start
-				true, // allow automatic stop
-				true, // damp peer oscillation
-				true, // passive tcp establishment
-				true, // delay open
-				-180, // delay open time
-				true); // collision detect established state		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNegativeHoldTime() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config =  new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				-300, // hold time
-				30, // connect retry interval
-				true, // allow automatic start
-				true, // allow automatic stop
-				true, // damp peer oscillation
-				true, // passive tcp establishment
-				true, // delay open
-				180, // delay open time
-				true); // collision detect established state		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationNegativeIdleHoldTime() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config =  new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				-30, // connect retry interval
-				true, // allow automatic start
-				true, // allow automatic stop
-				true, // damp peer oscillation
-				true, // passive tcp establishment
-				true, // delay open
-				180, // delay open time
-				true); // collision detect established state		
-	}
-
-	@Test(expected=ConfigurationException.class)
-	public void testBogusPeerConfigurationEmptyName() throws Exception {
-		@SuppressWarnings("unused")
-		PeerConfiguration config = new PeerConfigurationImpl("", new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), 10, 11);		
+public class PeerConfigurationDecoratorTest {
+	public static class MockPeerConfgurationDecorator extends PeerConfigurationDecorator {
+		MockPeerConfgurationDecorator(PeerConfiguration decorated) {
+			super(decorated);
+		}
 	}
 	
 	@Test
 	public void testEquals() throws Exception {
-		PeerConfiguration c1 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c1 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -166,8 +33,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c2 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c2 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -181,8 +48,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c3 = new PeerConfigurationImpl("bar", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c3 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("bar", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -196,8 +63,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c4 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c4 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -211,8 +78,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c5 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c5 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24577, // local AS
 				32768, // remote AS
@@ -226,8 +93,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c6 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c6 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32769, // remote AS
@@ -241,8 +108,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c7 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c7 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -256,8 +123,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c8 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c8 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -271,8 +138,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c9 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c9 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -286,8 +153,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c10 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c10 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -301,8 +168,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c11 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c11 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -316,8 +183,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c12 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c12 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -331,8 +198,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c13 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c13 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -346,8 +213,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c14 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c14 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -361,8 +228,8 @@ public class PeerConfigurationImplTest {
 				true, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c15 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c15 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -376,8 +243,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				true, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c16 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c16 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -391,8 +258,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				240, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c17 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -406,7 +273,7 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				true); // connect retry interval
+				true)); // connect retry interval
 
 		Assert.assertTrue(c1.equals(c2));
 		Assert.assertFalse(c1.equals(c3));
@@ -428,7 +295,7 @@ public class PeerConfigurationImplTest {
 
 	@Test
 	public void testHashCode() throws Exception {
-		PeerConfiguration c1 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c1 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -442,8 +309,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c2 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c2 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -457,8 +324,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c3 = new PeerConfigurationImpl("bar", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c3 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("bar", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -472,8 +339,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c4 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c4 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -487,8 +354,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c5 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c5 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24577, // local AS
 				32768, // remote AS
@@ -502,8 +369,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c6 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c6 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32769, // remote AS
@@ -517,8 +384,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c7 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c7 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -532,8 +399,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c8 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c8 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -547,8 +414,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c9 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c9 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -562,8 +429,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c10 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c10 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -577,8 +444,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c11 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c11 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -592,8 +459,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c12 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c12 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -607,8 +474,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c13 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c13 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -622,8 +489,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c14 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c14 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -637,8 +504,8 @@ public class PeerConfigurationImplTest {
 				true, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c15 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c15 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -652,8 +519,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				true, // delay open
 				180, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c16 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c16 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -667,8 +534,8 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				240, // delay open time
-				false); // connect retry interval
-		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
+				false)); // connect retry interval
+		PeerConfiguration c17 = new MockPeerConfgurationDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -682,7 +549,7 @@ public class PeerConfigurationImplTest {
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
-				true); // connect retry interval
+				true)); // connect retry interval
 		
 		Assert.assertEquals(c1.hashCode(), c2.hashCode());
 		Assert.assertFalse(c1.hashCode() == c3.hashCode());

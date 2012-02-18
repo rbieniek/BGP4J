@@ -38,6 +38,13 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private long remoteBgpIdentifier; 
 	private int holdTime;
 	private int idleHoldTime;
+	private boolean allowAutomaticStart;
+	private boolean allowAutomaticStop;
+	private boolean collisionDetectEstablishedState;
+	private boolean dampPeerOscillation;
+	private boolean delayOpen;
+	private boolean passiveTcpEstablishment;
+	private int delayOpenTime;
 	
 	public PeerConfigurationImpl() {
 		
@@ -68,6 +75,39 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 
 		setHoldTime(holdTime);
 		setIdleHoldTime(connectRetryInterval);
+	}
+	
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier, int holdTime, int connectRetryInterval,
+			boolean allowAutomaticStart, boolean allowAutomaticStop, boolean dampPeerOscillation) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, holdTime, connectRetryInterval);
+		
+		setAllowAutomaticStart(allowAutomaticStart);
+		setAllowAutomaticStop(allowAutomaticStop);
+		setDampPeerOscillation(dampPeerOscillation);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier, int holdTime, int connectRetryInterval,
+			boolean allowAutomaticStart, boolean allowAutomaticStop, boolean dampPeerOscillation,
+			boolean passiveTcpEstablishment, boolean delayOpen, int delayOpenTime) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, holdTime, connectRetryInterval,
+				allowAutomaticStart, allowAutomaticStop, dampPeerOscillation);
+		
+		setPassiveTcpEstablishment(passiveTcpEstablishment);
+		setDelayOpen(delayOpen);
+		setDelayOpenTime(delayOpenTime);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier, int holdTime, int connectRetryInterval,
+			boolean allowAutomaticStart, boolean allowAutomaticStop, boolean dampPeerOscillation,
+			boolean passiveTcpEstablishment, boolean delayOpen, int delayOpenTime,
+			boolean collisionDetectEstablishedState) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, holdTime, connectRetryInterval,
+				allowAutomaticStart, allowAutomaticStop, dampPeerOscillation, passiveTcpEstablishment, delayOpen, delayOpenTime);
+		
+		setCollisionDetectEstablishedState(collisionDetectEstablishedState);
 	}
 
 	@Override
@@ -219,6 +259,13 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(peerName)
 				.append(remoteAS)
 				.append(remoteBgpIdentifier)
+				.append(delayOpenTime)
+				.append(allowAutomaticStart)
+				.append(allowAutomaticStop)
+				.append(collisionDetectEstablishedState)
+				.append(dampPeerOscillation)
+				.append(delayOpen)
+				.append(passiveTcpEstablishment)
 				.toHashCode();
 				
 	}
@@ -235,14 +282,124 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 		
 		return (new EqualsBuilder())
 				.append(clientConfig, o.clientConfig)
-				.append(idleHoldTime, o.idleHoldTime)
+				.append(idleHoldTime, o.idleHoldTime)	
 				.append(holdTime, o.holdTime)
 				.append(localAS, o.localAS)
 				.append(localBgpIdentifier, o.localBgpIdentifier)
 				.append(peerName, o.peerName)
 				.append(remoteAS, o.remoteAS)
 				.append(remoteBgpIdentifier, o.remoteBgpIdentifier)
+				.append(delayOpenTime, o.delayOpenTime)
+				.append(allowAutomaticStart, o.allowAutomaticStart)
+				.append(allowAutomaticStop, o.allowAutomaticStop)
+				.append(collisionDetectEstablishedState, o.collisionDetectEstablishedState)
+				.append(dampPeerOscillation, o.dampPeerOscillation)
+				.append(delayOpen, o.delayOpen)
+				.append(passiveTcpEstablishment, o.passiveTcpEstablishment)
 				.isEquals();
+	}
+
+	/**
+	 * @return the allowAutomaticStart
+	 */
+	public boolean isAllowAutomaticStart() {
+		return allowAutomaticStart;
+	}
+
+	/**
+	 * @param allowAutomaticStart the allowAutomaticStart to set
+	 */
+	void setAllowAutomaticStart(boolean allowAutomaticStart) {
+		this.allowAutomaticStart = allowAutomaticStart;
+	}
+
+	/**
+	 * @return the allowAutomaticStop
+	 */
+	public boolean isAllowAutomaticStop() {
+		return allowAutomaticStop;
+	}
+
+	/**
+	 * @param allowAutomaticStop the allowAutomaticStop to set
+	 */
+	void setAllowAutomaticStop(boolean allowAutomaticStop) {
+		this.allowAutomaticStop = allowAutomaticStop;
+	}
+
+	/**
+	 * @return the collisionDetectEstablishedEnabledState
+	 */
+	public boolean isCollisionDetectEstablishedState() {
+		return collisionDetectEstablishedState;
+	}
+
+	/**
+	 * @param collisionDetectEstablishedEnabledState the collisionDetectEstablishedEnabledState to set
+	 */
+	void setCollisionDetectEstablishedState(
+			boolean collisionDetectEstablishedEnabledState) {
+		this.collisionDetectEstablishedState = collisionDetectEstablishedEnabledState;
+	}
+
+	/**
+	 * @return the dampPeerOscillation
+	 */
+	public boolean isDampPeerOscillation() {
+		return dampPeerOscillation;
+	}
+
+	/**
+	 * @param dampPeerOscillation the dampPeerOscillation to set
+	 */
+	void setDampPeerOscillation(boolean dampPeerOscillation) {
+		this.dampPeerOscillation = dampPeerOscillation;
+	}
+
+	/**
+	 * @return the delayOpen
+	 */
+	public boolean isDelayOpen() {
+		return delayOpen;
+	}
+
+	/**
+	 * @param delayOpen the delayOpen to set
+	 */
+	void setDelayOpen(boolean delayOpen) {
+		this.delayOpen = delayOpen;
+	}
+
+	/**
+	 * @return the passiveTcpEstablishment
+	 */
+	public boolean isPassiveTcpEstablishment() {
+		return passiveTcpEstablishment;
+	}
+
+	/**
+	 * @param passiveTcpEstablishment the passiveTcpEstablishment to set
+	 */
+	void setPassiveTcpEstablishment(boolean passiveTcpEstablishment) {
+		this.passiveTcpEstablishment = passiveTcpEstablishment;
+	}
+
+	/**
+	 * @return the delayOpenTime
+	 */
+	public int getDelayOpenTime() {
+		return delayOpenTime;
+	}
+
+	/**
+	 * @param delayOpenTime the delayOpenTime to set
+	 * @throws ConfigurationException 
+	 */
+	void setDelayOpenTime(int delayOpenTime) throws ConfigurationException {
+		if(delayOpenTime < 0)
+			throw new ConfigurationException("Illegal delay open time given: " + delayOpenTime);
+
+		this.delayOpenTime = delayOpenTime;
 	}
 
 }

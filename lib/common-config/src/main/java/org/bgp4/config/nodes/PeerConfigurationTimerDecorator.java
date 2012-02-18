@@ -17,67 +17,15 @@
  */
 package org.bgp4.config.nodes;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public abstract class PeerConfigurationTimerDecorator implements PeerConfiguration {
+public abstract class PeerConfigurationTimerDecorator extends PeerConfigurationDecorator {
 
-	private PeerConfiguration decorated;
-	
 	protected PeerConfigurationTimerDecorator(PeerConfiguration decorated) {
-		this.decorated = decorated;
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getClientConfig()
-	 */
-	public ClientConfiguration getClientConfig() {
-		return decorated.getClientConfig();
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getLocalAS()
-	 */
-	public int getLocalAS() {
-		return decorated.getLocalAS();
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getRemoteAS()
-	 */
-	public int getRemoteAS() {
-		return decorated.getRemoteAS();
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getPeerName()
-	 */
-	public String getPeerName() {
-		return decorated.getPeerName();
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getRemoteBgpIdentifier()
-	 */
-	public long getRemoteBgpIdentifier() {
-		return decorated.getRemoteBgpIdentifier();
-	}
-
-	/**
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getLocalBgpIdentifier()
-	 */
-	public long getLocalBgpIdentifier() {
-		return decorated.getLocalBgpIdentifier();
+		super(decorated);
 	}
 
 	/**
@@ -107,7 +55,7 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 		int retryInterval = decorated.getIdleHoldTime();
 		
 		if(retryInterval == 0)
-			retryInterval = getDefaultConnectRetryInterval();
+			retryInterval = getDefaultIdleHoldTime();
 		
 		return retryInterval;
 	}
@@ -116,45 +64,24 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	 * 
 	 * @return
 	 */
-	protected abstract int  getDefaultConnectRetryInterval();
-
-	/**
-	 * @param other
-	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#equals(java.lang.Object)
-	 */
-	public boolean equals(Object other) {
-		if(!(other instanceof PeerConfiguration))
-			return false;
-		
-		PeerConfiguration o = (PeerConfiguration)other;
-		
-		return (new EqualsBuilder())
-				.append(getClientConfig(), o.getClientConfig())
-				.append(getIdleHoldTime(), o.getIdleHoldTime())
-				.append(getHoldTime(), o.getHoldTime())
-				.append(getLocalAS(), o.getLocalAS())
-				.append(getLocalBgpIdentifier(), o.getLocalBgpIdentifier())
-				.append(getPeerName(), o.getPeerName())
-				.append(getRemoteAS(), o.getRemoteAS())
-				.append(getRemoteBgpIdentifier(), o.getRemoteBgpIdentifier())
-				.isEquals();
-	}
+	protected abstract int  getDefaultIdleHoldTime();
 
 	/**
 	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#hashCode()
+	 * @see org.bgp4.config.nodes.PeerConfiguration#getIdleHoldTime()
 	 */
-	public int hashCode() {
-		return (new HashCodeBuilder())
-				.append(getClientConfig())
-				.append(getIdleHoldTime())
-				.append(getHoldTime())
-				.append(getLocalAS())
-				.append(getLocalBgpIdentifier())
-				.append(getPeerName())
-				.append(getRemoteAS())
-				.append(getRemoteBgpIdentifier())
-				.toHashCode();
+	public int getDelayOpenTime() {
+		int retryInterval = decorated.getDelayOpenTime();
+		
+		if(retryInterval == 0)
+			retryInterval = getDefaultDelayOpenTime();
+		
+		return retryInterval;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected abstract int  getDefaultDelayOpenTime();
 }

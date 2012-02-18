@@ -42,8 +42,13 @@ public class FixedDefaultsPeerConfigurationTimerDecorator extends PeerConfigurat
 	 * @see org.bgp4.config.nodes.PeerConfigurationTimerDecorator#getDefaultConnectRetryInterval()
 	 */
 	@Override
-	protected int getDefaultConnectRetryInterval() {
+	protected int getDefaultIdleHoldTime() {
 		return 30;
+	}
+
+	@Override
+	protected int getDefaultDelayOpenTime() {
+		return 15;
 	}
 
 }

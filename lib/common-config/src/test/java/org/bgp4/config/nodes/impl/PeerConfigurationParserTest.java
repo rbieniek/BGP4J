@@ -109,7 +109,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 	}
 
 	@Test
-	public void testAcceptedConfigurationWithHoldTimerAndRetryInterval() throws Exception {
+	public void testAcceptedConfigurationWithHoldTimerAndRetryIntervalAndDelayOpen() throws Exception {
 		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(8)"));
 		
 		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
@@ -119,7 +119,37 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals("foo", peerConfig.getPeerName());
 		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
 		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
+		
 		Assert.assertEquals(30, peerConfig.getHoldTime());
-		Assert.assertEquals(300, peerConfig.getIdleHoldTime());		
+		Assert.assertEquals(300, peerConfig.getIdleHoldTime());
+		Assert.assertEquals(45, peerConfig.getDelayOpenTime());
+
+		Assert.assertTrue(peerConfig.isAllowAutomaticStart());
+		Assert.assertFalse(peerConfig.isAllowAutomaticStop());
+		Assert.assertFalse(peerConfig.isCollisionDetectEstablishedState());
+		Assert.assertFalse(peerConfig.isDampPeerOscillation());
+		Assert.assertFalse(peerConfig.isDelayOpen());
+		Assert.assertFalse(peerConfig.isPassiveTcpEstablishment());
 	}
+	
+	@Test
+	public void testAcceptedConfigurationWithOptions() throws Exception {
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(9)"));
+		
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(10, peerConfig.getLocalAS());
+		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo", peerConfig.getPeerName());
+		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
+
+		Assert.assertFalse(peerConfig.isAllowAutomaticStart());
+		Assert.assertTrue(peerConfig.isAllowAutomaticStop());
+		Assert.assertTrue(peerConfig.isCollisionDetectEstablishedState());
+		Assert.assertTrue(peerConfig.isDampPeerOscillation());
+		Assert.assertTrue(peerConfig.isDelayOpen());
+		Assert.assertTrue(peerConfig.isPassiveTcpEstablishment());
+	}
+	
 }

@@ -88,7 +88,15 @@ public class PeerConfigurationParser {
 
 		peerConfig.setHoldTime(config.getInt("Timers[@holdTime]", 0));
 		peerConfig.setIdleHoldTime(config.getInt("Timers[@idleHoldTime]", 0));
+		peerConfig.setDelayOpenTime(config.getInt("Timers[@delayOpenTime]", 0));
 		
+		peerConfig.setAllowAutomaticStart(config.getBoolean("Options[@allowAutomaticStart]", true));
+		peerConfig.setAllowAutomaticStop(config.getBoolean("Options[@allowAutomaticStop]", false));
+		peerConfig.setDampPeerOscillation(config.getBoolean("Options[@dampPeerOscillation]", false));
+		peerConfig.setCollisionDetectEstablishedState(config.getBoolean("Options[@collisionDetectEstablishedState]", false));
+		peerConfig.setDelayOpen(config.getBoolean("Options[@delayOpen]", false));
+		peerConfig.setPassiveTcpEstablishment(config.getBoolean("Options[@passiveTcpEstablishment]", false));
+
 		return peerConfig;
 	}
 	
