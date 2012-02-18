@@ -23,122 +23,49 @@ package org.bgp4j.netty;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class PeerConnectionInformation {
-	private int localAS;
-	private int remoteAS;
-	private long localBgpIdentifier;
-	private long remoteBgpIdentifier;
-	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
-	
-	public ASType getAsTypeInUse() {
-		return asTypeInUse;
-	}
-
-	public void setAsTypeInUse(ASType asType) {
-		this.asTypeInUse = asType;
-	}
+public interface PeerConnectionInformation {
+	public ASType getAsTypeInUse() ;
 
 	/**
 	 * 
 	 * @return
 	 */
-	public int getLocalAS() {
-		return localAS;
-	}
-	
-	/**
-	 * 
-	 * @param localAS
-	 */
-	public void setLocalAS(int localAS) {
-		this.localAS = localAS;
-	}
+	public int getLocalAS();
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public int getRemoteAS() {
-		return remoteAS;
-	}
+	public int getRemoteAS();
 	
-	/**
-	 * 
-	 * @param remoteAS
-	 */
-	public void setRemoteAS(int remoteAS) {
-		this.remoteAS = remoteAS;
-	}
-
 	/**
 	 * Test if the connection describes an IBGP connection (peers in the same AS)
 	 * 
 	 * @return <code>true</code> if IBGP connection, <code>false</code> otherwise
 	 */
-	public boolean isIBGPConnection() {
-		return (getRemoteAS() == getLocalAS());
-	}
+	public boolean isIBGPConnection();
 
 	/**
 	 * Test if the connection describes an EBGP connection (peers in the same AS)
 	 * 
 	 * @return <code>true</code> if EBGP connection, <code>false</code> otherwise
 	 */
-	public boolean isEBGPConnection() {
-		return (getRemoteAS() != getLocalAS());
-	}
+	public boolean isEBGPConnection();
 	
 	/**
 	 * Test if this connection uses 4 octet AS numbers
 	 * 
 	 * @return
 	 */
-	public boolean isAS4OctetsInUse() {
-		return (this.asTypeInUse == ASType.AS_NUMBER_4OCTETS);
-	}
+	public boolean isAS4OctetsInUse();
 
 	/**
 	 * @return the localBgpIdentifier
 	 */
-	public long getLocalBgpIdentifier() {
-		return localBgpIdentifier;
-	}
-
-	/**
-	 * @param localBgpIdentifier the localBgpIdentifier to set
-	 */
-	public void setLocalBgpIdentifier(long localBgpIdentifier) {
-		this.localBgpIdentifier = localBgpIdentifier;
-	}
+	public long getLocalBgpIdentifier();
 
 	/**
 	 * @return the remoteBgpIdentifier
 	 */
-	public long getRemoteBgpIdentifier() {
-		return remoteBgpIdentifier;
-	}
-
-	/**
-	 * @param remoteBgpIdentifier the remoteBgpIdentifier to set
-	 */
-	public void setRemoteBgpIdentifier(long remoteBgpIdentifier) {
-		this.remoteBgpIdentifier = remoteBgpIdentifier;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PeerConnectionInformation [localAS=").append(localAS)
-				.append(", remoteAS=").append(remoteAS)
-				.append(", localBgpIdentifier=").append(localBgpIdentifier)
-				.append(", remoteBgpIdentifier=").append(remoteBgpIdentifier)
-				.append(", ");
-		if (asTypeInUse != null)
-			builder.append("asTypeInUse=").append(asTypeInUse);
-		builder.append("]");
-		return builder.toString();
-	}
+	public long getRemoteBgpIdentifier();
 }

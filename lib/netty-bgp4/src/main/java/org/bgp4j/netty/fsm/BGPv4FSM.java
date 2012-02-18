@@ -37,20 +37,99 @@ import org.slf4j.Logger;
  */
 public class BGPv4FSM {
 
+	public class PeerConnectionInformationImpl implements PeerConnectionInformation {
+		
+		public ASType getAsTypeInUse() {
+			return asTypeInUse;
+		}
+
+		/**
+		 * 
+		 * @return
+		 */
+		public int getLocalAS() {
+			return peerConfig.getLocalAS();
+		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		public int getRemoteAS() {
+			return peerConfig.getRemoteAS();
+		}
+		
+		/**
+		 * Test if the connection describes an IBGP connection (peers in the same AS)
+		 * 
+		 * @return <code>true</code> if IBGP connection, <code>false</code> otherwise
+		 */
+		public boolean isIBGPConnection() {
+			return (getRemoteAS() == getLocalAS());
+		}
+
+		/**
+		 * Test if the connection describes an EBGP connection (peers in the same AS)
+		 * 
+		 * @return <code>true</code> if EBGP connection, <code>false</code> otherwise
+		 */
+		public boolean isEBGPConnection() {
+			return (getRemoteAS() != getLocalAS());
+		}
+		
+		/**
+		 * Test if this connection uses 4 octet AS numbers
+		 * 
+		 * @return
+		 */
+		public boolean isAS4OctetsInUse() {
+			return (asTypeInUse == ASType.AS_NUMBER_4OCTETS);
+		}
+
+		/**
+		 * @return the localBgpIdentifier
+		 */
+		public long getLocalBgpIdentifier() {
+			return peerConfig.getLocalBgpIdentifier();
+		}
+
+		/**
+		 * @return the remoteBgpIdentifier
+		 */
+		public long getRemoteBgpIdentifier() {
+			return peerConfig.getRemoteBgpIdentifier();
+		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("PeerConnectionInformation [localAS=").append(getLocalAS())
+					.append(", remoteAS=").append(getRemoteAS())
+					.append(", localBgpIdentifier=").append(getLocalBgpIdentifier())
+					.append(", remoteBgpIdentifier=").append(getRemoteBgpIdentifier())
+					.append(", ");
+			if (getAsTypeInUse() != null)
+				builder.append("asTypeInUse=").append(getAsTypeInUse());
+			builder.append("]");
+			return builder.toString();
+		}
+	}
+	
 	private @Inject Logger log;
 	
 	private InetAddress remotePeerAddress;
-	private PeerConnectionInformation pci = new PeerConnectionInformation();
 	private @Inject @New Instance<BGPv4Client> clientProvider;
+	
+	private PeerConfiguration peerConfig;
+	private FSMState fsmState;
+	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
 	
 	public void configure(PeerConfiguration peerConfig) {
 		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
-
-		pci.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS); // default value, subject to negotiation
-		pci.setLocalAS(peerConfig.getLocalAS());
-		pci.setLocalBgpIdentifier(peerConfig.getLocalBgpIdentifier());
-		pci.setRemoteAS(peerConfig.getRemoteAS());
-		pci.setRemoteBgpIdentifier(peerConfig.getRemoteBgpIdentifier());
+		this.peerConfig = peerConfig;
 	}
 
 	public InetAddress getRemotePeerAddress() {
@@ -58,7 +137,7 @@ public class BGPv4FSM {
 	}
 
 	public PeerConnectionInformation getPeerConnectionInformation() {
-		return pci;
+		return new PeerConnectionInformationImpl();
 	}
 	
 	public void startFSM() {
@@ -103,6 +182,13 @@ public class BGPv4FSM {
 	public void handleServerDisconnected() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/**
+	 * @return the fsmState
+	 */
+	public FSMState getFsmState() {
+		return fsmState;
 	}
 
 }

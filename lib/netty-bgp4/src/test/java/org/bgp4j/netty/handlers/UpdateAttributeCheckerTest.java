@@ -27,6 +27,7 @@ import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockChannel;
 import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
+import org.bgp4j.netty.MockPeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.AggregatorPathAttribute;
@@ -63,7 +64,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 				channelHandler });
 		channel = new MockChannel(pipeline, sink);
 		
-		peerInfo = new PeerConnectionInformation();
+		peerInfo = new MockPeerConnectionInformation();
 
 		// attach the context object to the channel handler
 		channel.getPipeline().getContext(checker).setAttachment(peerInfo);
@@ -82,7 +83,7 @@ public class UpdateAttributeCheckerTest extends BGPv4TestBase {
 	private MockChannelSink sink;
 	private ChannelPipeline pipeline;
 	private MockChannel channel;
-	private PeerConnectionInformation peerInfo;
+	private MockPeerConnectionInformation peerInfo;
 	
 	@Test
 	public void testPassAllRequiredAttributes2OctetsASIBGPConnection() throws Exception {

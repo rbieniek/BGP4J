@@ -24,6 +24,7 @@ import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockChannel;
 import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
+import org.bgp4j.netty.MockPeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
@@ -52,7 +53,7 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 				channelHandler });
 		channel = new MockChannel(pipeline, sink);
 		
-		peerInfo = new PeerConnectionInformation();
+		peerInfo = new MockPeerConnectionInformation();
 
 		// attach the context object to the channel handler
 		channel.getPipeline().getContext(checker).setAttachment(peerInfo);
