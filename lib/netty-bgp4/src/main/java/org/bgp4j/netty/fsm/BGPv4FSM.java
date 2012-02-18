@@ -71,7 +71,7 @@ public class BGPv4FSM {
 		
 	}
 
-	public void handleMessage(Channel channel, BGPv4Packet message) {
+	public void handleClientMessage(Channel channel, BGPv4Packet message) {
 		log.info("received message " + message);
 	}
 
@@ -86,6 +86,21 @@ public class BGPv4FSM {
 	}
 
 	public void handleClientDisconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleServerMessage(Channel channel, BGPv4Packet message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleServerOpened() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void handleServerDisconnected() {
 		// TODO Auto-generated method stub
 		
 	}

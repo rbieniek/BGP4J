@@ -30,7 +30,7 @@ import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.ChildChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.slf4j.Logger;
@@ -43,8 +43,8 @@ import org.slf4j.Logger;
  *
  */
 @Singleton
-public class BGPv4ClientEndpoint extends SimpleChannelHandler {
-	public static final String HANDLER_NAME ="BGP4-ClientEndpoint";
+public class BGPv4ServerEndpoint extends SimpleChannelHandler {
+	public static final String HANDLER_NAME ="BGP4-ServerEndpoint";
 
 	private @Inject Logger log;
 	private @Inject FSMRegistry fsmRegistry;
@@ -64,7 +64,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 			ctx.getChannel().close();
 		} else {
 			if(e.getMessage() instanceof BGPv4Packet) {
-				fsm.handleClientMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
+				fsm.handleServerMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
 			} else {
 				log.error("unknown payload class " + e.getMessage().getClass().getName() + " received for peer " + remotePeer);
 			}
@@ -75,9 +75,8 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelConnected(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
 	 */
 	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
+	public void childChannelOpen(ChannelHandlerContext ctx, ChildChannelStateEvent e) throws Exception {
+		InetAddress addr = ((InetSocketAddress)e.getChildChannel().getRemoteAddress()).getAddress();
 		
 		log.info("connected to client " + addr);
 		
@@ -101,7 +100,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 				}
 			}
 			
-			fsm.handleClientConnected();
+			fsm.handleServerOpened();
 		}
 	}
 
@@ -109,9 +108,8 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelConnected(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
 	 */
 	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
+	public void childChannelClosed(ChannelHandlerContext ctx, ChildChannelStateEvent e) throws Exception {
+		InetAddress addr = ((InetSocketAddress)e.getChildChannel().getRemoteAddress()).getAddress();
 		
 		log.info("disconnected from client " + addr);
 		
@@ -123,26 +121,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 			ctx.getChannel().close();
 		} else {
 			
-			fsm.handleClientDisconnected();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelClosed(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
-	 */
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
-		
-		log.info("connected to client " + addr);
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
-		
-		if(fsm == null) {
-			log.error("Internal Error: client for address " + addr + " is unknown");
-		} else {
-			fsm.handleClientClosed();
+			fsm.handleServerDisconnected();
 		}
 	}
 }
