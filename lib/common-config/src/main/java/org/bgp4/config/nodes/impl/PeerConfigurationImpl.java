@@ -37,7 +37,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private long localBgpIdentifier;
 	private long remoteBgpIdentifier; 
 	private int holdTime;
-	private int connectRetryInterval;
+	private int idleHoldTime;
 	
 	public PeerConfigurationImpl() {
 		
@@ -67,7 +67,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier);
 
 		setHoldTime(holdTime);
-		setConnectRetryInterval(connectRetryInterval);
+		setIdleHoldTime(connectRetryInterval);
 	}
 
 	@Override
@@ -191,18 +191,18 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	/**
 	 * @return the connectRetryInterval
 	 */
-	public int getConnectRetryInterval() {
-		return connectRetryInterval;
+	public int getIdleHoldTime() {
+		return idleHoldTime;
 	}
 
 	/**
 	 * @param connectRetryInterval the connectRetryInterval to set
 	 */
-	void setConnectRetryInterval(int connectRetryInterval)  throws ConfigurationException {
+	void setIdleHoldTime(int connectRetryInterval)  throws ConfigurationException {
 		if(connectRetryInterval < 0)
 			throw new ConfigurationException("Illegal connect retry interval given: " + connectRetryInterval);
 		
-		this.connectRetryInterval = connectRetryInterval;
+		this.idleHoldTime = connectRetryInterval;
 	}
 
 	/* (non-Javadoc)
@@ -212,7 +212,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	public int hashCode() {
 		return (new HashCodeBuilder())
 				.append(clientConfig)
-				.append(connectRetryInterval)
+				.append(idleHoldTime)
 				.append(holdTime)
 				.append(localAS)
 				.append(localBgpIdentifier)
@@ -235,7 +235,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 		
 		return (new EqualsBuilder())
 				.append(clientConfig, o.clientConfig)
-				.append(connectRetryInterval, o.connectRetryInterval)
+				.append(idleHoldTime, o.idleHoldTime)
 				.append(holdTime, o.holdTime)
 				.append(localAS, o.localAS)
 				.append(localBgpIdentifier, o.localBgpIdentifier)

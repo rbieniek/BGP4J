@@ -86,5 +86,5 @@ public interface PeerConfiguration {
 	 * 
 	 * @return
 	 */
-	public int getConnectRetryInterval();
+	public int getIdleHoldTime();
 }

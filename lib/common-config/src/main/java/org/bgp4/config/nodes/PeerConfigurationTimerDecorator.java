@@ -101,10 +101,10 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	
 	/**
 	 * @return
-	 * @see org.bgp4.config.nodes.PeerConfiguration#getConnectRetryInterval()
+	 * @see org.bgp4.config.nodes.PeerConfiguration#getIdleHoldTime()
 	 */
-	public int getConnectRetryInterval() {
-		int retryInterval = decorated.getConnectRetryInterval();
+	public int getIdleHoldTime() {
+		int retryInterval = decorated.getIdleHoldTime();
 		
 		if(retryInterval == 0)
 			retryInterval = getDefaultConnectRetryInterval();
@@ -131,7 +131,7 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 		
 		return (new EqualsBuilder())
 				.append(getClientConfig(), o.getClientConfig())
-				.append(getConnectRetryInterval(), o.getConnectRetryInterval())
+				.append(getIdleHoldTime(), o.getIdleHoldTime())
 				.append(getHoldTime(), o.getHoldTime())
 				.append(getLocalAS(), o.getLocalAS())
 				.append(getLocalBgpIdentifier(), o.getLocalBgpIdentifier())
@@ -148,7 +148,7 @@ public abstract class PeerConfigurationTimerDecorator implements PeerConfigurati
 	public int hashCode() {
 		return (new HashCodeBuilder())
 				.append(getClientConfig())
-				.append(getConnectRetryInterval())
+				.append(getIdleHoldTime())
 				.append(getHoldTime())
 				.append(getLocalAS())
 				.append(getLocalBgpIdentifier())

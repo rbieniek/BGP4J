@@ -18,8 +18,8 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		
 		Assert.assertEquals(0, decorated.getHoldTime());
 		Assert.assertEquals(120, decorator.getHoldTime());
-		Assert.assertEquals(0, decorated.getConnectRetryInterval());
-		Assert.assertEquals(30, decorator.getConnectRetryInterval());
+		Assert.assertEquals(0, decorated.getIdleHoldTime());
+		Assert.assertEquals(30, decorator.getIdleHoldTime());
 	}
 	
 	@Test
@@ -28,12 +28,12 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		PeerConfigurationTimerDecorator decorator = new FixedDefaultsPeerConfigurationTimerDecorator(decorated);
 		
 		decorated.setHoldTime(45);
-		decorated.setConnectRetryInterval(300);
+		decorated.setIdleHoldTime(300);
 		
 		Assert.assertEquals(45, decorated.getHoldTime());
 		Assert.assertEquals(45, decorator.getHoldTime());
-		Assert.assertEquals(300, decorated.getConnectRetryInterval());
-		Assert.assertEquals(300, decorator.getConnectRetryInterval());
+		Assert.assertEquals(300, decorated.getIdleHoldTime());
+		Assert.assertEquals(300, decorator.getIdleHoldTime());
 	}
 	
 	@Test

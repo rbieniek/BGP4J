@@ -62,7 +62,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
 		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
 		Assert.assertEquals(0, peerConfig.getHoldTime());
-		Assert.assertEquals(0, peerConfig.getConnectRetryInterval());		
+		Assert.assertEquals(0, peerConfig.getIdleHoldTime());		
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -120,6 +120,6 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
 		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
 		Assert.assertEquals(30, peerConfig.getHoldTime());
-		Assert.assertEquals(300, peerConfig.getConnectRetryInterval());		
+		Assert.assertEquals(300, peerConfig.getIdleHoldTime());		
 	}
 }

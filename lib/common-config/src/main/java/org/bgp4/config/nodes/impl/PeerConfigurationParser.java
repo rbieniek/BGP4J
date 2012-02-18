@@ -87,7 +87,7 @@ public class PeerConfigurationParser {
 		}
 
 		peerConfig.setHoldTime(config.getInt("Timers[@holdTime]", 0));
-		peerConfig.setConnectRetryInterval(config.getInt("Timers[@connectRetryInterval]", 0));
+		peerConfig.setIdleHoldTime(config.getInt("Timers[@idleHoldTime]", 0));
 		
 		return peerConfig;
 	}

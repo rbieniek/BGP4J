@@ -61,6 +61,6 @@
         <Client remote="192.168.4.1" />
         <AutonomousSystem local="10" remote="11" />
         <BgpIdentifier local="200" remote="300" />
-        <Timers holdTime="30" connectRetryInterval="300" />
+        <Timers holdTime="30" idleHoldTime="300" />
     </BgpPeer>
 </Config>
