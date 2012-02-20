@@ -41,7 +41,7 @@ public class SeApplicationBootstrap {
 
     static class ShutdownHook extends Thread {
         private final Weld weld;
-
+        
         ShutdownHook(Weld weld) {
             this.weld = weld;
         }

@@ -86,21 +86,27 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 			log.error("Internal Error: client for address " + addr + " is unknown");
 			
 			ctx.getChannel().close();
-		} else {
+		} else if(fsm.isCanAcceptConnection()) {
 			ChannelPipeline pipeline = ctx.getPipeline();
 			PeerConnectionInformation pci = fsm.getPeerConnectionInformation();
-			
-			for(String handlerName : pipeline.getNames()) {
+
+			for (String handlerName : pipeline.getNames()) {
 				ChannelHandler handler = pipeline.get(handlerName);
 
-				if(handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
-					log.info("attaching peer connection information " + pci + " to handler " + handlerName + " for client " + addr);
-					
+				if (handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
+					log.info("attaching peer connection information " + pci
+							+ " to handler " + handlerName + " for client "
+							+ addr);
+
 					pipeline.getContext(handlerName).setAttachment(pci);
 				}
 			}
+
+			fsm.handleServerOpened(ctx.getChannel());
+		} else {
+			log.info("Connection from client " + addr + " cannot be accepted");
 			
-			fsm.handleServerOpened();
+			ctx.getChannel().close();			
 		}
 	}
 

@@ -12,21 +12,21 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.fsm.FSMState.java 
+ *  
  */
-package org.bgp4j.netty.fsm;
+package org.bgp4j.weld;
+
+import java.io.Serializable;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public enum FSMState {
-	Stopped,
-	Idle,
-	Connect,
-	Active,
-	OpenSent,
-	OpenConfirm,
-	Established;
+public class ApplicationShutdownEvent implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4817298678737234951L;
+
 }

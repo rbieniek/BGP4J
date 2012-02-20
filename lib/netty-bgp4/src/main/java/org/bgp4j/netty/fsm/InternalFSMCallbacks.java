@@ -13,20 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.fsm.FSMState.java 
+ * File: org.bgp4j.netty.fsm.InternalFSMCallbacks.java 
  */
 package org.bgp4j.netty.fsm;
 
 /**
+ * Callback interface used for triggering actions from the internal state machine to
+ * the connection management and messagng code
+ * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public enum FSMState {
-	Stopped,
-	Idle,
-	Connect,
-	Active,
-	OpenSent,
-	OpenConfirm,
-	Established;
+public interface InternalFSMCallbacks {
+
+	/**
+	 * The remote connection to the remote peer shall be initiated
+	 */
+	void fireConnectRemotePeer();
 }

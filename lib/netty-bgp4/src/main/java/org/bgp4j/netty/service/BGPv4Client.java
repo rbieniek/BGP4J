@@ -27,6 +27,7 @@ import org.bgp4j.netty.handlers.ValidateServerIdentifier;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -49,7 +50,7 @@ public class BGPv4Client {
 	
 	private Channel clientChannel;
 
-	void startClient(PeerConfiguration peerConfiguration) {
+	public ChannelFuture startClient(PeerConfiguration peerConfiguration) {
 		ClientBootstrap bootstrap = new ClientBootstrap(channelFactory);
 
 		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
@@ -71,13 +72,23 @@ public class BGPv4Client {
 		bootstrap.setOption("tcpnoDelay", true);
 		bootstrap.setOption("keepAlive", true);
 		
-		bootstrap.connect(peerConfiguration.getClientConfig().getRemoteAddress());
+		log.info("connecting remote peer " + peerConfiguration.getPeerName() 
+				+ " with address " + peerConfiguration.getClientConfig().getRemoteAddress());
+		
+		return bootstrap.connect(peerConfiguration.getClientConfig().getRemoteAddress());
 	}
 
-	void stopClient() {
+	public void stopClient() {
 		if(clientChannel != null) {
 			clientChannel.close();
 			this.clientChannel = null;
 		}
+	}
+
+	/**
+	 * @return the clientChannel
+	 */
+	public Channel getClientChannel() {
+		return clientChannel;
 	}
 }

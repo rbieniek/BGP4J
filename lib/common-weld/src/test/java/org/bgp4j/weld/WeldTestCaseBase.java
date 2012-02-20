@@ -45,6 +45,7 @@ public class WeldTestCaseBase {
 	
 	@AfterClass
 	public static void teardownWeldContainer() {
+		weldContainer.event().select(ApplicationShutdownEvent.class).fire(new ApplicationShutdownEvent());
 		weld.shutdown();
 	}
 	

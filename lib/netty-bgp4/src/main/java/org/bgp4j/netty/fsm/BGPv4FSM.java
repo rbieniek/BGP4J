@@ -37,7 +37,13 @@ import org.slf4j.Logger;
  */
 public class BGPv4FSM {
 
-	public class PeerConnectionInformationImpl implements PeerConnectionInformation {
+	/**
+	 * Internal proxy class to expose the peer connection information to interested handlers
+	 * 
+	 * @author Rainer Bieniek (Rainer.Bieniek@web.de)
+	 *
+	 */
+	private class PeerConnectionInformationImpl implements PeerConnectionInformation {
 		
 		public ASType getAsTypeInUse() {
 			return asTypeInUse;
@@ -118,18 +124,40 @@ public class BGPv4FSM {
 		}
 	}
 	
+	/**
+	 * Internal class to bind callbacks from the internal state machine to concrete actions 
+	 * 
+	 * @author Rainer Bieniek (Rainer.Bieniek@web.de)
+	 *
+	 */
+	private class InternalFSMCallbacksImpl implements InternalFSMCallbacks {
+
+		@Override
+		public void fireConnectRemotePeer() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
 	private @Inject Logger log;
 	
 	private InetAddress remotePeerAddress;
 	private @Inject @New Instance<BGPv4Client> clientProvider;
 	
 	private PeerConfiguration peerConfig;
-	private FSMState fsmState;
 	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
+
+	private Channel peerChannel;
+	private BGPv4Client peerClient;
+	
+	private @Inject InternalFSM internalFsm;
 	
 	public void configure(PeerConfiguration peerConfig) {
 		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
 		this.peerConfig = peerConfig;
+		
+		internalFsm.setup(peerConfig, new InternalFSMCallbacksImpl());
 	}
 
 	public InetAddress getRemotePeerAddress() {
@@ -140,11 +168,39 @@ public class BGPv4FSM {
 		return new PeerConnectionInformationImpl();
 	}
 	
-	public void startFSM() {
-		// TODO Auto-generated method stub
-		
+	public void startFSMAutomatic() {
+//		if(peerConfig.isAllowAutomaticStart()) {
+//			FSMEvent event = FSMEvent.AutomaticStart;
+//			
+//			if(peerConfig.isDampPeerOscillation()) {
+//				if(peerConfig.isPassiveTcpEstablishment())
+//					event = FSMEvent.AutomaticStart_with_DampPeerOscillations_and_PassiveTcpEstablishment;
+//				else
+//					event = FSMEvent.AutomaticStart_with_DampPeerOscillations;
+//			} else if(peerConfig.isPassiveTcpEstablishment()) {
+//				event = FSMEvent.AutomaticStart_with_PassiveTcpEstablishment;
+//			}
+//			
+//			internalFsm.handleEvent(event);
+//		}
+		internalFsm.handleEvent(FSMEvent.AutomaticStart);
 	}
 
+	public void startFSMManual() {
+//		FSMEvent event = FSMEvent.ManualStart;
+//		
+//		if(peerConfig.isPassiveTcpEstablishment()) {
+//			event = FSMEvent.ManualStart_with_PassiveTcpEstablishment;
+//		}
+//		
+//		internalFsm.handleEvent(event);		
+		internalFsm.handleEvent(FSMEvent.ManualStart);
+	}
+
+	public void stopFSM() {
+		
+	}
+	
 	public void destroyFSM() {
 		// TODO Auto-generated method stub
 		
@@ -174,7 +230,7 @@ public class BGPv4FSM {
 		
 	}
 
-	public void handleServerOpened() {
+	public void handleServerOpened(Channel channel) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -184,11 +240,7 @@ public class BGPv4FSM {
 		
 	}
 
-	/**
-	 * @return the fsmState
-	 */
-	public FSMState getFsmState() {
-		return fsmState;
+	public boolean isCanAcceptConnection() {
+		return internalFsm.isCanAcceptConnection();
 	}
-
 }

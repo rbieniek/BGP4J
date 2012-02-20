@@ -26,6 +26,10 @@ public enum FSMEvent {
 	ManualStart,
 	ManualStop,
 	AutomaticStart,
+//	ManualStart_with_PassiveTcpEstablishment,
+//	AutomaticStart_with_PassiveTcpEstablishment,
+//	AutomaticStart_with_DampPeerOscillations,
+//	AutomaticStart_with_DampPeerOscillations_and_PassiveTcpEstablishment,
 	AutomaticStop,
 	
 	// Timer events

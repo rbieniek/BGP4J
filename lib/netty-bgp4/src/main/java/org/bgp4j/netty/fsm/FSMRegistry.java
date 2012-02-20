@@ -53,7 +53,8 @@ public class FSMRegistry {
 			
 			fsm.configure(peerConfig);
 			fsmMap.put(fsm.getRemotePeerAddress(), fsm);
-			fsm.startFSM();
+			
+			fsm.startFSMAutomatic();
 		}
 	}
 	
@@ -65,7 +66,7 @@ public class FSMRegistry {
 	
 	public void destroyRegistry() {
 		for(InetAddress addr : fsmMap.keySet())
-			fsmMap.get(addr).destroyFSM();
+			fsmMap.get(addr).stopFSM();
 		
 		fsmMap.clear();
 	}
