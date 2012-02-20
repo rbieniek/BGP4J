@@ -84,4 +84,23 @@ public abstract class PeerConfigurationTimerDecorator extends PeerConfigurationD
 	 * @return
 	 */
 	protected abstract int  getDefaultDelayOpenTime();
+
+	/* (non-Javadoc)
+	 * @see org.bgp4.config.nodes.PeerConfigurationDecorator#getConnectRetryTime()
+	 */
+	@Override
+	public int getConnectRetryTime() {
+		int connectRetryTime = decorated.getConnectRetryTime();
+		
+		if(connectRetryTime == 0)
+			connectRetryTime = getDefaultConnectRetryTime();
+		
+		return connectRetryTime;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected abstract int getDefaultConnectRetryTime();
 }

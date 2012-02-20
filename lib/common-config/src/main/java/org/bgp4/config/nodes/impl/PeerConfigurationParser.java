@@ -89,6 +89,7 @@ public class PeerConfigurationParser {
 		peerConfig.setHoldTime(config.getInt("Timers[@holdTime]", 0));
 		peerConfig.setIdleHoldTime(config.getInt("Timers[@idleHoldTime]", 0));
 		peerConfig.setDelayOpenTime(config.getInt("Timers[@delayOpenTime]", 0));
+		peerConfig.setConnectRetryTime(config.getInt("Timers[@connectRetryTime]", 0));
 		
 		peerConfig.setAllowAutomaticStart(config.getBoolean("Options[@allowAutomaticStart]", true));
 		peerConfig.setAllowAutomaticStop(config.getBoolean("Options[@allowAutomaticStop]", false));

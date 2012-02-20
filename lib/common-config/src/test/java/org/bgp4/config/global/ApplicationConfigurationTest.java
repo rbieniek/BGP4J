@@ -149,8 +149,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80401L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
 		applicationConfig.putPeer(peer);
@@ -173,8 +174,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80401L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
 		applicationConfig.putPeer(peer);
@@ -194,8 +196,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80601L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 
 		applicationConfig.putPeer(peer);
 		Assert.assertEquals(1, applicationConfig.listPeerConfigurations().size());
@@ -217,8 +220,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80401L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
 		applicationConfig.putPeer(peer);
@@ -237,8 +241,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80601L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 
 		applicationConfig.putPeer(otherPeer);
 		Assert.assertEquals(2, applicationConfig.listPeerConfigurations().size());
@@ -260,8 +265,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80401L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
 		applicationConfig.putPeer(peer);
@@ -295,8 +301,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80401L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
 		applicationConfig.putPeer(peer);
@@ -315,8 +322,9 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				11, // remote AS
 				0xc0a80301L, // local BGP identifier
 				0xc0a80601L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30); // connect retry interval
+				30); // idle hold time
 
 		applicationConfig.putPeer(otherPeer);
 		Assert.assertEquals(2, applicationConfig.listPeerConfigurations().size());

@@ -92,6 +92,12 @@ public interface PeerConfiguration {
 	 * 
 	 * @return
 	 */
+	public int getConnectRetryTime();
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean isAllowAutomaticStart();
 	
 	/**

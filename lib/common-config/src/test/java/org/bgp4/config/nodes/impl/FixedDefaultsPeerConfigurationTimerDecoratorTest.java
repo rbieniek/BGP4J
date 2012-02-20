@@ -44,94 +44,111 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 	
 	@Test
 	public void testEquals() throws Exception {
-		PeerConfiguration c1 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration cp1 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c2 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp2 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c3 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("bar", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp3 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				61, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c4 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c5 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24577, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c6 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32769, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c7 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80402L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c8 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80502L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c9 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp4 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				301, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c10 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp5 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				31)); // connect retry interval
-		PeerConfiguration c11 = new PeerConfigurationImpl("foo", // peer name 
+				31, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp6 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30, // connect retry interval
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				16, // delay open time
+				false)); 
+		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				false, // damp peer oscillation
@@ -139,109 +156,214 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				15, // delay open time
 				false); 
+		PeerConfiguration cd2 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd3 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				61, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd4 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				301, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd5 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				31, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd6 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				16, // delay open time
+				false); 
 		
-		Assert.assertTrue(c1.equals(c2));
-		Assert.assertTrue(c1.equals(c11));
-		Assert.assertFalse(c1.equals(c3));
-		Assert.assertFalse(c1.equals(c4));
-		Assert.assertFalse(c1.equals(c5));
-		Assert.assertFalse(c1.equals(c6));
-		Assert.assertFalse(c1.equals(c7));
-		Assert.assertFalse(c1.equals(c8));
-		Assert.assertFalse(c1.equals(c9));
-		Assert.assertFalse(c1.equals(c10));
+		Assert.assertTrue(cp1.equals(cp2));
+		Assert.assertTrue(cd1.equals(cd2));
+		Assert.assertTrue(cp1.equals(cd1));
+		Assert.assertTrue(cp2.equals(cd2));
+		Assert.assertTrue(cp3.equals(cd3));
+		Assert.assertTrue(cp4.equals(cd4));
+		Assert.assertTrue(cp5.equals(cd5));
+		Assert.assertTrue(cp6.equals(cd6));
+
+		Assert.assertFalse(cp1.equals(cp3));
+		Assert.assertFalse(cp1.equals(cp4));
+		Assert.assertFalse(cp1.equals(cp5));
+		Assert.assertFalse(cp1.equals(cp6));
+
+		Assert.assertFalse(cd1.equals(cd3));
+		Assert.assertFalse(cd1.equals(cd4));
+		Assert.assertFalse(cd1.equals(cd5));
+		Assert.assertFalse(cd1.equals(cd6));
 	}
 
 	@Test
 	public void testHashCode() throws Exception {
-		PeerConfiguration c1 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration cp1 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c2 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp2 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c3 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("bar", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp3 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				61, // connect retry time
 				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c4 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.5.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c5 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24577, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c6 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32769, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c7 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80402L, // local BGP identitifer
-				0xc0a80501L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c8 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
-				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
-				24576, // local AS
-				32768, // remote AS
-				0xc0a80401L, // local BGP identitifer
-				0xc0a80502L, // remote BGP identifier
-				300, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c9 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp4 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				301, // hold time
-				30)); // connect retry interval
-		PeerConfiguration c10 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp5 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				31)); // connect retry interval
-		PeerConfiguration c11 = new PeerConfigurationImpl("foo", // peer name 
+				31, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp6 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
 				0xc0a80401L, // local BGP identitifer
 				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
 				300, // hold time
-				30, // connect retry interval
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				16, // delay open time
+				false)); 
+		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				false, // damp peer oscillation
@@ -249,17 +371,104 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				15, // delay open time
 				false); 
+		PeerConfiguration cd2 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd3 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				61, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd4 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				301, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd5 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				31, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd6 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				16, // delay open time
+				false); 
 		
-		Assert.assertEquals(c1.hashCode(), c2.hashCode());
-		Assert.assertEquals(c1.hashCode(), c11.hashCode());
-		Assert.assertFalse(c1.hashCode() == c3.hashCode());
-		Assert.assertFalse(c1.hashCode() == c4.hashCode());
-		Assert.assertFalse(c1.hashCode() == c5.hashCode());
-		Assert.assertFalse(c1.hashCode() == c6.hashCode());
-		Assert.assertFalse(c1.hashCode() == c7.hashCode());
-		Assert.assertFalse(c1.hashCode() == c8.hashCode());
-		Assert.assertFalse(c1.hashCode() == c9.hashCode());
-		Assert.assertFalse(c1.hashCode() == c10.hashCode());
+		Assert.assertEquals(cp1.hashCode(), cp2.hashCode());
+		Assert.assertEquals(cd1.hashCode(), cd2.hashCode());
+		Assert.assertEquals(cp1.hashCode(), cd1.hashCode());
+		Assert.assertEquals(cp2.hashCode(), cd2.hashCode());
+		Assert.assertEquals(cp3.hashCode(), cd3.hashCode());
+		Assert.assertEquals(cp4.hashCode(), cd4.hashCode());
+		Assert.assertEquals(cp5.hashCode(), cd5.hashCode());
+		Assert.assertEquals(cp6.hashCode(), cd6.hashCode());
+		
+		Assert.assertFalse(cp1.hashCode() == cp3.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cp4.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cp5.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cp6.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd3.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd4.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd5.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd6.hashCode());
 	}
 
 }

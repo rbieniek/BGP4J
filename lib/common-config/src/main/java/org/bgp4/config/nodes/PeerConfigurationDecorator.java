@@ -179,6 +179,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 				.append(isDampPeerOscillation(), o.isDampPeerOscillation())
 				.append(isDelayOpen(), o.isDelayOpen())
 				.append(isPassiveTcpEstablishment(), o.isPassiveTcpEstablishment())
+				.append(getConnectRetryTime(), o.getConnectRetryTime())
 				.isEquals();
 	}
 
@@ -187,22 +188,51 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 	 * @see org.bgp4.config.nodes.PeerConfiguration#hashCode()
 	 */
 	public int hashCode() {
+		/*
 		return (new HashCodeBuilder())
+				.append(allowAutomaticStart)
+				.append(allowAutomaticStop)
+				.append(clientConfig)
+				.append(collisionDetectEstablishedState)
+				.append(dampPeerOscillation)
+				.append(connectRetryTime)
+				.append(delayOpen)
+				.append(delayOpenTime)
+				.append(holdTime)
+				.append(idleHoldTime)
+				.append(localAS)
+				.append(localBgpIdentifier)
+				.append(passiveTcpEstablishment)
+				.append(peerName)
+				.append(remoteAS)
+				.append(remoteBgpIdentifier)
+				.toHashCode();
+		 */
+		return (new HashCodeBuilder())
+				.append(isAllowAutomaticStart())
+				.append(isAllowAutomaticStop())
 				.append(getClientConfig())
-				.append(getIdleHoldTime())
-				.append(getHoldTime())
+				.append(isCollisionDetectEstablishedState())
+				.append(getConnectRetryTime())
+				.append(isDampPeerOscillation())
+				.append(isDelayOpen())
+				.append(getDelayOpenTime())
+				.append(getHoldTime())				
+				.append(getIdleHoldTime())				
 				.append(getLocalAS())
 				.append(getLocalBgpIdentifier())
+				.append(isPassiveTcpEstablishment())				
 				.append(getPeerName())
 				.append(getRemoteAS())
 				.append(getRemoteBgpIdentifier())
-				.append(getDelayOpenTime())
-				.append(isAllowAutomaticStart())
-				.append(isAllowAutomaticStop())
-				.append(isCollisionDetectEstablishedState())
-				.append(isDampPeerOscillation())
-				.append(isDelayOpen())
-				.append(isPassiveTcpEstablishment())
 				.toHashCode();
+	}
+
+	/**
+	 * @return
+	 * @see org.bgp4.config.nodes.PeerConfiguration#getConnectRetryTime()
+	 */
+	public int getConnectRetryTime() {
+		return decorated.getConnectRetryTime();
 	}
 }

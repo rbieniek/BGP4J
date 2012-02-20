@@ -51,4 +51,9 @@ public class FixedDefaultsPeerConfigurationTimerDecorator extends PeerConfigurat
 		return 15;
 	}
 
+	@Override
+	protected int getDefaultConnectRetryTime() {
+		return 60;
+	}
+
 }
