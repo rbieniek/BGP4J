@@ -23,37 +23,33 @@ package org.bgp4j.netty.fsm;
  */
 public enum FSMEvent {
 	// Administrative events
-	ManualStart,
-	ManualStop,
-	AutomaticStart,
-//	ManualStart_with_PassiveTcpEstablishment,
-//	AutomaticStart_with_PassiveTcpEstablishment,
-//	AutomaticStart_with_DampPeerOscillations,
-//	AutomaticStart_with_DampPeerOscillations_and_PassiveTcpEstablishment,
-	AutomaticStop,
+	ManualStart,                           // covers RFC 4271 events 1, 4,  
+	ManualStop,                            // RFC4271 event 2
+	AutomaticStart,                        // covers RFC4271 event 3, 5, 6, 7
+	AutomaticStop,                         // RFC4271 event 8
 	
 	// Timer events
-	ConnectRetryTimer_Expires,
-	HoldTimer_Expires,
-	KeepaliveTimer_Expires,
-	DelayOpenTimer_Expires,
-	IdleHoldTimer_Expires,
+	ConnectRetryTimer_Expires,             // RFC4271 event 9
+	HoldTimer_Expires,                     // RFC4271 event 10
+	KeepaliveTimer_Expires,                // RFC4271 event 11
+	DelayOpenTimer_Expires,                // RFC4271 event 12
+	IdleHoldTimer_Expires,                 // RFC4271 event 13
 	
 	// TCP connection-based events
-	TcpConnection_Valid,
-	Tcp_CR_Invalid,
-	Tcp_CR_Acked,
-	TcpConnectionConfirmed,
-	TcpConnectionFails,
+	TcpConnection_Valid,                   // RFC4171 event 14
+	Tcp_CR_Invalid,                        // RFC4271 event 15
+	Tcp_CR_Acked,                          // RFC4271 event 16
+	TcpConnectionConfirmed,                // RFC4271 event 17
+	TcpConnectionFails,                    // RFC4271 event 18
 	
 	// BGP Message-based events
-	BGPOpen,
-	BGPOpen_with_DelayOpenTimer_Running,
-	BGPOpenMsgErr,
-	OpenCollisionDump,
-	NotifyMsgVerErr,
-	NotifyMsg,
-	KeepAliveMsg,
-	UpdateMsg,
-	UpdateMsgErr,
+	BGPOpen,                               // covers RFC4271 event 19, 20
+	BGPHeaderErr,                          // RFC4271 event 21
+	BGPOpenMsgErr,                         // RFC4271 event 22
+	OpenCollisionDump,                     // RFC4271 event 23
+	NotifyMsgVerErr,                       // RFC4271 event 24
+	NotifyMsg,                             // RFC4271 event 25
+	KeepAliveMsg,                          // RFC4271 event 26 
+	UpdateMsg,                             // RFC4271 event 27
+	UpdateMsgErr,                          // RFC4271 event 28
 }

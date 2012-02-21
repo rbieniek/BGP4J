@@ -17,11 +17,7 @@
  */
 package org.bgp4j.netty.fsm;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 import javax.inject.Inject;
 
@@ -72,10 +68,6 @@ public class InternalFSM {
 	void handleEvent(FSMEvent event) {
 		switch(event) {
 		case AutomaticStart:
-//		case AutomaticStart_with_DampPeerOscillations:
-//		case AutomaticStart_with_DampPeerOscillations_and_PassiveTcpEstablishment:
-//		case AutomaticStart_with_PassiveTcpEstablishment:
-//		case ManualStart_with_PassiveTcpEstablishment:
 		case ManualStart:
 			handleStartEvent();
 			break;
@@ -91,7 +83,6 @@ public class InternalFSM {
 			break;
 		case HoldTimer_Expires:
 		case BGPOpen:
-		case BGPOpen_with_DelayOpenTimer_Running:
 		case BGPOpenMsgErr:
 		case DelayOpenTimer_Expires:
 		case KeepAliveMsg:
