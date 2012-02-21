@@ -45,6 +45,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	
 	@After
 	public void after() {
+		fsm.destroyFSM();
+		
 		fsm = null;
 		callbacks = null;
 		parser = null;
@@ -90,10 +92,10 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.ManualStart);
 		
 		verify(callbacks, never()).fireConnectRemotePeer();
-		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(FSMState.Active, fsm.getState());
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
-		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
 	}
 	
 	@Test
@@ -104,10 +106,10 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.AutomaticStart);
 		
 		verify(callbacks, never()).fireConnectRemotePeer();
-		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(FSMState.Active, fsm.getState());
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
-		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
 	}
 
 	@Test
@@ -174,7 +176,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		verify(callbacks).fireDisconnectRemotePeer(); // from connect retry timer expired handler
 		verify(callbacks).fireConnectRemotePeer(); // from initial connect
-		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
 		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
@@ -192,12 +194,170 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
 	}
 
+	@Test
+	public void testStartEventInPassiveModeConnectRetryTimerExpires() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer2"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		fsm.handleEvent(FSMEvent.AutomaticStart);
+		
+		verify(callbacks, never()).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Active, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+
+		conditionalSleep(fsm.getConnectRetryTimerDueWhen());
+
+		verify(callbacks, never()).fireDisconnectRemotePeer(); // from connect retry timer expired handler
+		verify(callbacks).fireConnectRemotePeer(); // from initial connect
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
+	}
+
+	@Test
+	public void testStartEventInActiveModeConnectStateTcpConnectionFailsNoPeerDampening() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer1"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		fsm.handleEvent(FSMEvent.AutomaticStart);
+		
+		verify(callbacks).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.TcpConnectionFails);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
+	}
+
+	@Test
+	public void testStartEventInActiveModeConnectStateTcpConnectionFailsPeerDampening() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer3"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		fsm.handleEvent(FSMEvent.AutomaticStart);
+		
+		verify(callbacks).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.TcpConnectionFails);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertTrue(fsm.isIdleHoldTimerRunning());
+		Assert.assertNotNull(fsm.getIdleHoldTimerDueWhen());
+	}
+
+	@Test
+	public void testStartEventInActiveModeConnectionSuccessNoOpenDelay() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer1"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		fsm.handleEvent(FSMEvent.AutomaticStart);
+		
+		verify(callbacks).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.TcpConnectionConfirmed);
+
+		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks).fireSendOpenMessage();
+		Assert.assertEquals(FSMState.OpenSent, fsm.getState());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
+		Assert.assertFalse(fsm.isDelayOpenTimerRunning());
+		Assert.assertNull(fsm.getDelayOpenTimerDueWhen());
+		Assert.assertTrue(fsm.isHoldTimerRunning());
+		Assert.assertNotNull(fsm.getHoldTimerDueWhen());
+	}
+
+	@Test
+	public void testStartEventInActiveModeConnectionSuccessOpenDelay() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer4"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		fsm.handleEvent(FSMEvent.AutomaticStart);
+		
+		verify(callbacks).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.TcpConnectionConfirmed);
+
+		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireSendOpenMessage();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
+		Assert.assertTrue(fsm.isDelayOpenTimerRunning());
+		Assert.assertNotNull(fsm.getDelayOpenTimerDueWhen());
+		Assert.assertFalse(fsm.isHoldTimerRunning());
+		Assert.assertNull(fsm.getHoldTimerDueWhen());
+		
+		conditionalSleep(fsm.getDelayOpenTimerDueWhen());
+		
+		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks).fireSendOpenMessage();
+		Assert.assertEquals(FSMState.OpenSent, fsm.getState());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
+		Assert.assertFalse(fsm.isDelayOpenTimerRunning());
+		Assert.assertNull(fsm.getDelayOpenTimerDueWhen());
+		Assert.assertTrue(fsm.isHoldTimerRunning());
+		Assert.assertNotNull(fsm.getHoldTimerDueWhen());
+	}
+
 	private Configuration loadConfiguration(String fileName) throws Exception {
 		return parser.parseConfiguration(new XMLConfiguration(fileName));
 	}
 	
 	private void conditionalSleep(Date untilWhen) throws InterruptedException {
 		long sleep = (untilWhen.getTime() - System.currentTimeMillis()) + 1000L;
+		
+		if(sleep > 0)
+			Thread.sleep(sleep);
+	}
+
+	/**
+	 * Sleep a fractional time of the interval between now and the given date.
+	 * 
+	 * @param untilWhen the date to sleep until if the fraction is 100
+	 * @param fraction the fractional value as percentage between 0 and 100
+	 * 
+	 * @throws InterruptedException
+	 */
+	private void conditionalSleepShort(Date untilWhen, long fraction) throws InterruptedException {
+		long sleep = (((untilWhen.getTime() - System.currentTimeMillis()) * fraction) / 100L);
 		
 		if(sleep > 0)
 			Thread.sleep(sleep);

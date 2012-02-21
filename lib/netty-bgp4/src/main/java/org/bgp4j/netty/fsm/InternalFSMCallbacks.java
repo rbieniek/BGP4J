@@ -35,4 +35,9 @@ public interface InternalFSMCallbacks {
 	 * The remote connection to the peer (if established) shall be disconnected and closed
 	 */
 	public void fireDisconnectRemotePeer();
+
+	/**
+	 * Sent an <code>OPEN</code> message to the remote peer.
+	 */
+	public void fireSendOpenMessage();
 }

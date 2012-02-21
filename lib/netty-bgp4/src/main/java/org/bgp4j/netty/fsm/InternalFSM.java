@@ -43,6 +43,8 @@ public class InternalFSM {
 	
 	private @Inject FireEventTimeManager<FireConnectRetryTimerExpired> fireConnectRetryTimeExpired;
 	private @Inject FireEventTimeManager<FireIdleHoldTimerExpired> fireIdleHoldTimerExpired;
+	private @Inject FireEventTimeManager<FireDelayOpenTimerExpired> fireDelayOpenTimerExpired;
+	private @Inject FireEventTimeManager<FireHoldTimerExpired> fireHoldTimerExpired;
 	
 	InternalFSM() {
 	}
@@ -53,13 +55,16 @@ public class InternalFSM {
 		
 		fireConnectRetryTimeExpired.createJobDetail(FireConnectRetryTimerExpired.class, this);
 		fireIdleHoldTimerExpired.createJobDetail(FireIdleHoldTimerExpired.class, this);
-		
+		fireDelayOpenTimerExpired.createJobDetail(FireDelayOpenTimerExpired.class, this);
+		fireHoldTimerExpired.createJobDetail(FireHoldTimerExpired.class, this);
 	}
 	
 	void destroyFSM() {
 		try {
 			fireConnectRetryTimeExpired.shutdown();
 			fireIdleHoldTimerExpired.shutdown();
+			fireDelayOpenTimerExpired.shutdown();
+			fireHoldTimerExpired.shutdown();
 		} catch (SchedulerException e) {
 			log.error("Internal error: failed to shutdown internal FSM for peer " + peerConfiguration.getPeerName(), e);
 		}
@@ -81,44 +86,49 @@ public class InternalFSM {
 		case IdleHoldTimer_Expires:
 			handleIdleHoldTimerExpiredEvent();
 			break;
+		case TcpConnection_Valid:
+		case Tcp_CR_Invalid:
+			// do nothing for now
+			break;
+		case Tcp_CR_Acked:
+		case TcpConnectionConfirmed:
+			handleTcpConnectionEstablished();
+			break;
+		case TcpConnectionFails:
+			handleTcpConnectionFails();
+			break;
+		case DelayOpenTimer_Expires:
+			handleDelayOpenTimerExpiredEvent();
+			break;
 		case HoldTimer_Expires:
 		case BGPOpen:
 		case BGPOpenMsgErr:
-		case DelayOpenTimer_Expires:
 		case KeepAliveMsg:
 		case KeepaliveTimer_Expires:
 		case NotifyMsg:
 		case NotifyMsgVerErr:
 		case OpenCollisionDump:
-		case Tcp_CR_Acked:
-		case Tcp_CR_Invalid:
-		case TcpConnection_Valid:
-		case TcpConnectionConfirmed:
-		case TcpConnectionFails:
 		case UpdateMsg:
 		case UpdateMsgErr:
 		}
 	}
 	
 	/**
-	 * handle any kind of start event. Unless the FSM is in <code>Stopped</code> state the event is ignored
+	 * handle any kind of start event. Unless the FSM is in <code>Idle</code> state the event is ignored
+	 * <ul>
+	 * <li>If passive TCP estalishment is disabled then fire the connect remote peer callback and move to <code>Connect</code> state</li>
+	 * <li>If passive TCP estalishment is ensabled then move to <code>Connect</code> state</li>
+	 * </ul>
 	 */
 	private void handleStartEvent() {		
 		if(state == FSMState.Idle) {
 			this.connectRetryCounter = 0;
-			
-			if(!peerConfiguration.isPassiveTcpEstablishment()) {
-				callbacks.fireConnectRemotePeer();
-				
-				try {
-					fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
-				} catch (SchedulerException e) {
-					log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
-				}
-			}
 			canAcceptConnection = true;
-			
-			this.state = FSMState.Connect;
+
+			if(!peerConfiguration.isPassiveTcpEstablishment())
+				moveStateToConnect();
+			else
+				moveStateToActive();
 		}
 	}
 
@@ -140,13 +150,33 @@ public class InternalFSM {
 	}
 	
 	/**
-	 * handle the connect retry timer fired
+	 * handle the connect retry timer fired event.
+	 * <ol>
+	 * <li>Fire disconnect remote peer callback</li>
+	 * <li>perform actions based on current state:
+	 * <ul>
+	 * <li>If state is <code>Connect</code>:
+	 * <ul>
+	 * <li>If peer dampening is enabled then restart the idle hold timer and move state to <code>Idle</code></li>
+	 * <li>If peer dampening is disabled then restart the connect retry timer then fire the connect remote peer callback and stay <code>Connect</code> state</li>
+	 * </ul>
+	 * </li>
+	 * <li>If the state is <code>Active</code> then fire the connect remote peer callback and  move the state to <code>Connect</code>.
+	 * <li>If the state is <code>Idle</code>:<ul>
+	 * <li>If passive TCP estalishment is disabled then fire the connect remote peer callback and move to <code>Connect</code> state</li>
+	 * <li>If passive TCP estalishment is ensabled then move to <code>Connect</code> state</li>
+	 * </ul>
+	 * </li>
+	 * </ul></li>
+	 * </ol>
 	 */
 	private void handleConnectRetryTimerExpiredEvent() {
 		if(state == FSMState.Connect) {
 			callbacks.fireDisconnectRemotePeer();
 			
 			if(peerConfiguration.isDampPeerOscillation()) {
+				state = FSMState.Idle;
+				
 				try {
 					fireIdleHoldTimerExpired.scheduleJob(peerConfiguration.getIdleHoldTime() << connectRetryCounter);
 				} catch (SchedulerException e) {
@@ -154,35 +184,111 @@ public class InternalFSM {
 				}
 			} else {
 				this.connectRetryCounter++;
-				callbacks.fireConnectRemotePeer();
 				
-				try {
-					fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
-				} catch (SchedulerException e) {
-					log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
-				}
+				moveStateToConnect();
 			}
-		}
-	}
-	
-	private void handleIdleHoldTimerExpiredEvent() {
-		if(state == FSMState.Connect) {
+		} else if(state == FSMState.Active) {
 			this.connectRetryCounter++;
-			callbacks.fireConnectRemotePeer();
 			
-			try {
-				fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
-			} catch (SchedulerException e) {
-				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
-			}
+			moveStateToConnect();
+		} else if(state == FSMState.Idle) {
+			if(!peerConfiguration.isPassiveTcpEstablishment())
+				moveStateToConnect();
+			else
+				moveStateToActive();			
 		}
 	}
 	
 	/**
-	 * handle the connect retry time expired event.
-	 * @return
+	 * handle the idle hold timer expired event. If the current state is <code>Idle</code> then the machine is moved into state <code>Connect</code>
 	 */
+	private void handleIdleHoldTimerExpiredEvent() {
+		if(state == FSMState.Idle) {			
+			this.connectRetryCounter++;
+			
+			moveStateToConnect();
+		}
+	}
+
+	/**
+	 * handle the delay open timer expired event. Depending on the current state the following actions are performed:
+	 * <ul>
+	 * <li>If the current state is <code>Connect</code> then send an <code>OPEN</code> message to the peer, set the hold timer to 600 seconds
+	 * and move the state to <code>OpenSent</code>
+	 * </ul>
+	 */
+	private void handleDelayOpenTimerExpiredEvent() {
+		if(state == FSMState.Connect) {
+			moveStateToOpenSent();
+		}
+	}
 	
+	/**
+	 * Handle TCP connections failures. 
+	 * <ul>
+	 * <li>if the current state is <code>Connect</code> then move to <code>Active</code>
+	 * <li>if the current state is <code>Active</code> then move to <code>Idle</code>
+	 * </ul>
+	 */
+	private void handleTcpConnectionFails() {
+		switch(state) {
+		case Connect:
+			try {
+				if (isDelayOpenTimerRunning()) {
+					moveStateToActive();
+				} else {
+					moveStateToIdle();
+				}
+			} catch(SchedulerException e) {
+				log.error("Internal Error: Failed to query delay open timer for peer " + peerConfiguration.getPeerName());
+				
+				moveStateToIdle();
+			}
+			break;
+		case Active:
+			moveStateToIdle();
+			break;
+		}
+	}
+
+	/**
+	 * Handle the connection being established. 
+	 * <ul>
+	 * <li>If the current state is <code>Connect</code>:<ul>
+	 * <li>If the delay open flag is set then the connect retry timer is canceled, the delay open timer is started with the configured value.
+	 * The state stay at <code>Connect</code></li>
+	 * <li>If the delay open flag is not set then the connect retry timer is canceled, an <code>OPEN</code> message is sent to the peer and
+	 * the state is moved to <code>OpenSent</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 */
+	private void handleTcpConnectionEstablished() {
+		switch(state) {
+		case Connect:
+			if(peerConfiguration.isDelayOpen()) {
+				try {
+					fireConnectRetryTimeExpired.cancelJob();
+				} catch (SchedulerException e) {
+					log.error("Internal Error: cannot cancel connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+				}
+				
+				try {
+					fireDelayOpenTimerExpired.scheduleJob(peerConfiguration.getDelayOpenTime());
+				} catch (SchedulerException e) {
+					log.error("Internal Error: cannot schedule open delay timer for peer " + peerConfiguration.getPeerName(), e);
+				}
+			} else {
+				moveStateToOpenSent();
+			}
+		}
+	}
+		
+	/**
+	 * check if connections can be accepted
+	 * 
+	 * @return
+	 */	
 	boolean isCanAcceptConnection() {
 		return this.canAcceptConnection;
 	}
@@ -239,4 +345,157 @@ public class InternalFSM {
 	Date getIdleHoldTimerDueWhen() throws SchedulerException {
 		return fireIdleHoldTimerExpired.getFiredWhen();
 	}
+
+	/**
+	 * check if the delay open timer is currently running
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	boolean isDelayOpenTimerRunning() throws SchedulerException {
+		return fireDelayOpenTimerExpired.isJobScheduled();
+	}
+	
+	/**
+	 * get the date when the delay open timer will fire
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	public Date getDelayOpenTimerDueWhen() throws SchedulerException {
+		return fireDelayOpenTimerExpired.getFiredWhen();
+	}
+
+	/**
+	 * Check if the hold timer is running
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	boolean isHoldTimerRunning() throws SchedulerException {
+		return fireHoldTimerExpired.isJobScheduled();
+	}
+	
+	/**
+	 * get the date when the hold timer will fire.
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	Date getHoldTimerDueWhen() throws SchedulerException {
+		return fireHoldTimerExpired.getFiredWhen();
+	}
+	
+	/**
+	 * Move from any other state to <code>Connect</code> state. It performs the following actions:
+	 * <ol>
+	 * <li>cancel the idle hold timer</li>
+	 * <li>cancel the connect retry timer</li>
+	 * <li>restart the connect retry timer with the configured value</li>
+	 * <li>fire the connect to remote peer callback</li>
+	 * <li>set the state to <code>Connect</code></li>
+	 * </ol>
+	 */
+	private void moveStateToConnect() {
+		try {
+			fireIdleHoldTimerExpired.cancelJob();
+			fireConnectRetryTimeExpired.cancelJob();
+			
+			fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
+		} catch (SchedulerException e) {
+			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+		}
+		
+		callbacks.fireConnectRemotePeer();
+		
+		this.state = FSMState.Connect;				
+	}
+
+	/**
+	 * Move from any other state to <code>Active</code> state. It performs the following actions:
+	 * <ol>
+	 * <li>cancel the idle hold timer</li>
+	 * <li>cancel the connect retry timer</li>
+	 * <li>cancel the delay open timer</li>
+	 * <li>restart the connect retry timer with the configured value</li>
+	 * <li>fire the connect to remote peer callback</li>
+	 * <li>set the state to <code>Active</code></li>
+	 * </ol>
+	 */
+	private void moveStateToActive() {
+		try {
+			fireIdleHoldTimerExpired.cancelJob();
+			fireConnectRetryTimeExpired.cancelJob();
+			fireDelayOpenTimerExpired.cancelJob();
+			
+			fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
+		} catch (SchedulerException e) {
+			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+		}
+		this.state = FSMState.Active;		
+	}
+
+	/**
+	 * Move from any other state to <code>Idle</code> state. It performs the following actions:
+	 * <ol>
+	 * <li>cancel the idle hold timer</li>
+	 * <li>cancel the connect retry timer</li>
+	 * <li>cancel the delay open timer</li>
+	 * <li>cancel the hold timer</li>
+	 * <li>restart the connect retry timer with the configured value if peer dampening is disabled</li>
+	 * <li>restart the idle hold timer with the configured value if peer dampening is enabled</li>
+	 * <li>set the state to <code>Idle</code></li>
+	 * </ol>
+	 */
+	private void moveStateToIdle() {
+		try {
+			fireIdleHoldTimerExpired.cancelJob();
+			fireConnectRetryTimeExpired.cancelJob();
+			fireDelayOpenTimerExpired.cancelJob();
+			fireHoldTimerExpired.cancelJob();
+		} catch(SchedulerException e) {
+			log.error("Interal Error: cannot cancel timers for peer " + peerConfiguration.getPeerName(), e);			
+		}
+		
+		if(peerConfiguration.isDampPeerOscillation()) {
+			try {
+				fireIdleHoldTimerExpired.scheduleJob(peerConfiguration.getIdleHoldTime() << connectRetryCounter);
+			} catch (SchedulerException e) {
+				log.error("Interal Error: cannot schedule idle hold timer for peer " + peerConfiguration.getPeerName(), e);
+			}
+		} else {
+			try {
+				fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
+			} catch (SchedulerException e) {
+				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+			}
+		}
+		this.state = FSMState.Idle;		
+	}
+
+	/**
+	 * Move from any other state to <code>OpenSent</code> state. It performs the following actions:
+	 * <ol>
+	 * <li>cancel the idle hold timer</li>
+	 * <li>cancel the connect retry timer</li>
+	 * <li>start the hold timer with 600 seconds</li>
+	 * <li>fire the send <code>OPEN</code> message to remote peer callback</li>
+	 * <li>set the state to <code>OpenSent</code></li>
+	 * </ol>
+	 */
+	private void moveStateToOpenSent() {
+		try {
+			fireIdleHoldTimerExpired.cancelJob();
+			fireConnectRetryTimeExpired.cancelJob();
+			
+			fireHoldTimerExpired.scheduleJob(600);
+		} catch (SchedulerException e) {
+			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+		}
+		
+		callbacks.fireSendOpenMessage();
+		
+		this.state = FSMState.OpenSent;		
+	}
+
 }
