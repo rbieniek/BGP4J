@@ -44,7 +44,7 @@ public class SchedulerFactory {
 		scheduler = factory.getScheduler();
 	}
 	
-	@Produces @Any Scheduler producerScheduler()  {
+	@Produces Scheduler producerScheduler()  {
 		return this.scheduler;
 	}
 	

@@ -20,6 +20,7 @@ package org.bgp4j.netty.fsm;
 import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 
 /**
@@ -31,30 +32,33 @@ import org.slf4j.Logger;
 public class InternalFSM {
 	private @Inject Logger log;
 	
-	private class FireEventTimerTask {
-		private FSMEvent event;
-		
-		private FireEventTimerTask(FSMEvent event) {
-			this.event = event;
-		}
-	}
-	
 	private FSMState state = FSMState.Stopped;
 	private PeerConfiguration peerConfiguration;
 	private InternalFSMCallbacks callbacks;
-	
+
 	private int connectRetryCounter = 0;
 	private boolean canAcceptConnection = false;
 	
+	private @Inject FireEventTimeManager<FireConnectRetryTimerExpired> fireConnectRetryTimeExpired;
+	
 	public InternalFSM() {
-		
 	}
 	
-	void setup(PeerConfiguration peerConfiguration, InternalFSMCallbacks callbacks) {
+	void setup(PeerConfiguration peerConfiguration, InternalFSMCallbacks callbacks) throws SchedulerException {
 		this.peerConfiguration = peerConfiguration;
 		this.callbacks = callbacks;
+		
+		fireConnectRetryTimeExpired.createJobDetail(FireConnectRetryTimerExpired.class, this);
 	}
 	
+	public void destroyFSM() {
+		try {
+			fireConnectRetryTimeExpired.shutdown();
+		} catch (SchedulerException e) {
+			log.error("Internal error: failed to shutdown internal FSM for peer " + peerConfiguration.getPeerName(), e);
+		}
+	}
+
 	void handleEvent(FSMEvent event) {
 		switch(event) {
 		case AutomaticStart:
@@ -114,5 +118,6 @@ public class InternalFSM {
 	public FSMState getState() {
 		return state;
 	}
+
 
 }

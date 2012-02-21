@@ -28,6 +28,7 @@ import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.service.BGPv4Client;
 import org.jboss.netty.channel.Channel;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 
 
@@ -153,7 +154,7 @@ public class BGPv4FSM {
 	
 	private @Inject InternalFSM internalFsm;
 	
-	public void configure(PeerConfiguration peerConfig) {
+	public void configure(PeerConfiguration peerConfig) throws SchedulerException {
 		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
 		this.peerConfig = peerConfig;
 		
@@ -202,8 +203,8 @@ public class BGPv4FSM {
 	}
 	
 	public void destroyFSM() {
-		// TODO Auto-generated method stub
 		
+		internalFsm.destroyFSM();
 	}
 
 	public void handleClientMessage(Channel channel, BGPv4Packet message) {

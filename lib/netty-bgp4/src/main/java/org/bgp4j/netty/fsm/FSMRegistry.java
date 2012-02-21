@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.bgp4.config.global.ApplicationConfiguration;
 import org.bgp4.config.global.PeerConfigurationEvent;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -37,11 +38,12 @@ import org.bgp4.config.nodes.PeerConfiguration;
  */
 @Singleton
 public class FSMRegistry {
-
+	
 	private Map<InetAddress, BGPv4FSM> fsmMap = new HashMap<InetAddress, BGPv4FSM>();
 	
 	private @Inject @New Instance<BGPv4FSM> fsmProvider;
 	private @Inject ApplicationConfiguration applicationConfiguration;
+	private @Inject Logger log;
 	
 	public FSMRegistry() {
 		
@@ -49,12 +51,16 @@ public class FSMRegistry {
 	
 	public void createRegistry() {
 		for(PeerConfiguration peerConfig : applicationConfiguration.listPeerConfigurations()) {
-			BGPv4FSM fsm = fsmProvider.get();
-			
-			fsm.configure(peerConfig);
-			fsmMap.put(fsm.getRemotePeerAddress(), fsm);
-			
-			fsm.startFSMAutomatic();
+			try {
+				BGPv4FSM fsm = fsmProvider.get();
+
+				fsm.configure(peerConfig);
+				fsmMap.put(fsm.getRemotePeerAddress(), fsm);
+
+				fsm.startFSMAutomatic();
+			} catch(Exception e) {
+				log.error("Internal error: cannot create peer " + peerConfig.getPeerName());
+			}
 		}
 	}
 	
@@ -77,13 +83,20 @@ public class FSMRegistry {
 		
 		switch(event.getType()) {
 		case CONFIGURATION_ADDED:
-			fsm = fsmProvider.get();
-			
-			fsm.configure(event.getCurrent());
-			
-			synchronized (fsmMap) {
-				fsmMap.put(fsm.getRemotePeerAddress(), fsm);				
+			try {
+				fsm = fsmProvider.get();
+				
+				fsm.configure(event.getCurrent());
+				
+				synchronized (fsmMap) {
+					fsmMap.put(fsm.getRemotePeerAddress(), fsm);				
+				}
+				
+				fsm.startFSMAutomatic();
+			} catch(Exception e) {
+				log.error("Internal error: cannot create peer " + event.getCurrent().getPeerName());
 			}
+
 			break;
 		case CONFIGURATION_REMOVED:
 			remotePeerAddress = event.getFormer().getClientConfig().getRemoteAddress().getAddress();
