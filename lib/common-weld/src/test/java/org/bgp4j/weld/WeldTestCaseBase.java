@@ -18,6 +18,7 @@ package org.bgp4j.weld;
 
 import javax.enterprise.inject.spi.BeanManager;
 
+import org.apache.log4j.BasicConfigurator;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.AfterClass;
@@ -34,6 +35,11 @@ public class WeldTestCaseBase {
 	private static WeldContainer weldContainer;
 	
 	private BeanManager beanManager;
+	
+	@BeforeClass
+	public static void setupLog4j() {
+		BasicConfigurator.configure();
+	}
 	
 	@BeforeClass
 	public static void setupWeldContainer() {

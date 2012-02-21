@@ -138,6 +138,12 @@ public class BGPv4FSM {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void fireDisconnectRemotePeer() {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	

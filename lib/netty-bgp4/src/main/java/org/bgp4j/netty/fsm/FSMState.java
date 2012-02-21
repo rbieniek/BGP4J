@@ -22,7 +22,6 @@ package org.bgp4j.netty.fsm;
  *
  */
 public enum FSMState {
-	Stopped,
 	Idle,
 	Connect,
 	Active,

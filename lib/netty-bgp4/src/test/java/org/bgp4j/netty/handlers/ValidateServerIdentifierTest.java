@@ -26,7 +26,6 @@ import org.bgp4j.netty.MockChannel;
 import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.MockPeerConnectionInformation;
-import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;

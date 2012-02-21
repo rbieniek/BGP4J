@@ -28,6 +28,7 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -59,8 +60,10 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 		public void triggerComplete(Trigger trigger,
 				JobExecutionContext context,
 				CompletedExecutionInstruction triggerInstructionCode) {
-			firedWhen = null;
-			triggerKey = null;
+			if(trigger.getKey().equals(triggerKey)) {
+				firedWhen = null;
+				triggerKey = null;
+			}
 		}
 	}
 	
@@ -69,19 +72,21 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 	private @Inject Scheduler scheduler;
 	private JobDetail jobDetail;
 	private TriggerKey triggerKey;
+	private JobKey jobKey;
 	private Date firedWhen;
 	
 	void createJobDetail(Class<T> jobClass, InternalFSM fsm, Map<String, Object> additionalJobData) throws SchedulerException {
 		JobDataMap map = new JobDataMap();
 		
-		map.put(FireEventTimeJob.FSM_KEY, this);
+		map.put(FireEventTimeJob.FSM_KEY, fsm);
 
 		if(additionalJobData != null)  {
 			for(Entry<String, Object> entry : additionalJobData.entrySet())
 				map.put(entry.getKey(), entry.getValue());
 		}
-		
-		jobDetail = JobBuilder.newJob(jobClass).usingJobData(map).build();
+
+		jobKey = new JobKey(UUID.randomUUID().toString());
+		jobDetail = JobBuilder.newJob(jobClass).usingJobData(map).withIdentity(jobKey).build();
 		
 		scheduler.getListenerManager().addTriggerListener(clearTriggerData, EverythingMatcher.allTriggers());
 	}
@@ -99,11 +104,20 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 	void scheduleJob(int whenInSeconds) throws SchedulerException {
 		triggerKey = TriggerKey.triggerKey(UUID.randomUUID().toString());
 		
-		firedWhen = scheduler.scheduleJob(jobDetail, TriggerBuilder.newTrigger()
-		.withIdentity(triggerKey)
-		.withSchedule(SimpleScheduleBuilder.simpleSchedule())
-		.startAt(new Date(System.currentTimeMillis() + whenInSeconds*1000L))
-		.build());
+		if(scheduler.checkExists(jobKey)) {
+			firedWhen = scheduler.scheduleJob(TriggerBuilder.newTrigger()
+			.withIdentity(triggerKey)
+			.forJob(jobKey)
+			.withSchedule(SimpleScheduleBuilder.simpleSchedule())
+			.startAt(new Date(System.currentTimeMillis() + whenInSeconds*1000L))
+			.build());			
+		} else {
+			firedWhen = scheduler.scheduleJob(jobDetail, TriggerBuilder.newTrigger()
+			.withIdentity(triggerKey)
+			.withSchedule(SimpleScheduleBuilder.simpleSchedule())
+			.startAt(new Date(System.currentTimeMillis() + whenInSeconds*1000L))
+			.build());
+		}
 	}
 	
 	boolean isJobScheduled() throws SchedulerException {

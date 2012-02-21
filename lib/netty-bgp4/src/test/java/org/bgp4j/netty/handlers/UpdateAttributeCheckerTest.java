@@ -28,7 +28,6 @@ import org.bgp4j.netty.MockChannel;
 import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.MockPeerConnectionInformation;
-import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.AggregatorPathAttribute;
 import org.bgp4j.netty.protocol.update.Attribute;

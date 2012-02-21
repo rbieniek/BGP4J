@@ -1,7 +1,7 @@
 package org.bgp4j.netty.fsm;
 
-class FireConnectRetryTimerExpired extends FireEventTimeJob {
-	FireConnectRetryTimerExpired() {
+public class FireConnectRetryTimerExpired extends FireEventTimeJob {
+	public FireConnectRetryTimerExpired() {
 		super(FSMEvent.ConnectRetryTimer_Expires);
 	}
 }

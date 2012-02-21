@@ -42,6 +42,10 @@ public class FireEventTimeManagerTest extends WeldTestCaseBase {
 			caught = true;
 		}
 
+		public void clear() {
+			caught = false;
+		}
+		
 		/**
 		 * @return the caught
 		 */
@@ -109,6 +113,39 @@ public class FireEventTimeManagerTest extends WeldTestCaseBase {
 		Assert.assertNull(manager.getFiredWhen());
 		Assert.assertFalse(manager.isJobScheduled());
 
+	}
+
+	@Test
+	public void testTimerFiredAndRefired() throws Exception {
+		Assert.assertFalse(simpleCaught.isCaught());
+		
+		manager.scheduleJob(10);
+		Assert.assertNotNull(manager.getFiredWhen());
+		Assert.assertTrue(manager.isJobScheduled());
+
+		Thread.sleep(5*1000);
+		Assert.assertFalse(simpleCaught.isCaught());
+		Thread.sleep(10*1000);
+
+		Assert.assertTrue(simpleCaught.isCaught());
+		Assert.assertNull(manager.getFiredWhen());
+		Assert.assertFalse(manager.isJobScheduled());
+
+		// refire
+		simpleCaught.clear();
+		Assert.assertFalse(simpleCaught.isCaught());
+		
+		manager.scheduleJob(10);
+		Assert.assertNotNull(manager.getFiredWhen());
+		Assert.assertTrue(manager.isJobScheduled());
+
+		Thread.sleep(5*1000);
+		Assert.assertFalse(simpleCaught.isCaught());
+		Thread.sleep(10*1000);
+
+		Assert.assertTrue(simpleCaught.isCaught());
+		Assert.assertNull(manager.getFiredWhen());
+		Assert.assertFalse(manager.isJobScheduled());
 	}
 
 	@Test
