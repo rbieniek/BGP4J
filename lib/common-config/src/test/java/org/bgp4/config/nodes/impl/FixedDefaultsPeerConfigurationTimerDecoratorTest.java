@@ -55,6 +55,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -71,6 +72,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -87,6 +89,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -103,6 +106,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -119,6 +123,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -135,11 +140,30 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				121, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp7 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				16, // delay open time
 				false)); 
+		
 		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
@@ -151,6 +175,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -167,6 +192,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -183,6 +209,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -199,6 +226,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -215,6 +243,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -231,6 +260,24 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				121, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd7 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -245,16 +292,19 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertTrue(cp4.equals(cd4));
 		Assert.assertTrue(cp5.equals(cd5));
 		Assert.assertTrue(cp6.equals(cd6));
+		Assert.assertTrue(cp7.equals(cd7));
 
 		Assert.assertFalse(cp1.equals(cp3));
 		Assert.assertFalse(cp1.equals(cp4));
 		Assert.assertFalse(cp1.equals(cp5));
 		Assert.assertFalse(cp1.equals(cp6));
+		Assert.assertFalse(cp1.equals(cp7));
 
 		Assert.assertFalse(cd1.equals(cd3));
 		Assert.assertFalse(cd1.equals(cd4));
 		Assert.assertFalse(cd1.equals(cd5));
 		Assert.assertFalse(cd1.equals(cd6));
+		Assert.assertFalse(cd1.equals(cd7));
 	}
 
 	@Test
@@ -270,6 +320,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -286,6 +337,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -302,6 +354,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -318,6 +371,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -334,6 +388,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -350,11 +405,30 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				121, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false)); 
+		PeerConfiguration cp7 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				16, // delay open time
 				false)); 
+		
 		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
@@ -366,6 +440,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -382,6 +457,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -398,6 +474,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -414,6 +491,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -430,6 +508,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -446,6 +525,24 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				121, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false); 
+		PeerConfiguration cd7 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -460,6 +557,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertEquals(cp4.hashCode(), cd4.hashCode());
 		Assert.assertEquals(cp5.hashCode(), cd5.hashCode());
 		Assert.assertEquals(cp6.hashCode(), cd6.hashCode());
+		Assert.assertEquals(cp7.hashCode(), cd7.hashCode());
 		
 		Assert.assertFalse(cp1.hashCode() == cp3.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cp4.hashCode());
@@ -469,6 +567,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertFalse(cp1.hashCode() == cd4.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cd5.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cd6.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd7.hashCode());
 	}
 
 }

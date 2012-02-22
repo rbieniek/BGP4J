@@ -103,4 +103,19 @@ public abstract class PeerConfigurationTimerDecorator extends PeerConfigurationD
 	 * @return
 	 */
 	protected abstract int getDefaultConnectRetryTime();
+
+	/* (non-Javadoc)
+	 * @see org.bgp4.config.nodes.PeerConfigurationDecorator#getAutomaticStartInterval()
+	 */
+	@Override
+	public int getAutomaticStartInterval() {
+		int interval = decorated.getAutomaticStartInterval();
+
+		if(interval == 0)
+			interval = getDefaultAutomaticStartInterval();
+
+		return interval;
+	}
+	
+	protected abstract int getDefaultAutomaticStartInterval();
 }

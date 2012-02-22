@@ -44,6 +44,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
+				120, // automatic start interval
 				true, // damp peer oscillation
 				true, // passive tcp establishment
 				true, // delay open
@@ -59,6 +60,7 @@ public class PeerConfigurationImplTest {
 		Assert.assertEquals(60, config.getConnectRetryTime());
 		Assert.assertEquals(300, config.getHoldTime());
 		Assert.assertEquals(30, config.getIdleHoldTime());
+		Assert.assertEquals(120, config.getAutomaticStartInterval());
 		Assert.assertTrue(config.isAllowAutomaticStart());
 		Assert.assertTrue(config.isAllowAutomaticStop());
 		Assert.assertTrue(config.isDampPeerOscillation());
@@ -100,6 +102,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
+				120, // automatic start interval
 				true, // damp peer oscillation
 				true, // passive tcp establishment
 				true, // delay open
@@ -121,6 +124,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
+				120, // automatic start interval
 				true, // damp peer oscillation
 				true, // passive tcp establishment
 				true, // delay open
@@ -142,6 +146,7 @@ public class PeerConfigurationImplTest {
 				-30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
+				120, // automatic start interval
 				true, // damp peer oscillation
 				true, // passive tcp establishment
 				true, // delay open
@@ -168,6 +173,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -184,6 +190,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -200,6 +207,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -216,6 +224,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -232,6 +241,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -248,6 +258,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -264,6 +275,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -280,6 +292,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -296,6 +309,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -312,6 +326,7 @@ public class PeerConfigurationImplTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -328,6 +343,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				true, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -344,6 +360,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				true, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -360,7 +377,8 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				true, // damp peer oscillation
+				10, // automatic start interval
+				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
@@ -376,8 +394,9 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				false, // damp peer oscillation
-				true, // passive tcp establishment
+				0, // automatic start interval
+				true, // damp peer oscillation
+				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
@@ -392,9 +411,10 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
-				false, // passive tcp establishment
-				true, // delay open
+				true, // passive tcp establishment
+				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c16 = new PeerConfigurationImpl("foo", // peer name 
@@ -408,10 +428,11 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
-				false, // delay open
-				240, // delay open time
+				true, // delay open
+				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -424,12 +445,30 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				240, // delay open time
+				false); // connect retry interval
+		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
-		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -440,6 +479,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -463,6 +503,7 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.equals(c16));
 		Assert.assertFalse(c1.equals(c17));
 		Assert.assertFalse(c1.equals(c18));
+		Assert.assertFalse(c1.equals(c19));
 	}
 
 	@Test
@@ -478,6 +519,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -494,6 +536,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -510,6 +553,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -526,6 +570,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -542,6 +587,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -558,6 +604,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -574,6 +621,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -590,6 +638,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -606,6 +655,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -622,6 +672,7 @@ public class PeerConfigurationImplTest {
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -638,6 +689,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				true, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -654,6 +706,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				true, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -670,7 +723,8 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				true, // damp peer oscillation
+				10, // automatic start interval
+				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
@@ -686,8 +740,9 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				false, // damp peer oscillation
-				true, // passive tcp establishment
+				0, // automatic start interval
+				true, // damp peer oscillation
+				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
@@ -702,9 +757,10 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
-				false, // passive tcp establishment
-				true, // delay open
+				true, // passive tcp establishment
+				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c16 = new PeerConfigurationImpl("foo", // peer name 
@@ -718,10 +774,11 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
-				false, // delay open
-				240, // delay open time
+				true, // delay open
+				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -734,12 +791,30 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				240, // delay open time
+				false); // connect retry interval
+		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
-		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -750,6 +825,7 @@ public class PeerConfigurationImplTest {
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -773,5 +849,6 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.hashCode() == c16.hashCode());
 		Assert.assertFalse(c1.hashCode() == c17.hashCode());
 		Assert.assertFalse(c1.hashCode() == c18.hashCode());
+		Assert.assertFalse(c1.hashCode() == c19.hashCode());
 	}
 }

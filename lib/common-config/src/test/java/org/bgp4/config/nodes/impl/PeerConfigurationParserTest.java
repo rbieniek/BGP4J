@@ -109,7 +109,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 	}
 
 	@Test
-	public void testAcceptedConfigurationWithHoldTimerAndRetryIntervalAndDelayOpenAndConnectRetryTime() throws Exception {
+	public void testAcceptedConfigurationWithHoldTimerAndRetryIntervalAndDelayOpenAndConnectRetryTimeAndAutomaticStartInterval() throws Exception {
 		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(8)"));
 		
 		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
@@ -124,6 +124,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertEquals(300, peerConfig.getIdleHoldTime());
 		Assert.assertEquals(45, peerConfig.getDelayOpenTime());
 		Assert.assertEquals(240, peerConfig.getConnectRetryTime());
+		Assert.assertEquals(600, peerConfig.getAutomaticStartInterval());
 
 		Assert.assertTrue(peerConfig.isAllowAutomaticStart());
 		Assert.assertFalse(peerConfig.isAllowAutomaticStop());

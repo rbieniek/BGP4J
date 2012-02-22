@@ -164,6 +164,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 		PeerConfiguration o = (PeerConfiguration)other;
 		
 		return (new EqualsBuilder())
+				.append(getAutomaticStartInterval(), o.getAutomaticStartInterval())
 				.append(getClientConfig(), o.getClientConfig())
 				.append(getIdleHoldTime(), o.getIdleHoldTime())
 				.append(getHoldTime(), o.getHoldTime())
@@ -211,6 +212,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 		return (new HashCodeBuilder())
 				.append(isAllowAutomaticStart())
 				.append(isAllowAutomaticStop())
+				.append(getAutomaticStartInterval())
 				.append(getClientConfig())
 				.append(isCollisionDetectEstablishedState())
 				.append(getConnectRetryTime())
@@ -234,5 +236,10 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 	 */
 	public int getConnectRetryTime() {
 		return decorated.getConnectRetryTime();
+	}
+
+	@Override
+	public int getAutomaticStartInterval() {
+		return decorated.getAutomaticStartInterval();
 	}
 }

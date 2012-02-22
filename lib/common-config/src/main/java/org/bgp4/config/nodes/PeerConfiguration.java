@@ -135,4 +135,10 @@ public interface PeerConfiguration {
 	 * @return
 	 */
 	public boolean isCollisionDetectEstablishedState();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getAutomaticStartInterval();
 }

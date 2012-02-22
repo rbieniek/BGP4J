@@ -56,4 +56,9 @@ public class FixedDefaultsPeerConfigurationTimerDecorator extends PeerConfigurat
 		return 60;
 	}
 
+	@Override
+	protected int getDefaultAutomaticStartInterval() {
+		return 120;
+	}
+
 }
