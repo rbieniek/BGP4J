@@ -95,6 +95,13 @@ class FireRepeatedEventTimeManager<T extends FireEventTimeJob> {
 		return scheduler.checkExists(triggerKey);
 	}
 
+	public Date getNextFireWhen() throws SchedulerException {
+		if(!isJobScheduled())
+			return null;
+		
+		return scheduler.getTrigger(triggerKey).getFireTimeAfter(new Date(System.currentTimeMillis()));
+	}
+	
 	void cancelJob() throws SchedulerException {
 		if(triggerKey != null) {
 			scheduler.unscheduleJob(triggerKey);

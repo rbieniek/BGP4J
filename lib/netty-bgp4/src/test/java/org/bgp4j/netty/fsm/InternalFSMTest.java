@@ -70,6 +70,41 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
 	}
 	
+	
+	@Test
+	public void testAutomaticStartEventInActiveModeWithoutEvent() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer1"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		Assert.assertTrue(fsm.isAutomaticStartRunning());
+		Assert.assertNotNull(fsm.getAutomaticStartDueWhen());
+		
+		conditionalSleep(fsm.getAutomaticStartDueWhen());
+		
+		verify(callbacks).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Connect, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+	}
+
+	@Test
+	public void testAutomaticStartEventInPassiveModeWithoutEvent() throws Exception {
+		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer2"), callbacks);
+
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+		Assert.assertTrue(fsm.isAutomaticStartRunning());
+		Assert.assertNotNull(fsm.getAutomaticStartDueWhen());
+		
+		conditionalSleep(fsm.getAutomaticStartDueWhen());
+		
+		verify(callbacks, never()).fireConnectRemotePeer();
+		Assert.assertEquals(FSMState.Active, fsm.getState());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+	}
+
 	@Test
 	public void testAutomaticStartEventInActiveMode() throws Exception {
 		fsm.setup(loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers.xml").getPeer("peer1"), callbacks);
@@ -236,8 +271,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.TcpConnectionFails);
 
 		Assert.assertEquals(FSMState.Idle, fsm.getState());
-		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
-		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());
 		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
 		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());
 	}

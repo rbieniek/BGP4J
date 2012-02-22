@@ -47,6 +47,9 @@ public class InternalFSM {
 	private @Inject FireEventTimeManager<FireHoldTimerExpired> fireHoldTimerExpired;
 	private @Inject FireRepeatedEventTimeManager<FireAutomaticStart> fireRepeatedAutomaticStart;
 	
+	private int proposedHoldTime = 0;
+	private int negotatedHoldTime = 0;
+	
 	InternalFSM() {
 	}
 	
@@ -62,7 +65,7 @@ public class InternalFSM {
 		fireRepeatedAutomaticStart.createJobDetail(FireAutomaticStart.class, this);
 		
 		if(peerConfiguration.isAllowAutomaticStart())
-			fireRepeatedAutomaticStart.startRepeatedJob(60); // for now hardcoded minutely interval
+			fireRepeatedAutomaticStart.startRepeatedJob(peerConfiguration.getAutomaticStartInterval()); 
 	}
 	
 	void destroyFSM() {
@@ -108,7 +111,10 @@ public class InternalFSM {
 			handleDelayOpenTimerExpiredEvent();
 			break;
 		case HoldTimer_Expires:
+			break;
 		case BGPOpen:
+			handleBgpOpenEvent();
+			break;
 		case BGPOpenMsgErr:
 		case KeepAliveMsg:
 		case KeepaliveTimer_Expires:
@@ -299,6 +305,13 @@ public class InternalFSM {
 	}
 		
 	/**
+	 * 
+	 */
+	private void handleBgpOpenEvent() {
+		
+	}
+	
+	/**
 	 * check if connections can be accepted
 	 * 
 	 * @return
@@ -399,6 +412,24 @@ public class InternalFSM {
 	Date getHoldTimerDueWhen() throws SchedulerException {
 		return fireHoldTimerExpired.getFiredWhen();
 	}
+
+	/**
+	 * Check if the automatic start event generator is running
+	 * 
+	 */
+	boolean isAutomaticStartRunning() throws SchedulerException {
+		return fireRepeatedAutomaticStart.isJobScheduled();
+	}
+	
+	/**
+	 * get the date the automatic start timer will fire the next time.
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	Date getAutomaticStartDueWhen() throws SchedulerException {
+		return fireRepeatedAutomaticStart.getNextFireWhen();
+	}
 	
 	/**
 	 * Move from any other state to <code>Connect</code> state. It performs the following actions:
@@ -477,12 +508,14 @@ public class InternalFSM {
 			} catch (SchedulerException e) {
 				log.error("Interal Error: cannot schedule idle hold timer for peer " + peerConfiguration.getPeerName(), e);
 			}
+			/*
 		} else {
 			try {
 				fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
 			} catch (SchedulerException e) {
 				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
 			}
+		*/
 		}
 		this.state = FSMState.Idle;		
 	}
@@ -510,6 +543,27 @@ public class InternalFSM {
 		callbacks.fireSendOpenMessage();
 		
 		this.state = FSMState.OpenSent;		
+	}
+
+	/**
+	 * @return the proposedHoldTimer
+	 */
+	public int getProposedHoldTime() {
+		return proposedHoldTime;
+	}
+
+	/**
+	 * @param proposedHoldTimer the proposedHoldTimer to set
+	 */
+	public void setProposedHoldTime(int proposedHoldTime) {
+		this.proposedHoldTime= proposedHoldTime;
+	}
+
+	/**
+	 * @return the negotatedHoldTime
+	 */
+	public int getNegotatedHoldTime() {
+		return negotatedHoldTime;
 	}
 
 }
