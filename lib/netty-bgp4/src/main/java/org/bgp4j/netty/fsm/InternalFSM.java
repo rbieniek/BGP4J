@@ -45,6 +45,7 @@ public class InternalFSM {
 	private @Inject FireEventTimeManager<FireIdleHoldTimerExpired> fireIdleHoldTimerExpired;
 	private @Inject FireEventTimeManager<FireDelayOpenTimerExpired> fireDelayOpenTimerExpired;
 	private @Inject FireEventTimeManager<FireHoldTimerExpired> fireHoldTimerExpired;
+	private @Inject FireRepeatedEventTimeManager<FireAutomaticStart> fireRepeatedAutomaticStart;
 	
 	InternalFSM() {
 	}
@@ -57,6 +58,11 @@ public class InternalFSM {
 		fireIdleHoldTimerExpired.createJobDetail(FireIdleHoldTimerExpired.class, this);
 		fireDelayOpenTimerExpired.createJobDetail(FireDelayOpenTimerExpired.class, this);
 		fireHoldTimerExpired.createJobDetail(FireHoldTimerExpired.class, this);
+		
+		fireRepeatedAutomaticStart.createJobDetail(FireAutomaticStart.class, this);
+		
+		if(peerConfiguration.isAllowAutomaticStart())
+			fireRepeatedAutomaticStart.startRepeatedJob(60); // for now hardcoded minutely interval
 	}
 	
 	void destroyFSM() {
@@ -65,6 +71,7 @@ public class InternalFSM {
 			fireIdleHoldTimerExpired.shutdown();
 			fireDelayOpenTimerExpired.shutdown();
 			fireHoldTimerExpired.shutdown();
+			fireRepeatedAutomaticStart.shutdown();
 		} catch (SchedulerException e) {
 			log.error("Internal error: failed to shutdown internal FSM for peer " + peerConfiguration.getPeerName(), e);
 		}
@@ -125,6 +132,13 @@ public class InternalFSM {
 			this.connectRetryCounter = 0;
 			canAcceptConnection = true;
 
+			try {
+			if(peerConfiguration.isDampPeerOscillation() && fireIdleHoldTimerExpired.isJobScheduled())
+				return;
+			} catch(SchedulerException e) {
+				log.error("cannot query idel hold timer for peer " + peerConfiguration.getPeerName(), e);
+			}
+			
 			if(!peerConfiguration.isPassiveTcpEstablishment())
 				moveStateToConnect();
 			else
