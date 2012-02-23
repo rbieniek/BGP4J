@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.fsm.FSMState.java 
  */
-package org.bgp4j.netty.fsm;
+package org.bgp4j.netty;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

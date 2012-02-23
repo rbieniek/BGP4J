@@ -150,6 +150,30 @@ public class BGPv4FSM {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void fireSendInternalErrorNotification() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void fireSendKeepaliveMessage() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void fireReleaseBGPResources() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void fireCompleteBGPInitialization() {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	
@@ -196,7 +220,7 @@ public class BGPv4FSM {
 //			
 //			internalFsm.handleEvent(event);
 //		}
-		internalFsm.handleEvent(FSMEvent.AutomaticStart);
+		internalFsm.handleEvent(FSMEvent.automaticStart());
 	}
 
 	public void startFSMManual() {
@@ -207,7 +231,7 @@ public class BGPv4FSM {
 //		}
 //		
 //		internalFsm.handleEvent(event);		
-		internalFsm.handleEvent(FSMEvent.ManualStart);
+		internalFsm.handleEvent(FSMEvent.manualStart());
 	}
 
 	public void stopFSM() {

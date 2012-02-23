@@ -17,39 +17,119 @@
  */
 package org.bgp4j.netty.fsm;
 
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public enum FSMEvent {
-	// Administrative events
-	ManualStart,                           // covers RFC 4271 events 1, 4,  
-	ManualStop,                            // RFC4271 event 2
-	AutomaticStart,                        // covers RFC4271 event 3, 5, 6, 7
-	AutomaticStop,                         // RFC4271 event 8
+public class FSMEvent {
+
+	private FSMEventType type;
 	
+	protected FSMEvent(FSMEventType type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public FSMEventType getType() {
+		return type;
+	}
+
+	// Adminstrative events
+	public static FSMEvent manualStart() {
+		return new FSMEvent(FSMEventType.ManualStart);  
+	}
+
+	public static FSMEvent manualStop() {
+		return new FSMEvent(FSMEventType.ManualStop);
+	}
+	
+	public static FSMEvent automaticStart() {
+		return new FSMEvent(FSMEventType.AutomaticStart);
+	}
+	
+	public static FSMEvent automaticStop() {
+		return new FSMEvent(FSMEventType.AutomaticStop);
+	}
+
 	// Timer events
-	ConnectRetryTimer_Expires,             // RFC4271 event 9
-	HoldTimer_Expires,                     // RFC4271 event 10
-	KeepaliveTimer_Expires,                // RFC4271 event 11
-	DelayOpenTimer_Expires,                // RFC4271 event 12
-	IdleHoldTimer_Expires,                 // RFC4271 event 13
+	public static final FSMEvent connectRetryTimerExpires() {
+		return new FSMEvent(FSMEventType.ConnectRetryTimer_Expires);
+	}
+	
+	public static final FSMEvent holdTimerExpires() {
+		return new FSMEvent(FSMEventType.HoldTimer_Expires);
+	}
+	
+	public static final FSMEvent keepaliveTimerExpires() {
+		return new FSMEvent(FSMEventType.KeepaliveTimer_Expires);
+	}
+	
+	public static final FSMEvent delayOpenTimerExpires() {
+		return new FSMEvent(FSMEventType.DelayOpenTimer_Expires);
+	}
+	
+	public static final FSMEvent idleHoldTimerExpires() {
+		return new FSMEvent(FSMEventType.IdleHoldTimer_Expires);
+	}
 	
 	// TCP connection-based events
-	TcpConnection_Valid,                   // RFC4171 event 14
-	Tcp_CR_Invalid,                        // RFC4271 event 15
-	Tcp_CR_Acked,                          // RFC4271 event 16
-	TcpConnectionConfirmed,                // RFC4271 event 17
-	TcpConnectionFails,                    // RFC4271 event 18
+	public static final FSMEvent tcpConnectionValid() {
+		return new FSMEvent(FSMEventType.TcpConnection_Valid);
+	}
+	
+	public static final FSMEvent tcpConnectionRequestInvalid() {
+		return new FSMEvent(FSMEventType.Tcp_CR_Invalid);
+	}
+
+	public static final FSMEvent tcpConnectionRequestAcked() {
+		return new FSMEvent(FSMEventType.Tcp_CR_Acked);
+	}
+	
+	public static final FSMEvent tcpConnectionConfirmed() {
+		return new FSMEvent(FSMEventType.TcpConnectionConfirmed);
+	}
+	
+	public static final FSMEvent tcpConnectionFails() {
+		return new FSMEvent(FSMEventType.TcpConnectionFails);
+	}
 	
 	// BGP Message-based events
-	BGPOpen,                               // covers RFC4271 event 19, 20
-	BGPHeaderErr,                          // RFC4271 event 21
-	BGPOpenMsgErr,                         // RFC4271 event 22
-	OpenCollisionDump,                     // RFC4271 event 23
-	NotifyMsgVerErr,                       // RFC4271 event 24
-	NotifyMsg,                             // RFC4271 event 25
-	KeepAliveMsg,                          // RFC4271 event 26 
-	UpdateMsg,                             // RFC4271 event 27
-	UpdateMsgErr,                          // RFC4271 event 28
+	public static final FSMEvent bgpOpen() {
+		return new FSMEvent(FSMEventType.BGPOpen);
+	}
+
+	public static final FSMEvent bgpHeaderError() {
+		return new FSMEvent(FSMEventType.BGPHeaderErr);
+	}
+
+	public static final FSMEvent bgpOpenMessageError() {
+		return new FSMEvent(FSMEventType.BGPOpenMsgErr);
+	}
+
+	public static final FSMEvent openCollisionDump() {
+		return new FSMEvent(FSMEventType.OpenCollisionDump);
+	}
+
+	public static final FSMEvent notifyMessageVersionError() {
+		return new FSMEvent(FSMEventType.NotifyMsgVerErr);
+	}
+	
+	public static final FSMEvent notifyMessage() {
+		return new FSMEvent(FSMEventType.NotifyMsg);
+	}
+
+	public static final FSMEvent keepAliveMessage() {
+		return new FSMEvent(FSMEventType.KeepAliveMsg);
+	}
+	
+	public static final FSMEvent updateMessage() {
+		return new FSMEvent(FSMEventType.UpdateMsg);
+	}
+
+	public static final FSMEvent updateMessageError() {
+		return new FSMEvent(FSMEventType.UpdateMsgErr);
+	}
 }

@@ -22,6 +22,7 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.netty.FSMState;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 
@@ -46,9 +47,10 @@ public class InternalFSM {
 	private @Inject FireEventTimeManager<FireDelayOpenTimerExpired> fireDelayOpenTimerExpired;
 	private @Inject FireEventTimeManager<FireHoldTimerExpired> fireHoldTimerExpired;
 	private @Inject FireRepeatedEventTimeManager<FireAutomaticStart> fireRepeatedAutomaticStart;
+	private @Inject FireRepeatedEventTimeManager<FireSendKeepalive> fireKeepaliveTimerExpired;
 	
-	private int proposedHoldTime = 0;
-	private int negotatedHoldTime = 0;
+	private int peerProposedHoldTime = 0;
+	private boolean haveFSMError = false;
 	
 	InternalFSM() {
 	}
@@ -61,6 +63,7 @@ public class InternalFSM {
 		fireIdleHoldTimerExpired.createJobDetail(FireIdleHoldTimerExpired.class, this);
 		fireDelayOpenTimerExpired.createJobDetail(FireDelayOpenTimerExpired.class, this);
 		fireHoldTimerExpired.createJobDetail(FireHoldTimerExpired.class, this);
+		fireKeepaliveTimerExpired.createJobDetail(FireSendKeepalive.class, this);
 		
 		fireRepeatedAutomaticStart.createJobDetail(FireAutomaticStart.class, this);
 		
@@ -75,13 +78,14 @@ public class InternalFSM {
 			fireDelayOpenTimerExpired.shutdown();
 			fireHoldTimerExpired.shutdown();
 			fireRepeatedAutomaticStart.shutdown();
+			fireKeepaliveTimerExpired.shutdown();
 		} catch (SchedulerException e) {
 			log.error("Internal error: failed to shutdown internal FSM for peer " + peerConfiguration.getPeerName(), e);
 		}
 	}
 
 	void handleEvent(FSMEvent event) {
-		switch(event) {
+		switch(event.getType()) {
 		case AutomaticStart:
 		case ManualStart:
 			handleStartEvent();
@@ -111,18 +115,46 @@ public class InternalFSM {
 			handleDelayOpenTimerExpiredEvent();
 			break;
 		case HoldTimer_Expires:
+			handleHoldTimerExpiredEvent();
 			break;
 		case BGPOpen:
 			handleBgpOpenEvent();
 			break;
-		case BGPOpenMsgErr:
 		case KeepAliveMsg:
+			handleKeepaliveMessageEvent();
+			break;
 		case KeepaliveTimer_Expires:
+			handleKeepaliveTimerExpiresEvent();
+			break;
 		case NotifyMsg:
+			handleNotifyMessageEvent();
+			break;
 		case NotifyMsgVerErr:
+			handleNotifyMessageVersionErrorEvent();
+			break;
 		case OpenCollisionDump:
+			handleOpenCollisionDumpEvent();
+			break;
+		case BGPOpenMsgErr:
+			handleBGPOpenMessageErrorEvent();
+			break;
+		case BGPHeaderErr:
+			handleBGPHeaderErrorEvent();
+			break;
 		case UpdateMsg:
+			handleUpdateMessageEvent();
+			break;
 		case UpdateMsgErr:
+			handleUpdateMessageErrorEvent();
+			break;
+		}
+		
+		if(haveFSMError) {
+			callbacks.fireSendInternalErrorNotification();
+			 
+			moveStateToIdle();
+			
+			haveFSMError = false;
 		}
 	}
 	
@@ -143,6 +175,8 @@ public class InternalFSM {
 				return;
 			} catch(SchedulerException e) {
 				log.error("cannot query idel hold timer for peer " + peerConfiguration.getPeerName(), e);
+				
+				haveFSMError = true;
 			}
 			
 			if(!peerConfiguration.isPassiveTcpEstablishment())
@@ -157,16 +191,12 @@ public class InternalFSM {
 	 */
 	private void handleStopEvent() {
 		if(state == FSMState.Connect) {
-			try {
-				fireConnectRetryTimeExpired.cancelJob();
-			} catch (SchedulerException e) {
-				log.error("Internal error: failed to cancel connect retry timer for peer " + peerConfiguration.getPeerName(), e);
-			}
 			callbacks.fireDisconnectRemotePeer();
 		}
 		
 		this.connectRetryCounter = 0;
-		this.state = FSMState.Idle;
+		
+		moveStateToIdle();
 	}
 	
 	/**
@@ -201,6 +231,8 @@ public class InternalFSM {
 					fireIdleHoldTimerExpired.scheduleJob(peerConfiguration.getIdleHoldTime() << connectRetryCounter);
 				} catch (SchedulerException e) {
 					log.error("Interal Error: cannot schedule idle hold timer for peer " + peerConfiguration.getPeerName(), e);
+					
+					haveFSMError = true;
 				}
 			} else {
 				this.connectRetryCounter++;
@@ -222,11 +254,28 @@ public class InternalFSM {
 	/**
 	 * handle the idle hold timer expired event. If the current state is <code>Idle</code> then the machine is moved into state <code>Connect</code>
 	 */
-	private void handleIdleHoldTimerExpiredEvent() {
-		if(state == FSMState.Idle) {			
+	private void handleHoldTimerExpiredEvent() {
+		switch(state) {
+		case Connect:
 			this.connectRetryCounter++;
-			
+			moveStateToIdle();		
+			break;
+		}
+	}
+
+	/**
+	 * handle the idle hold timer expired event. If the current state is <code>Idle</code> then the machine is moved into state <code>Connect</code>
+	 */
+	private void handleIdleHoldTimerExpiredEvent() {
+		switch(state) {
+		case Connect:
+			this.connectRetryCounter++;
+			moveStateToIdle();		
+			break;
+		case Idle:
+			this.connectRetryCounter++;
 			moveStateToConnect();
+			break;
 		}
 	}
 
@@ -262,7 +311,7 @@ public class InternalFSM {
 			} catch(SchedulerException e) {
 				log.error("Internal Error: Failed to query delay open timer for peer " + peerConfiguration.getPeerName());
 				
-				moveStateToIdle();
+				haveFSMError = true;
 			}
 			break;
 		case Active:
@@ -297,6 +346,8 @@ public class InternalFSM {
 					fireDelayOpenTimerExpired.scheduleJob(peerConfiguration.getDelayOpenTime());
 				} catch (SchedulerException e) {
 					log.error("Internal Error: cannot schedule open delay timer for peer " + peerConfiguration.getPeerName(), e);
+					
+					haveFSMError = true;
 				}
 			} else {
 				moveStateToOpenSent();
@@ -305,12 +356,134 @@ public class InternalFSM {
 	}
 		
 	/**
-	 * 
+	 * handle an inbound <code>OPEN</code> mesage from the remote peer
 	 */
 	private void handleBgpOpenEvent() {
-		
+		switch(state) {
+		case Connect:
+			try {
+				if(fireDelayOpenTimerExpired.isJobScheduled()) {
+					moveStateToOpenConfirm();
+				} else {
+					connectRetryCounter++;
+					moveStateToIdle();
+				}
+			} catch(SchedulerException e) {
+				log.error("cannot query delay openn timer for peer " + peerConfiguration.getPeerName(), e);
+				
+				haveFSMError = true;
+			}
+			break;
+		}
 	}
 	
+	/**
+	 * handle an <code>KEEPALIVE</CODE> message sent from the remote peer
+	 */
+	private void handleKeepaliveMessageEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}		
+	}
+	
+	/**
+	 * handle the expired keepalive timer on the local side
+	 */
+	private void handleKeepaliveTimerExpiresEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}
+	}
+
+	/**
+	 * handle a <code>NOTIFY</code> message sent from the remote peer
+	 */
+	private void handleNotifyMessageEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+		}
+	}
+	
+	/**
+	 * handle a malformed <code>NOTIFY</code> message sent from the remote peer
+	 */
+	private void handleNotifyMessageVersionErrorEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void handleOpenCollisionDumpEvent()  {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}		
+	}
+
+	/**
+	 * handle a malformed <code>OPEN</code> message sent from the remote peer
+	 */
+	private void handleBGPOpenMessageErrorEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}		
+	}
+	
+	/**
+	 * handle a malformed BGP packet where the initial header checks failed
+	 */
+	private void handleBGPHeaderErrorEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}
+	}
+	
+	/**
+	 * handle an <code>UPDATE</code> message sent from the remote peer
+	 */
+	private void handleUpdateMessageEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}		
+	}
+	
+	/**
+	 * handle a malformed <code>UPDATE</code> message sent from the remote peer
+	 */
+	private void handleUpdateMessageErrorEvent() {
+		switch(state) {
+		case Connect:
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		}		
+	}
+
 	/**
 	 * check if connections can be accepted
 	 * 
@@ -414,6 +587,25 @@ public class InternalFSM {
 	}
 
 	/**
+	 * check if the send keeplives timer is running 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	public boolean isKeepaliveTimerRunning() throws SchedulerException {
+		return fireKeepaliveTimerExpired.isJobScheduled();
+	}
+	
+	/**
+	 * get the date when the next keepalive packket is to be sent
+	 * 
+	 * @return
+	 * @throws SchedulerException
+	 */
+	public Date getKeepaliveTimerDueWhen() throws SchedulerException {
+		return fireKeepaliveTimerExpired.getNextFireWhen();
+	}
+	
+	/**
 	 * Check if the automatic start event generator is running
 	 * 
 	 */
@@ -432,6 +624,46 @@ public class InternalFSM {
 	}
 	
 	/**
+	 * @return the proposedHoldTimer
+	 */
+	int getPeerProposedHoldTime() {
+		return peerProposedHoldTime;
+	}
+
+	/**
+	 * @param proposedHoldTimer the proposedHoldTimer to set
+	 */
+	void setPeerProposedHoldTime(int proposedHoldTime) {
+		this.peerProposedHoldTime= proposedHoldTime;
+	}
+
+	/**
+	 * get the negotiated hold time. This is the minimum of the locally configured hold time and the
+	 * hold time value received from the remote peer in the initial open packet. 
+	 * It is assured that the negotiated hold time cannot be less than 3 seconds as specified by RFC4271. 
+	 *  
+	 * @return
+	 */
+	int getNegotiatedHoldTime() {
+		int negotiatedHoldTime = Math.min(peerConfiguration.getHoldTime(), peerProposedHoldTime);
+		
+		if(negotiatedHoldTime < 3)
+			negotiatedHoldTime = 3;
+		
+		return negotiatedHoldTime;
+	}
+	
+	/**
+	 * get the keepalive interval which is 1/3 of the negotiated hold time. It is assured that the interval
+	 * cannot be less than 1 second as specified by RFC4271
+	 * 
+	 * @return
+	 */
+	private int getSendKeepaliveTime() {
+		return Math.max(getNegotiatedHoldTime() / 3, 1);
+	}
+
+	/**
 	 * Move from any other state to <code>Connect</code> state. It performs the following actions:
 	 * <ol>
 	 * <li>cancel the idle hold timer</li>
@@ -449,6 +681,8 @@ public class InternalFSM {
 			fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
 		} catch (SchedulerException e) {
 			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+			
+			haveFSMError = true;
 		}
 		
 		callbacks.fireConnectRemotePeer();
@@ -476,6 +710,8 @@ public class InternalFSM {
 			fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
 		} catch (SchedulerException e) {
 			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+			
+			haveFSMError = true;
 		}
 		this.state = FSMState.Active;		
 	}
@@ -487,6 +723,9 @@ public class InternalFSM {
 	 * <li>cancel the connect retry timer</li>
 	 * <li>cancel the delay open timer</li>
 	 * <li>cancel the hold timer</li>
+	 * <li>cancel the send keepalive timer</li>
+	 * <li>release all BGP resources</li>
+	 * <li>disconnect the remote peer</li>
 	 * <li>restart the connect retry timer with the configured value if peer dampening is disabled</li>
 	 * <li>restart the idle hold timer with the configured value if peer dampening is enabled</li>
 	 * <li>set the state to <code>Idle</code></li>
@@ -498,24 +737,24 @@ public class InternalFSM {
 			fireConnectRetryTimeExpired.cancelJob();
 			fireDelayOpenTimerExpired.cancelJob();
 			fireHoldTimerExpired.cancelJob();
+			fireKeepaliveTimerExpired.cancelJob();
 		} catch(SchedulerException e) {
 			log.error("Interal Error: cannot cancel timers for peer " + peerConfiguration.getPeerName(), e);			
+			
+			haveFSMError = true;
 		}
+		
+		callbacks.fireReleaseBGPResources();
+		callbacks.fireDisconnectRemotePeer();
 		
 		if(peerConfiguration.isDampPeerOscillation()) {
 			try {
 				fireIdleHoldTimerExpired.scheduleJob(peerConfiguration.getIdleHoldTime() << connectRetryCounter);
 			} catch (SchedulerException e) {
 				log.error("Interal Error: cannot schedule idle hold timer for peer " + peerConfiguration.getPeerName(), e);
+				
+				haveFSMError = true;
 			}
-			/*
-		} else {
-			try {
-				fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
-			} catch (SchedulerException e) {
-				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
-			}
-		*/
 		}
 		this.state = FSMState.Idle;		
 	}
@@ -538,32 +777,53 @@ public class InternalFSM {
 			fireHoldTimerExpired.scheduleJob(600);
 		} catch (SchedulerException e) {
 			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+			
+			haveFSMError = true;
 		}
 		
+		callbacks.fireCompleteBGPInitialization();
 		callbacks.fireSendOpenMessage();
 		
 		this.state = FSMState.OpenSent;		
 	}
 
-	/**
-	 * @return the proposedHoldTimer
-	 */
-	public int getProposedHoldTime() {
-		return proposedHoldTime;
-	}
+	private void moveStateToOpenConfirm() {
+		callbacks.fireCompleteBGPInitialization();
+		callbacks.fireSendOpenMessage();
+		callbacks.fireSendKeepaliveMessage();
 
-	/**
-	 * @param proposedHoldTimer the proposedHoldTimer to set
-	 */
-	public void setProposedHoldTime(int proposedHoldTime) {
-		this.proposedHoldTime= proposedHoldTime;
-	}
+		try {
+			fireConnectRetryTimeExpired.cancelJob();
+		}  catch(SchedulerException e) {
+			log.error("cannont cancel connect retry timer", e);
+			
+			haveFSMError = true;
+		}
+		try {
+			fireDelayOpenTimerExpired.cancelJob();
+		} catch(SchedulerException e){
+			log.error("cannont cancel open delay timer", e);
+			
+			haveFSMError = true;
+		}
 
-	/**
-	 * @return the negotatedHoldTime
-	 */
-	public int getNegotatedHoldTime() {
-		return negotatedHoldTime;
+		if(!peerConfiguration.isHoldTimerDisabled()) {
+			try {
+				fireKeepaliveTimerExpired.startRepeatedJob(getSendKeepaliveTime());
+			} catch(SchedulerException e) {
+				log.error("cannont start send keepalive timer", e);
+				
+				haveFSMError = true;				
+			}
+			
+			try {
+				fireHoldTimerExpired.cancelJob();
+				fireHoldTimerExpired.scheduleJob(getNegotiatedHoldTime());
+			} catch(SchedulerException e) {
+				
+			}
+		}
+		this.state = FSMState.OpenConfirm;
 	}
-
+	
 }

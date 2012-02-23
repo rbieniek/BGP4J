@@ -53,6 +53,18 @@
             <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="true"/>
             <Timers holdTime="180" idleHoldTime="15" delayOpen="10" connectRetryTime="5" automaticStartInterval="10" />
         </BgpPeer>
+        <!--
+            - IBGP connection
+            - local BGP identifier lower than remote BGP identifier
+            - active connection, no peer dampening, open delay 10 seconds, no hold timer
+        -->
+        <BgpPeer name="peer5">
+            <Client remote="192.168.4.3" />
+            <AutonomousSystem local="65280" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.2}" remote="${ipv4:192.168.4.3}" />
+            <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="true" holdTimerDisabled="true" />
+            <Timers holdTime="0" idleHoldTime="15" delayOpen="10" connectRetryTime="5" automaticStartInterval="10" />
+        </BgpPeer>
     </BgpPeers>
 
 </Config>

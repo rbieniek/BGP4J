@@ -40,4 +40,24 @@ public interface InternalFSMCallbacks {
 	 * Sent an <code>OPEN</code> message to the remote peer.
 	 */
 	public void fireSendOpenMessage();
+
+	/**
+	 * send an FSM error notification to the remote peer
+	 */
+	public void fireSendInternalErrorNotification();
+
+	/**
+	 * send a keepalive message to the remote peer
+	 */
+	void fireSendKeepaliveMessage();
+
+	/**
+	 * release all resources hold on behalf of the remote peer
+	 */
+	void fireReleaseBGPResources();
+	
+	/**
+	 * complete the initialization
+	 */
+	void fireCompleteBGPInitialization();
 }
