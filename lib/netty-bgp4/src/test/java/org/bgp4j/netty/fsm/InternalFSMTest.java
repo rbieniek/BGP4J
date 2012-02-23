@@ -404,6 +404,229 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(false);
 	}
 
+	@Test
+	public void testTransitionActiveByManualStop() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.manualStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByDelayOpenTimerExpires() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState();
+	}
+	
+	@Test
+	public void testTransitionActiveByTcpConnectionSuccessWithDelayOpenTimer() throws Exception {
+		initializeFSMToActiveState("peer7");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInActiveState(true);
+	}
+	
+	@Test
+	public void testTransitionActiveByTcpConnectionSuccessWithoutDelayOpenTimer() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState();
+	}
+	
+	@Test
+	public void testTransitionActiveByTcpConnectionFailure() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.tcpConnectionFails());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+		
+	@Test
+	public void testTransitionActiveByOpenEventOpenDelayTimerRunningWithHoldTimer() throws Exception {
+		initializeFSMToConnectState("peer7");
+
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
+
+		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireSendOpenMessage();
+		assertMachineInConnectState(true);
+
+		fsm.handleEvent(FSMEvent.bgpOpen());
+
+		verify(callbacks).fireConnectRemotePeer();
+		assertMachineInOpenConfirm(true);
+	}
+
+	@Test
+	public void testTransitionActiveByOpenEventOpenDelayTimerRunningWithoutHoldTimer() throws Exception {
+		initializeFSMToConnectState("peer8");
+
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
+
+		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireSendOpenMessage();
+		assertMachineInConnectState(true);
+
+		fsm.handleEvent(FSMEvent.bgpOpen());
+
+		verify(callbacks).fireConnectRemotePeer();
+		assertMachineInOpenConfirm(false);
+	}
+
+	@Test
+	public void testTransitionActiveByOpenMessageError() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByBgpHeaderError() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.bgpHeaderError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByNotifiyVersionError() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByAutomaticStop() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.automaticStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByHoldTimerExpires() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.holdTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByKeepaliveTimerExpires() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.keepaliveTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByIdleHoldTimerExpires() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByOpenCollisionDump() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.openCollisionDump());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByNotifiyMessage() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.notifyMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByKeepaliveMessage() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByUpdateMessage() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.updateMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionActiveByUpdateMessageError() throws Exception {
+		initializeFSMToActiveState("peer2");
+		
+		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
+		fsm.handleEvent(FSMEvent.updateMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+
+	// -- end of test messages
 	private Configuration loadConfiguration(String fileName) throws Exception {
 		return parser.parseConfiguration(new XMLConfiguration(fileName));
 	}
