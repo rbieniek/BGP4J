@@ -151,6 +151,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80401L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
@@ -176,6 +177,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80401L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
@@ -198,6 +200,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80601L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 
 		applicationConfig.putPeer(peer);
@@ -222,6 +225,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80401L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
@@ -243,6 +247,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80601L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 
 		applicationConfig.putPeer(otherPeer);
@@ -267,6 +272,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80401L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
@@ -303,6 +309,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80401L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 		
 		Assert.assertEquals(0, applicationConfig.listPeerConfigurations().size());
@@ -324,6 +331,7 @@ public class ApplicationConfigurationTest extends ConfigTestBase {
 				0xc0a80601L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30); // idle hold time
 
 		applicationConfig.putPeer(otherPeer);

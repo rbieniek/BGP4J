@@ -52,6 +52,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -69,6 +70,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -86,6 +88,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -103,6 +106,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -120,6 +124,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -137,6 +142,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -154,6 +160,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -172,6 +179,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -189,6 +197,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -206,6 +215,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -223,6 +233,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -240,6 +251,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -257,6 +269,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -274,6 +287,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -317,6 +331,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -334,6 +349,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -351,6 +367,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -368,6 +385,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -385,6 +403,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -402,6 +421,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -419,6 +439,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -437,6 +458,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -454,6 +476,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -471,6 +494,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -488,6 +512,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -505,6 +530,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				31, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -522,6 +548,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -539,6 +566,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connect retry time
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop

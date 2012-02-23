@@ -179,6 +179,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 				.append(isCollisionDetectEstablishedState(), o.isCollisionDetectEstablishedState())
 				.append(isDampPeerOscillation(), o.isDampPeerOscillation())
 				.append(isDelayOpen(), o.isDelayOpen())
+				.append(isHoldTimerDisabled(), o.isHoldTimerDisabled())
 				.append(isPassiveTcpEstablishment(), o.isPassiveTcpEstablishment())
 				.append(getConnectRetryTime(), o.getConnectRetryTime())
 				.isEquals();
@@ -189,26 +190,6 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 	 * @see org.bgp4.config.nodes.PeerConfiguration#hashCode()
 	 */
 	public int hashCode() {
-		/*
-		return (new HashCodeBuilder())
-				.append(allowAutomaticStart)
-				.append(allowAutomaticStop)
-				.append(clientConfig)
-				.append(collisionDetectEstablishedState)
-				.append(dampPeerOscillation)
-				.append(connectRetryTime)
-				.append(delayOpen)
-				.append(delayOpenTime)
-				.append(holdTime)
-				.append(idleHoldTime)
-				.append(localAS)
-				.append(localBgpIdentifier)
-				.append(passiveTcpEstablishment)
-				.append(peerName)
-				.append(remoteAS)
-				.append(remoteBgpIdentifier)
-				.toHashCode();
-		 */
 		return (new HashCodeBuilder())
 				.append(isAllowAutomaticStart())
 				.append(isAllowAutomaticStop())
@@ -219,7 +200,8 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 				.append(isDampPeerOscillation())
 				.append(isDelayOpen())
 				.append(getDelayOpenTime())
-				.append(getHoldTime())				
+				.append(getHoldTime())
+				.append(isHoldTimerDisabled())
 				.append(getIdleHoldTime())				
 				.append(getLocalAS())
 				.append(getLocalBgpIdentifier())
@@ -241,5 +223,13 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 	@Override
 	public int getAutomaticStartInterval() {
 		return decorated.getAutomaticStartInterval();
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isHoldTimerDisabled() {
+		return decorated.isHoldTimerDisabled();
 	}
 }

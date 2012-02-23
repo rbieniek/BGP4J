@@ -70,6 +70,6 @@
         <AutonomousSystem local="10" remote="11" />
         <BgpIdentifier local="200" remote="300" />
         <Options allowAutomaticStart="false" allowAutomaticStop="true" dampPeerOscillation="true" 
-            collisionDetectEstablishedState="true" delayOpen="true" passiveTcpEstablishment="true" />
+            collisionDetectEstablishedState="true" delayOpen="true" passiveTcpEstablishment="true" holdTimerDisabled="true" />
     </BgpPeer>
 </Config>

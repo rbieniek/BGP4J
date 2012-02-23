@@ -152,6 +152,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertTrue(peerConfig.isDampPeerOscillation());
 		Assert.assertTrue(peerConfig.isDelayOpen());
 		Assert.assertTrue(peerConfig.isPassiveTcpEstablishment());
+		Assert.assertTrue(peerConfig.isHoldTimerDisabled());
 	}
 	
 }

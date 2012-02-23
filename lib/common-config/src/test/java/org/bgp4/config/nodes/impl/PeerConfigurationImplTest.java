@@ -41,6 +41,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				true, // hold timer disabled
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
@@ -59,6 +60,7 @@ public class PeerConfigurationImplTest {
 		Assert.assertEquals(0xc0a80501L, config.getRemoteBgpIdentifier());
 		Assert.assertEquals(60, config.getConnectRetryTime());
 		Assert.assertEquals(300, config.getHoldTime());
+		Assert.assertTrue(config.isHoldTimerDisabled());
 		Assert.assertEquals(30, config.getIdleHoldTime());
 		Assert.assertEquals(120, config.getAutomaticStartInterval());
 		Assert.assertTrue(config.isAllowAutomaticStart());
@@ -99,6 +101,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
@@ -121,6 +124,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				-300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
@@ -143,6 +147,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				-30, // idle hold time
 				true, // allow automatic start
 				true, // allow automatic stop
@@ -170,6 +175,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -187,6 +193,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -204,6 +211,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -221,6 +229,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -238,6 +247,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -255,6 +265,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -272,6 +283,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -289,6 +301,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80502L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -306,6 +319,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -323,7 +337,8 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
-				31, // idle hold time
+				true, // hold timer disabled
+				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
@@ -340,8 +355,9 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
-				30, // idle hold time
-				true, // allow automatic start
+				false, // hold timer disabled
+				31, // idle hold time
+				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
@@ -357,9 +373,10 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
-				false, // allow automatic start
-				true, // allow automatic stop
+				true, // allow automatic start
+				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
@@ -374,10 +391,11 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
-				false, // allow automatic stop
-				10, // automatic start interval
+				true, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -391,11 +409,12 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				0, // automatic start interval
-				true, // damp peer oscillation
+				10, // automatic start interval
+				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
@@ -408,12 +427,13 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
-				false, // damp peer oscillation
-				true, // passive tcp establishment
+				true, // damp peer oscillation
+				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
@@ -425,13 +445,14 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
-				false, // passive tcp establishment
-				true, // delay open
+				true, // passive tcp establishment
+				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
@@ -442,14 +463,15 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
-				false, // delay open
-				240, // delay open time
+				true, // delay open
+				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -459,6 +481,25 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				240, // delay open time
+				false); // connect retry interval
+		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -468,7 +509,7 @@ public class PeerConfigurationImplTest {
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
-		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c20 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -476,6 +517,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -504,6 +546,7 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.equals(c17));
 		Assert.assertFalse(c1.equals(c18));
 		Assert.assertFalse(c1.equals(c19));
+		Assert.assertFalse(c1.equals(c20));
 	}
 
 	@Test
@@ -516,6 +559,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -533,6 +577,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -550,6 +595,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -567,6 +613,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -584,6 +631,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -601,6 +649,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -618,6 +667,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -635,6 +685,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80502L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -652,6 +703,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				301, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -669,7 +721,8 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
-				31, // idle hold time
+				true, // hold timer disabled
+				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
@@ -686,8 +739,9 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
-				30, // idle hold time
-				true, // allow automatic start
+				false, // hold timer disabled
+				31, // idle hold time
+				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
@@ -703,9 +757,10 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
-				false, // allow automatic start
-				true, // allow automatic stop
+				true, // allow automatic start
+				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
@@ -720,10 +775,11 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
-				false, // allow automatic stop
-				10, // automatic start interval
+				true, // allow automatic stop
+				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
@@ -737,11 +793,12 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
-				0, // automatic start interval
-				true, // damp peer oscillation
+				10, // automatic start interval
+				false, // damp peer oscillation
 				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
@@ -754,12 +811,13 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
-				false, // damp peer oscillation
-				true, // passive tcp establishment
+				true, // damp peer oscillation
+				false, // passive tcp establishment
 				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
@@ -771,13 +829,14 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
-				false, // passive tcp establishment
-				true, // delay open
+				true, // passive tcp establishment
+				false, // delay open
 				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c17 = new PeerConfigurationImpl("foo", // peer name 
@@ -788,14 +847,15 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
 				0, // automatic start interval
 				false, // damp peer oscillation
 				false, // passive tcp establishment
-				false, // delay open
-				240, // delay open time
+				true, // delay open
+				180, // delay open time
 				false); // connect retry interval
 		PeerConfiguration c18 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -805,6 +865,25 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				60, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				240, // delay open time
+				false); // connect retry interval
+		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -814,7 +893,7 @@ public class PeerConfigurationImplTest {
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
-		PeerConfiguration c19 = new PeerConfigurationImpl("foo", // peer name 
+		PeerConfiguration c20 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
 				24576, // local AS
 				32768, // remote AS
@@ -822,6 +901,7 @@ public class PeerConfigurationImplTest {
 				0xc0a80501L, // remote BGP identifier
 				61, // connectRetryTime
 				300, // hold time
+				false, // hold timer disabled
 				30, // idle hold time
 				false, // allow automatic start
 				false, // allow automatic stop
@@ -850,5 +930,6 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.hashCode() == c17.hashCode());
 		Assert.assertFalse(c1.hashCode() == c18.hashCode());
 		Assert.assertFalse(c1.hashCode() == c19.hashCode());
+		Assert.assertFalse(c1.hashCode() == c20.hashCode());
 	}
 }

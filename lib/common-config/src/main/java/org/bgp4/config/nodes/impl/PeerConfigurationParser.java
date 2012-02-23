@@ -98,6 +98,7 @@ public class PeerConfigurationParser {
 		peerConfig.setCollisionDetectEstablishedState(config.getBoolean("Options[@collisionDetectEstablishedState]", false));
 		peerConfig.setDelayOpen(config.getBoolean("Options[@delayOpen]", false));
 		peerConfig.setPassiveTcpEstablishment(config.getBoolean("Options[@passiveTcpEstablishment]", false));
+		peerConfig.setHoldTimerDisabled(config.getBoolean("Options[@holdTimerDisabled]", false));
 
 		return peerConfig;
 	}

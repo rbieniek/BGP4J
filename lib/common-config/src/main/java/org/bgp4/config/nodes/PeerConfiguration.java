@@ -141,4 +141,10 @@ public interface PeerConfiguration {
 	 * @return
 	 */
 	public int getAutomaticStartInterval();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isHoldTimerDisabled();
 }

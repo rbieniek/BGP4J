@@ -37,6 +37,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private long localBgpIdentifier;
 	private long remoteBgpIdentifier; 
 	private int holdTime;
+	private boolean holdTimerDisabled;
 	private int idleHoldTime;
 	private boolean allowAutomaticStart;
 	private boolean allowAutomaticStop;
@@ -79,17 +80,18 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	}
 
 	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
-			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, int idleHoldTime) throws ConfigurationException {
+			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, boolean holdTimerDisabled, int idleHoldTime) throws ConfigurationException {
 		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime);
 
 		setHoldTime(holdTime);
+		setHoldTimerDisabled(holdTimerDisabled);
 		setIdleHoldTime(idleHoldTime);
 	}
 	
 	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
-			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, int idleHoldTime,
+			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, boolean holdTimerDisabled, int idleHoldTime,
 			boolean allowAutomaticStart, boolean allowAutomaticStop, int automaticStartInterval, boolean dampPeerOscillation) throws ConfigurationException {
-		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, idleHoldTime);
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, holdTimerDisabled, idleHoldTime);
 		
 		setAllowAutomaticStart(allowAutomaticStart);
 		setAllowAutomaticStop(allowAutomaticStop);
@@ -98,10 +100,10 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	}
 
 	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
-			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, int idleHoldTime,
+			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, boolean holdTimerDisabled, int idleHoldTime,
 			boolean allowAutomaticStart, boolean allowAutomaticStop, int automaticStartInterval, boolean dampPeerOscillation,
 			boolean passiveTcpEstablishment, boolean delayOpen, int delayOpenTime) throws ConfigurationException {
-		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, idleHoldTime,
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, holdTimerDisabled, idleHoldTime,
 				allowAutomaticStart, allowAutomaticStop, automaticStartInterval, dampPeerOscillation);
 		
 		setPassiveTcpEstablishment(passiveTcpEstablishment);
@@ -110,11 +112,11 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	}
 
 	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
-			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, int idleHoldTime,
+			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, boolean holdTimerDisabled, int idleHoldTime,
 			boolean allowAutomaticStart, boolean allowAutomaticStop, int automaticStartInterval, boolean dampPeerOscillation,
 			boolean passiveTcpEstablishment, boolean delayOpen, int delayOpenTime,
 			boolean collisionDetectEstablishedState) throws ConfigurationException {
-		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, idleHoldTime,
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, holdTimerDisabled, idleHoldTime,
 				allowAutomaticStart, allowAutomaticStop, automaticStartInterval ,dampPeerOscillation, passiveTcpEstablishment, delayOpen, delayOpenTime);
 		
 		setCollisionDetectEstablishedState(collisionDetectEstablishedState);
@@ -271,6 +273,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(delayOpen)
 				.append(delayOpenTime)
 				.append(holdTime)
+				.append(holdTimerDisabled)
 				.append(idleHoldTime)
 				.append(localAS)
 				.append(localBgpIdentifier)
@@ -303,6 +306,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(delayOpen, o.delayOpen)
 				.append(delayOpenTime, o.delayOpenTime)
 				.append(holdTime, o.holdTime)
+				.append(holdTimerDisabled, o.holdTimerDisabled)
 				.append(idleHoldTime, o.idleHoldTime)	
 				.append(localAS, o.localAS)
 				.append(localBgpIdentifier, o.localBgpIdentifier)
@@ -443,11 +447,25 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	/**
 	 * @param automaticStartInterval the automaticStartInterval to set
 	 */
-	public void setAutomaticStartInterval(int automaticStartInterval) throws ConfigurationException {
+	void setAutomaticStartInterval(int automaticStartInterval) throws ConfigurationException {
 		if(automaticStartInterval < 0)
 			throw new ConfigurationException("Illegal automatic start interval given: " + connectRetryTime);
 
 		this.automaticStartInterval = automaticStartInterval;
+	}
+
+	/**
+	 * @return the holdTimerDisabled
+	 */
+	public boolean isHoldTimerDisabled() {
+		return holdTimerDisabled;
+	}
+
+	/**
+	 * @param holdTimerDisabled the holdTimerDisabled to set
+	 */
+	void setHoldTimerDisabled(boolean holdTimerDisabled) {
+		this.holdTimerDisabled = holdTimerDisabled;
 	}
 
 }
