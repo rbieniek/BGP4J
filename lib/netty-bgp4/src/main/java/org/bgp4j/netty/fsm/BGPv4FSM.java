@@ -174,6 +174,12 @@ public class BGPv4FSM {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void fireSendCeaseNotification() {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	

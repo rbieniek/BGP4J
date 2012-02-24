@@ -47,6 +47,11 @@ public interface InternalFSMCallbacks {
 	public void fireSendInternalErrorNotification();
 
 	/**
+	 * send a CEASE notification to the remote peer
+	 */
+	public void fireSendCeaseNotification();
+
+	/**
 	 * send a keepalive message to the remote peer
 	 */
 	void fireSendKeepaliveMessage();
