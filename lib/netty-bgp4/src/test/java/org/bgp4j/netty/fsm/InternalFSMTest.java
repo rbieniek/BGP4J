@@ -99,7 +99,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		verify(callbacks, never()).fireConnectRemotePeer();
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInActiveState(false);
+		assertMachineInActiveState(true, false);
 	}
 
 	@Test
@@ -117,13 +117,13 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		verify(callbacks, never()).fireConnectRemotePeer();
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInActiveState(false);
+		assertMachineInActiveState(true, false);
 	}
 	
 	@Test
 	public void testAutomaticStartEventInPassiveMode() throws Exception {
 		initializeFSMToActiveState("peer2");
-		assertMachineInActiveState(false);
+		assertMachineInActiveState(true, false);
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails());
 		
 		verify(callbacks).fireConnectRemotePeer();
-		assertMachineInActiveState(false);
+		assertMachineInActiveState(true, false);
 	}
 
 	@Test
@@ -434,7 +434,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInActiveState(true);
+		assertMachineInActiveState(false, true);
 	}
 	
 	@Test
@@ -461,35 +461,35 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 	@Test
 	public void testTransitionActiveByOpenEventOpenDelayTimerRunningWithHoldTimer() throws Exception {
-		initializeFSMToConnectState("peer7");
+		initializeFSMToActiveState("peer7");
 
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
 
-		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireConnectRemotePeer();
 		verify(callbacks, never()).fireSendOpenMessage();
-		assertMachineInConnectState(true);
+		assertMachineInActiveState(false, true);
 
 		fsm.handleEvent(FSMEvent.bgpOpen());
 
-		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(true);
 	}
 
 	@Test
 	public void testTransitionActiveByOpenEventOpenDelayTimerRunningWithoutHoldTimer() throws Exception {
-		initializeFSMToConnectState("peer8");
+		initializeFSMToActiveState("peer8");
 
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed());
 
-		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireConnectRemotePeer();
 		verify(callbacks, never()).fireSendOpenMessage();
-		assertMachineInConnectState(true);
+		assertMachineInActiveState(false, true);
 
 		fsm.handleEvent(FSMEvent.bgpOpen());
 
-		verify(callbacks).fireConnectRemotePeer();
+		verify(callbacks, never()).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(false);
 	}
 
@@ -686,7 +686,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks,never()).fireConnectRemotePeer();
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 
-		assertMachineInActiveState(false);
+		assertMachineInActiveState(true, false);
 	}
 	
 	/**
@@ -738,10 +738,15 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	 * This method does not check the connect retry counter because it is irrelevant for the machine to transition to the active state.
 	 * @throws Exception
 	 */
-	private void assertMachineInActiveState(boolean mustHaveOpenDelayTimer) throws Exception {
+	private void assertMachineInActiveState(boolean mustHaveConnectRetryTimer, boolean mustHaveOpenDelayTimer) throws Exception {
 		Assert.assertEquals(FSMState.Active, fsm.getState());
-		Assert.assertTrue(fsm.isConnectRetryTimerRunning());
-		Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());		
+		if(mustHaveConnectRetryTimer) {
+			Assert.assertTrue(fsm.isConnectRetryTimerRunning());
+			Assert.assertNotNull(fsm.getConnectRetryTimerDueWhen());
+		} else {
+			Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+			Assert.assertNull(fsm.getConnectRetryTimerDueWhen());			
+		}
 		
 		if(mustHaveOpenDelayTimer) {
 			Assert.assertTrue(fsm.isDelayOpenTimerRunning());

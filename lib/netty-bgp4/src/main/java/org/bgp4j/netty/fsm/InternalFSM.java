@@ -190,9 +190,7 @@ public class InternalFSM {
 	 * handle any kind of stop event
 	 */
 	private void handleStopEvent() {
-		if(state == FSMState.Connect) {
-			callbacks.fireDisconnectRemotePeer();
-		}
+		callbacks.fireDisconnectRemotePeer();
 		
 		this.connectRetryCounter = 0;
 		
@@ -257,6 +255,7 @@ public class InternalFSM {
 	private void handleHoldTimerExpiredEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			this.connectRetryCounter++;
 			moveStateToIdle();		
 			break;
@@ -269,6 +268,7 @@ public class InternalFSM {
 	private void handleIdleHoldTimerExpiredEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			this.connectRetryCounter++;
 			moveStateToIdle();		
 			break;
@@ -287,8 +287,11 @@ public class InternalFSM {
 	 * </ul>
 	 */
 	private void handleDelayOpenTimerExpiredEvent() {
-		if(state == FSMState.Connect) {
+		switch(state) {
+		case Connect:
+		case Active:
 			moveStateToOpenSent();
+			break;
 		}
 	}
 	
@@ -315,6 +318,7 @@ public class InternalFSM {
 			}
 			break;
 		case Active:
+			this.connectRetryCounter++;
 			moveStateToIdle();
 			break;
 		}
@@ -335,6 +339,7 @@ public class InternalFSM {
 	private void handleTcpConnectionEstablished() {
 		switch(state) {
 		case Connect:
+		case Active:
 			if(peerConfiguration.isDelayOpen()) {
 				try {
 					fireConnectRetryTimeExpired.cancelJob();
@@ -361,6 +366,7 @@ public class InternalFSM {
 	private void handleBgpOpenEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			try {
 				if(fireDelayOpenTimerExpired.isJobScheduled()) {
 					moveStateToOpenConfirm();
@@ -383,6 +389,7 @@ public class InternalFSM {
 	private void handleKeepaliveMessageEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -395,6 +402,7 @@ public class InternalFSM {
 	private void handleKeepaliveTimerExpiresEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -407,6 +415,7 @@ public class InternalFSM {
 	private void handleNotifyMessageEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 		}
@@ -418,6 +427,7 @@ public class InternalFSM {
 	private void handleNotifyMessageVersionErrorEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -430,6 +440,7 @@ public class InternalFSM {
 	private void handleOpenCollisionDumpEvent()  {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -442,6 +453,7 @@ public class InternalFSM {
 	private void handleBGPOpenMessageErrorEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -454,6 +466,7 @@ public class InternalFSM {
 	private void handleBGPHeaderErrorEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -466,6 +479,7 @@ public class InternalFSM {
 	private void handleUpdateMessageEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -478,6 +492,7 @@ public class InternalFSM {
 	private void handleUpdateMessageErrorEvent() {
 		switch(state) {
 		case Connect:
+		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
