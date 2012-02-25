@@ -65,4 +65,9 @@ public interface InternalFSMCallbacks {
 	 * complete the initialization
 	 */
 	void fireCompleteBGPInitialization();
+
+	/**
+	 * fire a notification to the peer that the hold timer expired
+	 */
+	void fireSendHoldTimerExpiredNotification();
 }

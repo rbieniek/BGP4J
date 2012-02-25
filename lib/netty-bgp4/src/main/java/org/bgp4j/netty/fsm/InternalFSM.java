@@ -92,7 +92,7 @@ public class InternalFSM {
 			break;
 		case AutomaticStop:
 		case ManualStop:
-			handleStopEvent();
+			handleStopEvent(event.getType());
 			break;
 		case ConnectRetryTimer_Expires:
 			handleConnectRetryTimerExpiredEvent();
@@ -151,6 +151,7 @@ public class InternalFSM {
 		
 		if(haveFSMError) {
 			callbacks.fireSendInternalErrorNotification();
+			connectRetryCounter++;
 			 
 			moveStateToIdle();
 			
@@ -189,10 +190,17 @@ public class InternalFSM {
 	/**
 	 * handle any kind of stop event
 	 */
-	private void handleStopEvent() {
+	private void handleStopEvent(FSMEventType type) {
 		callbacks.fireDisconnectRemotePeer();
 		
-		this.connectRetryCounter = 0;
+		switch(type) {
+		case AutomaticStop:
+			this.connectRetryCounter++;	
+			break;
+		case ManualStop:
+			this.connectRetryCounter = 0;
+			break;
+		}
 		
 		moveStateToIdle();
 	}
@@ -219,7 +227,8 @@ public class InternalFSM {
 	 * </ol>
 	 */
 	private void handleConnectRetryTimerExpiredEvent() {
-		if(state == FSMState.Connect) {
+		switch(state) {
+		case Connect:
 			callbacks.fireDisconnectRemotePeer();
 			
 			if(peerConfiguration.isDampPeerOscillation()) {
@@ -237,15 +246,21 @@ public class InternalFSM {
 				
 				moveStateToConnect();
 			}
-		} else if(state == FSMState.Active) {
+			break;
+		case Active:
 			this.connectRetryCounter++;
 			
 			moveStateToConnect();
-		} else if(state == FSMState.Idle) {
+			break;
+		case Idle:
 			if(!peerConfiguration.isPassiveTcpEstablishment())
 				moveStateToConnect();
 			else
 				moveStateToActive();			
+			break;
+		default:
+			haveFSMError=true;
+			break;
 		}
 	}
 	
@@ -256,6 +271,11 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
+			this.connectRetryCounter++;
+			moveStateToIdle();		
+			break;
+		case OpenSent:
+			callbacks.fireSendHoldTimerExpiredNotification();
 			this.connectRetryCounter++;
 			moveStateToIdle();		
 			break;
@@ -276,6 +296,15 @@ public class InternalFSM {
 			this.connectRetryCounter++;
 			moveStateToConnect();
 			break;
+		case OpenSent:
+			haveFSMError = true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
 		}
 	}
 
@@ -291,6 +320,13 @@ public class InternalFSM {
 		case Connect:
 		case Active:
 			moveStateToOpenSent();
+			break;
+		case OpenSent:
+		case OpenConfirm:
+		case Established:
+			haveFSMError = true;
+			break;
+		case Idle:
 			break;
 		}
 	}
@@ -321,6 +357,16 @@ public class InternalFSM {
 			this.connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			moveStateToActive();
+			break;
+		case OpenConfirm:
+		case Established:
+			moveStateToIdle();
+			break;
+		case Idle:
+			// do nothing
+			break;	
 		}
 	}
 
@@ -357,6 +403,15 @@ public class InternalFSM {
 			} else {
 				moveStateToOpenSent();
 			}
+			break;
+		case OpenSent:
+		case OpenConfirm:
+		case Established:
+			haveFSMError = true;
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}
 	}
 		
@@ -369,7 +424,7 @@ public class InternalFSM {
 		case Active:
 			try {
 				if(fireDelayOpenTimerExpired.isJobScheduled()) {
-					moveStateToOpenConfirm();
+					moveStateToOpenConfirm(true);
 				} else {
 					connectRetryCounter++;
 					moveStateToIdle();
@@ -379,6 +434,18 @@ public class InternalFSM {
 				
 				haveFSMError = true;
 			}
+			break;
+		case OpenSent:
+			moveStateToOpenConfirm(false);
+			break;
+		case OpenConfirm:
+			// TODO what to do here?
+			break;
+		case Established:
+			// TODO what to do here?
+			break;
+		case Idle:
+			// do nothing here
 			break;
 		}
 	}
@@ -393,6 +460,18 @@ public class InternalFSM {
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			haveFSMError = true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}		
 	}
 	
@@ -406,6 +485,18 @@ public class InternalFSM {
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			haveFSMError=true;
+			break;
+		case OpenConfirm:
+			// TODO handlle confirm
+			break;
+		case Established:
+			// TODO handle esatblished
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}
 	}
 
@@ -418,6 +509,19 @@ public class InternalFSM {
 		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
+			break;
+		case OpenSent:
+			haveFSMError = true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}
 	}
 	
@@ -428,8 +532,17 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
-			connectRetryCounter++;
+		case OpenSent:
 			moveStateToIdle();
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
 			break;
 		}
 	}
@@ -444,6 +557,20 @@ public class InternalFSM {
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			callbacks.fireSendCeaseNotification();
+			connectRetryCounter++;
+			moveStateToIdle();
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}		
 	}
 
@@ -457,6 +584,18 @@ public class InternalFSM {
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			haveFSMError = true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}		
 	}
 	
@@ -467,8 +606,18 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
+		case OpenSent:
 			connectRetryCounter++;
 			moveStateToIdle();
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
 			break;
 		}
 	}
@@ -483,6 +632,18 @@ public class InternalFSM {
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
+		case OpenSent:
+			haveFSMError=true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
+			break;
 		}		
 	}
 	
@@ -495,6 +656,18 @@ public class InternalFSM {
 		case Active:
 			connectRetryCounter++;
 			moveStateToIdle();
+			break;
+		case OpenSent:
+			haveFSMError = true;
+			break;
+		case OpenConfirm:
+			// TODO handle confirm
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
 			break;
 		}		
 	}
@@ -711,6 +884,7 @@ public class InternalFSM {
 	 * <li>cancel the idle hold timer</li>
 	 * <li>cancel the connect retry timer</li>
 	 * <li>cancel the delay open timer</li>
+	 * <li>cancal the hold timer</li>
 	 * <li>restart the connect retry timer with the configured value</li>
 	 * <li>fire the connect to remote peer callback</li>
 	 * <li>set the state to <code>Active</code></li>
@@ -721,6 +895,7 @@ public class InternalFSM {
 			fireIdleHoldTimerExpired.cancelJob();
 			fireConnectRetryTimeExpired.cancelJob();
 			fireDelayOpenTimerExpired.cancelJob();
+			fireHoldTimerExpired.cancelJob();
 			
 			fireConnectRetryTimeExpired.scheduleJob(peerConfiguration.getConnectRetryTime());
 		} catch (SchedulerException e) {
@@ -802,9 +977,20 @@ public class InternalFSM {
 		this.state = FSMState.OpenSent;		
 	}
 
-	private void moveStateToOpenConfirm() {
-		callbacks.fireCompleteBGPInitialization();
-		callbacks.fireSendOpenMessage();
+	/**
+	 * move the state to open confirm.
+	 * <ul>
+	 * <li>If called from the states <code>CONNECT</code> or <code>ACTIVE</code> then complete BGP initialization and send the peer an <code>OPEN</code> message</li>
+	 * <li>If called from state <code>OPEN SENT</code> then do <b>not</b> complete BGP initialization and send the peer an <code>OPEN</code> message</li>
+	 * </ul>
+	 * @param sendOpenMessage
+	 */
+	private void moveStateToOpenConfirm(boolean sendOpenMessage) {
+		if(sendOpenMessage) {
+			callbacks.fireCompleteBGPInitialization();
+			callbacks.fireSendOpenMessage();
+		}
+		
 		callbacks.fireSendKeepaliveMessage();
 
 		try {

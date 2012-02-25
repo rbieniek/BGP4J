@@ -132,7 +132,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.automaticStop());
 
-		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -303,7 +303,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
 		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -314,7 +314,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.automaticStop());
 		
-		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -526,7 +526,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
 		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -537,7 +537,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.automaticStop());
 		
-		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -654,7 +654,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionOpenSentByAutomaticStop() throws Exception {
 		initializeFSMToOpenSentState("peer1");
 		
-		fsm.handleEvent(FSMEvent.automaticStart());
+		fsm.handleEvent(FSMEvent.automaticStop());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
@@ -676,6 +676,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.holdTimerExpires());
 		
+		verify(callbacks).fireSendHoldTimerExpiredNotification();
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
@@ -742,7 +743,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	}
 	
 	@Test
-	public void testTransitionOpenSentByConnectTimerExpires() throws Exception {
+	public void testTransitionOpenSentByConnectRetryTimerExpires() throws Exception {
 		initializeFSMToOpenSentState("peer1");
 		
 		fsm.handleEvent(FSMEvent.connectRetryTimerExpires());
