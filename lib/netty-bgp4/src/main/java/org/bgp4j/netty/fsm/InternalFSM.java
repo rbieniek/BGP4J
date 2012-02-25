@@ -166,7 +166,7 @@ public class InternalFSM {
 	 * <li>If passive TCP estalishment is ensabled then move to <code>Connect</code> state</li>
 	 * </ul>
 	 */
-	private void handleStartEvent() {		
+	private void handleStartEvent() {
 		if(state == FSMState.Idle) {
 			this.connectRetryCounter = 0;
 			canAcceptConnection = true;
@@ -275,9 +275,16 @@ public class InternalFSM {
 			moveStateToIdle();		
 			break;
 		case OpenSent:
+		case OpenConfirm:
 			callbacks.fireSendHoldTimerExpiredNotification();
 			this.connectRetryCounter++;
 			moveStateToIdle();		
+			break;
+		case Established:
+			// TODO handle established
+			break;
+		case Idle:
+			// do nothing
 			break;
 		}
 	}
@@ -297,10 +304,8 @@ public class InternalFSM {
 			moveStateToConnect();
 			break;
 		case OpenSent:
-			haveFSMError = true;
-			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			haveFSMError = true;
 			break;
 		case Established:
 			// TODO handle established
@@ -464,7 +469,7 @@ public class InternalFSM {
 			haveFSMError = true;
 			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			moveStateToEstablished();
 			break;
 		case Established:
 			// TODO handle established
@@ -489,7 +494,7 @@ public class InternalFSM {
 			haveFSMError=true;
 			break;
 		case OpenConfirm:
-			// TODO handlle confirm
+			callbacks.fireSendKeepaliveMessage();
 			break;
 		case Established:
 			// TODO handle esatblished
@@ -511,10 +516,8 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			haveFSMError = true;
-			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			haveFSMError = true;
 			break;
 		case Established:
 			// TODO handle established
@@ -533,10 +536,8 @@ public class InternalFSM {
 		case Connect:
 		case Active:
 		case OpenSent:
-			moveStateToIdle();
-			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			moveStateToIdle();
 			break;
 		case Established:
 			// TODO handle established
@@ -558,12 +559,10 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
+		case OpenConfirm:
 			callbacks.fireSendCeaseNotification();
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case OpenConfirm:
-			// TODO handle confirm
 			break;
 		case Established:
 			// TODO handle established
@@ -581,14 +580,10 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
+		case OpenSent:
+		case OpenConfirm:
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case OpenSent:
-			haveFSMError = true;
-			break;
-		case OpenConfirm:
-			// TODO handle confirm
 			break;
 		case Established:
 			// TODO handle established
@@ -607,11 +602,9 @@ public class InternalFSM {
 		case Connect:
 		case Active:
 		case OpenSent:
+		case OpenConfirm:
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case OpenConfirm:
-			// TODO handle confirm
 			break;
 		case Established:
 			// TODO handle established
@@ -633,10 +626,8 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			haveFSMError=true;
-			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			haveFSMError=true;
 			break;
 		case Established:
 			// TODO handle established
@@ -658,10 +649,8 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			haveFSMError = true;
-			break;
 		case OpenConfirm:
-			// TODO handle confirm
+			haveFSMError = true;
 			break;
 		case Established:
 			// TODO handle established
@@ -975,6 +964,32 @@ public class InternalFSM {
 		callbacks.fireSendOpenMessage();
 		
 		this.state = FSMState.OpenSent;		
+	}
+
+	/**
+	 * Move from any other state to <code>OpenSent</code> state. It performs the following actions:
+	 * <ol>
+	 * <li>cancel the idle hold timer</li>
+	 * <li>cancel the connect retry timer</li>
+	 * <li>start the hold timer with 600 seconds</li>
+	 * <li>fire the send <code>OPEN</code> message to remote peer callback</li>
+	 * <li>set the state to <code>OpenSent</code></li>
+	 * </ol>
+	 */
+	private void moveStateToEstablished() {
+		try {
+			fireIdleHoldTimerExpired.cancelJob();
+			fireConnectRetryTimeExpired.cancelJob();
+			
+			fireHoldTimerExpired.cancelJob();
+			fireHoldTimerExpired.scheduleJob(getNegotiatedHoldTime());
+		} catch (SchedulerException e) {
+			log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+			
+			haveFSMError = true;
+		}
+		
+		this.state = FSMState.Established;		
 	}
 
 	/**

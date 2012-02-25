@@ -838,7 +838,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.automaticStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenSentState();
+		assertMachineInOpenConfirm(true, 1);
 	}	
 	
 	@Test
@@ -848,14 +848,14 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.manualStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenSentState();
+		assertMachineInOpenConfirm(true, 1);
 	}	
 	
 	@Test
 	public void testTransitionOpenConfirmByAutomaticStop() throws Exception {
 		initializeFSMToOpenConfirmState("peer1");
 		
-		fsm.handleEvent(FSMEvent.automaticStart());
+		fsm.handleEvent(FSMEvent.automaticStop());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
@@ -878,6 +878,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.holdTimerExpires());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendHoldTimerExpiredNotification();
 		assertMachineInIdleState(false);
 	}
 
@@ -887,7 +888,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.tcpConnectionFails());
 		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(false);
 	}
 
@@ -1098,7 +1099,9 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	private void initializeFSMToOpenConfirmState(String peerName) throws Exception {
 		initializeFSMToOpenSentState(peerName);
 		
-		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 25);
+		// conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 25);
+		Thread.sleep(1000);
+		
 		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
