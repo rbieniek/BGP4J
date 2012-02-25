@@ -830,6 +830,201 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	}
 
 	// -- Open Confiren state transitions
+	@Test
+	public void testTransitionOpenConfirmByAutomaticStart() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.automaticStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState();
+	}	
+	
+	@Test
+	public void testTransitionOpenConfirmByManualStart() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.manualStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState();
+	}	
+	
+	@Test
+	public void testTransitionOpenConfirmByAutomaticStop() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.automaticStart());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByManualStop() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.manualStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByHoldTimerExpires() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.holdTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByTcpConnectionFails() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionFails());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByBgpOpen() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		assertMachineInOpenConfirm(true);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByBgpHeaderError() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpHeaderError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+
+	@Test
+	public void testTransitionOpenConfirmByBgpOpenMessageError() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByOpenCollisionDump() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.openCollisionDump());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendCeaseNotification();
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByNofiticationVersionError() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByConnectTimerExpires() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.connectRetryTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByKeepaliveTimerExpires() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.keepaliveTimerExpires());
+
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenConfirm(true, 2);
+	}
+
+	@Test
+	public void testTransitionOpenConfirmByDelayOpenTimerExpires() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByIdleHoldTimerExpires() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByNotifyMessage() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.notifyMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByKeepaliveMessage() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+
+		assertMachineInEstablished(true);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByUpdateMessage() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.updateMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionOpenConfirmByUpdateMessageError() throws Exception {
+		initializeFSMToOpenConfirmState("peer1");
+		
+		fsm.handleEvent(FSMEvent.updateMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
 
 	// -- end of test messages
 	private Configuration loadConfiguration(String fileName) throws Exception {
@@ -1046,7 +1241,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	 * This method does not check the connect retry counter because it is irrelevant for the machine to transition to the active state.
 	 * @throws Exception
 	 */
-	private void assertMachineInOpenConfirm(boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+	private void assertMachineInOpenConfirm(boolean mustHaveHoldAndKeepaliveTimer, 
+			int numberOfKeepalivesSent) throws Exception {
 		Assert.assertEquals(FSMState.OpenConfirm, fsm.getState());
 		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
 		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());		
@@ -1068,8 +1264,47 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		}
 		
 		verify(callbacks).fireSendOpenMessage();
-		verify(callbacks).fireSendKeepaliveMessage();
+		verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage();
 		verify(callbacks).fireCompleteBGPInitialization();
+	}
+
+	private void assertMachineInOpenConfirm(boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+		assertMachineInOpenConfirm(mustHaveHoldAndKeepaliveTimer, 1);
+	}
+
+	/**
+	 * check if the machine is in active state and that the timer are in the following states:
+	 * <ul>
+	 * <li><b>Connect retry timer:</b> Not running
+	 * <li><b>Delay open timer:</b> Not running
+	 * <li><b>Idle hold timer:</b>Not running
+	 * <li><b>Hold timer:</b>Conditionally checked
+	 * <li><b>Keepalive timer:</b>Conditonally checked
+	 * </ul>
+	 * This method does not check the connect retry counter because it is irrelevant for the machine to transition to the active state.
+	 * @throws Exception
+	 */
+	private void assertMachineInEstablished(boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
+		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());		
+		Assert.assertFalse(fsm.isDelayOpenTimerRunning());
+		Assert.assertNull(fsm.getDelayOpenTimerDueWhen());			
+		Assert.assertFalse(fsm.isIdleHoldTimerRunning());
+		Assert.assertNull(fsm.getIdleHoldTimerDueWhen());		
+		
+		if(mustHaveHoldAndKeepaliveTimer) {
+			Assert.assertTrue(fsm.isHoldTimerRunning());
+			Assert.assertNotNull(fsm.getHoldTimerDueWhen());
+			Assert.assertTrue(fsm.isKeepaliveTimerRunning());
+			Assert.assertNotNull(fsm.getKeepaliveTimerDueWhen());
+		} else {
+			Assert.assertFalse(fsm.isHoldTimerRunning());
+			Assert.assertNull(fsm.getHoldTimerDueWhen());
+			Assert.assertFalse(fsm.isKeepaliveTimerRunning());
+			Assert.assertNull(fsm.getKeepaliveTimerDueWhen());
+		}
+
 	}
 
 	/**
