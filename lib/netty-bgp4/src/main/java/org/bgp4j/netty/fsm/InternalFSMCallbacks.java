@@ -70,4 +70,9 @@ public interface InternalFSMCallbacks {
 	 * fire a notification to the peer that the hold timer expired
 	 */
 	void fireSendHoldTimerExpiredNotification();
+
+	/**
+	 * fire an notification to the peer that it sent a bad update
+	 */
+	void fireSendUpdateErrorNotification();
 }

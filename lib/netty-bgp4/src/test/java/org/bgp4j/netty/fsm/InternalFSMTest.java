@@ -830,7 +830,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(false);
 	}
 
-	// -- Open Confiren state transitions
+	// -- Open Confirm state transitions
 	@Test
 	public void testTransitionOpenConfirmByAutomaticStart() throws Exception {
 		initializeFSMToOpenConfirmState("peer1");
@@ -1028,6 +1028,203 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(false);
 	}
 
+	// -- Established state transitions
+	@Test
+	public void testTransitionEstablishedByAutomaticStart() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.automaticStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInEstablished(true);
+	}	
+	
+	@Test
+	public void testTransitionEstablishedByManualStart() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.manualStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInEstablished(true);
+	}	
+	
+	@Test
+	public void testTransitionEstablishedByAutomaticStop() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.automaticStop());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionEstablishedByManualStop() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.manualStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionEstablishedByHoldTimerExpires() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.holdTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendHoldTimerExpiredNotification();
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionEstablishedByTcpConnectionFails() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionFails());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionEstablishedByBgpOpen() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		assertMachineInEstablished(true);
+	}
+
+	@Test
+	public void testTransitionEstablishedByBgpHeaderError() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpHeaderError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+
+
+	@Test
+	public void testTransitionEstablishedByBgpOpenMessageError() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByOpenCollisionDump() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.openCollisionDump());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendCeaseNotification();
+		assertMachineInIdleState(false);
+	}
+
+	@Test
+	public void testTransitionEstablishedByNofiticationVersionError() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByConnectTimerExpires() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.connectRetryTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByKeepaliveTimerExpires() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.keepaliveTimerExpires());
+
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInEstablished(true, 2);
+	}
+
+	@Test
+	public void testTransitionEstablishedByDelayOpenTimerExpires() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByIdleHoldTimerExpires() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByNotifyMessage() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.notifyMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification();
+		assertMachineInIdleState(false);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByKeepaliveMessage() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+
+		assertMachineInEstablished(true);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByUpdateMessage() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.updateMessage());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInEstablished(true);
+	}
+	
+	@Test
+	public void testTransitionEstablishedByUpdateMessageError() throws Exception {
+		initializeFSMToEstablishedState("peer1");
+		
+		fsm.handleEvent(FSMEvent.updateMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendUpdateErrorNotification();
+		assertMachineInIdleState(false);
+	}
+
 	// -- end of test messages
 	private Configuration loadConfiguration(String fileName) throws Exception {
 		return parser.parseConfiguration(new XMLConfiguration(fileName));
@@ -1102,13 +1299,31 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		// conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 25);
 		Thread.sleep(1000);
 		
+		fsm.setPeerProposedHoldTime(10);
 		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInOpenConfirm(true);
 
 	}
-	
+
+	/**
+	 * Configure the machine and bring it to the connect state.
+	 * 
+	 * @param peerName
+	 * @throws Exception
+	 */
+	private void initializeFSMToEstablishedState(String peerName) throws Exception {
+		initializeFSMToOpenConfirmState(peerName);
+		
+		Thread.sleep(1000);
+		
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInEstablished(true);
+	}
+
 	/**
 	 * Configure the machine and bring it to the active state.
 	 * 
@@ -1288,7 +1503,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	 * This method does not check the connect retry counter because it is irrelevant for the machine to transition to the active state.
 	 * @throws Exception
 	 */
-	private void assertMachineInEstablished(boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+	private void assertMachineInEstablished(boolean mustHaveHoldAndKeepaliveTimer, 
+			int numberOfKeepalivesSent) throws Exception {
 		Assert.assertEquals(FSMState.Established, fsm.getState());
 		Assert.assertFalse(fsm.isConnectRetryTimerRunning());
 		Assert.assertNull(fsm.getConnectRetryTimerDueWhen());		
@@ -1309,8 +1525,13 @@ public class InternalFSMTest extends WeldTestCaseBase {
 			Assert.assertNull(fsm.getKeepaliveTimerDueWhen());
 		}
 
+		verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage();
 	}
 
+	private void assertMachineInEstablished(boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+		assertMachineInEstablished(mustHaveHoldAndKeepaliveTimer, 1);
+	}
+	
 	/**
 	 * check if the machine is in idle state and that the timers are in the following state
 	 * <ul>

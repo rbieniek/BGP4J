@@ -276,12 +276,10 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			callbacks.fireSendHoldTimerExpiredNotification();
 			this.connectRetryCounter++;
 			moveStateToIdle();		
-			break;
-		case Established:
-			// TODO handle established
 			break;
 		case Idle:
 			// do nothing
@@ -305,10 +303,8 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
-			haveFSMError = true;
-			break;
 		case Established:
-			// TODO handle established
+			haveFSMError = true;
 			break;
 		}
 	}
@@ -472,7 +468,14 @@ public class InternalFSM {
 			moveStateToEstablished();
 			break;
 		case Established:
-			// TODO handle established
+			try {
+				fireHoldTimerExpired.cancelJob();
+				fireHoldTimerExpired.scheduleJob(getNegotiatedHoldTime());
+			} catch (SchedulerException e) {
+				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+				
+				haveFSMError = true;
+			}
 			break;
 		case Idle:
 			// do nothing
@@ -494,10 +497,8 @@ public class InternalFSM {
 			haveFSMError=true;
 			break;
 		case OpenConfirm:
-			callbacks.fireSendKeepaliveMessage();
-			break;
 		case Established:
-			// TODO handle esatblished
+			callbacks.fireSendKeepaliveMessage();
 			break;
 		case Idle:
 			// do nothing
@@ -517,10 +518,8 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
-			haveFSMError = true;
-			break;
 		case Established:
-			// TODO handle established
+			haveFSMError = true;
 			break;
 		case Idle:
 			// do nothing
@@ -537,10 +536,8 @@ public class InternalFSM {
 		case Active:
 		case OpenSent:
 		case OpenConfirm:
-			moveStateToIdle();
-			break;
 		case Established:
-			// TODO handle established
+			moveStateToIdle();
 			break;
 		case Idle:
 			// do nothing
@@ -560,12 +557,10 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			callbacks.fireSendCeaseNotification();
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case Established:
-			// TODO handle established
 			break;
 		case Idle:
 			// do nothing
@@ -582,11 +577,9 @@ public class InternalFSM {
 		case Active:
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case Established:
-			// TODO handle established
 			break;
 		case Idle:
 			// do nothing
@@ -603,11 +596,9 @@ public class InternalFSM {
 		case Active:
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			connectRetryCounter++;
 			moveStateToIdle();
-			break;
-		case Established:
-			// TODO handle established
 			break;
 		case Idle:
 			// do nothing
@@ -630,7 +621,14 @@ public class InternalFSM {
 			haveFSMError=true;
 			break;
 		case Established:
-			// TODO handle established
+			try {
+				fireHoldTimerExpired.cancelJob();
+				fireHoldTimerExpired.scheduleJob(getNegotiatedHoldTime());
+			} catch (SchedulerException e) {
+				log.error("Interal Error: cannot schedule connect retry timer for peer " + peerConfiguration.getPeerName(), e);
+				
+				haveFSMError = true;
+			}
 			break;
 		case Idle:
 			// do nothing
@@ -653,7 +651,9 @@ public class InternalFSM {
 			haveFSMError = true;
 			break;
 		case Established:
-			// TODO handle established
+			callbacks.fireSendUpdateErrorNotification();
+			connectRetryCounter++;
+			moveStateToIdle();
 			break;
 		case Idle:
 			// do nothing
