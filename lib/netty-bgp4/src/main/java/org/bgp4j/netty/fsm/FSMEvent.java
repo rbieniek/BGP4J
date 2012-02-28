@@ -24,6 +24,24 @@ package org.bgp4j.netty.fsm;
  */
 public class FSMEvent {
 
+	static class ChannelFSMEvent extends FSMEvent {
+		private FSMChannel channel;
+		
+		public ChannelFSMEvent(FSMEventType type, FSMChannel channel) {
+			super(type);
+			
+			this.channel = channel;
+		}
+
+		/**
+		 * @return the channel
+		 */
+		public FSMChannel getChannel() {
+			return channel;
+		}
+
+	}
+	
 	private FSMEventType type;
 	
 	protected FSMEvent(FSMEventType type) {
@@ -76,29 +94,21 @@ public class FSMEvent {
 	}
 	
 	// TCP connection-based events
-	public static final FSMEvent tcpConnectionValid() {
-		return new FSMEvent(FSMEventType.TcpConnection_Valid);
+	public static final FSMEvent tcpConnectionConfirmed(FSMChannel channel) {
+		return new ChannelFSMEvent(FSMEventType.TcpConnectionConfirmed, channel);
 	}
 	
-	public static final FSMEvent tcpConnectionRequestInvalid() {
-		return new FSMEvent(FSMEventType.Tcp_CR_Invalid);
-	}
-
-	public static final FSMEvent tcpConnectionRequestAcked() {
-		return new FSMEvent(FSMEventType.Tcp_CR_Acked);
+	public static final FSMEvent tcpConnectionRequestAcked(FSMChannel channel) {
+		return new ChannelFSMEvent(FSMEventType.Tcp_CR_Acked, channel);
 	}
 	
-	public static final FSMEvent tcpConnectionConfirmed() {
-		return new FSMEvent(FSMEventType.TcpConnectionConfirmed);
-	}
-	
-	public static final FSMEvent tcpConnectionFails() {
-		return new FSMEvent(FSMEventType.TcpConnectionFails);
+	public static final FSMEvent tcpConnectionFails(FSMChannel channel) {
+		return new ChannelFSMEvent(FSMEventType.TcpConnectionFails, channel);
 	}
 	
 	// BGP Message-based events
-	public static final FSMEvent bgpOpen() {
-		return new FSMEvent(FSMEventType.BGPOpen);
+	public static final FSMEvent bgpOpen(FSMChannel channel) {
+		return new ChannelFSMEvent(FSMEventType.BGPOpen, channel);
 	}
 
 	public static final FSMEvent bgpHeaderError() {

@@ -34,27 +34,27 @@ public interface InternalFSMCallbacks {
 	/**
 	 * The remote connection to the peer (if established) shall be disconnected and closed
 	 */
-	public void fireDisconnectRemotePeer();
+	public void fireDisconnectRemotePeer(FSMChannel channel);
 
 	/**
 	 * Sent an <code>OPEN</code> message to the remote peer.
 	 */
-	public void fireSendOpenMessage();
+	public void fireSendOpenMessage(FSMChannel channel);
 
 	/**
 	 * send an FSM error notification to the remote peer
 	 */
-	public void fireSendInternalErrorNotification();
+	public void fireSendInternalErrorNotification(FSMChannel channel);
 
 	/**
 	 * send a CEASE notification to the remote peer
 	 */
-	public void fireSendCeaseNotification();
+	public void fireSendCeaseNotification(FSMChannel channel);
 
 	/**
 	 * send a keepalive message to the remote peer
 	 */
-	void fireSendKeepaliveMessage();
+	void fireSendKeepaliveMessage(FSMChannel channel);
 
 	/**
 	 * release all resources hold on behalf of the remote peer
@@ -69,10 +69,10 @@ public interface InternalFSMCallbacks {
 	/**
 	 * fire a notification to the peer that the hold timer expired
 	 */
-	void fireSendHoldTimerExpiredNotification();
+	void fireSendHoldTimerExpiredNotification(FSMChannel channel);
 
 	/**
 	 * fire an notification to the peer that it sent a bad update
 	 */
-	void fireSendUpdateErrorNotification();
+	void fireSendUpdateErrorNotification(FSMChannel channel);
 }

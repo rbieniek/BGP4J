@@ -140,25 +140,31 @@ public class BGPv4FSM {
 		}
 
 		@Override
-		public void fireDisconnectRemotePeer() {
+		public void fireDisconnectRemotePeer(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void fireSendOpenMessage() {
+		public void fireSendOpenMessage(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void fireSendInternalErrorNotification() {
+		public void fireSendInternalErrorNotification(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void fireSendKeepaliveMessage() {
+		public void fireSendCeaseNotification(FSMChannel channel) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void fireSendKeepaliveMessage(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -176,22 +182,17 @@ public class BGPv4FSM {
 		}
 
 		@Override
-		public void fireSendCeaseNotification() {
+		public void fireSendHoldTimerExpiredNotification(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public void fireSendHoldTimerExpiredNotification() {
+		public void fireSendUpdateErrorNotification(FSMChannel channel) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
-		public void fireSendUpdateErrorNotification() {
-			// TODO Auto-generated method stub
-			
-		}
 		
 	}
 	

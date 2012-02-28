@@ -35,11 +35,12 @@ public enum FSMEventType {
 	DelayOpenTimer_Expires,                // RFC4271 event 12
 	IdleHoldTimer_Expires,                 // RFC4271 event 13
 	
-	// TCP connection-based events
-	TcpConnection_Valid,                   // RFC4171 event 14
-	Tcp_CR_Invalid,                        // RFC4271 event 15
-	Tcp_CR_Acked,                          // RFC4271 event 16
-	TcpConnectionConfirmed,                // RFC4271 event 17
+	// TCP connection-based events. 
+	// The underlying transport layer abstraction doesn't expose any other events than confirmed and failed
+	// Therefore event 15 is not implemented
+//	Tcp_CR_Invalid,                        // RFC4271 event 15
+    Tcp_CR_Acked,                          // RFC4271 event 16
+	TcpConnectionConfirmed,                // covers RFC4271 event 14, 17
 	TcpConnectionFails,                    // RFC4271 event 18
 	
 	// BGP Message-based events

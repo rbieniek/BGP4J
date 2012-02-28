@@ -18,6 +18,8 @@
 package org.bgp4j.netty.fsm;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -51,6 +53,10 @@ public class InternalFSM {
 	
 	private int peerProposedHoldTime = 0;
 	private boolean haveFSMError = false;
+
+	private FSMChannel connectedChannel;
+	private FSMChannel activeChannel;
+	private FSMChannel runningChannel;
 	
 	InternalFSM() {
 	}
@@ -100,16 +106,23 @@ public class InternalFSM {
 		case IdleHoldTimer_Expires:
 			handleIdleHoldTimerExpiredEvent();
 			break;
-		case TcpConnection_Valid:
-		case Tcp_CR_Invalid:
-			// do nothing for now
+		case TcpConnectionConfirmed:
+			if(event instanceof FSMEvent.ChannelFSMEvent)
+				handleTcpConnectionConfirmed(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			else
+				haveFSMError = true;
 			break;
 		case Tcp_CR_Acked:
-		case TcpConnectionConfirmed:
-			handleTcpConnectionEstablished();
+			if(event instanceof FSMEvent.ChannelFSMEvent)
+				handleTcpConnectionAcked(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			else
+				haveFSMError = true;
 			break;
 		case TcpConnectionFails:
-			handleTcpConnectionFails();
+			if(event instanceof FSMEvent.ChannelFSMEvent)
+				handleTcpConnectionFails(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			else
+				haveFSMError = true;
 			break;
 		case DelayOpenTimer_Expires:
 			handleDelayOpenTimerExpiredEvent();
@@ -118,7 +131,10 @@ public class InternalFSM {
 			handleHoldTimerExpiredEvent();
 			break;
 		case BGPOpen:
-			handleBgpOpenEvent();
+			if(event instanceof FSMEvent.ChannelFSMEvent)
+				handleBgpOpenEvent(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			else
+				haveFSMError = true;
 			break;
 		case KeepAliveMsg:
 			handleKeepaliveMessageEvent();
@@ -150,7 +166,9 @@ public class InternalFSM {
 		}
 		
 		if(haveFSMError) {
-			callbacks.fireSendInternalErrorNotification();
+			if(runningChannel != null)
+				callbacks.fireSendInternalErrorNotification(runningChannel);
+			
 			connectRetryCounter++;
 			 
 			moveStateToIdle();
@@ -191,8 +209,6 @@ public class InternalFSM {
 	 * handle any kind of stop event
 	 */
 	private void handleStopEvent(FSMEventType type) {
-		callbacks.fireDisconnectRemotePeer();
-		
 		switch(type) {
 		case AutomaticStop:
 			this.connectRetryCounter++;	
@@ -229,7 +245,8 @@ public class InternalFSM {
 	private void handleConnectRetryTimerExpiredEvent() {
 		switch(state) {
 		case Connect:
-			callbacks.fireDisconnectRemotePeer();
+			callbacks.fireDisconnectRemotePeer(connectedChannel);
+			connectedChannel = null;
 			
 			if(peerConfiguration.isDampPeerOscillation()) {
 				state = FSMState.Idle;
@@ -277,7 +294,7 @@ public class InternalFSM {
 		case OpenSent:
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendHoldTimerExpiredNotification();
+			callbacks.fireSendHoldTimerExpiredNotification(runningChannel);
 			this.connectRetryCounter++;
 			moveStateToIdle();		
 			break;
@@ -320,6 +337,13 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
+			if(connectedChannel != null) {
+				runningChannel = connectedChannel;
+				connectedChannel = null;
+			} else if(activeChannel != null) {
+				connectedChannel = activeChannel;
+				activeChannel = null;
+			}
 			moveStateToOpenSent();
 			break;
 		case OpenSent:
@@ -338,8 +362,9 @@ public class InternalFSM {
 	 * <li>if the current state is <code>Connect</code> then move to <code>Active</code>
 	 * <li>if the current state is <code>Active</code> then move to <code>Idle</code>
 	 * </ul>
+	 * @param i 
 	 */
-	private void handleTcpConnectionFails() {
+	private void handleTcpConnectionFails(FSMChannel channel) {
 		switch(state) {
 		case Connect:
 			try {
@@ -350,7 +375,7 @@ public class InternalFSM {
 				}
 			} catch(SchedulerException e) {
 				log.error("Internal Error: Failed to query delay open timer for peer " + peerConfiguration.getPeerName());
-				
+			
 				haveFSMError = true;
 			}
 			break;
@@ -359,11 +384,17 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			moveStateToActive();
+			if(channel == runningChannel) {
+				runningChannel = null;
+				moveStateToActive();
+			}
 			break;
 		case OpenConfirm:
 		case Established:
-			moveStateToIdle();
+			if(channel == runningChannel) {
+				runningChannel = null;
+				moveStateToIdle();
+			}
 			break;
 		case Idle:
 			// do nothing
@@ -372,7 +403,7 @@ public class InternalFSM {
 	}
 
 	/**
-	 * Handle the connection being established. 
+	 * Handle the connection originated by the local peer to the remote peer has being established. 
 	 * <ul>
 	 * <li>If the current state is <code>Connect</code>:<ul>
 	 * <li>If the delay open flag is set then the connect retry timer is canceled, the delay open timer is started with the configured value.
@@ -382,11 +413,14 @@ public class InternalFSM {
 	 * </ul>
 	 * </li>
 	 * </ul>
+	 * 
+	 * @param channelId the ID of the channel with which the connection was established
 	 */
-	private void handleTcpConnectionEstablished() {
+	private void handleTcpConnectionAcked(FSMChannel channel) {
 		switch(state) {
 		case Connect:
 		case Active:
+			connectedChannel = channel;
 			if(peerConfiguration.isDelayOpen()) {
 				try {
 					fireConnectRetryTimeExpired.cancelJob();
@@ -402,6 +436,7 @@ public class InternalFSM {
 					haveFSMError = true;
 				}
 			} else {
+				runningChannel = channel;
 				moveStateToOpenSent();
 			}
 			break;
@@ -417,23 +452,87 @@ public class InternalFSM {
 	}
 		
 	/**
-	 * handle an inbound <code>OPEN</code> mesage from the remote peer
+	 * Handle the connection from the remote peer to the local peer being established. 
+	 * <ul>
+	 * <li>If the current state is <code>Connect</code>:<ul>
+	 * <li>If the delay open flag is set then the connect retry timer is canceled, the delay open timer is started with the configured value.
+	 * The state stay at <code>Connect</code></li>
+	 * <li>If the delay open flag is not set then the connect retry timer is canceled, an <code>OPEN</code> message is sent to the peer and
+	 * the state is moved to <code>OpenSent</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * 
+	 * @param channelId the ID of the channel with which the connection was established
 	 */
-	private void handleBgpOpenEvent() {
+	private void handleTcpConnectionConfirmed(FSMChannel channel) {
 		switch(state) {
 		case Connect:
 		case Active:
-			try {
-				if(fireDelayOpenTimerExpired.isJobScheduled()) {
-					moveStateToOpenConfirm(true);
-				} else {
-					connectRetryCounter++;
-					moveStateToIdle();
+			if(activeChannel != null)
+				callbacks.fireDisconnectRemotePeer(activeChannel);
+			activeChannel = channel;
+			
+			if(peerConfiguration.isDelayOpen()) {
+				try {
+					fireConnectRetryTimeExpired.cancelJob();
+				} catch (SchedulerException e) {
+					log.error("Internal Error: cannot cancel connect retry timer for peer " + peerConfiguration.getPeerName(), e);
 				}
-			} catch(SchedulerException e) {
-				log.error("cannot query delay openn timer for peer " + peerConfiguration.getPeerName(), e);
 				
+				try {
+					fireDelayOpenTimerExpired.scheduleJob(peerConfiguration.getDelayOpenTime());
+				} catch (SchedulerException e) {
+					log.error("Internal Error: cannot schedule open delay timer for peer " + peerConfiguration.getPeerName(), e);
+					
+					haveFSMError = true;
+				}
+			} else {
+				runningChannel = channel;
+				moveStateToOpenSent();
+			}
+			break;
+		case OpenSent:
+		case OpenConfirm:
+		case Established:
+			haveFSMError = true;
+			break;
+		case Idle:
+			// do nothing
+			break;
+		}
+	}
+	/**
+	 * handle an inbound <code>OPEN</code> mesage from the remote peer
+  	 *
+	 * @param channelId the ID of the channel with which the connection was established
+	 */
+	private void handleBgpOpenEvent(FSMChannel channel) {
+		switch(state) {
+		case Connect:
+		case Active:
+			if(channel == connectedChannel) {
+				runningChannel = channel;
+				connectedChannel = null;
+			} else if(channel == activeChannel){
+				runningChannel = activeChannel;
+				activeChannel = null;
+			} else {
 				haveFSMError = true;
+			}
+			if(!haveFSMError) {
+				try {
+					if(fireDelayOpenTimerExpired.isJobScheduled()) {
+						moveStateToOpenConfirm(true);
+					} else {
+						connectRetryCounter++;
+						moveStateToIdle();
+					}
+				} catch(SchedulerException e) {
+					log.error("cannot query delay openn timer for peer " + peerConfiguration.getPeerName(), e);
+				
+					haveFSMError = true;
+				}
 			}
 			break;
 		case OpenSent:
@@ -498,7 +597,7 @@ public class InternalFSM {
 			break;
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendKeepaliveMessage();
+			callbacks.fireSendKeepaliveMessage(runningChannel);
 			break;
 		case Idle:
 			// do nothing
@@ -558,7 +657,7 @@ public class InternalFSM {
 		case OpenSent:
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendCeaseNotification();
+			callbacks.fireSendCeaseNotification(runningChannel);
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -651,7 +750,7 @@ public class InternalFSM {
 			haveFSMError = true;
 			break;
 		case Established:
-			callbacks.fireSendUpdateErrorNotification();
+			callbacks.fireSendUpdateErrorNotification(runningChannel);
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -924,7 +1023,18 @@ public class InternalFSM {
 		}
 		
 		callbacks.fireReleaseBGPResources();
-		callbacks.fireDisconnectRemotePeer();
+		if(connectedChannel != null) {
+			callbacks.fireDisconnectRemotePeer(connectedChannel);
+			connectedChannel = null;
+		}
+		if(activeChannel != null) {
+			callbacks.fireDisconnectRemotePeer(activeChannel);
+			activeChannel = null;
+		}
+		if(runningChannel != null) {
+			callbacks.fireDisconnectRemotePeer(runningChannel);
+			runningChannel = null;			
+		}
 		
 		if(peerConfiguration.isDampPeerOscillation()) {
 			try {
@@ -961,7 +1071,7 @@ public class InternalFSM {
 		}
 		
 		callbacks.fireCompleteBGPInitialization();
-		callbacks.fireSendOpenMessage();
+		callbacks.fireSendOpenMessage(runningChannel);
 		
 		this.state = FSMState.OpenSent;		
 	}
@@ -1003,10 +1113,10 @@ public class InternalFSM {
 	private void moveStateToOpenConfirm(boolean sendOpenMessage) {
 		if(sendOpenMessage) {
 			callbacks.fireCompleteBGPInitialization();
-			callbacks.fireSendOpenMessage();
+			callbacks.fireSendOpenMessage(runningChannel);
 		}
 		
-		callbacks.fireSendKeepaliveMessage();
+		callbacks.fireSendKeepaliveMessage(runningChannel);
 
 		try {
 			fireConnectRetryTimeExpired.cancelJob();
