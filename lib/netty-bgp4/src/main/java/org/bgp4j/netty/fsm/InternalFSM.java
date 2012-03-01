@@ -18,8 +18,6 @@
 package org.bgp4j.netty.fsm;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -341,7 +339,7 @@ public class InternalFSM {
 				runningChannel = connectedChannel;
 				connectedChannel = null;
 			} else if(activeChannel != null) {
-				connectedChannel = activeChannel;
+				runningChannel = activeChannel;
 				activeChannel = null;
 			}
 			moveStateToOpenSent();

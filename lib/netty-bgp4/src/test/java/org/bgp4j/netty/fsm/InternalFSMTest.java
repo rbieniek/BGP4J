@@ -473,12 +473,12 @@ public class InternalFSMTest extends WeldTestCaseBase {
 
 	@Test
 	public void testTransitionActiveByDelayOpenTimerExpires() throws Exception {
-		initializeFSMToActiveState("peer2");
+		initializeFSMToActiveState("peer7");
 		
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
 		
-		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
-		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		conditionalSleep(fsm.getDelayOpenTimerDueWhen());
+		// fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInOpenSentState(activeBundle);
