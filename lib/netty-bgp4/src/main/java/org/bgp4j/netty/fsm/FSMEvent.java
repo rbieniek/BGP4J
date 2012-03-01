@@ -107,8 +107,8 @@ public class FSMEvent {
 	}
 	
 	// BGP Message-based events
-	public static final FSMEvent bgpOpen(FSMChannel channel) {
-		return new ChannelFSMEvent(FSMEventType.BGPOpen, channel);
+	public static final FSMEvent bgpOpen() {
+		return new FSMEvent(FSMEventType.BGPOpen);
 	}
 
 	public static final FSMEvent bgpHeaderError() {
@@ -117,10 +117,6 @@ public class FSMEvent {
 
 	public static final FSMEvent bgpOpenMessageError() {
 		return new FSMEvent(FSMEventType.BGPOpenMsgErr);
-	}
-
-	public static final FSMEvent openCollisionDump() {
-		return new FSMEvent(FSMEventType.OpenCollisionDump);
 	}
 
 	public static final FSMEvent notifyMessageVersionError() {

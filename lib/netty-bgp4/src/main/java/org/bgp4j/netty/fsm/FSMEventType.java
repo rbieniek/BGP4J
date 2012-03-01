@@ -44,10 +44,11 @@ public enum FSMEventType {
 	TcpConnectionFails,                    // RFC4271 event 18
 	
 	// BGP Message-based events
+	// The OpenCollisionDump event is never fired explicitly but handled internally int the FSM
 	BGPOpen,                               // covers RFC4271 event 19, 20
 	BGPHeaderErr,                          // RFC4271 event 21
 	BGPOpenMsgErr,                         // RFC4271 event 22
-	OpenCollisionDump,                     // RFC4271 event 23
+	// OpenCollisionDump,                     // RFC4271 event 23
 	NotifyMsgVerErr,                       // RFC4271 event 24
 	NotifyMsg,                             // RFC4271 event 25
 	KeepAliveMsg,                          // RFC4271 event 26 

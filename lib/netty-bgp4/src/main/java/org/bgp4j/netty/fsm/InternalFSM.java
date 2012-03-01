@@ -54,6 +54,8 @@ public class InternalFSM {
 
 	private FSMChannel connectedChannel;
 	private FSMChannel activeChannel;
+	private boolean sentOpenOnConnectedChannel = false;
+	private boolean sentOpenOnActiveChannel = false;
 	
 	InternalFSM() {
 	}
@@ -128,10 +130,7 @@ public class InternalFSM {
 			handleHoldTimerExpiredEvent();
 			break;
 		case BGPOpen:
-			if(event instanceof FSMEvent.ChannelFSMEvent)
-				handleBgpOpenEvent(((FSMEvent.ChannelFSMEvent)event).getChannel());
-			else
-				haveFSMError = true;
+			handleBgpOpenEvent();
 			break;
 		case KeepAliveMsg:
 			handleKeepaliveMessageEvent();
@@ -144,9 +143,6 @@ public class InternalFSM {
 			break;
 		case NotifyMsgVerErr:
 			handleNotifyMessageVersionErrorEvent();
-			break;
-		case OpenCollisionDump:
-			handleOpenCollisionDumpEvent();
 			break;
 		case BGPOpenMsgErr:
 			handleBGPOpenMessageErrorEvent();
@@ -386,13 +382,24 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			if(channel == connectedChannel)
+			if(channel == connectedChannel) {
+				if(sentOpenOnConnectedChannel && !sentOpenOnActiveChannel) {
+					moveStateToActive();
+					sentOpenOnActiveChannel = false;
+				}
 				connectedChannel = null;
-			if(channel == activeChannel)
+			} else if(channel == activeChannel) {
+				if(!sentOpenOnConnectedChannel && sentOpenOnActiveChannel) {
+					moveStateToActive();
+					sentOpenOnActiveChannel = false;
+					
+					if(connectedChannel != null) {
+						callbacks.fireDisconnectRemotePeer(connectedChannel);
+						connectedChannel = null;
+					}
+				}
 				activeChannel = null;
-			
-			if(connectedChannel == null && activeChannel == null)
-				moveStateToActive();
+			}
 			break;
 		case OpenConfirm:
 		case Established:
@@ -449,6 +456,11 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
+			if(connectedChannel != null)
+				haveFSMError = true;
+			else
+				connectedChannel = channel;
+			break;
 		case OpenConfirm:
 		case Established:
 			haveFSMError = true;
@@ -501,6 +513,11 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
+			if(activeChannel != null)
+				haveFSMError = true;
+			else
+				activeChannel = channel;
+			break;
 		case OpenConfirm:
 		case Established:
 			haveFSMError = true;
@@ -515,11 +532,10 @@ public class InternalFSM {
   	 *
 	 * @param channelId the ID of the channel with which the connection was established
 	 */
-	private void handleBgpOpenEvent(FSMChannel channel) {
+	private void handleBgpOpenEvent() {
 		switch(state) {
 		case Connect:
 		case Active:
-			// TODO must we do collision detection here?
 			try {
 				if(fireDelayOpenTimerExpired.isJobScheduled()) {
 					moveStateToOpenConfirm(true);
@@ -534,6 +550,17 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
+			if(connectedChannel != null && activeChannel != null) {
+				if(peerConfiguration.getLocalBgpIdentifier() < peerConfiguration.getRemoteBgpIdentifier()) {
+					callbacks.fireSendCeaseNotification(connectedChannel);
+					callbacks.fireDisconnectRemotePeer(connectedChannel);
+					connectedChannel = null;
+				} else {
+					callbacks.fireSendCeaseNotification(activeChannel);
+					callbacks.fireDisconnectRemotePeer(activeChannel);
+					activeChannel = null;					
+				}
+			}
 			moveStateToOpenConfirm(false);
 			break;
 		case OpenConfirm:
@@ -645,33 +672,6 @@ public class InternalFSM {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	private void handleOpenCollisionDumpEvent()  {
-		// TODO must we handle this as an external event?
-		switch(state) {
-		case Connect:
-		case Active:
-			connectRetryCounter++;
-			moveStateToIdle();
-			break;
-		case OpenSent:
-		case OpenConfirm:
-		case Established:
-			if(connectedChannel != null)
-				callbacks.fireSendCeaseNotification(connectedChannel);
-			if(activeChannel != null)
-				callbacks.fireSendCeaseNotification(activeChannel);
-			connectRetryCounter++;
-			moveStateToIdle();
-			break;
-		case Idle:
-			// do nothing
-			break;
-		}		
-	}
-
 	/**
 	 * handle a malformed <code>OPEN</code> message sent from the remote peer
 	 */
@@ -1039,6 +1039,8 @@ public class InternalFSM {
 			callbacks.fireDisconnectRemotePeer(activeChannel);
 			activeChannel = null;
 		}
+		sentOpenOnActiveChannel = false;
+		sentOpenOnConnectedChannel = false;
 		
 		if(peerConfiguration.isDampPeerOscillation()) {
 			try {
@@ -1075,10 +1077,14 @@ public class InternalFSM {
 		}
 		
 		callbacks.fireCompleteBGPInitialization();
-		if(connectedChannel != null)
+		if(connectedChannel != null) {
 			callbacks.fireSendOpenMessage(connectedChannel);
-		if(activeChannel != null)
+			sentOpenOnConnectedChannel = true;
+		}
+		if(activeChannel != null) {
 			callbacks.fireSendOpenMessage(activeChannel);
+			sentOpenOnActiveChannel = true;
+		}
 		
 		this.state = FSMState.OpenSent;		
 	}

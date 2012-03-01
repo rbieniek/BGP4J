@@ -269,7 +269,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInConnectState(true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(connectedBundle, true);
@@ -286,7 +286,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInConnectState(true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(activeBundle, true);
@@ -303,7 +303,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInConnectState(true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(connectedBundle, false);
@@ -320,7 +320,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInConnectState(true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(activeBundle, false);
@@ -398,17 +398,6 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(null, false);
-	}
-
-	@Test
-	public void testTransitionConnectByOpenCollisionDump() throws Exception {
-		initializeFSMToConnectState("peer1");
-		
-		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
-		fsm.handleEvent(FSMEvent.openCollisionDump());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(null, false);
@@ -562,7 +551,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInActiveState(false, true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks, never()).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(activeBundle, true);
@@ -579,7 +568,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, never()).fireSendOpenMessage(argThat(anyChannelMatcher));
 		assertMachineInActiveState(false, true);
 
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 
 		verify(callbacks, never()).fireConnectRemotePeer();
 		assertMachineInOpenConfirm(activeBundle, false);
@@ -657,17 +646,6 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
 		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(null, false);
-	}
-
-	@Test
-	public void testTransitionActiveByOpenCollisionDump() throws Exception {
-		initializeFSMToActiveState("peer2");
-		
-		conditionalSleepShort(fsm.getConnectRetryTimerDueWhen(), 50);
-		fsm.handleEvent(FSMEvent.openCollisionDump());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
 		assertMachineInIdleState(null, false);
@@ -844,7 +822,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionOpenSentOnConnectedChannelByBgpOpen() throws Exception {
 		initializeFSMToOpenSentState(connectedBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInOpenConfirm(connectedBundle, true);
 	}
@@ -853,7 +831,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionOpenSentOnActiveChannelByBgpOpen() throws Exception {
 		initializeFSMToOpenSentState(activeBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInOpenConfirm(activeBundle, true);
 	}
@@ -898,28 +876,6 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(activeBundle, false);
 	}
 	
-	@Test
-	public void testTransitionOpenSentOnConnectedChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToOpenSentState(connectedBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(connectedBundle.getChannel());
-		assertMachineInIdleState(connectedBundle, false);
-	}
-
-	@Test
-	public void testTransitionOpenSentOnActiveChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToOpenSentState(activeBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(activeBundle.getChannel());
-		assertMachineInIdleState(activeBundle, false);
-	}
-
 	@Test
 	public void testTransitionOpenSentOnConnectedChannelByNofiticationVersionError() throws Exception {
 		initializeFSMToOpenSentState(connectedBundle, "peer1");
@@ -1116,6 +1072,507 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(activeBundle, false);
 	}
 
+	// -- Open Sent state transitions with second connection
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByBgpOpenLowerLocalBgpIdentifier() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+		assertMachineInOpenConfirm(activeBundle, true);
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByBgpOpenHigherBgpIdentifier() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer9");
+
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		assertMachineInOpenConfirm(connectedBundle, true);
+		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByBgpOpenLowerLocalBgpIdentifier() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		assertMachineInOpenConfirm(activeBundle, true);
+		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByBgpOpenHigherBgpIdentifier() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer9");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
+		
+		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+		assertMachineInOpenConfirm(connectedBundle, true);
+	}
+
+	@Test
+	public void testTransitionOnConnectedChannelOpenSentTcpConnectionConfirmedByAutomaticStart() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.automaticStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(connectedBundle);
+	}	
+	
+	@Test
+	public void testTransitionOnActiveChannelOpenSentTcpConnectionRequestAckedByAutomaticStart() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.automaticStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(activeBundle);
+	}	
+	
+	@Test
+	public void testTransitionOnConnectedChannelOpenSentTcpConnectionConfirmedByManualStart() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.manualStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(connectedBundle);
+	}	
+	
+	@Test
+	public void testTransitionOnActiveChannelOpenSentTcpConnectionRequestAckedByManualStart() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.manualStart());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(activeBundle);
+	}	
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByAutomaticStop() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.automaticStop());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByAutomaticStop() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.automaticStop());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByManualStop() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.manualStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByManualStop() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.manualStop());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByHoldTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.holdTimerExpires());
+		
+		verify(callbacks).fireSendHoldTimerExpiredNotification(connectedBundle.getMatcherArg());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByHoldTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.holdTimerExpires());
+		
+		verify(callbacks).fireSendHoldTimerExpiredNotification(activeBundle.getMatcherArg());
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByConnectedTcpConnectionFails() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.tcpConnectionFails(connectedBundle.getChannel()));
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInActiveState(true, false);
+		verify(callbacks, never()).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByActiveTcpConnectionFails() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.tcpConnectionFails(activeBundle.getChannel()));
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(connectedBundle);
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByConnectedTcpConnectionFails() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.tcpConnectionFails(connectedBundle.getChannel()));
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(activeBundle);
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByActiveTcpConnectionFails() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.tcpConnectionFails(activeBundle.getChannel()));
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInActiveState(true, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByBgpHeaderError() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpHeaderError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByBgpHeaderError() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpHeaderError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByBgpOpenMessageError() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByBgpOpenMessageError() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByNofiticationVersionError() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getChannel());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionConfirmedByNofiticationVersionError() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByConnectRetryTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.connectRetryTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByConnectRetryTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.connectRetryTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByKeepaliveTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.keepaliveTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByKeepaliveTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.keepaliveTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByDelayOpenTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByDelayOpenTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.delayOpenTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByIdleHoldTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByIdleHoldTimerExpires() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.idleHoldTimerExpires());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByNotifyMessage() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.notifyMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByNotifyMessage() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.notifyMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByKeepaliveMessage() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByKeepaliveMessage() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.keepAliveMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByUpdateMessage() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.updateMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByUpdateMessage() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.updateMessage());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+	
+	@Test
+	public void testTransitionOpenSentOnConnectedChannelTcpConnectionConfirmedByUpdateMessageError() throws Exception {
+		initializeFSMToOpenSentState(connectedBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.updateMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(connectedBundle.getMatcherArg());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(connectedBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+	}
+
+	@Test
+	public void testTransitionOpenSentOnActiveChannelTcpConnectionRequestAckedByUpdateMessageError() throws Exception {
+		initializeFSMToOpenSentState(activeBundle, "peer1");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.updateMessageError());
+		
+		Assert.assertEquals(1, fsm.getConnectRetryCounter());
+		verify(callbacks).fireSendInternalErrorNotification(activeBundle.getMatcherArg());
+		assertMachineInIdleState(activeBundle, false);
+		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
+	}
+
 	// -- Open Confirm state transitions
 	@Test
 	public void testTransitionOpenConfirmOnConnectedChannelByAutomaticStart() throws Exception {
@@ -1243,7 +1700,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionOpenConfirmOnConnectedChannelByBgpOpen() throws Exception {
 		initializeFSMToOpenConfirmState(connectedBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInOpenConfirm(connectedBundle, true);
 	}
@@ -1252,7 +1709,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionOpenConfirmOnActiveChannelByBgpOpen() throws Exception {
 		initializeFSMToOpenConfirmState(activeBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInOpenConfirm(activeBundle, true);
 	}
@@ -1294,28 +1751,6 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpenMessageError());
 		
 		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(activeBundle, false);
-	}
-
-	@Test
-	public void testTransitionOpenConfirmOnConnectedChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToOpenConfirmState(connectedBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
-		assertMachineInIdleState(connectedBundle, false);
-	}
-
-	@Test
-	public void testTransitionOpenConfirmOnActiveChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToOpenConfirmState(activeBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
 		assertMachineInIdleState(activeBundle, false);
 	}
 
@@ -1636,7 +2071,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionEstablishedOnConnectedChannelByBgpOpen() throws Exception {
 		initializeFSMToEstablishedState(connectedBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInEstablished(connectedBundle, true);
 	}
@@ -1645,7 +2080,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	public void testTransitionEstablishedOnActiveChannelByBgpOpen() throws Exception {
 		initializeFSMToEstablishedState(activeBundle, "peer1");
 		
-		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		assertMachineInEstablished(activeBundle, true);
 	}
@@ -1690,28 +2125,6 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		assertMachineInIdleState(activeBundle, false);
 	}
 	
-	@Test
-	public void testTransitionEstablishedOnConnectedChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToEstablishedState(connectedBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
-		assertMachineInIdleState(connectedBundle, false);
-	}
-
-	@Test
-	public void testTransitionEstablishedOnActiveChannelByOpenCollisionDump() throws Exception {
-		initializeFSMToEstablishedState(activeBundle, "peer1");
-		
-		fsm.handleEvent(FSMEvent.openCollisionDump());
-		
-		Assert.assertEquals(1, fsm.getConnectRetryCounter());
-		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
-		assertMachineInIdleState(activeBundle, false);
-	}
-
 	@Test
 	public void testTransitionEstablishedOnConnectedChannelByNofiticationVersionError() throws Exception {
 		initializeFSMToEstablishedState(connectedBundle, "peer1");
@@ -1978,7 +2391,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		Thread.sleep(1000);
 		
 		fsm.setPeerProposedHoldTime(10);
-		fsm.handleEvent(FSMEvent.bgpOpen(testBundle.getChannel()));
+		fsm.handleEvent(FSMEvent.bgpOpen());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
 		assertMachineInOpenConfirm(testBundle, true);
