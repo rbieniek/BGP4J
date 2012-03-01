@@ -472,6 +472,40 @@ public class InternalFSMTest extends WeldTestCaseBase {
 	}
 
 	@Test
+	public void testTransitionActiveByDuplicatedConnectionConfirmedWithOpenDelayTimer() throws Exception {
+		InternalFSMTestBundle secondActiveBundle = new InternalFSMTestBundle(mock(FSMChannel.class), false);
+		
+		initializeFSMToActiveState("peer7");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		conditionalSleepShort(fsm.getDelayOpenTimerDueWhen(), 50);
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(secondActiveBundle.getChannel()));
+		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
+
+		conditionalSleep(fsm.getDelayOpenTimerDueWhen());
+
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(secondActiveBundle);
+	}
+	
+	@Test
+	public void testTransitionActiveByConnectionAckedWithOpenDelayTimer() throws Exception {
+		initializeFSMToActiveState("peer7");
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
+		conditionalSleepShort(fsm.getDelayOpenTimerDueWhen(), 50);
+		
+		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
+
+		conditionalSleep(fsm.getDelayOpenTimerDueWhen());
+
+		Assert.assertEquals(0, fsm.getConnectRetryCounter());
+		assertMachineInOpenSentState(connectedBundle);
+		verify(callbacks).fireSendOpenMessage(activeBundle.getMatcherArg());
+	}
+	
+	@Test
 	public void testTransitionActiveByDelayOpenTimerExpires() throws Exception {
 		initializeFSMToActiveState("peer7");
 		
@@ -1192,7 +1226,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(connectedBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(connectedBundle, false);
+		assertMachineInIdleState(null, false);
 	}
 
 	@Test
@@ -1202,7 +1236,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(activeBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(activeBundle, false);
+		assertMachineInIdleState(null, false);
 	}
 
 	@Test
@@ -1585,7 +1619,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(connectedBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(connectedBundle, false);
+		assertMachineInIdleState(null, false);
 	}
 
 	@Test
@@ -1595,7 +1629,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(activeBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInIdleState(activeBundle, false);
+		assertMachineInIdleState(null, false);
 	}
 
 	@Test

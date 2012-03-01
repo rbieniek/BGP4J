@@ -54,7 +54,6 @@ public class InternalFSM {
 
 	private FSMChannel connectedChannel;
 	private FSMChannel activeChannel;
-	private FSMChannel runningChannel;
 	
 	InternalFSM() {
 	}
@@ -164,8 +163,17 @@ public class InternalFSM {
 		}
 		
 		if(haveFSMError) {
-			if(runningChannel != null)
-				callbacks.fireSendInternalErrorNotification(runningChannel);
+			// sent internal error notification only when in state established or open confirm or open sent 
+			switch(state) {
+			case Established:
+			case OpenConfirm:
+			case OpenSent:
+				if (activeChannel != null)
+					callbacks.fireSendInternalErrorNotification(activeChannel);
+				if (connectedChannel != null)
+					callbacks.fireSendInternalErrorNotification(connectedChannel);
+				break;
+			}
 			
 			connectRetryCounter++;
 			 
@@ -292,7 +300,10 @@ public class InternalFSM {
 		case OpenSent:
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendHoldTimerExpiredNotification(runningChannel);
+			if(connectedChannel != null)
+				callbacks.fireSendHoldTimerExpiredNotification(connectedChannel);
+			if(activeChannel != null)
+				callbacks.fireSendHoldTimerExpiredNotification(activeChannel);
 			this.connectRetryCounter++;
 			moveStateToIdle();		
 			break;
@@ -335,13 +346,6 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
-			if(connectedChannel != null) {
-				runningChannel = connectedChannel;
-				connectedChannel = null;
-			} else if(activeChannel != null) {
-				runningChannel = activeChannel;
-				activeChannel = null;
-			}
 			moveStateToOpenSent();
 			break;
 		case OpenSent:
@@ -382,17 +386,23 @@ public class InternalFSM {
 			moveStateToIdle();
 			break;
 		case OpenSent:
-			if(channel == runningChannel) {
-				runningChannel = null;
+			if(channel == connectedChannel)
+				connectedChannel = null;
+			if(channel == activeChannel)
+				activeChannel = null;
+			
+			if(connectedChannel == null && activeChannel == null)
 				moveStateToActive();
-			}
 			break;
 		case OpenConfirm:
 		case Established:
-			if(channel == runningChannel) {
-				runningChannel = null;
+			if(channel == connectedChannel)
+				connectedChannel = null;
+			if(channel == activeChannel)
+				activeChannel = null;
+			
+			if(connectedChannel == null && activeChannel == null)
 				moveStateToIdle();
-			}
 			break;
 		case Idle:
 			// do nothing
@@ -427,6 +437,7 @@ public class InternalFSM {
 				}
 				
 				try {
+					fireDelayOpenTimerExpired.cancelJob();
 					fireDelayOpenTimerExpired.scheduleJob(peerConfiguration.getDelayOpenTime());
 				} catch (SchedulerException e) {
 					log.error("Internal Error: cannot schedule open delay timer for peer " + peerConfiguration.getPeerName(), e);
@@ -434,7 +445,6 @@ public class InternalFSM {
 					haveFSMError = true;
 				}
 			} else {
-				runningChannel = channel;
 				moveStateToOpenSent();
 			}
 			break;
@@ -479,6 +489,7 @@ public class InternalFSM {
 				}
 				
 				try {
+					fireDelayOpenTimerExpired.cancelJob();
 					fireDelayOpenTimerExpired.scheduleJob(peerConfiguration.getDelayOpenTime());
 				} catch (SchedulerException e) {
 					log.error("Internal Error: cannot schedule open delay timer for peer " + peerConfiguration.getPeerName(), e);
@@ -486,7 +497,6 @@ public class InternalFSM {
 					haveFSMError = true;
 				}
 			} else {
-				runningChannel = channel;
 				moveStateToOpenSent();
 			}
 			break;
@@ -509,28 +519,18 @@ public class InternalFSM {
 		switch(state) {
 		case Connect:
 		case Active:
-			if(channel == connectedChannel) {
-				runningChannel = channel;
-				connectedChannel = null;
-			} else if(channel == activeChannel){
-				runningChannel = activeChannel;
-				activeChannel = null;
-			} else {
-				haveFSMError = true;
-			}
-			if(!haveFSMError) {
-				try {
-					if(fireDelayOpenTimerExpired.isJobScheduled()) {
-						moveStateToOpenConfirm(true);
-					} else {
-						connectRetryCounter++;
-						moveStateToIdle();
-					}
-				} catch(SchedulerException e) {
-					log.error("cannot query delay openn timer for peer " + peerConfiguration.getPeerName(), e);
-				
-					haveFSMError = true;
+			// TODO must we do collision detection here?
+			try {
+				if(fireDelayOpenTimerExpired.isJobScheduled()) {
+					moveStateToOpenConfirm(true);
+				} else {
+					connectRetryCounter++;
+					moveStateToIdle();
 				}
+			} catch(SchedulerException e) {
+				log.error("cannot query delay openn timer for peer " + peerConfiguration.getPeerName(), e);
+			
+				haveFSMError = true;
 			}
 			break;
 		case OpenSent:
@@ -595,7 +595,10 @@ public class InternalFSM {
 			break;
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendKeepaliveMessage(runningChannel);
+			if(connectedChannel != null)
+				callbacks.fireSendKeepaliveMessage(connectedChannel);
+			if(activeChannel != null)
+				callbacks.fireSendKeepaliveMessage(activeChannel);
 			break;
 		case Idle:
 			// do nothing
@@ -646,6 +649,7 @@ public class InternalFSM {
 	 * 
 	 */
 	private void handleOpenCollisionDumpEvent()  {
+		// TODO must we handle this as an external event?
 		switch(state) {
 		case Connect:
 		case Active:
@@ -655,7 +659,10 @@ public class InternalFSM {
 		case OpenSent:
 		case OpenConfirm:
 		case Established:
-			callbacks.fireSendCeaseNotification(runningChannel);
+			if(connectedChannel != null)
+				callbacks.fireSendCeaseNotification(connectedChannel);
+			if(activeChannel != null)
+				callbacks.fireSendCeaseNotification(activeChannel);
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -748,7 +755,10 @@ public class InternalFSM {
 			haveFSMError = true;
 			break;
 		case Established:
-			callbacks.fireSendUpdateErrorNotification(runningChannel);
+			if(connectedChannel != null)
+				callbacks.fireSendUpdateErrorNotification(connectedChannel);
+			if(activeChannel != null)
+				callbacks.fireSendUpdateErrorNotification(activeChannel);
 			connectRetryCounter++;
 			moveStateToIdle();
 			break;
@@ -1029,10 +1039,6 @@ public class InternalFSM {
 			callbacks.fireDisconnectRemotePeer(activeChannel);
 			activeChannel = null;
 		}
-		if(runningChannel != null) {
-			callbacks.fireDisconnectRemotePeer(runningChannel);
-			runningChannel = null;			
-		}
 		
 		if(peerConfiguration.isDampPeerOscillation()) {
 			try {
@@ -1069,7 +1075,10 @@ public class InternalFSM {
 		}
 		
 		callbacks.fireCompleteBGPInitialization();
-		callbacks.fireSendOpenMessage(runningChannel);
+		if(connectedChannel != null)
+			callbacks.fireSendOpenMessage(connectedChannel);
+		if(activeChannel != null)
+			callbacks.fireSendOpenMessage(activeChannel);
 		
 		this.state = FSMState.OpenSent;		
 	}
@@ -1111,10 +1120,16 @@ public class InternalFSM {
 	private void moveStateToOpenConfirm(boolean sendOpenMessage) {
 		if(sendOpenMessage) {
 			callbacks.fireCompleteBGPInitialization();
-			callbacks.fireSendOpenMessage(runningChannel);
+			if(connectedChannel != null)
+				callbacks.fireSendOpenMessage(connectedChannel);
+			if(activeChannel != null)
+				callbacks.fireSendOpenMessage(activeChannel);
 		}
 		
-		callbacks.fireSendKeepaliveMessage(runningChannel);
+		if(connectedChannel != null)
+			callbacks.fireSendKeepaliveMessage(connectedChannel);
+		if(activeChannel != null)
+			callbacks.fireSendKeepaliveMessage(activeChannel);
 
 		try {
 			fireConnectRetryTimeExpired.cancelJob();
