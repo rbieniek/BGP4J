@@ -18,7 +18,6 @@
 package org.bgp4j.netty.fsm;
 
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 
