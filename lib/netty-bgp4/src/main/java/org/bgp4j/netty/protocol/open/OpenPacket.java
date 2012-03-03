@@ -115,7 +115,7 @@ public class OpenPacket extends BGPv4Packet {
 		buffer.writeShort(getHoldTime());
 		buffer.writeInt((int)getBgpIdentifier());
 		
-		ChannelBuffer capabilities = Capability.encodeCapabilities(getCapabilities());
+		ChannelBuffer capabilities = CapabilityCodec.encodeCapabilities(getCapabilities());
 		
 		if(capabilities.readableBytes() > 0) {
 			buffer.writeByte(capabilities.readableBytes() + 2); // cap length + type byte + parameter length byte

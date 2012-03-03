@@ -16,8 +16,6 @@
  */
 package org.bgp4j.netty.protocol.open;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -27,30 +25,6 @@ public class UnknownCapability extends Capability {
 	private int capabilityType;
 	private byte[] value;
 	
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.Capability#encodeParameterValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeParameterValue() {
-		ChannelBuffer buffer = null;
-		
-		if(value != null && value.length > 0) {
-			buffer = ChannelBuffers.buffer(value.length);
-			
-			buffer.writeBytes(getValue());
-		}
-		
-		return buffer;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.Capability#getCapabilityType()
-	 */
-	@Override
-	public int getCapabilityType() {
-		return capabilityType;
-	}
-
 	/**
 	 * @return the value
 	 */
@@ -72,16 +46,11 @@ public class UnknownCapability extends Capability {
 		this.capabilityType = capabilityType;
 	}
 
-	@Override
-	protected void decodeParameterValue(ChannelBuffer buffer) {
-		int parameterLength = buffer.readUnsignedByte();
-		
-		if(parameterLength > 0) {
-			value = new byte[parameterLength];
-			
-			buffer.readBytes(value);
-		}
-		
+	/**
+	 * @return the capabilityType
+	 */
+	public int getCapabilityType() {
+		return capabilityType;
 	}
 
 }

@@ -86,7 +86,7 @@ public abstract class CapabilityException extends OpenPacketException {
 	}
 
 	private byte[] encondeCapability(Capability cap) {
-		ChannelBuffer buffer = cap.encodeCapability();
+		ChannelBuffer buffer = CapabilityCodec.encodeCapability(cap);
 		byte[] packet  = new byte[buffer.readableBytes()];
 		
 		buffer.readBytes(this.capability);
@@ -98,7 +98,7 @@ public abstract class CapabilityException extends OpenPacketException {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 		
 		for(Capability cap : caps)
-			buffer.writeBytes(cap.encodeCapability());
+			buffer.writeBytes(CapabilityCodec.encodeCapability(cap));
 		
 		byte[] packet  = new byte[buffer.readableBytes()];
 		

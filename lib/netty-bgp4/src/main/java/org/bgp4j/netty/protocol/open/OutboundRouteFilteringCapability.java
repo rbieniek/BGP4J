@@ -21,10 +21,7 @@ import java.util.Map;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.SubsequentAddressFamily;
-import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.refresh.ORFType;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -78,51 +75,6 @@ public class OutboundRouteFilteringCapability extends Capability {
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.Capability#encodeParameterValue()
 	 */
-	@Override
-	protected ChannelBuffer encodeParameterValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(5 + 2*filters.size());
-		
-		buffer.writeShort(addressFamily.toCode());
-		buffer.writeByte(0);
-		buffer.writeByte(subsequentAddressFamily.toCode());
-		buffer.writeByte(filters.size());
-		
-		for(ORFType type : filters.keySet()) {
-			buffer.writeByte(type.toCode());
-			buffer.writeByte(filters.get(type).toCode());
-		}
-		
-		return buffer;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.Capability#getCapabilityType()
-	 */
-	@Override
-	public int getCapabilityType() {
-		return BGPv4Constants.BGP_CAPABILITY_TYPE_OUTBOUND_ROUTE_FILTERING;
-	}
-
-	@Override
-	protected void decodeParameterValue(ChannelBuffer buffer) {
-		assertMinimalLength(buffer, 5); // 2 octest AFI + 1 octet reserved + 1 octet SAFI + 1 octet number of (ORF type, Send/Receive) tuples
-		
-		setAddressFamily(AddressFamily.fromCode(buffer.readUnsignedShort()));
-		buffer.readByte();
-		setSubsequentAddressFamily(SubsequentAddressFamily.fromCode(buffer.readUnsignedByte()));
-		
-		int orfs = buffer.readUnsignedByte();
-		
-		if(buffer.readableBytes() != 2*orfs)
-			throw new UnspecificOpenPacketException("Expected " + (2*orfs) + " octets parameter, got " + buffer.readableBytes() + " octets");
-		
-		try {
-			filters.put(ORFType.fromCode(buffer.readUnsignedByte()), SendReceive.fromCode(buffer.readUnsignedByte()));
-		} catch(IllegalArgumentException e) {
-			throw new UnspecificOpenPacketException(e);
-		}
-	}
-	
 
 	/**
 	 * @return the filters

@@ -100,7 +100,7 @@ public class OpenPacketDecoder {
 				case BGPv4Constants.BGP_OPEN_PARAMETER_TYPE_AUTH:
 					break;
 				case BGPv4Constants.BGP_OPEN_PARAMETER_TYPE_CAPABILITY:
-					packet.getCapabilities().addAll(Capability.decodeCapabilities(valueBuffer));
+					packet.getCapabilities().addAll(CapabilityCodec.decodeCapabilities(valueBuffer));
 					break;
 				default:
 					throw new UnsupportedOptionalParameterException();
