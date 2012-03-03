@@ -269,7 +269,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 
 		verify(callbacks).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 	}
 
 	@Test
@@ -286,7 +286,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 
 		verify(callbacks).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}
 
 	@Test
@@ -303,7 +303,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 
 		verify(callbacks).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(connectedBundle, false);
+		assertMachineInOpenConfirmState(connectedBundle, false);
 	}
 
 	@Test
@@ -320,7 +320,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 
 		verify(callbacks).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(activeBundle, false);
+		assertMachineInOpenConfirmState(activeBundle, false);
 	}
 
 	@Test
@@ -551,7 +551,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 
 		verify(callbacks, never()).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}
 
 	@Test
@@ -568,7 +568,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 
 		verify(callbacks, never()).fireConnectRemotePeer();
-		assertMachineInOpenConfirm(activeBundle, false);
+		assertMachineInOpenConfirmState(activeBundle, false);
 	}
 
 	@Test
@@ -821,7 +821,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 	}
 
 	@Test
@@ -830,7 +830,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}
 
 	@Test
@@ -1089,7 +1089,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
 		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
 	}
@@ -1101,7 +1101,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
 		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
 	}
@@ -1700,7 +1700,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInIdleState(connectedBundle, false);
 	}
 
 	@Test
@@ -1709,7 +1709,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInIdleState(activeBundle, false);
 	}
 
 	@Test
@@ -1886,7 +1886,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}
 	
 	@Test
@@ -1895,7 +1895,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 	}
 	
 	@Test
@@ -1952,7 +1952,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
 		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
-		assertMachineInOpenConfirm(activeBundle, true, 1, false);
+		assertMachineInOpenConfirm(activeBundle, true, 0, false);
 	}
 
 	@Test
@@ -1962,8 +1962,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.bgpOpen(activeBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(connectedBundle, true);
-		verify(callbacks, never()).fireSendCeaseNotification(activeBundle.getMatcherArg());
+		assertMachineInOpenConfirmState(connectedBundle, true);
+		verify(callbacks).fireSendCeaseNotification(activeBundle.getMatcherArg());
 		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
 	}
 
@@ -1974,8 +1974,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInOpenConfirm(activeBundle, true);
-		verify(callbacks, never()).fireSendCeaseNotification(connectedBundle.getMatcherArg());
+		assertMachineInOpenConfirmState(activeBundle, true);
+		verify(callbacks).fireSendCeaseNotification(connectedBundle.getMatcherArg());
 		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
 	}
 	
@@ -2000,7 +2000,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.automaticStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 	}	
 	
 	@Test
@@ -2011,7 +2011,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.automaticStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}	
 	
 	@Test
@@ -2022,7 +2022,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.manualStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 	}	
 	
 	@Test
@@ -2033,7 +2033,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.manualStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}	
 	
 	@Test
@@ -2129,7 +2129,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(activeBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(connectedBundle, true);
+		assertMachineInOpenConfirmState(connectedBundle, true);
 	}
 
 	@Test
@@ -2140,7 +2140,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionFails(connectedBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(activeBundle, true);
+		assertMachineInOpenConfirmState(activeBundle, true);
 	}
 
 	@Test
@@ -2364,7 +2364,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionConfirmed(activeBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 		verify(callbacks).fireDisconnectRemotePeer(activeBundle.getMatcherArg());
 	}
 	
@@ -2375,7 +2375,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(connectedBundle.getChannel()));
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 		
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 		verify(callbacks).fireDisconnectRemotePeer(connectedBundle.getMatcherArg());
 	}
 	
@@ -2441,7 +2441,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.automaticStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}	
 	
 	@Test
@@ -2451,7 +2451,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.automaticStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 	}	
 	
 	@Test
@@ -2461,7 +2461,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.manualStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}	
 	
 	@Test
@@ -2471,7 +2471,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.manualStart());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 	}	
 	
 	@Test
@@ -2562,7 +2562,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}
 
 	@Test
@@ -2571,7 +2571,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.bgpOpen(connectedBundle.getChannel()));
 		
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInIdleState(activeBundle, false);
 	}
 
 	@Test
@@ -2748,7 +2748,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}
 	
 	@Test
@@ -2757,7 +2757,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 	}
 	
 	@Test
@@ -2767,7 +2767,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.updateMessage());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(connectedBundle, true);
+		assertMachineInEstablishedState(connectedBundle, true);
 	}
 	
 	@Test
@@ -2777,7 +2777,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.updateMessage());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(activeBundle, true);
+		assertMachineInEstablishedState(activeBundle, true);
 	}
 	
 	@Test
@@ -2883,7 +2883,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.bgpOpen(testBundle.getChannel()));
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInOpenConfirm(testBundle, true);
+		assertMachineInOpenConfirmState(testBundle, true);
 
 	}
 
@@ -2901,7 +2901,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		fsm.handleEvent(FSMEvent.keepAliveMessage());
 		
 		Assert.assertEquals(0, fsm.getConnectRetryCounter());
-		assertMachineInEstablished(testBundle, true);
+		assertMachineInEstablishedState(testBundle, true);
 	}
 
 	/**
@@ -3064,11 +3064,14 @@ public class InternalFSMTest extends WeldTestCaseBase {
 
 		if(mustHaveSentOpen)
 			verify(callbacks).fireSendOpenMessage(testBundle.getMatcherArg());
-		verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage(testBundle.getMatcherArg());
+		if(numberOfKeepalivesSent > 0)
+			verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage(testBundle.getMatcherArg());
+		else
+			verify(callbacks, never()).fireSendKeepaliveMessage(testBundle.getMatcherArg());
 		verify(callbacks).fireCompleteBGPInitialization();
 	}
 
-	private void assertMachineInOpenConfirm(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+	private void assertMachineInOpenConfirmState(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
 		assertMachineInOpenConfirm(testBundle, mustHaveHoldAndKeepaliveTimer, 1, true);
 	}
 
@@ -3112,7 +3115,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage(testBundle.getMatcherArg());
 	}
 
-	private void assertMachineInEstablished(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
+	private void assertMachineInEstablishedState(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {
 		assertMachineInEstablished(testBundle, mustHaveHoldAndKeepaliveTimer, 1);
 	}
 	
