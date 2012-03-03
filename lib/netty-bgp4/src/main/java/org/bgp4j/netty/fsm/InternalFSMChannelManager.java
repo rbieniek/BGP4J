@@ -17,6 +17,9 @@
  */
 package org.bgp4j.netty.fsm;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -25,8 +28,8 @@ class InternalFSMChannelManager {
 
 	private FSMChannel managedChannel;
 	private InternalFSMCallbacks callbacks;
-	private boolean sentOpenMessage;
-	private boolean establishedChannel;
+	private List<FSMEventType> inboundEventStream = new LinkedList<FSMEventType>();
+	private List<FSMEventType> outboundEventStream = new LinkedList<FSMEventType>();
 	
 	InternalFSMChannelManager(InternalFSMCallbacks callbacks) {
 		this.callbacks = callbacks;  
@@ -39,7 +42,8 @@ class InternalFSMChannelManager {
 	}
 	
 	void disconnect() {
-		fireDisconnectRemotePeer();
+		if(isConnected())
+			fireDisconnectRemotePeer();
 		clear();
 	}
 	
@@ -57,8 +61,7 @@ class InternalFSMChannelManager {
 	void fireSendOpenMessage() {
 		if(managedChannel != null) {
 			callbacks.fireSendOpenMessage(managedChannel);
-			
-			sentOpenMessage = true;
+			this.outboundEventStream.add(FSMEventType.BGPOpen);
 		}
 	}
 
@@ -66,54 +69,50 @@ class InternalFSMChannelManager {
 	 * send an FSM error notification to the remote peer
 	 */
 	void fireSendInternalErrorNotification() {
-		if(managedChannel != null)
+		if(managedChannel != null) {
 			callbacks.fireSendInternalErrorNotification(managedChannel);
+			this.outboundEventStream.add(FSMEventType.NotifyMsg);
+		}
 	}
 
 	/**
 	 * send a CEASE notification to the remote peer
 	 */
 	void fireSendCeaseNotification() {
-		if(managedChannel != null)
+		if(managedChannel != null) {
 			callbacks.fireSendCeaseNotification(managedChannel);
+			this.outboundEventStream.add(FSMEventType.NotifyMsg);
+		}
 	}
 
 	/**
 	 * send a keepalive message to the remote peer
 	 */
 	void fireSendKeepaliveMessage() {
-		if(managedChannel != null)
+		if(managedChannel != null) {
 			callbacks.fireSendKeepaliveMessage(managedChannel);
+			this.outboundEventStream.add(FSMEventType.KeepAliveMsg);
+		}
 	}
 
 	/**
 	 * fire a notification to the peer that the hold timer expired
 	 */
 	void fireSendHoldTimerExpiredNotification() {
-		if(managedChannel != null)
+		if(managedChannel != null) {
 			callbacks.fireSendHoldTimerExpiredNotification(managedChannel);
+			this.outboundEventStream.add(FSMEventType.NotifyMsg);
+		}
 	}
 
 	/**
 	 * fire an notification to the peer that it sent a bad update
 	 */
 	void fireSendUpdateErrorNotification() {
-		if(managedChannel != null)
+		if(managedChannel != null) {
 			callbacks.fireSendUpdateErrorNotification(managedChannel);
-	}
-
-	/**
-	 * @return the sentOpenMessage
-	 */
-	boolean isSentOpenMessage() {
-		return sentOpenMessage;
-	}
-
-	/**
-	 * @param sentOpenMessage the sentOpenMessage to set
-	 */
-	void setSentOpenMessage(boolean sentOpenMessage) {
-		this.sentOpenMessage = sentOpenMessage;
+			this.outboundEventStream.add(FSMEventType.NotifyMsg);
+		}
 	}
 
 	boolean isConnected() {
@@ -126,19 +125,20 @@ class InternalFSMChannelManager {
 
 	void clear() {
 		this.managedChannel = null;
-		this.sentOpenMessage = false;
-		this.establishedChannel = false;
-	}
-
-	void tagAsEstablished() {
-		if(isConnected())
-			this.establishedChannel = true;
+		this.inboundEventStream.clear();
+		this.outboundEventStream.clear();
 	}
 	
-	/**
-	 * @return the establishedChannel
-	 */
-	boolean isEstablishedChannel() {
-		return establishedChannel;
+	boolean hasSeenInboundFSMEvent(FSMEventType event) {
+		return this.inboundEventStream.contains(event);
+	}
+	
+	boolean hasSeenOutbboundFSMEvent(FSMEventType event) {
+		return this.outboundEventStream.contains(event);
+	}
+	
+	void pushInboundFSMEvent(FSMEventType event) {
+		if(isConnected())
+			this.inboundEventStream.add(event);
 	}
 }

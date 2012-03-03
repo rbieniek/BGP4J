@@ -91,6 +91,18 @@ public class InternalFSM {
 	}
 
 	void handleEvent(FSMEvent event) {
+		FSMChannel channel = null;
+		InternalFSMChannelManager channelManager = null;
+		
+		if(event instanceof FSMEvent.ChannelFSMEvent) {
+			channel = ((FSMEvent.ChannelFSMEvent)event).getChannel();
+			
+			if(connectedChannelManager.isManagedChannel(channel))
+				channelManager = connectedChannelManager;
+			else if(activeChannelManager.isManagedChannel(channel))
+				channelManager = activeChannelManager;			
+		}
+		
 		switch(event.getType()) {
 		case AutomaticStart:
 		case ManualStart:
@@ -107,20 +119,20 @@ public class InternalFSM {
 			handleIdleHoldTimerExpiredEvent();
 			break;
 		case TcpConnectionConfirmed:
-			if(event instanceof FSMEvent.ChannelFSMEvent)
-				handleTcpConnectionConfirmed(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			if(channel != null)
+				handleTcpConnectionConfirmed(channel);
 			else
 				haveFSMError = true;
 			break;
 		case Tcp_CR_Acked:
-			if(event instanceof FSMEvent.ChannelFSMEvent)
-				handleTcpConnectionAcked(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			if(channel != null)
+				handleTcpConnectionAcked(channel);
 			else
 				haveFSMError = true;
 			break;
 		case TcpConnectionFails:
-			if(event instanceof FSMEvent.ChannelFSMEvent)
-				handleTcpConnectionFails(((FSMEvent.ChannelFSMEvent)event).getChannel());
+			if(channel != null)
+				handleTcpConnectionFails(channel);
 			else
 				haveFSMError = true;
 			break;
@@ -131,7 +143,10 @@ public class InternalFSM {
 			handleHoldTimerExpiredEvent();
 			break;
 		case BGPOpen:
-			handleBgpOpenEvent();
+			if(channel != null && channelManager != null)
+				handleBgpOpenEvent(channel, channelManager);
+			else
+				haveFSMError = true;
 			break;
 		case KeepAliveMsg:
 			handleKeepaliveMessageEvent();
@@ -159,6 +174,9 @@ public class InternalFSM {
 			break;
 		}
 		
+		if(channelManager != null)
+			channelManager.pushInboundFSMEvent(event.getType());
+
 		if(haveFSMError) {
 			// sent internal error notification only when in state established or open confirm or open sent 
 			switch(state) {
@@ -380,11 +398,11 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 			if(connectedChannelManager.isManagedChannel(channel)) {
-				if(!activeChannelManager.isSentOpenMessage())
+				if(!activeChannelManager.hasSeenOutbboundFSMEvent(FSMEventType.BGPOpen))
 					moveStateToActive();
 				connectedChannelManager.clear();
 			} else if(activeChannelManager.isManagedChannel(channel)) {
-				if(!connectedChannelManager.isSentOpenMessage()) {
+				if(!connectedChannelManager.hasSeenOutbboundFSMEvent(FSMEventType.BGPOpen)) {
 					if(connectedChannelManager.isConnected())
 						moveStateToConnect();
 					else
@@ -396,28 +414,21 @@ public class InternalFSM {
 		case OpenConfirm:
 			if(connectedChannelManager.isManagedChannel(channel)) {
 				connectedChannelManager.clear();
-				if(!activeChannelManager.isConnected())
+				if(!activeChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
 					moveStateToIdle();
 			} else if(activeChannelManager.isManagedChannel(channel)) {
 				activeChannelManager.clear();
-				if(!connectedChannelManager.isConnected())
+				if(!connectedChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
 					moveStateToIdle();				
 			}
 			break;	
 		case Established:
 			if(connectedChannelManager.isManagedChannel(channel)) {
-				boolean established = connectedChannelManager.isEstablishedChannel();
-				
 				connectedChannelManager.clear();
-				if(established)
-					moveStateToIdle();
 			} else if(activeChannelManager.isManagedChannel(channel)) {
-				boolean established = activeChannelManager.isEstablishedChannel();
-				
 				activeChannelManager.clear();
-				if(established)
-					moveStateToIdle();
 			}
+			moveStateToIdle();
 			break;
 		case Idle:
 			// do nothing
@@ -464,12 +475,12 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
+		case OpenConfirm:
 			if(connectedChannelManager.isConnected() || !activeChannelManager.isConnected())
 				haveFSMError = true;
 			else
 				connectedChannelManager.connect(channel);
 			break;
-		case OpenConfirm:
 		case Established:
 			haveFSMError = true;
 			break;
@@ -519,12 +530,12 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
-			if(activeChannelManager.isConnected() && activeChannelManager.isSentOpenMessage())
+		case OpenConfirm:
+			if(activeChannelManager.isConnected() && activeChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
 				haveFSMError = true;
 			else
 				activeChannelManager.connect(channel);
 			break;
-		case OpenConfirm:
 		case Established:
 			haveFSMError = true;
 			break;
@@ -538,7 +549,7 @@ public class InternalFSM {
   	 *
 	 * @param channelId the ID of the channel with which the connection was established
 	 */
-	private void handleBgpOpenEvent() {
+	private void handleBgpOpenEvent(FSMChannel channel, InternalFSMChannelManager channelManager) {
 		switch(state) {
 		case Connect:
 		case Active:
@@ -556,21 +567,31 @@ public class InternalFSM {
 			}
 			break;
 		case OpenSent:
-			if(connectedChannelManager.isConnected() && activeChannelManager.isConnected()) {
+			if(channelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+				haveFSMError = true;
+			else if(connectedChannelManager.isConnected() && activeChannelManager.isConnected()) {				
 				if(peerConfiguration.getLocalBgpIdentifier() < peerConfiguration.getRemoteBgpIdentifier()) {
-					if(connectedChannelManager.isSentOpenMessage())
-						connectedChannelManager.fireSendCeaseNotification();
+					connectedChannelManager.fireSendCeaseNotification();
 					connectedChannelManager.disconnect();
 				} else {
-					if(activeChannelManager.isSentOpenMessage())
-						activeChannelManager.fireSendCeaseNotification();
+					activeChannelManager.fireSendCeaseNotification();
 					activeChannelManager.disconnect();
 				}
 			}
 			moveStateToOpenConfirm(false);
 			break;
 		case OpenConfirm:
-			// TODO what to do here?
+			if(channelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+				haveFSMError = true;
+			else if(connectedChannelManager.isConnected() && activeChannelManager.isConnected()) {				
+				if(peerConfiguration.getLocalBgpIdentifier() < peerConfiguration.getRemoteBgpIdentifier()) {
+					connectedChannelManager.fireSendCeaseNotification();
+					connectedChannelManager.disconnect();
+				} else {
+					activeChannelManager.fireSendCeaseNotification();
+					activeChannelManager.disconnect();
+				}
+			}
 			break;
 		case Established:
 			// TODO what to do here?
@@ -628,8 +649,10 @@ public class InternalFSM {
 			break;
 		case OpenConfirm:
 		case Established:
-			activeChannelManager.fireSendKeepaliveMessage();
-			connectedChannelManager.fireSendKeepaliveMessage();
+			if(activeChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+				activeChannelManager.fireSendKeepaliveMessage();
+			if(connectedChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+				connectedChannelManager.fireSendKeepaliveMessage();
 			break;
 		case Idle:
 			// do nothing
@@ -1101,8 +1124,10 @@ public class InternalFSM {
 			haveFSMError = true;
 		}
 
-		activeChannelManager.tagAsEstablished();
-		connectedChannelManager.tagAsEstablished();
+		if(!activeChannelManager.hasSeenOutbboundFSMEvent(FSMEventType.KeepAliveMsg))
+			activeChannelManager.disconnect();
+		if(!connectedChannelManager.hasSeenOutbboundFSMEvent(FSMEventType.KeepAliveMsg))
+			connectedChannelManager.disconnect();
 		
 		this.state = FSMState.Established;		
 	}
@@ -1124,7 +1149,7 @@ public class InternalFSM {
 
 		activeChannelManager.fireSendKeepaliveMessage();
 		connectedChannelManager.fireSendKeepaliveMessage();
-
+		
 		try {
 			fireConnectRetryTimeExpired.cancelJob();
 		}  catch(SchedulerException e) {
