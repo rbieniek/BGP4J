@@ -424,11 +424,16 @@ public class InternalFSM {
 			break;	
 		case Established:
 			if(connectedChannelManager.isManagedChannel(channel)) {
-				connectedChannelManager.clear();
+				if(connectedChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+					moveStateToIdle();
+				else
+					connectedChannelManager.clear();
 			} else if(activeChannelManager.isManagedChannel(channel)) {
-				activeChannelManager.clear();
+				if(activeChannelManager.hasSeenOutbboundFSMEvent(FSMEventType.BGPOpen))
+					moveStateToIdle();
+				else
+					activeChannelManager.clear();
 			}
-			moveStateToIdle();
 			break;
 		case Idle:
 			// do nothing
@@ -476,13 +481,11 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			if(connectedChannelManager.isConnected() || !activeChannelManager.isConnected())
 				haveFSMError = true;
 			else
 				connectedChannelManager.connect(channel);
-			break;
-		case Established:
-			haveFSMError = true;
 			break;
 		case Idle:
 			// do nothing
@@ -531,13 +534,11 @@ public class InternalFSM {
 			break;
 		case OpenSent:
 		case OpenConfirm:
+		case Established:
 			if(activeChannelManager.isConnected() && activeChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
 				haveFSMError = true;
 			else
 				activeChannelManager.connect(channel);
-			break;
-		case Established:
-			haveFSMError = true;
 			break;
 		case Idle:
 			// do nothing
@@ -594,7 +595,17 @@ public class InternalFSM {
 			}
 			break;
 		case Established:
-			// TODO what to do here?
+			if(channelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
+				haveFSMError = true;
+			else if(connectedChannelManager.isConnected() && activeChannelManager.isConnected()) {				
+				if(peerConfiguration.getLocalBgpIdentifier() < peerConfiguration.getRemoteBgpIdentifier()) {
+					connectedChannelManager.fireSendCeaseNotification();
+					moveStateToIdle();
+				} else {
+					activeChannelManager.fireSendCeaseNotification();
+					activeChannelManager.disconnect();
+				}
+			}
 			break;
 		case Idle:
 			// do nothing here
