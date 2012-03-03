@@ -17,10 +17,6 @@
  */
 package org.bgp4j.net;
 
-import org.bgp4j.netty.NLRICodec;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -106,30 +102,5 @@ public class AddressPrefixBasedORFEntry extends ORFEntry {
 		this.prefix = prefix;
 	}
 
-	@Override
-	protected int calculateORFPayloadEncodingLength() {
-		int size = 0;
-		
-		if(getAction() != ORFAction.REMOVE_ALL)
-			size += 6 + NLRICodec.calculateEncodedNLRILength(this.prefix); // 4 octet sequence + 1 octet min length + 1 octet max length + prefix length
-		
-		return size;
-	}
-
-	@Override
-	protected ChannelBuffer encodeORFPayload() {
-		ChannelBuffer buffer = null;
-		
-		if(getAction() != ORFAction.REMOVE_ALL) {
-			buffer = ChannelBuffers.buffer(calculateORFPayloadEncodingLength());
-
-			buffer.writeInt(sequence);
-			buffer.writeByte(minLength);
-			buffer.writeByte(maxLength);
-			buffer.writeBytes(NLRICodec.encodeNLRI(this.prefix));
-		}
-		
-		return buffer;
-	}
 
 }

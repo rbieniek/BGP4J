@@ -17,6 +17,8 @@
  */
 package org.bgp4j.netty.protocol.open;
 
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;

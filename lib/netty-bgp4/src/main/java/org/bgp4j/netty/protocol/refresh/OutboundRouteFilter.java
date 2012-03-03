@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.ORFEntry;
+import org.bgp4j.net.ORFRefreshType;
+import org.bgp4j.net.ORFType;
 import org.bgp4j.net.SubsequentAddressFamily;
 
 /**

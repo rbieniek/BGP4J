@@ -23,10 +23,15 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.ORFType;
+import org.bgp4j.net.OutboundRouteFilteringCapability;
+import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.OutboundRouteFilteringCapability.SendReceive;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.protocol.open.OutboundRouteFilteringCapability.SendReceive;
-import org.bgp4j.netty.protocol.refresh.ORFType;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;

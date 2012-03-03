@@ -22,7 +22,13 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AddressPrefixBasedORFEntry;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.ORFAction;
+import org.bgp4j.net.ORFEntry;
+import org.bgp4j.net.ORFMatch;
+import org.bgp4j.net.ORFRefreshType;
+import org.bgp4j.net.ORFType;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.After;

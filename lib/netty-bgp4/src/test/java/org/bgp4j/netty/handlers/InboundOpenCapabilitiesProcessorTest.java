@@ -19,6 +19,7 @@ package org.bgp4j.netty.handlers;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.AutonomousSystem4Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockChannel;
@@ -26,7 +27,6 @@ import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
 import org.bgp4j.netty.MockPeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformation;
-import org.bgp4j.netty.protocol.open.AutonomousSystem4Capability;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.jboss.netty.channel.ChannelHandler;

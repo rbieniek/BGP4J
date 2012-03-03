@@ -17,7 +17,6 @@
  */
 package org.bgp4j.net;
 
-import org.bgp4j.netty.BGPv4Constants;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -26,10 +25,13 @@ import org.bgp4j.netty.BGPv4Constants;
 public enum ORFType {
 	ADDRESS_PREFIX_BASED;
 
+	/** Address prefix based outbound route filter type (RFC 5292) */
+	private static final int BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED = 64;
+	
 	public int toCode() {
 		switch(this) {
 		case ADDRESS_PREFIX_BASED:
-			return BGPv4Constants.BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED;
+			return BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED;
 		default:
 			throw new IllegalArgumentException("cannot encode OutboudRouteFilter type " + this);
 		}
@@ -37,7 +39,7 @@ public enum ORFType {
 	
 	public static ORFType fromCode(int code) {
 		switch(code) {
-		case BGPv4Constants.BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED:
+		case BGP_OUTBOUND_ROUTE_FILTER_TYPE_ADDRESS_PREFIX_BASED:
 			return ADDRESS_PREFIX_BASED;
 		default:
 			throw new IllegalArgumentException("cannot encode OutboudRouteFilter type code " + code);

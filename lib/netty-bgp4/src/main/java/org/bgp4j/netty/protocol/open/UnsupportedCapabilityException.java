@@ -19,6 +19,7 @@ package org.bgp4j.netty.protocol.open;
 
 import java.util.Collection;
 
+import org.bgp4j.net.Capability;
 import org.bgp4j.netty.protocol.NotificationPacket;
 
 /**

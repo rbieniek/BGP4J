@@ -19,8 +19,6 @@ package org.bgp4j.net;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bgp4j.netty.protocol.refresh.ORFType;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *

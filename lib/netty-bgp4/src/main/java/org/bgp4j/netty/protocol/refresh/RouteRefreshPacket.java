@@ -18,6 +18,8 @@
 package org.bgp4j.netty.protocol.refresh;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.ORFEntry;
+import org.bgp4j.net.ORFType;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
@@ -66,13 +68,13 @@ public class RouteRefreshPacket extends BGPv4Packet {
 				int entriesLength=0;  
 				
 				for(ORFEntry entry : outboundRouteFilter.getEntries().get(type))
-					entriesLength += entry.calculateEncodingLength();
+					entriesLength += ORFEntryCodec.calculateEncodingLength(entry);
 
 				buffer.writeByte(type.toCode());
 				buffer.writeShort(entriesLength);
 
 				for(ORFEntry entry : outboundRouteFilter.getEntries().get(type)) {
-					buffer.writeBytes(entry.encodeORFEntry());
+					buffer.writeBytes(ORFEntryCodec.encodeORFEntry(entry));
 				}
 				
 			}
@@ -91,7 +93,7 @@ public class RouteRefreshPacket extends BGPv4Packet {
 				size += 3;  // 1 octet ORF type + 2 octets ORF entries length
 			
 				for(ORFEntry entry : outboundRouteFilter.getEntries().get(type))
-					size += entry.calculateEncodingLength();
+					size += ORFEntryCodec.calculateEncodingLength(entry);
 			}
 		}
 

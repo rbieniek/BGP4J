@@ -37,8 +37,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sun.media.sound.AlawCodec;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *

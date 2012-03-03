@@ -19,6 +19,7 @@ package org.bgp4j.netty.protocol.open;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.net.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
