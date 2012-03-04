@@ -1008,7 +1008,8 @@ public class InternalFSM {
 
 		callbacks.fireConnectRemotePeer();
 		
-		this.state = FSMState.Connect;				
+		this.state = FSMState.Connect;
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
 	/**
@@ -1036,7 +1037,9 @@ public class InternalFSM {
 			
 			haveFSMError = true;
 		}
+		
 		this.state = FSMState.Active;		
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
 	/**
@@ -1080,7 +1083,8 @@ public class InternalFSM {
 				haveFSMError = true;
 			}
 		}
-		this.state = FSMState.Idle;		
+		this.state = FSMState.Idle;
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
 	/**
@@ -1109,7 +1113,8 @@ public class InternalFSM {
 		connectedChannelManager.fireSendOpenMessage();
 		activeChannelManager.fireSendOpenMessage();
 		
-		this.state = FSMState.OpenSent;		
+		this.state = FSMState.OpenSent;
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
 	/**
@@ -1141,6 +1146,7 @@ public class InternalFSM {
 			connectedChannelManager.disconnect();
 		
 		this.state = FSMState.Established;		
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
 	/**
@@ -1193,6 +1199,7 @@ public class InternalFSM {
 			}
 		}
 		this.state = FSMState.OpenConfirm;
+		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 	
 }
