@@ -20,6 +20,7 @@ package org.bgp4j.netty.protocol.refresh;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.ORFEntry;
 import org.bgp4j.net.ORFType;
+import org.bgp4j.net.OutboundRouteFilter;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;

@@ -16,6 +16,9 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -44,6 +47,31 @@ public class AutonomousSystem4Capability extends Capability {
 	 */
 	public void setAutonomousSystem(int autonomousSystem) {
 		this.autonomousSystem = autonomousSystem;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.net.Capability#orderNumber()
+	 */
+	@Override
+	protected int orderNumber() {
+		return ORDER_NUMBER_AS4_CAPABILITY;
+	}
+
+	@Override
+	protected boolean equalsSubclass(Capability other) {
+		return (getAutonomousSystem() == ((AutonomousSystem4Capability)other).getAutonomousSystem());
+	}
+
+	@Override
+	protected int hashCodeSubclass() {
+		return (new HashCodeBuilder()).append(getAutonomousSystem()).toHashCode();
+	}
+
+	@Override
+	protected int compareToSubclass(Capability other) {
+		return (new CompareToBuilder())
+				.append(getAutonomousSystem(), ((AutonomousSystem4Capability)other).getAutonomousSystem())
+				.toComparison();
 	}
 
 }

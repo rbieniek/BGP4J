@@ -16,8 +16,13 @@
  */
 package org.bgp4j.net;
 
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -66,7 +71,7 @@ public class OutboundRouteFilteringCapability extends Capability {
 
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
-	private Map<ORFType, SendReceive> filters = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
+	private Map<ORFType, SendReceive> filters = new TreeMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.Capability#encodeParameterValue()
@@ -113,5 +118,77 @@ public class OutboundRouteFilteringCapability extends Capability {
 	public void setSubsequentAddressFamily(
 			SubsequentAddressFamily subsequentAddressFamily) {
 		this.subsequentAddressFamily = subsequentAddressFamily;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.net.Capability#orderNumber()
+	 */
+	@Override
+	protected int orderNumber() {
+		return ORDER_NUMBER_OUTBOUND_ROUTE_FILTERING_CAPABILITY;
+	}
+
+	@Override
+	protected boolean equalsSubclass(Capability other) {
+		OutboundRouteFilteringCapability orc = (OutboundRouteFilteringCapability)other;
+		EqualsBuilder builder = new EqualsBuilder();
+		
+		builder.append(getAddressFamily(), orc.getAddressFamily())
+			.append(getSubsequentAddressFamily(), orc.getSubsequentAddressFamily())
+			.append(getFilters().size(), orc.getFilters()
+					.size());
+		
+		if(!builder.isEquals())
+			return false;
+
+		Iterator<ORFType> hSet = getFilters().keySet().iterator();
+		Iterator<ORFType> oSet = orc.getFilters().keySet().iterator();
+		
+		while(hSet.hasNext()) {
+			ORFType hType = hSet.next();
+			ORFType oType = oSet.next();
+			
+			builder.append(hType, oType).append(getFilters().get(hType), orc.getFilters().get(oType));
+		}
+		
+		return builder.isEquals();
+	}
+
+	@Override
+	protected int hashCodeSubclass() {
+		HashCodeBuilder hcb = new HashCodeBuilder();
+		
+		hcb.append(getAddressFamily()).append(getSubsequentAddressFamily());
+		
+		for(ORFType orfType : getFilters().keySet())
+			hcb.append(orfType.toCode()).append(getFilters().get(orfType).toCode());
+		
+		return hcb.toHashCode();
+	}
+
+	@Override
+	protected int compareToSubclass(Capability other) {
+		OutboundRouteFilteringCapability orc = (OutboundRouteFilteringCapability)other;
+		CompareToBuilder builder = new CompareToBuilder();
+		
+		builder.append(getAddressFamily(), orc.getAddressFamily())
+			.append(getSubsequentAddressFamily(), orc.getSubsequentAddressFamily())
+			.append(getFilters().size(), orc.getFilters()
+					.size());
+		
+		if(builder.toComparison() != 0)
+			return builder.toComparison();
+
+		Iterator<ORFType> hSet = getFilters().keySet().iterator();
+		Iterator<ORFType> oSet = orc.getFilters().keySet().iterator();
+		
+		while(hSet.hasNext()) {
+			ORFType hType = hSet.next();
+			ORFType oType = oSet.next();
+			
+			builder.append(hType, oType).append(getFilters().get(hType), orc.getFilters().get(oType));
+		}
+		
+		return builder.toComparison();
 	}
 }

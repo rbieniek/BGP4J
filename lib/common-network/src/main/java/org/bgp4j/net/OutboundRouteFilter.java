@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.refresh.OutboundRouteFilter.java 
  */
-package org.bgp4j.netty.protocol.refresh;
+package org.bgp4j.net;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,11 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.ORFEntry;
-import org.bgp4j.net.ORFRefreshType;
-import org.bgp4j.net.ORFType;
-import org.bgp4j.net.SubsequentAddressFamily;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

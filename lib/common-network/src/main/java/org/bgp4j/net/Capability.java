@@ -16,6 +16,8 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 
 /**
@@ -24,6 +26,56 @@ package org.bgp4j.net;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public abstract class Capability {
+public abstract class Capability implements Comparable<Capability> {
+
+	protected static final int ORDER_NUMBER_AS4_CAPABILITY = 1;
+	protected static final int ORDER_NUMBER_MULTI_PROTOCOL_CAPABILITY = 2;
+	protected static final int ORDER_NUMBER_OUTBOUND_ROUTE_FILTERING_CAPABILITY = 3;
+	protected static final int ORDER_NUMBER_ROUTE_REFRESH_CAPABILITY = 4;
+	protected static final int ORDER_NUMBER_UNKNOWN_CAPABILITY = 5;
 	
+	@Override
+	public final boolean equals(Object o) {
+		if(!(o instanceof Capability))
+			return false;
+		
+		Capability other = (Capability)o;
+		
+		if(orderNumber() != other.orderNumber())
+			return false;
+		
+		return equalsSubclass(other);
+	}
+
+	@Override
+	public final int hashCode() {
+		return (new HashCodeBuilder()).append(orderNumber()).append(hashCodeSubclass()).toHashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public final int compareTo(Capability other) {
+		int val = (new Integer(orderNumber())).compareTo(other.orderNumber());
+		
+		if(val != 0)
+			return val;
+		
+		return compareToSubclass(other);
+	}
+
+	protected abstract int orderNumber();
+	
+	protected boolean equalsSubclass(Capability other) {
+		return true;
+	}
+	
+	protected int hashCodeSubclass() {
+		return 0;
+	}
+	
+	protected int compareToSubclass(Capability other) {
+		return 0;
+	}
 }

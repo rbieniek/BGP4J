@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -51,6 +55,42 @@ public class UnknownCapability extends Capability {
 	 */
 	public int getCapabilityType() {
 		return capabilityType;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.net.Capability#orderNumber()
+	 */
+	@Override
+	protected int orderNumber() {
+		return ORDER_NUMBER_UNKNOWN_CAPABILITY;
+	}
+
+	@Override
+	protected boolean equalsSubclass(Capability other) {
+		UnknownCapability uc = (UnknownCapability)other;
+		
+		return (new EqualsBuilder())
+				.append(getCapabilityType(), uc.getCapabilityType())
+				.append(getValue(), uc.getValue())
+				.isEquals();
+	}
+
+	@Override
+	protected int hashCodeSubclass() {
+		return (new HashCodeBuilder())
+				.append(getValue())
+				.append(getCapabilityType())
+				.toHashCode();
+	}
+
+	@Override
+	protected int compareToSubclass(Capability other) {
+		UnknownCapability uc = (UnknownCapability)other;
+		
+		return (new CompareToBuilder())
+				.append(getCapabilityType(), uc.getCapabilityType())
+				.append(getValue(), uc.getValue())
+				.toComparison();
 	}
 
 }

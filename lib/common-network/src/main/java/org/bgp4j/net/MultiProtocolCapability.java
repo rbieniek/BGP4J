@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -53,6 +57,42 @@ public class MultiProtocolCapability extends Capability {
 	 */
 	public void setSafi(SubsequentAddressFamily safi) {
 		this.safi = safi;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.net.Capability#orderNumber()
+	 */
+	@Override
+	protected int orderNumber() {
+		return ORDER_NUMBER_MULTI_PROTOCOL_CAPABILITY;
+	}
+
+	@Override
+	protected boolean equalsSubclass(Capability other) {
+		MultiProtocolCapability mp = (MultiProtocolCapability)other;
+		
+		return (new EqualsBuilder())
+				.append(getAfi(), mp.getAfi())
+				.append(getSafi(), mp.getSafi())
+				.isEquals();
+	}
+
+	@Override
+	protected int hashCodeSubclass() {
+		return (new HashCodeBuilder())
+				.append(getAfi())
+				.append(getSafi())
+				.toHashCode();
+	}
+
+	@Override
+	protected int compareToSubclass(Capability other) {
+		MultiProtocolCapability mp = (MultiProtocolCapability)other;
+		
+		return (new CompareToBuilder())
+				.append(getAfi(), mp.getAfi())
+				.append(getSafi(), mp.getSafi())
+				.toComparison();
 	}
 
 }
