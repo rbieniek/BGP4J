@@ -28,6 +28,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class MultiProtocolCapability extends Capability {
 
+	public MultiProtocolCapability() {}
+	
+	public MultiProtocolCapability(AddressFamily afi, SubsequentAddressFamily safi) {
+		setAfi(afi);
+		setSafi(safi);
+	}
+	
 	private AddressFamily afi;
 	private SubsequentAddressFamily safi;
 	

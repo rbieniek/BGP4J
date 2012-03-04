@@ -29,6 +29,15 @@ public class UnknownCapability extends Capability {
 	private int capabilityType;
 	private byte[] value;
 	
+	public UnknownCapability() {
+		
+	}
+	
+	public UnknownCapability(int capabilityType, byte[] value) {
+		setCapabilityType(capabilityType);
+		setValue(value);
+	}
+	
 	/**
 	 * @return the value
 	 */

@@ -37,6 +37,12 @@ public class OutboundRouteFilteringCapability extends Capability {
 		this.subsequentAddressFamily = subsequentAddressFamily;
 	}
 
+	public OutboundRouteFilteringCapability(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, Map<ORFType, SendReceive> filters) {
+		this(addressFamily, subsequentAddressFamily);
+
+		setFilters(filters);
+	}
+
 	public enum SendReceive {
 		RECEIVE,
 		SEND,
@@ -88,7 +94,10 @@ public class OutboundRouteFilteringCapability extends Capability {
 	 * @param filters the filters to set
 	 */
 	public void setFilters(Map<ORFType, SendReceive> filters) {
-		this.filters = filters;
+		this.filters.clear();
+		
+		if(filters != null)
+			this.filters.putAll(filters);
 	}
 
 	/**
