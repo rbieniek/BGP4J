@@ -7,6 +7,8 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
 import org.junit.Test;
 
 public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
@@ -170,6 +172,25 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				16, // delay open time
 				false)); 
+		PeerConfiguration cp8 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) }))); 
 		
 		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -297,6 +318,25 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				16, // delay open time
 				false); 
+		PeerConfiguration cd8 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) })); 
 		
 		Assert.assertTrue(cp1.equals(cp2));
 		Assert.assertTrue(cd1.equals(cd2));
@@ -307,18 +347,21 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertTrue(cp5.equals(cd5));
 		Assert.assertTrue(cp6.equals(cd6));
 		Assert.assertTrue(cp7.equals(cd7));
+		Assert.assertTrue(cp8.equals(cd8));
 
 		Assert.assertFalse(cp1.equals(cp3));
 		Assert.assertFalse(cp1.equals(cp4));
 		Assert.assertFalse(cp1.equals(cp5));
 		Assert.assertFalse(cp1.equals(cp6));
 		Assert.assertFalse(cp1.equals(cp7));
+		Assert.assertFalse(cp1.equals(cp8));
 
 		Assert.assertFalse(cd1.equals(cd3));
 		Assert.assertFalse(cd1.equals(cd4));
 		Assert.assertFalse(cd1.equals(cd5));
 		Assert.assertFalse(cd1.equals(cd6));
 		Assert.assertFalse(cd1.equals(cd7));
+		Assert.assertFalse(cd1.equals(cd8));
 	}
 
 	@Test
@@ -449,6 +492,25 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				16, // delay open time
 				false)); 
+		PeerConfiguration cp8 = new FixedDefaultsPeerConfigurationTimerDecorator(new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) }))); 
 		
 		PeerConfiguration cd1 = new PeerConfigurationImpl("foo", // peer name 
 				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
@@ -576,6 +638,25 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 				false, // delay open
 				16, // delay open time
 				false); 
+		PeerConfiguration cd8 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connect retry time
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				120, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				15, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) })); 
 		
 		Assert.assertEquals(cp1.hashCode(), cp2.hashCode());
 		Assert.assertEquals(cd1.hashCode(), cd2.hashCode());
@@ -586,6 +667,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertEquals(cp5.hashCode(), cd5.hashCode());
 		Assert.assertEquals(cp6.hashCode(), cd6.hashCode());
 		Assert.assertEquals(cp7.hashCode(), cd7.hashCode());
+		Assert.assertEquals(cp8.hashCode(), cd8.hashCode());
 		
 		Assert.assertFalse(cp1.hashCode() == cp3.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cp4.hashCode());
@@ -596,6 +678,7 @@ public class FixedDefaultsPeerConfigurationTimerDecoratorTest {
 		Assert.assertFalse(cp1.hashCode() == cd5.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cd6.hashCode());
 		Assert.assertFalse(cp1.hashCode() == cd7.hashCode());
+		Assert.assertFalse(cp1.hashCode() == cd8.hashCode());
 	}
 
 }

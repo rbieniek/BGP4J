@@ -18,6 +18,8 @@
 package org.bgp4.config.nodes.impl;
 
 import java.net.InetAddress;
+import java.util.Iterator;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -25,6 +27,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4.config.ConfigTestBase;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.ORFSendReceive;
+import org.bgp4j.net.ORFType;
+import org.bgp4j.net.OutboundRouteFilteringCapability;
+import org.bgp4j.net.RouteRefreshCapability;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -153,6 +164,52 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertTrue(peerConfig.isDelayOpen());
 		Assert.assertTrue(peerConfig.isPassiveTcpEstablishment());
 		Assert.assertTrue(peerConfig.isHoldTimerDisabled());
+	}
+	
+	
+	@Test
+	public void testAcceptedConfigurationWithOptionsAndCapabilities() throws Exception {
+		PeerConfiguration peerConfig = parser.parseConfiguration(config.configurationAt("BgpPeer(10)"));
+		
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), peerConfig.getClientConfig().getRemoteAddress().getAddress());
+		Assert.assertEquals(179, peerConfig.getClientConfig().getRemoteAddress().getPort());
+		Assert.assertEquals(10, peerConfig.getLocalAS());
+		Assert.assertEquals(11, peerConfig.getRemoteAS());
+		Assert.assertEquals("foo", peerConfig.getPeerName());
+		Assert.assertEquals(200, peerConfig.getLocalBgpIdentifier());
+		Assert.assertEquals(300, peerConfig.getRemoteBgpIdentifier());
+
+		Assert.assertFalse(peerConfig.isAllowAutomaticStart());
+		Assert.assertTrue(peerConfig.isAllowAutomaticStop());
+		Assert.assertTrue(peerConfig.isCollisionDetectEstablishedState());
+		Assert.assertTrue(peerConfig.isDampPeerOscillation());
+		Assert.assertTrue(peerConfig.isDelayOpen());
+		Assert.assertTrue(peerConfig.isPassiveTcpEstablishment());
+		Assert.assertTrue(peerConfig.isHoldTimerDisabled());
+		
+		Iterator<Capability> capIt = peerConfig.getCapabilities().getCapabilities().iterator();
+		
+		Assert.assertTrue(capIt.hasNext());
+		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();
+		Assert.assertEquals(256, as4cap.getAutonomousSystem());
+
+		MultiProtocolCapability mpCap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv4, mpCap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mpCap.getSafi());
+
+		OutboundRouteFilteringCapability oorCap = (OutboundRouteFilteringCapability)capIt.next();
+		Map<ORFType, ORFSendReceive> filters = oorCap.getFilters();
+		Assert.assertEquals(AddressFamily.IPv4, oorCap.getAddressFamily());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, oorCap.getSubsequentAddressFamily());
+		Assert.assertEquals(1, filters.size());
+		Assert.assertTrue(filters.containsKey(ORFType.ADDRESS_PREFIX_BASED));
+		Assert.assertEquals(ORFSendReceive.BOTH, filters.get(ORFType.ADDRESS_PREFIX_BASED));
+
+		Assert.assertTrue(capIt.hasNext());
+		Assert.assertEquals(RouteRefreshCapability.class, capIt.next().getClass());
+
+		Assert.assertFalse(capIt.hasNext());
+
 	}
 	
 }

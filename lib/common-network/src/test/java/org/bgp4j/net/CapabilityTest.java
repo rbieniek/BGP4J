@@ -22,7 +22,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.bgp4j.net.OutboundRouteFilteringCapability.SendReceive;
 import org.junit.Test;
 
 /**
@@ -85,23 +84,23 @@ public class CapabilityTest {
 	
 	@Test
 	public void testOutboundRouteFilteringCapability() {
-		Map<ORFType, SendReceive> map1 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map2 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map3 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map4 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map5 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map6 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map7 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map8 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map9 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
-		Map<ORFType, SendReceive> map10 = new HashMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
+		Map<ORFType, ORFSendReceive> map1 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map2 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map3 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map4 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map5 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map6 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map7 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map8 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map9 = new HashMap<ORFType, ORFSendReceive>();
+		Map<ORFType, ORFSendReceive> map10 = new HashMap<ORFType, ORFSendReceive>();
 
-		map3.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.RECEIVE);
-		map4.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.RECEIVE);
-		map7.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.SEND);
-		map8.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.BOTH);
-		map9.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.SEND);
-		map10.put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.BOTH);
+		map3.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.RECEIVE);
+		map4.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.RECEIVE);
+		map7.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.SEND);
+		map8.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.BOTH);
+		map9.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.SEND);
+		map10.put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.BOTH);
 
 		OutboundRouteFilteringCapability cap1 = new OutboundRouteFilteringCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, map1);
 		OutboundRouteFilteringCapability cap2 = new OutboundRouteFilteringCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, map2);

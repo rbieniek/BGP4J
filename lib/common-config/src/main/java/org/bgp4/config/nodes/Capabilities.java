@@ -17,10 +17,34 @@
  */
 package org.bgp4.config.nodes;
 
+import java.util.Set;
+
+import org.bgp4j.net.Capability;
+
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
  *
  */
 public interface Capabilities {
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Set<Capability> getCapabilities();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean equals(Object other);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public int hashCode();
 
 }

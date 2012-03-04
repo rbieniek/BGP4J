@@ -147,4 +147,10 @@ public interface PeerConfiguration {
 	 * @return
 	 */
 	public boolean isHoldTimerDisabled();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Capabilities getCapabilities();
 }

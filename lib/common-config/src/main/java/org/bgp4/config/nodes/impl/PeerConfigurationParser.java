@@ -35,10 +35,12 @@ import org.bgp4.config.nodes.PeerConfiguration;
 public class PeerConfigurationParser {
 
 	private @Inject ClientConfigurationParser clientConfigurationParser;
+	private @Inject CapabilitiesParser capabilityParser;
 	
 	public PeerConfiguration parseConfiguration(HierarchicalConfiguration config) throws ConfigurationException {
 		PeerConfigurationImpl peerConfig = new PeerConfigurationImpl();
 		List<HierarchicalConfiguration> clientConfigs = config.configurationsAt("Client");
+		List<HierarchicalConfiguration> capabilityConfigs = config.configurationsAt("Capabilities");
 		
 		try {
 			peerConfig.setPeerName(config.getString("[@name]"));
@@ -52,6 +54,11 @@ public class PeerConfigurationParser {
 			throw new ConfigurationException("missing <Client/> element");			
 		} else
 			peerConfig.setClientConfig(clientConfigurationParser.parseConfig(clientConfigs.get(0)));
+		
+		if(capabilityConfigs.size() > 1) {
+			throw new ConfigurationException("duplicate <Capabilities/> element");
+		} else if(capabilityConfigs.size() == 1)
+			peerConfig.setCapabilities(capabilityParser.parseConfig(capabilityConfigs.get(0)));
 		
 		try {
 			peerConfig.setLocalAS(config.getInt("AutonomousSystem[@local]"));

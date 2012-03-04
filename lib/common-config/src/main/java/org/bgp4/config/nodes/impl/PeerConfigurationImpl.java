@@ -21,6 +21,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bgp4.config.nodes.Capabilities;
 import org.bgp4.config.nodes.ClientConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
 
@@ -48,6 +49,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	private int delayOpenTime;
 	private int connectRetryTime;
 	private int automaticStartInterval;
+	private Capabilities capabilities = new CapabilitiesImpl();
 	
 	public PeerConfigurationImpl() {
 		
@@ -120,6 +122,18 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				allowAutomaticStart, allowAutomaticStop, automaticStartInterval ,dampPeerOscillation, passiveTcpEstablishment, delayOpen, delayOpenTime);
 		
 		setCollisionDetectEstablishedState(collisionDetectEstablishedState);
+	}
+
+	public PeerConfigurationImpl(String peerName, ClientConfiguration clientConfig, int localAS, int remoteAS, 
+			long localBgpIdentifier, long remoteBgpIdentifier, int connectRetryTime, int holdTime, boolean holdTimerDisabled, int idleHoldTime,
+			boolean allowAutomaticStart, boolean allowAutomaticStop, int automaticStartInterval, boolean dampPeerOscillation,
+			boolean passiveTcpEstablishment, boolean delayOpen, int delayOpenTime,
+			boolean collisionDetectEstablishedState, Capabilities capabilities) throws ConfigurationException {
+		this(peerName, clientConfig, localAS, remoteAS, localBgpIdentifier, remoteBgpIdentifier, connectRetryTime, holdTime, holdTimerDisabled, idleHoldTime,
+				allowAutomaticStart, allowAutomaticStop, automaticStartInterval ,dampPeerOscillation, passiveTcpEstablishment, delayOpen, delayOpenTime);
+		
+		setCollisionDetectEstablishedState(collisionDetectEstablishedState);
+		setCapabilities(capabilities);
 	}
 
 	@Override
@@ -266,6 +280,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(allowAutomaticStart)
 				.append(allowAutomaticStop)
 				.append(automaticStartInterval)
+				.append(capabilities)
 				.append(clientConfig)
 				.append(collisionDetectEstablishedState)
 				.append(connectRetryTime)
@@ -299,6 +314,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(allowAutomaticStart, o.allowAutomaticStart)
 				.append(allowAutomaticStop, o.allowAutomaticStop)
 				.append(automaticStartInterval, o.automaticStartInterval)
+				.append(capabilities, o.capabilities)
 				.append(clientConfig, o.clientConfig)
 				.append(collisionDetectEstablishedState, o.collisionDetectEstablishedState)
 				.append(connectRetryTime, o.connectRetryTime)
@@ -466,6 +482,20 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	 */
 	void setHoldTimerDisabled(boolean holdTimerDisabled) {
 		this.holdTimerDisabled = holdTimerDisabled;
+	}
+
+	/**
+	 * @return the capabilities
+	 */
+	public Capabilities getCapabilities() {
+		return capabilities;
+	}
+
+	/**
+	 * @param capabilities the capabilities to set
+	 */
+	void setCapabilities(Capabilities capabilities) {
+		this.capabilities = capabilities;
 	}
 
 }

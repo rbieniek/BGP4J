@@ -37,47 +37,15 @@ public class OutboundRouteFilteringCapability extends Capability {
 		this.subsequentAddressFamily = subsequentAddressFamily;
 	}
 
-	public OutboundRouteFilteringCapability(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, Map<ORFType, SendReceive> filters) {
+	public OutboundRouteFilteringCapability(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, Map<ORFType, ORFSendReceive> filters) {
 		this(addressFamily, subsequentAddressFamily);
 
 		setFilters(filters);
 	}
 
-	public enum SendReceive {
-		RECEIVE,
-		SEND,
-		BOTH;
-		
-		public int toCode() {
-			switch(this) {
-			case RECEIVE:
-				return 1;
-			case SEND:
-				return 2;
-			case BOTH:
-				return 3;
-			default:
-				throw new IllegalArgumentException("unknown Send/Receive type " + this);
-			}
-		}
-		
-		public static SendReceive fromCode(int code) {
-			switch(code) {
-			case 1:
-				return RECEIVE;
-			case 2:
-				return SEND;
-			case 3:
-				return BOTH;
-			default:
-				throw new IllegalArgumentException("unknown Send/Receive type ode " + code);
-			}
-		}
-	}
-
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
-	private Map<ORFType, SendReceive> filters = new TreeMap<ORFType, OutboundRouteFilteringCapability.SendReceive>();
+	private Map<ORFType, ORFSendReceive> filters = new TreeMap<ORFType, ORFSendReceive>();
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.Capability#encodeParameterValue()
@@ -86,14 +54,14 @@ public class OutboundRouteFilteringCapability extends Capability {
 	/**
 	 * @return the filters
 	 */
-	public Map<ORFType, SendReceive> getFilters() {
+	public Map<ORFType, ORFSendReceive> getFilters() {
 		return filters;
 	}
 
 	/**
 	 * @param filters the filters to set
 	 */
-	public void setFilters(Map<ORFType, SendReceive> filters) {
+	public void setFilters(Map<ORFType, ORFSendReceive> filters) {
 		this.filters.clear();
 		
 		if(filters != null)

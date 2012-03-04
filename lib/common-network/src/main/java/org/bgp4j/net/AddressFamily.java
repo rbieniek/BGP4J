@@ -1,5 +1,7 @@
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Address families as defined in RFC 1700
  * @author rainer
@@ -99,5 +101,38 @@ public enum AddressFamily {
 		default:
 			throw new IllegalArgumentException("unknown address family code: " + code);
 		}
+	}
+	
+	public static AddressFamily fromString(String value) {
+		if(StringUtils.equalsIgnoreCase("ipv4", value)) {
+			return IPv4;
+		} else if(StringUtils.equalsIgnoreCase("ipv6", value)) {
+			return IPv6;
+		} else if(StringUtils.equalsIgnoreCase("nsap", value)) {
+			return NSAP;
+		} else if(StringUtils.equalsIgnoreCase("hdlc", value)) {
+			return HDLC;
+		} else if(StringUtils.equalsIgnoreCase("bbn1882", value)) {
+			return BBN1882;
+		} else if(StringUtils.equalsIgnoreCase("ieee802", value)) {
+			return IEEE802;
+		} else if(StringUtils.equalsIgnoreCase("e163", value)) {
+			return E163;
+		} else if(StringUtils.equalsIgnoreCase("e164", value)) {
+			return E164;
+		} else if(StringUtils.equalsIgnoreCase("f69", value)) {
+			return F69;
+		} else if(StringUtils.equalsIgnoreCase("x121", value)) {
+			return X121;
+		} else if(StringUtils.equalsIgnoreCase("ipx", value)) {
+			return IPX;
+		} else if(StringUtils.equalsIgnoreCase("appletalk", value)) {
+			return APPLETALK;
+		} else if(StringUtils.equalsIgnoreCase("decnet4", value)) {
+			return DECNET4;
+		} else if(StringUtils.equalsIgnoreCase("banyan", value)) {
+			return BANYAN;
+		} else
+			throw new IllegalArgumentException("unknown address family: " + value);
 	}
 }

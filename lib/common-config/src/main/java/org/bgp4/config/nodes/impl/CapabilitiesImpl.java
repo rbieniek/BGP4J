@@ -17,7 +17,13 @@
  */
 package org.bgp4.config.nodes.impl;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bgp4.config.nodes.Capabilities;
+import org.bgp4j.net.Capability;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
@@ -25,4 +31,55 @@ import org.bgp4.config.nodes.Capabilities;
  */
 public class CapabilitiesImpl implements Capabilities {
 
+	private TreeSet<Capability> capabilities = new TreeSet<Capability>();
+	
+	CapabilitiesImpl() {
+	}
+	
+	CapabilitiesImpl(Capability[] caps) {
+		for(Capability cap : caps)
+			capabilities.add(cap);
+	}
+	
+	@Override
+	public Set<Capability> getCapabilities() {
+		return Collections.unmodifiableSet(capabilities);
+	}
+
+	void addCapability(Capability cap) {
+		this.capabilities.add(cap);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		HashCodeBuilder hcb = new HashCodeBuilder();
+		
+		for(Capability cap : capabilities)
+			hcb.append(cap);
+		
+		return hcb.toHashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Capabilities))
+			return false;
+
+		Set<Capability> otherCaps = ((Capabilities)obj).getCapabilities();
+		
+		if(otherCaps.size() != capabilities.size())
+			return false;
+		
+		for(Capability cap : capabilities)
+			if(!otherCaps.contains(cap))
+				return false;
+		
+		return true;
+	}
 }

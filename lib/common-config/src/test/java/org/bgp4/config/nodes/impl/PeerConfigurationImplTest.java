@@ -23,6 +23,11 @@ import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.junit.Test;
 
 /**
@@ -527,6 +532,45 @@ public class PeerConfigurationImplTest {
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
+		PeerConfiguration c21 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				180, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) })); // connect retry interval
+		PeerConfiguration c22 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				180, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16), 
+						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING) })); // connect retry interval
 
 		Assert.assertTrue(c1.equals(c2));
 		Assert.assertFalse(c1.equals(c3));
@@ -547,6 +591,10 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.equals(c18));
 		Assert.assertFalse(c1.equals(c19));
 		Assert.assertFalse(c1.equals(c20));
+		Assert.assertFalse(c1.equals(c21));
+		Assert.assertFalse(c1.equals(c22));
+
+		Assert.assertFalse(c21.equals(c20));
 	}
 
 	@Test
@@ -911,6 +959,45 @@ public class PeerConfigurationImplTest {
 				false, // delay open
 				180, // delay open time
 				true); // connect retry interval
+		PeerConfiguration c21 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				180, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16) })); // connect retry interval
+		PeerConfiguration c22 = new PeerConfigurationImpl("foo", // peer name 
+				new ClientConfigurationImpl(InetAddress.getByName("192.168.4.1")), // peer address  
+				24576, // local AS
+				32768, // remote AS
+				0xc0a80401L, // local BGP identitifer
+				0xc0a80501L, // remote BGP identifier
+				60, // connectRetryTime
+				300, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				false, // allow automatic start
+				false, // allow automatic stop
+				0, // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				180, // delay open time
+				false,
+				new CapabilitiesImpl(new Capability[] { new AutonomousSystem4Capability(16), 
+						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING) })); // connect retry interval
 		
 		Assert.assertEquals(c1.hashCode(), c2.hashCode());
 		Assert.assertFalse(c1.hashCode() == c3.hashCode());
@@ -931,5 +1018,9 @@ public class PeerConfigurationImplTest {
 		Assert.assertFalse(c1.hashCode() == c18.hashCode());
 		Assert.assertFalse(c1.hashCode() == c19.hashCode());
 		Assert.assertFalse(c1.hashCode() == c20.hashCode());
+		Assert.assertFalse(c1.hashCode() == c21.hashCode());
+		Assert.assertFalse(c1.hashCode() == c22.hashCode());
+
+		Assert.assertFalse(c21.hashCode() == c20.hashCode());
 	}
 }

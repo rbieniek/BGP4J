@@ -72,4 +72,21 @@
         <Options allowAutomaticStart="false" allowAutomaticStop="true" dampPeerOscillation="true" 
             collisionDetectEstablishedState="true" delayOpen="true" passiveTcpEstablishment="true" holdTimerDisabled="true" />
     </BgpPeer>
+
+    <!-- working peer configuration with configured options and all capabilities set -->
+    <BgpPeer name="foo">
+        <Client remote="192.168.4.1" />
+        <AutonomousSystem local="10" remote="11" />
+        <BgpIdentifier local="200" remote="300" />
+        <Options allowAutomaticStart="false" allowAutomaticStop="true" dampPeerOscillation="true" 
+            collisionDetectEstablishedState="true" delayOpen="true" passiveTcpEstablishment="true" holdTimerDisabled="true" />
+        <Capabilities >
+            <LargeAutonomousSystem local="256" />
+            <RouteRefresh />
+            <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast"/>
+            <OutboundRouteFiltering addressFamily="ipv4" subsequentAddressFamily="unicast">
+                <Entry type="addressPrefixBased" direction="both" />
+            </OutboundRouteFiltering>
+        </Capabilities>
+    </BgpPeer>
 </Config>

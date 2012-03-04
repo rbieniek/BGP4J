@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    
+    <!-- empty capabilities -->
+    <Capabilities >
+        
+    </Capabilities>
+
+    <!-- AS4 one capability -->
+    <Capabilities >
+        <LargeAutonomousSystem local="256" />
+    </Capabilities>
+
+    <!-- AS4 two capability (second ignored) -->
+    <Capabilities >
+        <LargeAutonomousSystem local="256" />
+        <LargeAutonomousSystem local="512" />
+    </Capabilities>
+
+    <!-- RouteRefresh one capability -->
+    <Capabilities >
+        <RouteRefresh />
+    </Capabilities>
+
+    <!-- MultiProtocol one capability -->
+    <Capabilities >
+        <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast"/>
+    </Capabilities>
+    
+    <!-- MultiProtocol two capabilities -->
+    <Capabilities >
+        <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast"/>
+        <MultiProtocol addressFamily="ipv6" subsequentAddressFamily="unicast"/>
+    </Capabilities>
+
+    <!-- OutboundRouteFilter one capability -->
+    <Capabilities >
+        <OutboundRouteFiltering addressFamily="ipv4" subsequentAddressFamily="unicast">
+            <Entry type="addressPrefixBased" direction="both" />
+        </OutboundRouteFiltering>
+    </Capabilities>
+    
+    
+    <!-- OutboundRouteFilter two capabilities -->
+    <Capabilities >
+        <OutboundRouteFiltering addressFamily="ipv4" subsequentAddressFamily="unicast">
+            <Entry type="addressPrefixBased" direction="both" />
+        </OutboundRouteFiltering>
+        <OutboundRouteFiltering addressFamily="ipv6" subsequentAddressFamily="unicast">
+            <Entry type="addressPrefixBased" direction="both" />
+        </OutboundRouteFiltering>
+    </Capabilities>
+</Config>

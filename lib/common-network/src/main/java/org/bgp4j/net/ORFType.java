@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -44,5 +46,12 @@ public enum ORFType {
 		default:
 			throw new IllegalArgumentException("cannot encode OutboudRouteFilter type code " + code);
 		}
+	}
+	
+	public static ORFType fromString(String value) {
+		if(StringUtils.equalsIgnoreCase("addressPrefixBased", value)) {
+			return ADDRESS_PREFIX_BASED;
+		} else
+			throw new IllegalArgumentException("cannot encode OutboudRouteFilter type: " + value);
 	}
 }

@@ -29,8 +29,8 @@ import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.ORFType;
 import org.bgp4j.net.OutboundRouteFilteringCapability;
 import org.bgp4j.net.RouteRefreshCapability;
+import org.bgp4j.net.ORFSendReceive;
 import org.bgp4j.net.SubsequentAddressFamily;
-import org.bgp4j.net.OutboundRouteFilteringCapability.SendReceive;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -282,9 +282,9 @@ public class CapabilityTest extends BGPv4TestBase {
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, orfCap.getSubsequentAddressFamily());
 		Assert.assertEquals(1, orfCap.getFilters().size());
 		
-		SendReceive sr = orfCap.getFilters().get(ORFType.ADDRESS_PREFIX_BASED);
+		ORFSendReceive sr = orfCap.getFilters().get(ORFType.ADDRESS_PREFIX_BASED);
 		
-		Assert.assertEquals(SendReceive.BOTH, sr);
+		Assert.assertEquals(ORFSendReceive.BOTH, sr);
 	}
 	
 	@Test
@@ -294,7 +294,7 @@ public class CapabilityTest extends BGPv4TestBase {
 		byte[] packet;
 		ChannelBuffer buffer;
 
-		cap.getFilters().put(ORFType.ADDRESS_PREFIX_BASED, SendReceive.BOTH);
+		cap.getFilters().put(ORFType.ADDRESS_PREFIX_BASED, ORFSendReceive.BOTH);
 		caps.add(cap);
 	
 		buffer = CapabilityCodec.encodeCapabilities(caps);

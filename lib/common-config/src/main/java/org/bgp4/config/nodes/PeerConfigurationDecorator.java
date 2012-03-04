@@ -165,6 +165,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 		
 		return (new EqualsBuilder())
 				.append(getAutomaticStartInterval(), o.getAutomaticStartInterval())
+				.append(getCapabilities(), o.getCapabilities())
 				.append(getClientConfig(), o.getClientConfig())
 				.append(getIdleHoldTime(), o.getIdleHoldTime())
 				.append(getHoldTime(), o.getHoldTime())
@@ -194,6 +195,7 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 				.append(isAllowAutomaticStart())
 				.append(isAllowAutomaticStop())
 				.append(getAutomaticStartInterval())
+				.append(getCapabilities())
 				.append(getClientConfig())
 				.append(isCollisionDetectEstablishedState())
 				.append(getConnectRetryTime())
@@ -231,5 +233,10 @@ public class PeerConfigurationDecorator implements PeerConfiguration {
 	 */
 	public boolean isHoldTimerDisabled() {
 		return decorated.isHoldTimerDisabled();
+	}
+
+	@Override
+	public Capabilities getCapabilities() {
+		return decorated.getCapabilities();
 	}
 }

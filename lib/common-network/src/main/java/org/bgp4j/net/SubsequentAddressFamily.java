@@ -1,5 +1,7 @@
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Subsequent address family as defined in RFC 2858
  * 
@@ -35,5 +37,16 @@ public enum SubsequentAddressFamily {
 		default:
 			throw new IllegalArgumentException("Unknown subsequent address family code: " + code);
 		}
+	}
+	
+	public static SubsequentAddressFamily fromString(String value) {
+		if(StringUtils.equalsIgnoreCase("unicast", value)) {
+			return NLRI_UNICAST_FORWARDING;
+		} else if(StringUtils.equalsIgnoreCase("multicast", value)) {
+			return NLRI_MULTICAST_FORWARDING;
+		} else if(StringUtils.equalsIgnoreCase("unicast_multicast", value)) {
+			return NLRI_UNICAST_MULTICAST_FORWARDING;
+		} else
+			throw new IllegalArgumentException("Unknown subsequent address family: " + value);
 	}
 }
