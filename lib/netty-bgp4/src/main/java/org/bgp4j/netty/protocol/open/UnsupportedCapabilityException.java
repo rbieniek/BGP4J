@@ -89,6 +89,6 @@ public class UnsupportedCapabilityException extends CapabilityException {
 
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new UnsupportedCapabilityNotificationPacket(getCapability());
+		return new ByteArrayUnsupportedCapabilityNotificationPacket(getCapability());
 	}
 }

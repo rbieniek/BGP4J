@@ -59,6 +59,9 @@ public class OpenPacketDecoder {
 		case OpenNotificationPacket.SUBCODE_UNSUPPORTED_VERSION_NUMBER:
 			packet = new UnsupportedVersionNumberNotificationPacket(buffer.readUnsignedShort());
 			break;
+		case OpenNotificationPacket.SUBCODE_UNSUPPORTED_CAPABILITY:
+			packet = new CapabilityListUnsupportedCapabilityNotificationPacket(CapabilityCodec.decodeCapabilities(buffer));
+			break;
 		}
 		
 		return packet;

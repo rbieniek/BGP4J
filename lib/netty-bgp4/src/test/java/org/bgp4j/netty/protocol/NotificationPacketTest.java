@@ -17,11 +17,18 @@
  */
 package org.bgp4j.netty.protocol;
 
+import java.util.Iterator;
+
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.protocol.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +38,7 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CeaseNotificationPacketTest extends BGPv4TestBase {
+public class NotificationPacketTest extends BGPv4TestBase {
 
 	private BGPv4PacketDecoder decoder;
 	
@@ -307,4 +314,40 @@ public class CeaseNotificationPacketTest extends BGPv4TestBase {
 				(byte)0x08, // Out of resources
 		}, (new OutOfResourcesNotificationPacket()).encodePacket());
 	}
+	
+	@Test
+	public void testDecodeUnsupportedCapabilityNotificationPacket() {
+		CapabilityListUnsupportedCapabilityNotificationPacket packet = safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
+				(byte)0x03, // type code NOTIFICATION
+				(byte)0x02, // error code: BGP Open
+				(byte)0x07, // suberror code: Unsupported capability
+				(byte)0x41, // Capability code 65: 4-octet AS numbers 
+				(byte)0x04, // Capability length: 4 octets 
+				(byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00, // AS number 64512
+				0x02, // Capability code 2: Route refresh
+				0x00, // Capability length: 0 octets
+				0x01, // Capability code 1: Multi-Protocol 
+				0x04, // Capability length: 4 octets
+				0x00, 0x01, // Address Family 1: IPv4
+				0x00,  // reserved
+				0x01,  // Subsequent address family 1: Unicast forwarding
+		})), CapabilityListUnsupportedCapabilityNotificationPacket.class);
+
+		Iterator<Capability> capIt = packet.getCapabilities().iterator();
+		
+		Assert.assertTrue(capIt.hasNext());
+		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();
+		Assert.assertEquals(64512, as4cap.getAutonomousSystem());
+		
+		Assert.assertTrue(capIt.hasNext());
+		Assert.assertEquals(RouteRefreshCapability.class, capIt.next().getClass());
+		
+		Assert.assertTrue(capIt.hasNext());
+		MultiProtocolCapability mpCap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv4, mpCap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mpCap.getSafi());
+		
+		Assert.assertFalse(capIt.hasNext());
+	}
+
 }

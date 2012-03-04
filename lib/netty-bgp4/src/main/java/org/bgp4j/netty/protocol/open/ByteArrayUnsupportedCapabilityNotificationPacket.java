@@ -16,15 +16,31 @@
  */
 package org.bgp4j.netty.protocol.open;
 
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnsupportedCapabilityNotificationPacket extends OpenNotificationPacket {
+public class ByteArrayUnsupportedCapabilityNotificationPacket extends UnsupportedCapabilityNotificationPacket {
 
-	protected UnsupportedCapabilityNotificationPacket() {
-		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_CAPABILITY);
+	private byte[] capability;
+	
+	public ByteArrayUnsupportedCapabilityNotificationPacket(byte[] capability) {
+		this.capability = capability;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4j.netty.protocol.NotificationPacket#encodeAdditionalPayload()
+	 */
+	@Override
+	protected ChannelBuffer encodeAdditionalPayload() {
+		ChannelBuffer buffer = ChannelBuffers.buffer(capability.length);
+		
+		buffer.writeBytes(capability);
+		
+		return buffer;
 	}
 
 }
