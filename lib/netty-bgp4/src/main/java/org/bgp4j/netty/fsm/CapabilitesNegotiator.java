@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.fsm;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -26,24 +27,23 @@ import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.AutonomousSystem4Capability;
 import org.bgp4j.net.Capability;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.protocol.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 
 /**
- * This class negotiates the supported capabilities with a peer.
+ * This class negotiates the supported capabilities with a peer. According to RFC 5492 an intersection
+ * of the locally configured capabilities and the capabilities announced by the remote peer can be build
+ * which forms the capability "working set" per connection.
  * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public class CapabilitesNegotiator {
 
-	private Set<Capability> negotiatedCapabilities = new TreeSet<Capability>();
 	private PeerConfiguration peerConfiguration;
+	private List<Capability> remoteCapabilities = new LinkedList<Capability>();
 	
 	void setup(PeerConfiguration peerCofiguration) {
 		this.peerConfiguration = peerCofiguration;
-		
-		this.negotiatedCapabilities.addAll((peerCofiguration.getCapabilities().getRequiredCapabilities()));
 	}
 	
 	/**
@@ -55,10 +55,73 @@ public class CapabilitesNegotiator {
 	 * @param packet
 	 * @see BGPv4Constants#BGP_AS_TRANS
 	 */
-	void insertNegotiatedCapabilities(OpenPacket packet) {
+	void insertLocalCapabilities(OpenPacket packet) {
 		packet.getCapabilities().clear();
 		
-		for(Capability cap : negotiatedCapabilities) {
+		insertLocalCapabilities(packet, peerConfiguration.getCapabilities().getRequiredCapabilities());
+		insertLocalCapabilities(packet, peerConfiguration.getCapabilities().getOptionalCapabilities());
+	}
+
+	/**
+	 * record the capabilites passed in from the peer
+	 * 
+	 * @param packet
+	 */
+	void recordPeerCapabilities(OpenPacket packet) {
+		remoteCapabilities.clear();
+		
+		if(packet.getCapabilities() != null) {
+			remoteCapabilities.addAll(packet.getCapabilities());
+		}
+	}
+
+	/**
+	 * build an intersection of the locally configured capabilities and the capabilites passed in from the peer.
+	 * 
+	 * @return
+	 */
+	public Set<Capability> intersectLocalAndRemoteCapabilities() {
+		Set<Capability> caps = new TreeSet<Capability>();
+		
+		for(Capability cap : peerConfiguration.getCapabilities().getRequiredCapabilities())
+			if(remoteCapabilities.contains(cap))
+				caps.add(cap);
+		for(Capability cap : peerConfiguration.getCapabilities().getOptionalCapabilities())
+			if(remoteCapabilities.contains(cap))
+				caps.add(cap);
+		
+		return caps;
+	}
+
+	/**
+	 * build a set of capabilites which are marked as required in the local configuration and which
+	 * are not supported by the peer.
+	 * The local speaker may build an Unsupported Capabilities notification message based on that info
+	 * 
+	 * @return
+	 */
+	public Set<Capability> missingRequiredCapabilities() {
+		Set<Capability> caps = new TreeSet<Capability>();
+		
+		for(Capability cap : peerConfiguration.getCapabilities().getRequiredCapabilities())
+			if(!remoteCapabilities.contains(cap))
+				caps.add(cap);
+
+		return caps;
+	}
+	
+	/**
+	 * Insert the currently negotiated capabilities into the OPEN packet.
+	 * 
+	 * If the capabilities contain an AS number larger than 65536 then the 
+	 * AS number in the OPEN packet is changed to AS_TRANS (23456)
+	 * 
+	 * @param packet
+	 * @param capabilities
+	 * @see BGPv4Constants#BGP_AS_TRANS
+	 */
+	private void insertLocalCapabilities(OpenPacket packet, Collection<Capability> capabilities) {
+		for(Capability cap : capabilities) {
 			if(cap instanceof AutonomousSystem4Capability) {
 				AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)cap;
 				
@@ -70,34 +133,5 @@ public class CapabilitesNegotiator {
 			
 			packet.getCapabilities().add(cap);
 		}
-	}
-	
-	/**
-	 * Handle the notification packet received from the peer about a capability that the peer
-	 * cannot handle.
-	 * 
-	 * @param packet
-	 */
-	void handleUnsupportedPeerCapability(CapabilityListUnsupportedCapabilityNotificationPacket packet) {
-		for(Capability cap : packet.getCapabilities())
-			negotiatedCapabilities.remove(cap);
-	}
-	
-	/**
-	 * Check an OPEN packet received from a remote peer and match the capabilities contained in it with the
-	 * configured capabilities
-	 * 
-	 * @param packet the open packet received from the remote peer
-	 * @return a list of unsupported capabilities.
-	 */
-	List<Capability> checkOpenForUnsupportedCapabilities(OpenPacket packet) {
-		List<Capability> unwantedCaps = new LinkedList<Capability>();
-		
-		for(Capability cap : packet.getCapabilities()) {
-			if(!peerConfiguration.getCapabilities().getRequiredCapabilities().contains(cap))
-				unwantedCaps.add(cap);
-		}
-		
-		return unwantedCaps;
 	}
 }
