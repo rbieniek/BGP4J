@@ -187,7 +187,7 @@ public class PeerConfigurationParserTest extends ConfigTestBase {
 		Assert.assertTrue(peerConfig.isPassiveTcpEstablishment());
 		Assert.assertTrue(peerConfig.isHoldTimerDisabled());
 		
-		Iterator<Capability> capIt = peerConfig.getCapabilities().getCapabilities().iterator();
+		Iterator<Capability> capIt = peerConfig.getCapabilities().getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();

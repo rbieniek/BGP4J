@@ -57,5 +57,12 @@
         <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast"/>
         <MultiProtocol addressFamily="ipv6" subsequentAddressFamily="unicast"/>
     </Capabilities>
-    
+        
+    <!-- MultiProtocol two capabilities -->
+    <Capabilities >
+        <LargeAutonomousSystem local="256" />
+        <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast" optional="true"/>
+        <MultiProtocol addressFamily="ipv6" subsequentAddressFamily="unicast" optional="true"/>
+    </Capabilities>
+
 </Config>

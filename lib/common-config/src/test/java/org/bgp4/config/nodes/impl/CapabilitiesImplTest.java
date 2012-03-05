@@ -33,81 +33,183 @@ import org.junit.Test;
 public class CapabilitiesImplTest {
 
 	@Test
-	public void testCapabilitiesSameSizeSameArgsSameOrder() {
+	public void testRequiredCapabilitiesSameSizeSameArgsSameOrder() {
 		CapabilitiesImpl cap1 = new CapabilitiesImpl();
 		CapabilitiesImpl cap2 = new CapabilitiesImpl();
 		
-		cap1.addCapability(new AutonomousSystem4Capability(16));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new RouteRefreshCapability());
+		cap1.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new RouteRefreshCapability());
 		
-		cap2.addCapability(new AutonomousSystem4Capability(16));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new RouteRefreshCapability());
+		cap2.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new RouteRefreshCapability());
 		
 		Assert.assertEquals(cap1, cap2);
 		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
 	}
 
 	@Test
-	public void testCapabilitiesSameSizeSameArgsDifferentOrder() {
+	public void testRequiredCapabilitiesSameSizeSameArgsDifferentOrder() {
 		CapabilitiesImpl cap1 = new CapabilitiesImpl();
 		CapabilitiesImpl cap2 = new CapabilitiesImpl();
 		
-		cap1.addCapability(new AutonomousSystem4Capability(16));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new RouteRefreshCapability());
+		cap1.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new RouteRefreshCapability());
 		
-		cap2.addCapability(new RouteRefreshCapability());
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new AutonomousSystem4Capability(16));
+		cap2.addRequiredCapability(new RouteRefreshCapability());
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new AutonomousSystem4Capability(16));
 		
 		Assert.assertEquals(cap1, cap2);
 		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
 	}
 
 	@Test
-	public void testCapabilitiesSameSizeDifferentArgsSameOrder() {
+	public void testRequiredCapabilitiesSameSizeDifferentArgsSameOrder() {
 		CapabilitiesImpl cap1 = new CapabilitiesImpl();
 		CapabilitiesImpl cap2 = new CapabilitiesImpl();
 		
-		cap1.addCapability(new AutonomousSystem4Capability(16));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new RouteRefreshCapability());
+		cap1.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new RouteRefreshCapability());
 		
-		cap2.addCapability(new AutonomousSystem4Capability(16));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new RouteRefreshCapability());
+		cap2.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new RouteRefreshCapability());
 		
 		Assert.assertFalse(cap1.equals(cap2));
 		Assert.assertFalse(cap1.hashCode() == cap2.hashCode());
 	}
 
 	@Test
-	public void testCapabilitiesRepeatedArgs() {
+	public void testRequiredCapabilitiesRepeatedArgs() {
 		CapabilitiesImpl cap1 = new CapabilitiesImpl();
 		CapabilitiesImpl cap2 = new CapabilitiesImpl();
 		
-		cap1.addCapability(new AutonomousSystem4Capability(16));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap1.addCapability(new RouteRefreshCapability());
+		cap1.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new RouteRefreshCapability());
 		
-		cap2.addCapability(new AutonomousSystem4Capability(16));
-		cap2.addCapability(new AutonomousSystem4Capability(16));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
-		cap2.addCapability(new RouteRefreshCapability());
-		cap2.addCapability(new RouteRefreshCapability());
+		cap2.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap2.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addRequiredCapability(new RouteRefreshCapability());
+		cap2.addRequiredCapability(new RouteRefreshCapability());
 		
 		Assert.assertEquals(cap1, cap2);
 		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
 	}
+	
+	// ---
+
+	@Test
+	public void testOptionalCapabilitiesSameSizeSameArgsSameOrder() {
+		CapabilitiesImpl cap1 = new CapabilitiesImpl();
+		CapabilitiesImpl cap2 = new CapabilitiesImpl();
+		
+		cap1.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new RouteRefreshCapability());
+		
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		
+		Assert.assertEquals(cap1, cap2);
+		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
+	}
+
+	@Test
+	public void testOptionalCapabilitiesSameSizeSameArgsDifferentOrder() {
+		CapabilitiesImpl cap1 = new CapabilitiesImpl();
+		CapabilitiesImpl cap2 = new CapabilitiesImpl();
+		
+		cap1.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new RouteRefreshCapability());
+		
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		
+		Assert.assertEquals(cap1, cap2);
+		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
+	}
+
+	@Test
+	public void testOptionalCapabilitiesSameSizeDifferentArgsSameOrder() {
+		CapabilitiesImpl cap1 = new CapabilitiesImpl();
+		CapabilitiesImpl cap2 = new CapabilitiesImpl();
+		
+		cap1.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new RouteRefreshCapability());
+		
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		
+		Assert.assertFalse(cap1.equals(cap2));
+		Assert.assertFalse(cap1.hashCode() == cap2.hashCode());
+	}
+
+	@Test
+	public void testOptionalCapabilitiesRepeatedArgs() {
+		CapabilitiesImpl cap1 = new CapabilitiesImpl();
+		CapabilitiesImpl cap2 = new CapabilitiesImpl();
+		
+		cap1.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addOptionalCapability(new RouteRefreshCapability());
+		
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		
+		Assert.assertEquals(cap1, cap2);
+		Assert.assertEquals(cap1.hashCode(), cap2.hashCode());
+	}
+
+	@Test
+	public void testRequiredCapabilitiesOptionalCapabilitiesSameSizeSameArgsSameOrder() {
+		CapabilitiesImpl cap1 = new CapabilitiesImpl();
+		CapabilitiesImpl cap2 = new CapabilitiesImpl();
+		
+		cap1.addRequiredCapability(new AutonomousSystem4Capability(16));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap1.addRequiredCapability(new RouteRefreshCapability());
+		
+		cap2.addOptionalCapability(new AutonomousSystem4Capability(16));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		cap2.addOptionalCapability(new RouteRefreshCapability());
+		
+		Assert.assertFalse(cap1.equals(cap2));
+		Assert.assertFalse(cap1.hashCode() == cap2.hashCode());
+	}
+
+
 }

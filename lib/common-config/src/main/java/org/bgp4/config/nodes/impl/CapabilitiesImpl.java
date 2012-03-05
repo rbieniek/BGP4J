@@ -31,23 +31,31 @@ import org.bgp4j.net.Capability;
  */
 public class CapabilitiesImpl implements Capabilities {
 
-	private TreeSet<Capability> capabilities = new TreeSet<Capability>();
+	private TreeSet<Capability> requiredCapabilities = new TreeSet<Capability>();
+	private TreeSet<Capability> optionalCapabilities = new TreeSet<Capability>();
 	
 	CapabilitiesImpl() {
 	}
 	
-	CapabilitiesImpl(Capability[] caps) {
-		for(Capability cap : caps)
-			capabilities.add(cap);
-	}
-	
-	@Override
-	public Set<Capability> getCapabilities() {
-		return Collections.unmodifiableSet(capabilities);
+	CapabilitiesImpl(Capability[] requiredCaps) {
+		for(Capability cap : requiredCaps)
+			requiredCapabilities.add(cap);
 	}
 
-	void addCapability(Capability cap) {
-		this.capabilities.add(cap);
+	CapabilitiesImpl(Capability[] requiredCaps, Capability[] optionalCaps) {
+		this(requiredCaps);
+		
+		for(Capability cap : optionalCaps)
+			optionalCapabilities.add(cap);
+	}
+
+	@Override
+	public Set<Capability> getRequiredCapabilities() {
+		return Collections.unmodifiableSet(requiredCapabilities);
+	}
+
+	void addRequiredCapability(Capability cap) {
+		this.requiredCapabilities.add(cap);
 	}
 
 	/* (non-Javadoc)
@@ -57,9 +65,12 @@ public class CapabilitiesImpl implements Capabilities {
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
 		
-		for(Capability cap : capabilities)
-			hcb.append(cap);
-		
+		for(Capability cap : requiredCapabilities)
+			hcb.append(cap).append(false);
+
+		for(Capability cap : optionalCapabilities)
+			hcb.append(cap).append(true);
+
 		return hcb.toHashCode();
 	}
 
@@ -71,15 +82,33 @@ public class CapabilitiesImpl implements Capabilities {
 		if(!(obj instanceof Capabilities))
 			return false;
 
-		Set<Capability> otherCaps = ((Capabilities)obj).getCapabilities();
+		Set<Capability> otherCaps = ((Capabilities)obj).getRequiredCapabilities();
 		
-		if(otherCaps.size() != capabilities.size())
+		if(otherCaps.size() != requiredCapabilities.size())
 			return false;
 		
-		for(Capability cap : capabilities)
+		for(Capability cap : requiredCapabilities)
 			if(!otherCaps.contains(cap))
 				return false;
 		
+		otherCaps = ((Capabilities)obj).getOptionalCapabilities();
+		
+		if(otherCaps.size() != optionalCapabilities.size())
+			return false;
+		
+		for(Capability cap : optionalCapabilities)
+			if(!otherCaps.contains(cap))
+				return false;
 		return true;
 	}
+
+	@Override
+	public Set<Capability> getOptionalCapabilities() {
+		return Collections.unmodifiableSet(optionalCapabilities);
+	}
+	
+	void addOptionalCapability(Capability cap) {
+		this.optionalCapabilities.add(cap);
+	}
+
 }

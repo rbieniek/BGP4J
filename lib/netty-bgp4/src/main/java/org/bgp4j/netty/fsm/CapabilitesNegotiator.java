@@ -43,7 +43,7 @@ public class CapabilitesNegotiator {
 	void setup(PeerConfiguration peerCofiguration) {
 		this.peerConfiguration = peerCofiguration;
 		
-		this.negotiatedCapabilities.addAll((peerCofiguration.getCapabilities().getCapabilities()));
+		this.negotiatedCapabilities.addAll((peerCofiguration.getCapabilities().getRequiredCapabilities()));
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public class CapabilitesNegotiator {
 		List<Capability> unwantedCaps = new LinkedList<Capability>();
 		
 		for(Capability cap : packet.getCapabilities()) {
-			if(!peerConfiguration.getCapabilities().getCapabilities().contains(cap))
+			if(!peerConfiguration.getCapabilities().getRequiredCapabilities().contains(cap))
 				unwantedCaps.add(cap);
 		}
 		

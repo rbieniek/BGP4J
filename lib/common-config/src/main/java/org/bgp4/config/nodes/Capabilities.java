@@ -31,7 +31,13 @@ public interface Capabilities {
 	 * 
 	 * @return
 	 */
-	public Set<Capability> getCapabilities();
+	public Set<Capability> getRequiredCapabilities();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Set<Capability> getOptionalCapabilities();
 	
 	/**
 	 * 

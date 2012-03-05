@@ -47,12 +47,19 @@ public class CapabilitiesParser {
 
 		int as4Number = hierarchicalConfiguration.getInt("LargeAutonomousSystem[@local]", -1);
 		
-		if(as4Number > 0)
-			caps.addCapability(new AutonomousSystem4Capability(as4Number));
-
-		if(hierarchicalConfiguration.containsKey("RouteRefresh"))
-			caps.addCapability(new RouteRefreshCapability());
+		if(as4Number > 0) {
+			if(hierarchicalConfiguration.getBoolean("LargeAutonomousSystem[@optional]", false))
+				caps.addOptionalCapability(new AutonomousSystem4Capability(as4Number));
+			else
+				caps.addRequiredCapability(new AutonomousSystem4Capability(as4Number));
+		}
 		
+		if(hierarchicalConfiguration.containsKey("RouteRefresh")) {
+			if(hierarchicalConfiguration.getBoolean("RouteRefresh[@optional]", false))
+				caps.addOptionalCapability(new RouteRefreshCapability());
+			else
+				caps.addRequiredCapability(new RouteRefreshCapability());
+		}		
 		parseMultiprotocolCapabilities(hierarchicalConfiguration.configurationsAt("MultiProtocol"), caps);
 		parseOutboundRouteFilteringCapabilities(hierarchicalConfiguration.configurationsAt("OutboundRouteFiltering"), caps);
 		
@@ -62,8 +69,13 @@ public class CapabilitiesParser {
 	private void parseMultiprotocolCapabilities(List<HierarchicalConfiguration> capabilityConfigs, CapabilitiesImpl  caps) throws ConfigurationException {
 		for(HierarchicalConfiguration config : capabilityConfigs) {
 			try {
-				caps.addCapability(new MultiProtocolCapability(AddressFamily.fromString(config.getString("[@addressFamily]")), 
-						SubsequentAddressFamily.fromString(config.getString("[@subsequentAddressFamily]"))));
+				MultiProtocolCapability mp = new MultiProtocolCapability(AddressFamily.fromString(config.getString("[@addressFamily]")), 
+						SubsequentAddressFamily.fromString(config.getString("[@subsequentAddressFamily]")));
+				
+				if(config.getBoolean("[@optional]", false))
+					caps.addOptionalCapability(mp);
+				else
+					caps.addRequiredCapability(mp);
 			} catch(IllegalArgumentException e) {
 				throw new ConfigurationException(e);
 			}
@@ -83,9 +95,14 @@ public class CapabilitiesParser {
 				if(filters.size() == 0)
 					throw new ConfigurationException("filter type/direction pair required");
 				
-				caps.addCapability(new OutboundRouteFilteringCapability(AddressFamily.fromString(config.getString("[@addressFamily]")), 
+				OutboundRouteFilteringCapability orfc = new OutboundRouteFilteringCapability(AddressFamily.fromString(config.getString("[@addressFamily]")), 
 						SubsequentAddressFamily.fromString(config.getString("[@subsequentAddressFamily]")), 
-						filters));
+						filters);
+				
+				if(config.getBoolean("[@optional]", false))
+					caps.addOptionalCapability(orfc);
+				else
+					caps.addRequiredCapability(orfc);
 			} catch(IllegalArgumentException e) {
 				throw new ConfigurationException(e);
 			}

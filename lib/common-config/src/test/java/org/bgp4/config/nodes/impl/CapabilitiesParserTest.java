@@ -63,13 +63,13 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	public void testEmptyConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(0)"));
 		
-		Assert.assertEquals(0, caps.getCapabilities().size());
+		Assert.assertEquals(0, caps.getRequiredCapabilities().size());
 	}
 
 	@Test
 	public void testOneAS4Configuration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(1)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		AutonomousSystem4Capability cap = (AutonomousSystem4Capability)capIt.next();
@@ -80,7 +80,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testTwoAS4Configuration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(2)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		AutonomousSystem4Capability cap = (AutonomousSystem4Capability)capIt.next();
@@ -92,7 +92,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testOneRouteRefreshConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(3)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		Assert.assertEquals(RouteRefreshCapability.class, capIt.next().getClass());
@@ -103,7 +103,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testOneMultiProtoclConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(4)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		MultiProtocolCapability cap = (MultiProtocolCapability)capIt.next();
@@ -117,7 +117,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testTwoMultiProtoclConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(5)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		MultiProtocolCapability cap = (MultiProtocolCapability)capIt.next();
@@ -135,7 +135,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testOneOutboundRouteFilteringConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(6)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		OutboundRouteFilteringCapability cap = (OutboundRouteFilteringCapability)capIt.next();
@@ -153,7 +153,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testTwoOutboundRouteFilteringConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(7)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		OutboundRouteFilteringCapability cap = (OutboundRouteFilteringCapability)capIt.next();
@@ -178,7 +178,7 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 	@Test
 	public void testOneAS4TwoMultiProtoclConfiguration() throws Exception {
 		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(8)"));
-		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
 		
 		Assert.assertTrue(capIt.hasNext());
 		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();
@@ -197,4 +197,27 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 		Assert.assertFalse(capIt.hasNext());
 	}
 
+	@Test
+	public void testRequiredOneAS4OptionalTwoMultiProtoclConfiguration() throws Exception {
+		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(9)"));
+		Iterator<Capability> capIt = caps.getRequiredCapabilities().iterator();
+		
+		Assert.assertTrue(capIt.hasNext());
+		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();
+		Assert.assertEquals(256, as4cap.getAutonomousSystem());
+		Assert.assertFalse(capIt.hasNext());
+
+		capIt = caps.getOptionalCapabilities().iterator();
+		Assert.assertTrue(capIt.hasNext());
+		MultiProtocolCapability cap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv4, cap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, cap.getSafi());
+
+		Assert.assertTrue(capIt.hasNext());
+		cap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv6, cap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, cap.getSafi());
+
+		Assert.assertFalse(capIt.hasNext());
+	}
 }
