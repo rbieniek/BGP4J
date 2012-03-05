@@ -174,4 +174,27 @@ public class CapabilitiesParserTest extends ConfigTestBase {
 		
 		Assert.assertFalse(capIt.hasNext());
 	}
+
+	@Test
+	public void testOneAS4TwoMultiProtoclConfiguration() throws Exception {
+		Capabilities caps = parser.parseConfig(config.configurationAt("Capabilities(8)"));
+		Iterator<Capability> capIt = caps.getCapabilities().iterator();
+		
+		Assert.assertTrue(capIt.hasNext());
+		AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)capIt.next();
+		Assert.assertEquals(256, as4cap.getAutonomousSystem());
+
+		Assert.assertTrue(capIt.hasNext());
+		MultiProtocolCapability cap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv4, cap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, cap.getSafi());
+
+		Assert.assertTrue(capIt.hasNext());
+		cap = (MultiProtocolCapability)capIt.next();
+		Assert.assertEquals(AddressFamily.IPv6, cap.getAfi());
+		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, cap.getSafi());
+
+		Assert.assertFalse(capIt.hasNext());
+	}
+
 }

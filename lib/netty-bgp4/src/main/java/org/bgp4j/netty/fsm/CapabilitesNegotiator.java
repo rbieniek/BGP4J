@@ -17,10 +17,10 @@
  */
 package org.bgp4j.netty.fsm;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.AutonomousSystem4Capability;
@@ -28,7 +28,6 @@ import org.bgp4j.net.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
-import org.bgp4j.netty.protocol.open.UnsupportedCapabilityNotificationPacket;
 
 /**
  * This class negotiates the supported capabilities with a peer.
@@ -38,7 +37,7 @@ import org.bgp4j.netty.protocol.open.UnsupportedCapabilityNotificationPacket;
  */
 public class CapabilitesNegotiator {
 
-	private Set<Capability> negotiatedCapabilities = new HashSet<Capability>();
+	private Set<Capability> negotiatedCapabilities = new TreeSet<Capability>();
 	private PeerConfiguration peerConfiguration;
 	
 	void setup(PeerConfiguration peerCofiguration) {
@@ -67,9 +66,9 @@ public class CapabilitesNegotiator {
 					packet.setAs4AutonomousSystem(((AutonomousSystem4Capability) cap).getAutonomousSystem());
 					packet.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
 				}
-				
-				packet.getCapabilities().add(cap);
 			}
+			
+			packet.getCapabilities().add(cap);
 		}
 	}
 	
