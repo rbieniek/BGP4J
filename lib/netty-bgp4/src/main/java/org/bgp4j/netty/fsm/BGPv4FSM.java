@@ -208,12 +208,14 @@ public class BGPv4FSM {
 	private BGPv4Client peerClient;
 	
 	private @Inject InternalFSM internalFsm;
+	private @Inject CapabilitesNegotiator capabilitiesNegotiator;
 	
 	public void configure(PeerConfiguration peerConfig) throws SchedulerException {
 		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
 		this.peerConfig = peerConfig;
 		
 		internalFsm.setup(peerConfig, new InternalFSMCallbacksImpl());
+		capabilitiesNegotiator.setup(peerConfig);
 	}
 
 	public InetAddress getRemotePeerAddress() {
