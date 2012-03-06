@@ -13,37 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.LocalChannelTest.java 
+ * File: org.bgp4j.netty.LocalChannelBGPv4TestBase.java 
  */
 package org.bgp4j.netty;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.local.DefaultLocalClientChannelFactory;
 import org.jboss.netty.channel.local.DefaultLocalServerChannelFactory;
 import org.jboss.netty.channel.local.LocalAddress;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class LocalChannelTest extends BGPv4TestBase {
-
+public class LocalChannelBGPv4TestBase extends BGPv4TestBase {
+	
 	@BeforeClass
 	public static void beforeClass() {
 		clientFactory = new DefaultLocalClientChannelFactory();
@@ -73,54 +64,20 @@ public class LocalChannelTest extends BGPv4TestBase {
 	public void after() {
 		address = null;
 	}
-	
+
 	private static DefaultLocalClientChannelFactory clientFactory;
 	private static DefaultLocalServerChannelFactory serverFactory;
-	private ParametrizableChannelPipelineFactory serverPipelineFactory;
-	private ParametrizableChannelPipelineFactory clientPipelineFactory;
-	private LocalAddress address;
-	private ServerBootstrap serverBootstrap;
-	private ClientBootstrap clientBootstrap;
-	private Channel clientChannel;
+	protected ParametrizableChannelPipelineFactory serverPipelineFactory;
+	protected ParametrizableChannelPipelineFactory clientPipelineFactory;
+	protected LocalAddress address;
+	protected ServerBootstrap serverBootstrap;
+	protected ClientBootstrap clientBootstrap;
 
-	private class SimpleRecordingChannelHandler extends SimpleChannelHandler {
-
-		private List<Object> messages = new LinkedList<Object>();
+	protected void setupMessageRecordingClientPipeline() {
+		clientRecorder = new MessageRecordingChannelHandler();
 		
-		/* (non-Javadoc)
-		 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
-		 */
-		@Override
-		public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-			messages.add(e.getMessage());
-		}
-
-		/**
-		 * @return the messages
-		 */
-		public List<Object> getMessages() {
-			return messages;
-		}
-		
+		clientPipelineFactory.addChannelHandler(clientRecorder);
 	}
-	
-	@Test
-	public void testSimpleWriteClientReadServer() throws Exception {
-		SimpleRecordingChannelHandler handler = new SimpleRecordingChannelHandler();
-		Object message = new Integer(1);
-		
-		serverPipelineFactory.addChannelHandler(handler);
-		
-		serverBootstrap.bind(address);
-		clientChannel = clientBootstrap.connect(address).getChannel();
 
-		// clientPipeline.sendUpstream(new UpstreamMessageEvent(clientChannel, message, address));
-		clientChannel.write(message);
-		
-		Iterator<Object> it = handler.getMessages().iterator();
-		
-		Assert.assertTrue(it.hasNext());
-		Assert.assertEquals(message, it.next());
-		Assert.assertFalse(it.hasNext());
-	}
+	protected MessageRecordingChannelHandler clientRecorder;
 }
