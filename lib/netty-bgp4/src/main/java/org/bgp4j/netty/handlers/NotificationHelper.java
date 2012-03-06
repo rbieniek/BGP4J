@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.handlers;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.bgp4j.netty.protocol.NotificationPacket;
@@ -46,10 +47,7 @@ public class NotificationHelper {
 		 */
 		@Override
 		public void operationComplete(ChannelFuture future) throws Exception {
-			if(next != null)
-				future.getChannel().write(notification).addListener(next);
-			else
-				future.getChannel().write(notification);				
+			send(future.getChannel());
 		}
 		
 		private void send(Channel channel) {
@@ -96,11 +94,13 @@ public class NotificationHelper {
 		if(listener instanceof BgpEventFireChannelFutureListener)
 			((BgpEventFireChannelFutureListener)listener).setBgpEvent(new NotificationEvent(notifications));
 		
-		if(notifications.size() > 0) {
-			ConcatenatedWrite next = new ConcatenatedWrite(notifications.remove(0), listener);
+		Iterator<NotificationPacket> it = notifications.iterator();
+		
+		if(it.hasNext()) {
+			ConcatenatedWrite next = new ConcatenatedWrite(it.next(), listener);
 	
-			for(NotificationPacket notification : notifications) {
-				ConcatenatedWrite current = new ConcatenatedWrite(notification, next);
+			while(it.hasNext()) {
+				ConcatenatedWrite current = new ConcatenatedWrite(it.next(), next);
 				
 				next = current;
 			}

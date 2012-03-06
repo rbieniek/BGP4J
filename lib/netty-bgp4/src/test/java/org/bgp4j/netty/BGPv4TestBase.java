@@ -19,6 +19,9 @@ package org.bgp4j.netty;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bgp4j.netty.handlers.NotificationEvent;
 import org.bgp4j.netty.protocol.BGPv4Packet;
@@ -116,6 +119,27 @@ public class BGPv4TestBase extends WeldTestCaseBase {
 	
 		Assert.assertEquals(1, ne.getNotifications().size());
 		Assert.assertEquals(packetClass, ne.getNotifications().get(0).getClass());
+	}
+
+	protected void assertNotificationEvent(List<Class<? extends NotificationPacket>> packetClasses, ChannelEvent event) {
+		Assert.assertTrue(event instanceof MessageEvent);
+		
+		MessageEvent me = (MessageEvent)event;
+		
+		Assert.assertTrue(me.getMessage() instanceof NotificationEvent);
+		NotificationEvent ne = (NotificationEvent)me.getMessage();
+	
+		List<Class<? extends NotificationPacket>> notifications = new LinkedList<Class<? extends NotificationPacket>>();
+		
+		for(NotificationPacket packet : ne.getNotifications())
+			notifications.add(packet.getClass());
+
+		Assert.assertEquals(packetClasses.size(), notifications.size());
+
+		Iterator<Class<? extends NotificationPacket>> wantedIt = packetClasses.iterator();
+		
+		while(wantedIt.hasNext())
+			Assert.assertTrue(notifications.remove(wantedIt.next()));
 	}
 
 	public abstract class AssertExecption {

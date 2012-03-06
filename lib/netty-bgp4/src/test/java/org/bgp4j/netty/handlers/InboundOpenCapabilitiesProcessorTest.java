@@ -17,21 +17,24 @@
  */
 package org.bgp4j.netty.handlers;
 
+import java.util.UUID;
+
 import junit.framework.Assert;
 
 import org.bgp4j.net.AutonomousSystem4Capability;
 import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.MockChannel;
-import org.bgp4j.netty.MockChannelHandler;
-import org.bgp4j.netty.MockChannelSink;
-import org.bgp4j.netty.MockPeerConnectionInformation;
-import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.LocalChannelBGPv4TestBase;
+import org.bgp4j.netty.MessageRecordingChannelHandler;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.local.LocalAddress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,39 +43,50 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
+public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestBase {
 
 	@Before
 	public void before() {
-		InboundOpenCapabilitiesProcessor checker = obtainInstance(InboundOpenCapabilitiesProcessor.class);
+		messageRecorder = obtainInstance(MessageRecordingChannelHandler.class);
 		
-		channelHandler = obtainInstance(MockChannelHandler.class);
-		sink = obtainInstance(MockChannelSink.class);
-		pipeline = Channels.pipeline(new ChannelHandler[] { 
-				checker,
-				channelHandler });
-		channel = new MockChannel(pipeline, sink);
+		LocalAddress codecOnlyAddress = new LocalAddress(UUID.randomUUID().toString());
 		
-		peerInfo = new MockPeerConnectionInformation();
+		serverBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
+			
+			@Override
+			public ChannelPipeline getPipeline() throws Exception {
+				return Channels.pipeline(new ChannelHandler[] { 
+						obtainInstance(InboundOpenCapabilitiesProcessor.class), 
+						messageRecorder });
+			}
+		});
+		serverChannel = serverBootstrap.bind(codecOnlyAddress);
 
-		// attach the context object to the channel handler
-		channel.getPipeline().getContext(checker).setAttachment(peerInfo);
+		clientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] {
+				messageRecorder 
+				}));
+		clientChannel = clientBootstrap.connect(codecOnlyAddress).getChannel();		
 	}
 	
 	@After
 	public void after() {
-		channel = null;
-		channelHandler = null;
-		sink = null;
-		pipeline = null;
-		peerInfo = null;
+		if(clientChannel != null)
+			clientChannel.close();
+		if(serverChannel != null)
+			serverChannel.close();
+		clientChannel = null;
+		clientBootstrap.releaseExternalResources();
+		clientBootstrap = null;
+		serverBootstrap.releaseExternalResources();
+		serverBootstrap = null;
 	}
 
-	private MockChannelHandler channelHandler;
-	private MockChannelSink sink;
-	private ChannelPipeline pipeline;
-	private MockChannel channel;
-	private PeerConnectionInformation peerInfo;
+	private MessageRecordingChannelHandler messageRecorder;
+	
+	private ServerBootstrap serverBootstrap;
+	private ClientBootstrap clientBootstrap;
+	private Channel clientChannel;
+	private Channel serverChannel;
 	
 	@Test
 	public void testTwoOctetASNumberNoASCap() throws Exception {
@@ -80,12 +94,12 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 		
 		open.setAutonomousSystem(64172);
 		
-		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, open));
+		clientChannel.write(open);
 		
-		Assert.assertEquals(0, sink.getWaitingEventNumber());
-		Assert.assertEquals(1, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(channelHandler.nextEvent()), OpenPacket.class);
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
 		Assert.assertEquals(64172, consumed.getEffectiveAutonomousSystem());	
 	}
@@ -97,12 +111,12 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 		open.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
 		open.setAs4AutonomousSystem(641723);
 		
-		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, open));
+		clientChannel.write(open);
 		
-		Assert.assertEquals(0, sink.getWaitingEventNumber());
-		Assert.assertEquals(1, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(channelHandler.nextEvent()), OpenPacket.class);
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
 		Assert.assertEquals(641723, consumed.getEffectiveAutonomousSystem());	
 	}
@@ -114,12 +128,12 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 		open.setAutonomousSystem(64172);
 		open.getCapabilities().add(new AutonomousSystem4Capability(64172));
 		
-		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, open));
+		clientChannel.write(open);
 		
-		Assert.assertEquals(0, sink.getWaitingEventNumber());
-		Assert.assertEquals(1, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(channelHandler.nextEvent()), OpenPacket.class);
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
 		Assert.assertEquals(64172, consumed.getEffectiveAutonomousSystem());
 		
@@ -132,12 +146,13 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 		open.setAutonomousSystem(64172);
 		open.getCapabilities().add(new AutonomousSystem4Capability(64173));
 		
-		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, open));
+		clientChannel.write(open);
 		
-		Assert.assertEquals(1, sink.getWaitingEventNumber());
-		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
+		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}
 
 	@Test
@@ -147,11 +162,12 @@ public class InboundOpenCapabilitiesProcessorTest extends BGPv4TestBase {
 		open.setAutonomousSystem(64172);
 		open.getCapabilities().add(new AutonomousSystem4Capability(641720));
 		
-		pipeline.sendUpstream(buildUpstreamBgpMessageEvent(channel, open));
+		clientChannel.write(open);
 		
-		Assert.assertEquals(1, sink.getWaitingEventNumber());
-		Assert.assertEquals(0, channelHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(sink.getEvents().remove(0)).getClass());
+		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
+		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}
 }

@@ -36,8 +36,8 @@ public class NotificationEvent extends BgpEvent {
 		notifications.add(packet);
 	}
 	
-	public NotificationEvent(Collection<NotificationPacket> packet) {
-		notifications.addAll(notifications);
+	public NotificationEvent(Collection<NotificationPacket> notifications) {
+		this.notifications.addAll(notifications);
 	}
 
 	/**
