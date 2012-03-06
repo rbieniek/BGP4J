@@ -25,7 +25,9 @@ import javax.inject.Inject;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ChildChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.ServerChannel;
@@ -40,6 +42,7 @@ public class MessageRecordingChannelHandler extends SimpleChannelHandler {
 	@Inject Logger log;
 
 	private Map<Channel, List<ChannelEvent>> events = new HashMap<Channel, List<ChannelEvent>>();
+	private PeerConnectionInformation peerInfo;
 	
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
@@ -87,5 +90,37 @@ public class MessageRecordingChannelHandler extends SimpleChannelHandler {
 			ChildChannelStateEvent e) throws Exception {
 		// TODO Auto-generated method stub
 		super.childChannelOpen(ctx, e);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelOpen(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
+	 */
+	@Override
+	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		if(peerInfo != null) {
+			Channel channel = ctx.getChannel();
+			
+			for(String name : channel.getPipeline().getNames()) {
+				ChannelHandler handler = channel.getPipeline().get(name);
+	
+				if(handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
+					channel.getPipeline().getContext(handler).setAttachment(peerInfo);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return the peerInfo
+	 */
+	public PeerConnectionInformation getPeerInfo() {
+		return peerInfo;
+	}
+
+	/**
+	 * @param peerInfo the peerInfo to set
+	 */
+	public void setPeerInfo(PeerConnectionInformation peerInfo) {
+		this.peerInfo = peerInfo;
 	}
 }

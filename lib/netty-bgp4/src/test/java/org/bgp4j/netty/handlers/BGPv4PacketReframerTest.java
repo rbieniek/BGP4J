@@ -84,7 +84,6 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 
 	private MessageRecordingChannelHandler messageRecorder;
 	
-	// channel setup with only the codec in the chain
 	private ServerBootstrap serverBootstrap;
 	private ClientBootstrap clientBootstrap;
 	private Channel clientChannel;
