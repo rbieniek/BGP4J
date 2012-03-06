@@ -58,7 +58,9 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 			if(openPacket.getBgpIdentifier() != peerConnInfo.getRemoteBgpIdentifier()) {	
 				log.error("expected remote BGP identifier {}, received BGP identifier {}", peerConnInfo.getRemoteBgpIdentifier(), openPacket.getBgpIdentifier());
 				
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadBgpIdentifierNotificationPacket());
+				NotificationHelper.sendNotification(ctx, 
+						new BadBgpIdentifierNotificationPacket(), 
+						new BgpEventFireChannelFutureListener(ctx));
 				return;
 			}
 
@@ -67,7 +69,9 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 						peerConnInfo.getRemoteAS(), 
 						openPacket.getAutonomousSystem());
 				
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadPeerASNotificationPacket());
+				NotificationHelper.sendNotification(ctx, 
+						new BadPeerASNotificationPacket(), 
+						new BgpEventFireChannelFutureListener(ctx));
 				return;
 			}
 		}

@@ -64,7 +64,9 @@ public class BGPv4Codec extends SimpleChannelHandler {
 			} catch(ProtocolPacketException ex) {
 				log.error("received malformed protocol packet, closing connection", ex);
 				
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, ex.toNotificationPacket());
+				NotificationHelper.sendNotification(ctx, 
+						ex.toNotificationPacket(), 
+						new BgpEventFireChannelFutureListener(ctx));
 			} catch(Exception ex) {
 				log.error("generic decoding exception, closing connection", ex);
 				

@@ -61,7 +61,9 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 								BGPv4Constants.BGP_AS_TRANS, 
 								openASNumber);
 						
-						NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadPeerASNotificationPacket());
+						NotificationHelper.sendNotification(ctx, 
+								new BadPeerASNotificationPacket(), 
+								new BgpEventFireChannelFutureListener(ctx));
 						return;						
 					}
 				} else {
@@ -70,7 +72,9 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 								capASNumber, 
 								openASNumber);
 						
-						NotificationHelper.sendNotificationAndCloseChannel(ctx, new BadPeerASNotificationPacket());
+						NotificationHelper.sendNotification(ctx, 
+								new BadPeerASNotificationPacket(), 
+								new BgpEventFireChannelFutureListener(ctx));
 						return;						
 					}					
 				}

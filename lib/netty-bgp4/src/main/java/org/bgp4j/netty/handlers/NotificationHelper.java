@@ -16,7 +16,7 @@
  */
 package org.bgp4j.netty.handlers;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.jboss.netty.channel.Channel;
@@ -32,23 +32,11 @@ import org.jboss.netty.channel.ChannelHandlerContext;
  */
 public class NotificationHelper {
 
-	private static class CloseChannelFuture implements ChannelFutureListener {
-
-		/* (non-Javadoc)
-		 * @see org.jboss.netty.channel.ChannelFutureListener#operationComplete(org.jboss.netty.channel.ChannelFuture)
-		 */
-		@Override
-		public void operationComplete(ChannelFuture future) throws Exception {
-			future.getChannel().close();
-		}
-		
-	}
-	
-	private static class ConcatenatedWriteOrCloseFuture implements ChannelFutureListener {
+	private static class ConcatenatedWrite implements ChannelFutureListener {
 		private NotificationPacket notification;
-		private ConcatenatedWriteOrCloseFuture next;
+		private ChannelFutureListener next;
 		
-		private ConcatenatedWriteOrCloseFuture(NotificationPacket notification, ConcatenatedWriteOrCloseFuture next) {
+		private ConcatenatedWrite(NotificationPacket notification, ChannelFutureListener next) {
 			this.next = next;
 			this.notification = notification;
 		}
@@ -58,15 +46,17 @@ public class NotificationHelper {
 		 */
 		@Override
 		public void operationComplete(ChannelFuture future) throws Exception {
-			if(notification != null) {
+			if(next != null)
 				future.getChannel().write(notification).addListener(next);
-			} else {
-				future.getChannel().close();
-			}
+			else
+				future.getChannel().write(notification);				
 		}
 		
 		private void send(Channel channel) {
-			channel.write(notification).addListener(next);
+			if(next != null)
+				channel.write(notification).addListener(next);
+			else
+				channel.write(notification);
 		}
 	}
 	
@@ -76,8 +66,8 @@ public class NotificationHelper {
 	 * @param ctx the channel handler context containing the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendNotificationAndCloseChannel(ChannelHandlerContext ctx, NotificationPacket notification) {
-		sendNotificationAndCloseChannel(ctx.getChannel(), notification);
+	public static void sendNotification(ChannelHandlerContext ctx, NotificationPacket notification, ChannelFutureListener listener) {
+		sendNotification(ctx.getChannel(), notification, listener);
 	}
 	
 	/**
@@ -86,26 +76,14 @@ public class NotificationHelper {
 	 * @param channel the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendNotificationAndCloseChannel(Channel channel, NotificationPacket notification) {
-		channel.write(notification).addListener(new CloseChannelFuture());
-	}
-
-	/**
-	 * send a list of notifications and close the channel after the last message was sent.
-	 * 
-	 * @param channel the channel.
-	 * @param notification the notification to send
-	 */
-	public static void sendNotificationsAndCloseChannel(Channel channel, Collection<NotificationPacket> notifications) {
-		ConcatenatedWriteOrCloseFuture next = new ConcatenatedWriteOrCloseFuture(null, null);
-
-		for(NotificationPacket notification : notifications) {
-			ConcatenatedWriteOrCloseFuture current = new ConcatenatedWriteOrCloseFuture(notification, next);
-			
-			next = current;
-		}
+	public static void sendNotification(Channel channel, NotificationPacket notification, ChannelFutureListener listener) {
+		if(listener instanceof BgpEventFireChannelFutureListener)
+			((BgpEventFireChannelFutureListener)listener).setBgpEvent(new NotificationEvent(notification));
 		
-		next.send(channel);
+		if(listener != null)
+			channel.write(notification).addListener(listener);
+		else
+			channel.write(notification);
 	}
 
 	/**
@@ -114,8 +92,31 @@ public class NotificationHelper {
 	 * @param channel the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendNotificationsAndCloseChannel(ChannelHandlerContext ctx, Collection<NotificationPacket> notifications) {
-		sendNotificationsAndCloseChannel(ctx.getChannel(), notifications);
+	public static void sendNotifications(Channel channel, List<NotificationPacket> notifications, ChannelFutureListener listener) {
+		if(listener instanceof BgpEventFireChannelFutureListener)
+			((BgpEventFireChannelFutureListener)listener).setBgpEvent(new NotificationEvent(notifications));
+		
+		if(notifications.size() > 0) {
+			ConcatenatedWrite next = new ConcatenatedWrite(notifications.remove(0), listener);
+	
+			for(NotificationPacket notification : notifications) {
+				ConcatenatedWrite current = new ConcatenatedWrite(notification, next);
+				
+				next = current;
+			}
+			
+			next.send(channel);
+		}
+	}
+
+	/**
+	 * send a list of notifications and close the channel after the last message was sent.
+	 * 
+	 * @param channel the channel.
+	 * @param notification the notification to send
+	 */
+	public static void sendNotifications(ChannelHandlerContext ctx, List<NotificationPacket> notifications, ChannelFutureListener listener) {
+		sendNotifications(ctx.getChannel(), notifications, listener);
 	}
 
 	/**
@@ -124,8 +125,8 @@ public class NotificationHelper {
 	 * @param ctx the channel handler context containing the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendEncodedNotificationAndCloseChannel(ChannelHandlerContext ctx, NotificationPacket notification) {
-		sendEncodedNotificationAndCloseChannel(ctx.getChannel(), notification);
+	public static void sendEncodedNotification(ChannelHandlerContext ctx, NotificationPacket notification, ChannelFutureListener listener) {
+		sendEncodedNotification(ctx.getChannel(), notification, listener);
 	}
 	
 	/**
@@ -134,7 +135,13 @@ public class NotificationHelper {
 	 * @param channel the channel.
 	 * @param notification the notification to send
 	 */
-	public static void sendEncodedNotificationAndCloseChannel(Channel channel, NotificationPacket notification) {
-		channel.write(notification.encodePacket()).addListener(new CloseChannelFuture());
+	public static void sendEncodedNotification(Channel channel, NotificationPacket notification, ChannelFutureListener listener) {
+		if(listener instanceof BgpEventFireChannelFutureListener)
+			((BgpEventFireChannelFutureListener)listener).setBgpEvent(new NotificationEvent(notification));
+		
+		if(listener != null) 
+			channel.write(notification.encodePacket()).addListener(listener);
+		else
+			channel.write(notification.encodePacket());
 	}
 }

@@ -39,12 +39,10 @@ import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.UnknownCapability;
 import org.bgp4j.netty.ASType;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockChannel;
 import org.bgp4j.netty.MockChannelHandler;
 import org.bgp4j.netty.MockChannelSink;
-import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.handlers.BGPv4Codec;
-import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.netty.protocol.refresh.RouteRefreshPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
@@ -72,7 +70,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 		codecOnlyHandler = obtainInstance(MockChannelHandler.class);
 		codecOnlySink = obtainInstance(MockChannelSink.class);;
 		codecOnlyPipeline = Channels.pipeline(new ChannelHandler[] { obtainInstance(BGPv4Codec.class), codecOnlyHandler });
-		codecOnlyChannel = new MockChannel(codecOnlyPipeline, codecOnlySink);		
+		
+		codecOnlyChannel = new MockChannel(codecOnlyPipeline, codecOnlySink);
 
 		completeHandler = obtainInstance(MockChannelHandler.class);
 		completeSink = obtainInstance(MockChannelSink.class);

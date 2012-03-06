@@ -227,31 +227,10 @@ public class BGPv4FSM {
 	}
 	
 	public void startFSMAutomatic() {
-//		if(peerConfig.isAllowAutomaticStart()) {
-//			FSMEvent event = FSMEvent.AutomaticStart;
-//			
-//			if(peerConfig.isDampPeerOscillation()) {
-//				if(peerConfig.isPassiveTcpEstablishment())
-//					event = FSMEvent.AutomaticStart_with_DampPeerOscillations_and_PassiveTcpEstablishment;
-//				else
-//					event = FSMEvent.AutomaticStart_with_DampPeerOscillations;
-//			} else if(peerConfig.isPassiveTcpEstablishment()) {
-//				event = FSMEvent.AutomaticStart_with_PassiveTcpEstablishment;
-//			}
-//			
-//			internalFsm.handleEvent(event);
-//		}
 		internalFsm.handleEvent(FSMEvent.automaticStart());
 	}
 
 	public void startFSMManual() {
-//		FSMEvent event = FSMEvent.ManualStart;
-//		
-//		if(peerConfig.isPassiveTcpEstablishment()) {
-//			event = FSMEvent.ManualStart_with_PassiveTcpEstablishment;
-//		}
-//		
-//		internalFsm.handleEvent(event);		
 		internalFsm.handleEvent(FSMEvent.manualStart());
 	}
 

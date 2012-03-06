@@ -122,7 +122,9 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 			
 			// if we have any bad attribute, generate notification message and leave
 			if(attributeFlagsErrorList.size() > 0) {
-				NotificationHelper.sendNotificationAndCloseChannel(ctx, new AttributeFlagsNotificationPacket(serializeAttributes(attributeFlagsErrorList)));
+				NotificationHelper.sendNotification(ctx, 
+						new AttributeFlagsNotificationPacket(serializeAttributes(attributeFlagsErrorList)), 
+						new BgpEventFireChannelFutureListener(ctx));
 			} else {
 				// check presence of mandatory attributes
 				Set<Class<? extends Attribute>> mandatoryAttributes;
@@ -160,7 +162,9 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 						notifications.add(new MissingWellKnownAttributeNotificationPacket(code));
 					}
 					
-					NotificationHelper.sendNotificationsAndCloseChannel(ctx, notifications);
+					NotificationHelper.sendNotifications(ctx, 
+							notifications, 
+							new BgpEventFireChannelFutureListener(ctx));
 				} else {
 					boolean haveBougsWidth = false;
 					
@@ -174,7 +178,9 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					}
 					
 					if(haveBougsWidth) {
-						NotificationHelper.sendNotificationAndCloseChannel(ctx, new MalformedAttributeListNotificationPacket());
+						NotificationHelper.sendNotification(ctx, 
+								new MalformedAttributeListNotificationPacket(), 
+								new BgpEventFireChannelFutureListener(ctx));
 					} else
 						sentUpstream = true;
 				}
