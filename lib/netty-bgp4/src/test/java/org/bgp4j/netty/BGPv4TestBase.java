@@ -20,7 +20,9 @@ package org.bgp4j.netty;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import org.bgp4j.netty.handlers.NotificationEvent;
 import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -102,6 +104,18 @@ public class BGPv4TestBase extends WeldTestCaseBase {
 		for(int i=0; i<a.length; i++) {
 			Assert.assertEquals("buffer position " + i, a[i], b[i]);
 		}
+	}
+
+	protected void assertNotificationEvent(Class<? extends NotificationPacket> packetClass, ChannelEvent event) {
+		Assert.assertTrue(event instanceof MessageEvent);
+		
+		MessageEvent me = (MessageEvent)event;
+		
+		Assert.assertTrue(me.getMessage() instanceof NotificationEvent);
+		NotificationEvent ne = (NotificationEvent)me.getMessage();
+	
+		Assert.assertEquals(1, ne.getNotifications().size());
+		Assert.assertEquals(packetClass, ne.getNotifications().get(0).getClass());
 	}
 
 	public abstract class AssertExecption {

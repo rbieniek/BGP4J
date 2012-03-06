@@ -17,16 +17,13 @@
  */
 package org.bgp4j.netty;
 
-import java.util.UUID;
-
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.local.DefaultLocalClientChannelFactory;
 import org.jboss.netty.channel.local.DefaultLocalServerChannelFactory;
-import org.jboss.netty.channel.local.LocalAddress;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
@@ -47,37 +44,28 @@ public class LocalChannelBGPv4TestBase extends BGPv4TestBase {
 		serverFactory.releaseExternalResources();
 	}
 	
-	@Before
-	public void before() {
-		address = new LocalAddress(UUID.randomUUID().toString());
-		serverPipelineFactory = new ParametrizableChannelPipelineFactory();
-		clientPipelineFactory = new ParametrizableChannelPipelineFactory();
-
-		serverBootstrap = new ServerBootstrap(serverFactory);
-		serverBootstrap.setPipelineFactory(serverPipelineFactory);
-
-		clientBootstrap = new ClientBootstrap(clientFactory);
-		clientBootstrap.setPipelineFactory(clientPipelineFactory);
-	}
-	
-	@After
-	public void after() {
-		address = null;
-	}
-
 	private static DefaultLocalClientChannelFactory clientFactory;
 	private static DefaultLocalServerChannelFactory serverFactory;
-	protected ParametrizableChannelPipelineFactory serverPipelineFactory;
-	protected ParametrizableChannelPipelineFactory clientPipelineFactory;
-	protected LocalAddress address;
-	protected ServerBootstrap serverBootstrap;
-	protected ClientBootstrap clientBootstrap;
 
-	protected void setupMessageRecordingClientPipeline() {
-		clientRecorder = new MessageRecordingChannelHandler();
+	protected ServerBootstrap buildLocalServerBootstrap(final ChannelPipelineFactory pipelineFactory) {
+		ServerBootstrap bootstrap = new ServerBootstrap(serverFactory);
 		
-		clientPipelineFactory.addChannelHandler(clientRecorder);
+		bootstrap.setPipelineFactory(pipelineFactory);
+		
+		return bootstrap;
 	}
-
-	protected MessageRecordingChannelHandler clientRecorder;
+	
+	protected ClientBootstrap buildLocalClientBootstrap(final ChannelPipeline pipeline) {
+		ClientBootstrap bootstrap = new ClientBootstrap(clientFactory);
+		
+		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+			
+			@Override
+			public ChannelPipeline getPipeline() throws Exception {
+				return pipeline;
+			}
+		});
+		
+		return bootstrap;
+	}
 }

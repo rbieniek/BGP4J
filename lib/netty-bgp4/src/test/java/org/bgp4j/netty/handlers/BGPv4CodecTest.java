@@ -19,6 +19,7 @@ package org.bgp4j.netty.handlers;
 
 import java.net.Inet4Address;
 import java.util.List;
+import java.util.UUID;
 
 import junit.framework.Assert;
 
@@ -39,23 +40,37 @@ import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.UnknownCapability;
 import org.bgp4j.netty.ASType;
-import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.MockChannel;
-import org.bgp4j.netty.MockChannelHandler;
-import org.bgp4j.netty.MockChannelSink;
+import org.bgp4j.netty.LocalChannelBGPv4TestBase;
+import org.bgp4j.netty.MessageRecordingChannelHandler;
+import org.bgp4j.netty.protocol.ConnectionNotSynchronizedNotificationPacket;
+import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.netty.protocol.open.UnsupportedOptionalParameterNotificationPacket;
+import org.bgp4j.netty.protocol.open.UnsupportedVersionNumberNotificationPacket;
 import org.bgp4j.netty.protocol.refresh.RouteRefreshPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
+import org.bgp4j.netty.protocol.update.AttributeLengthNotificationPacket;
+import org.bgp4j.netty.protocol.update.InvalidNetworkFieldNotificationPacket;
+import org.bgp4j.netty.protocol.update.InvalidNextHopNotificationPacket;
+import org.bgp4j.netty.protocol.update.InvalidOriginNotificationPacket;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
+import org.bgp4j.netty.protocol.update.MalformedASPathAttributeNotificationPacket;
+import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute;
 import org.bgp4j.netty.protocol.update.MultiProtocolReachableNLRI;
 import org.bgp4j.netty.protocol.update.MultiProtocolUnreachableNLRI;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
+import org.bgp4j.netty.protocol.update.OptionalAttributeErrorNotificationPacket;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.local.LocalAddress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,55 +79,86 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4CodecTest extends BGPv4TestBase {
+public class BGPv4CodecTest extends LocalChannelBGPv4TestBase {
 	@Before
 	public void before() {
-		codecOnlyHandler = obtainInstance(MockChannelHandler.class);
-		codecOnlySink = obtainInstance(MockChannelSink.class);;
-		codecOnlyPipeline = Channels.pipeline(new ChannelHandler[] { obtainInstance(BGPv4Codec.class), codecOnlyHandler });
+		messageRecorder = obtainInstance(MessageRecordingChannelHandler.class);
 		
-		codecOnlyChannel = new MockChannel(codecOnlyPipeline, codecOnlySink);
+		LocalAddress codecOnlyAddress = new LocalAddress(UUID.randomUUID().toString());
+		
+		codecOnlyServerBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
+			
+			@Override
+			public ChannelPipeline getPipeline() throws Exception {
+				return Channels.pipeline(new ChannelHandler[] { 
+						obtainInstance(BGPv4Codec.class), 
+						messageRecorder });
+			}
+		});
+		
+		codecOnlyServerChannel = codecOnlyServerBootstrap.bind(codecOnlyAddress);
+		codecOnlyClientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] { messageRecorder }));
+		codecOnlyClientChannel = codecOnlyClientBootstrap.connect(codecOnlyAddress).getChannel();
 
-		completeHandler = obtainInstance(MockChannelHandler.class);
-		completeSink = obtainInstance(MockChannelSink.class);
-		completePipeline = Channels.pipeline(new ChannelHandler[] { 
-				obtainInstance(BGPv4Reframer.class), 
-				obtainInstance(BGPv4Codec.class), 
-				completeHandler });
-		completeChannel = new MockChannel(completePipeline, completeSink);		
-		
-		Assert.assertNotSame(codecOnlyHandler, completeHandler);
-		Assert.assertNotSame(codecOnlySink, completeSink);
+		LocalAddress completeAddress = new LocalAddress(UUID.randomUUID().toString());
+
+		completeServerBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
+			
+			@Override
+			public ChannelPipeline getPipeline() throws Exception {
+				return Channels.pipeline(new ChannelHandler[] { 
+						obtainInstance(BGPv4Reframer.class),
+						obtainInstance(BGPv4Codec.class), 
+						messageRecorder }); 
+				}
+			});
+		completeServerChannel = completeServerBootstrap.bind(completeAddress);
+		completeClientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] { messageRecorder }));
+		completeClientChannel = completeClientBootstrap.connect(completeAddress).getChannel();
+
+		Assert.assertNotSame(codecOnlyClientChannel, completeClientChannel);
 }
 	
 	@After
 	public void after() {
-		codecOnlyHandler = null;
-		codecOnlySink = null;
-		codecOnlyPipeline = null;
-		codecOnlyChannel = null;
+		if(codecOnlyClientChannel != null)
+			codecOnlyClientChannel.close();
+		if(codecOnlyServerChannel != null)
+			codecOnlyServerChannel.close();
+		codecOnlyClientChannel = null;
+		codecOnlyClientBootstrap.releaseExternalResources();
+		codecOnlyClientBootstrap = null;
+		codecOnlyServerBootstrap.releaseExternalResources();
+		codecOnlyServerBootstrap = null;
 
-		completeChannel = null;
-		completeHandler = null;
-		completeSink = null;
-		completePipeline = null;
+		if(completeClientChannel != null)
+			completeClientChannel.close();
+		if(completeServerChannel != null)
+			completeServerChannel.close();
+		completeClientChannel = null;
+		completeClientBootstrap.releaseExternalResources();
+		completeClientBootstrap = null;
+		completeServerBootstrap.releaseExternalResources();
+		completeServerBootstrap = null;
 	}
 
+	private MessageRecordingChannelHandler messageRecorder;
+	
 	// channel setup with only the codec in the chain
-	private MockChannelHandler codecOnlyHandler;
-	private MockChannelSink codecOnlySink;
-	private ChannelPipeline codecOnlyPipeline;
-	private MockChannel codecOnlyChannel;
+	private ServerBootstrap codecOnlyServerBootstrap;
+	private ClientBootstrap codecOnlyClientBootstrap;
+	private Channel codecOnlyClientChannel;
+	private Channel codecOnlyServerChannel;
 	
 	// channel setup with reframer and codec in the chain to test complete BGP protocol packets (header + payload)
-	private MockChannelHandler completeHandler;
-	private MockChannelSink completeSink;
-	private ChannelPipeline completePipeline;
-	private MockChannel completeChannel;
+	private ServerBootstrap completeServerBootstrap;
+	private ClientBootstrap completeClientBootstrap;
+	private Channel completeClientChannel;
+	private Channel completeServerChannel;
 
 	@Test
 	public void testStrippedBasicOpenPacket() throws Exception {
-		codecOnlyPipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(codecOnlyChannel, new byte[] {
+		codecOnlyClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x04, // BGP version 4 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
@@ -121,10 +167,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // optional parameter length 0 
 		}));
 
-		Assert.assertEquals(0, codecOnlySink.getWaitingEventNumber());
-		Assert.assertEquals(1, codecOnlyHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(codecOnlyClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyServerChannel));
 	
-		OpenPacket open = safeDowncast(safeExtractChannelEvent(codecOnlyHandler.nextEvent()), OpenPacket.class);
+		OpenPacket open = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(codecOnlyServerChannel)), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -135,7 +181,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 
 	@Test
 	public void testCompleteBasicOpenPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1d, // length 29 octets
@@ -147,10 +193,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // optional parameter length 0 
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		OpenPacket open = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), OpenPacket.class);
+		OpenPacket open = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -163,7 +209,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 	public void testStrippedFullOpenPacket() throws Exception {
 		Capability cap;
 		
-		codecOnlyPipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(codecOnlyChannel, new byte[] {
+		codecOnlyClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x04, // BGP version 4 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
@@ -180,10 +226,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512
 		}));
 
-		Assert.assertEquals(0, codecOnlySink.getWaitingEventNumber());
-		Assert.assertEquals(1, codecOnlyHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(codecOnlyClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyServerChannel));
 	
-		OpenPacket open = safeDowncast(safeExtractChannelEvent(codecOnlyHandler.nextEvent()), OpenPacket.class);
+		OpenPacket open = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(codecOnlyServerChannel)), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -212,7 +258,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 	public void testCompleteFullOpenPacket() throws Exception {
 		Capability cap;
 		
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x35, // length 53 octets
@@ -232,10 +278,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		OpenPacket open = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), OpenPacket.class);
+		OpenPacket open = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), OpenPacket.class);
 		
 		Assert.assertEquals(4, open.getProtocolVersion());
 		Assert.assertEquals(64512, open.getAutonomousSystem());
@@ -262,7 +308,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 	
 	@Test
 	public void testStrippedBadBgpVersionOpenPacket() throws Exception {
-		codecOnlyPipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(codecOnlyChannel, new byte[] {
+		codecOnlyClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x05, // BGP version 5 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
@@ -271,8 +317,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // optional parameter length 0 
 		}));
 
-		Assert.assertEquals(1, codecOnlySink.getWaitingEventNumber());
-		Assert.assertEquals(0, codecOnlyHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyServerChannel));
 	
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -282,12 +328,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x2, // OPEN error message
 				(byte)01, // Unsupported Version Number
 				(byte)0x00, (byte)0x04, // BGP version 4 
-		}, codecOnlySink.nextEvent());		
+		}, messageRecorder.nextEvent(codecOnlyClientChannel));
+		
+		assertNotificationEvent(UnsupportedVersionNumberNotificationPacket.class, messageRecorder.nextEvent(codecOnlyServerChannel));
 	}
 	
 	@Test
 	public void testCompleteBadBgpVersionOpenPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1d, // length 29 octets
@@ -299,8 +347,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // optional parameter length 0 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -310,12 +358,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x2, // OPEN error message
 				(byte)01, // Unsupported Version Number
 				(byte)0x00, (byte)0x04, // BGP version 4 
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(UnsupportedVersionNumberNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testStrippedBadBgpIdentifierOpenPacket() throws Exception {
-		codecOnlyPipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(codecOnlyChannel, new byte[] {
+		codecOnlyClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x04, // BGP version 4 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
@@ -324,8 +374,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // optional parameter length 0 
 		}));
 
-		Assert.assertEquals(1, codecOnlySink.getWaitingEventNumber());
-		Assert.assertEquals(0, codecOnlyHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyServerChannel));
 	
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -334,12 +384,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x2, // OPEN error message
 				(byte)0x3, // Bad BGP Identifier
-		}, codecOnlySink.nextEvent());		
+		}, messageRecorder.nextEvent(codecOnlyClientChannel));		
+		
+		assertNotificationEvent(BadBgpIdentifierNotificationPacket.class, messageRecorder.nextEvent(codecOnlyServerChannel));
 	}
 
 	@Test
 	public void testStrippedUnsupportedOptionalParameterOpenPacket() throws Exception {
-		codecOnlyPipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(codecOnlyChannel, new byte[] {
+		codecOnlyClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0x01, // type code OPEN
 				(byte)0x04, // BGP version 4 
 				(byte)0xfc, (byte)0x00, // Autonomous system 64512 
@@ -349,8 +401,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, (byte)0x00 // bogus optional parameter type code 3
 		}));
 
-		Assert.assertEquals(1, codecOnlySink.getWaitingEventNumber());
-		Assert.assertEquals(0, codecOnlyHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(codecOnlyServerChannel));
 	
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -359,12 +411,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x2, // OPEN error message
 				(byte)0x4, // Unsupported Optional Parameter
-		}, codecOnlySink.nextEvent());		
+		}, messageRecorder.nextEvent(codecOnlyClientChannel));		
+		
+		assertNotificationEvent(UnsupportedOptionalParameterNotificationPacket.class, messageRecorder.nextEvent(codecOnlyServerChannel));
 	}
 
 	@Test
 	public void testCompleteUpdatePacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x35, // length 53 octets
@@ -379,10 +433,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x00 // NLRI: 0.0.0.0/0	
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), UpdatePacket.class);
 		
 		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
 		Assert.assertEquals(5, packet.getPathAttributes().size());
@@ -408,7 +462,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 	
 	@Test
 	public void testMalformedWithdrawnRoutesNopathAttributeListUpdatePacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x15, // length 21 octets
@@ -416,8 +470,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x00, 0x00, // bad withdrawn routes length (2 octets), points to end of packet 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -426,12 +480,15 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x01, // Message header error
 				(byte)0x01, // Connection not synchronized
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(ConnectionNotSynchronizedNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
+
 	}
 
 	@Test
 	public void testDecodeMalformedWithdrawnRoutesLengthOnPacketEndUpdatePacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x17, // length 23 octets
@@ -440,8 +497,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x00, 0x00, // Total path attributes length  (0 octets)
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -450,12 +507,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x01, // Malformed attribute list
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+	
+		assertNotificationEvent(MalformedAttributeListNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 		
 	@Test
 	public void testDecodeMalformedWithdrawnRoutesLengthOverEndUpdatePacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x17, // length 23 octets
@@ -464,8 +523,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x00, 0x00, // Total path attributes length  (0 octets)
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -474,12 +533,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x01, // Malformed attribute list
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(MalformedAttributeListNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testDecodeAttributeListTooLongUpdatePacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x17, // length 23 octets
@@ -488,8 +549,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x00, 0x02, // Total path attributes length  (2 octets), points to end of packet
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -498,13 +559,15 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x01, // Malformed attribute list
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(MalformedAttributeListNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	
 	@Test
 	public void testDecodeOriginInvalidPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1b, // length 27 octets
@@ -514,8 +577,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x04, // Path attribute: ORIGIN INCOMPLETE  
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -525,12 +588,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x06, // Invalid origin
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x04, // Path attribute: ORIGIN INCOMPLETE  
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(InvalidOriginNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	@Test
 	public void testDecodeOriginShortPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1a, // length 26 octets
@@ -540,8 +605,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x01, (byte)0x00, // Path attribute:   
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -551,12 +616,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x05, // Attribute length
 				(byte)0x40, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN INCOMPLETE  
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(AttributeLengthNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	@Test
 	public void testDecodeASPath4BadPathTypeOneASNumberPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x21, // length 33 octets
@@ -567,8 +634,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x05, 0x01, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -578,12 +645,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
 				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06,  0x05, 0x01, 0x00, 0x00, 0x12, 0x34, 
-		}, completeSink.nextEvent());
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(MalformedASPathAttributeNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	@Test
 	public void testDecodeASPath4ASSequenceTwoASNumberOneMissingPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x21, // length 33 octets
@@ -594,8 +663,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -605,12 +674,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
 				(byte)0x50, (byte)0x11, (byte)0x00, (byte)0x06,  0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(MalformedASPathAttributeNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testDecodeASPath2BadPathTypeOneASNumberPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1f, // length 31 octets
@@ -621,8 +692,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x05, 0x01, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -632,12 +703,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
 				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, 0x05, 0x01, 0x12, 0x34, 
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(MalformedASPathAttributeNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	@Test
 	public void testDecodeASPath2ASSequenceTwoASNumberOneMissingPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1f, // length 31 octets
@@ -648,8 +721,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x02, 0x02, 0x12, 0x34, // Invalid 0x1234 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -659,12 +732,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x0b, // Malformed AS Path
 				(byte)0x50, (byte)0x02, (byte)0x00, (byte)0x04, 0x02, 0x02, 0x12, 0x34, 
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(MalformedASPathAttributeNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 
 	@Test
 	public void testNextHopPacketIpMulticastNextHop() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1e, // length 30 octets
@@ -674,8 +749,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xe0, (byte)0x00, (byte)0x00, (byte)0x01, // Path attribute: NEXT_HOP 224.0.0.1
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -685,12 +760,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // Update message error
 				(byte)0x08, // Invalid next hop
 				(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xe0, (byte)0x00, (byte)0x00, (byte)0x01,
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(InvalidNextHopNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testDecodeOneNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1a, // length 26 octets
@@ -700,10 +777,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x10, (byte)0xac, 0x10, // NLRI 172.16/16 
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
-		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), UpdatePacket.class);
 		NetworkLayerReachabilityInformation nlri;
 		
 		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
@@ -718,7 +795,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 	
 	@Test
 	public void testDecodeTwoNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1f, // length 31 octets
@@ -729,10 +806,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0, // NLRI 192.168.32.0/28
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
-		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), UpdatePacket.class);
 		NetworkLayerReachabilityInformation nlri;
 		
 		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
@@ -752,7 +829,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 
 	@Test
 	public void testDecodeBogusNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1e, // length 30 octets
@@ -763,8 +840,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x1c, (byte)0xc0, (byte)0xa8, 0x20,  // NLRI 192.168.32/28 bogus one octet missing
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -773,12 +850,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x03, // Update message error
 				(byte)0x0a, // Invalid network field
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));		
+		
+		assertNotificationEvent(InvalidNetworkFieldNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testDecodeValidMpReachNlriFourByteNextHopTwoNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x2a, // length 42 octets
@@ -793,10 +872,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x14, (byte)0xc0, (byte)0xa8, (byte)0xf0, //  NLRI 192.168.255.0/20
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), UpdatePacket.class);
 		
 		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
 		Assert.assertEquals(1, packet.getPathAttributes().size());
@@ -821,7 +900,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 
 	@Test
 	public void testDecodeBogusSafiMpReachNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1f, // length 31 octets
@@ -835,8 +914,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x00, // reserved
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -850,12 +929,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x04, // Bogus SAFI 
 				0x00, // NEXT_HOP length 0
 				0x00, // reserved
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(OptionalAttributeErrorNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testDecodeValidMpUnreachNlriTwoNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x24, // length 36 octets
@@ -868,10 +949,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x14, (byte)0xc0, (byte)0xa8, (byte)0xf0, //  NLRI 192.168.255.0/20
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), UpdatePacket.class);
+		UpdatePacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), UpdatePacket.class);
 		
 		Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
 		Assert.assertEquals(1, packet.getPathAttributes().size());
@@ -895,7 +976,7 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 
 	@Test
 	public void testDecodeBogusSafiMpUnreachNlri() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x1d, // length 29 octets
@@ -907,8 +988,8 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				0x04, // Bogus SAFI 
 		}));
 
-		Assert.assertEquals(1, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(0, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 
 		assertChannelEventContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -920,12 +1001,14 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x80, 0x0f, 0x03, // Path Attribute MP_REACH_NLRI
 				0x00, (byte)0x01, // AFI(IPv4) 
 				0x04, // Bogus SAFI 
-		}, completeSink.nextEvent());		
+		}, messageRecorder.nextEvent(completeClientChannel));
+		
+		assertNotificationEvent(OptionalAttributeErrorNotificationPacket.class, messageRecorder.nextEvent(completeServerChannel));
 	}
 	
 	@Test
 	public void testCompleteFullRouteRefreshPacket() throws Exception {
-		completePipeline.sendUpstream(buildProtocolPacketUpstreamMessageEvent(completeChannel, new byte[] {
+		completeClientChannel.write(buildProtocolPacket(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x24, // length 36 octets
@@ -944,10 +1027,10 @@ public class BGPv4CodecTest extends BGPv4TestBase {
 				(byte)0x0, // prefix 0.0.0.0/0
 		}));
 
-		Assert.assertEquals(0, completeSink.getWaitingEventNumber());
-		Assert.assertEquals(1, completeHandler.getWaitingEventNumber());
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(completeClientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(completeServerChannel));
 	
-		RouteRefreshPacket packet = safeDowncast(safeExtractChannelEvent(completeHandler.nextEvent()), RouteRefreshPacket.class);
+		RouteRefreshPacket packet = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(completeServerChannel)), RouteRefreshPacket.class);
 		
 		Assert.assertEquals(AddressFamily.IPv4, packet.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, packet.getSubsequentAddressFamily());
