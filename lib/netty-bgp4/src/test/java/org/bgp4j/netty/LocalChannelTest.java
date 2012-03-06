@@ -17,13 +17,19 @@
  */
 package org.bgp4j.netty;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
@@ -61,36 +67,45 @@ public class LocalChannelTest extends BGPv4TestBase {
 	@Before
 	public void before() {
 		address = new LocalAddress(UUID.randomUUID().toString());
+		serverPipelineFactory = new ParametrizableChannelPipelineFactory();
+		clientPipelineFactory = new ParametrizableChannelPipelineFactory();
 
-		serverPipeline = Channels.pipeline();
-		serverChannel = serverFactory.newChannel(serverPipeline);
-		serverChannel.bind(address);
-		
-		clientPipeline = Channels.pipeline();
-		clientChannel = clientFactory.newChannel(clientPipeline);
-		clientChannel.connect(address);
+		serverBootstrap = new ServerBootstrap(serverFactory);
+		serverBootstrap.setPipelineFactory(serverPipelineFactory);
+
+		clientBootstrap = new ClientBootstrap(clientFactory);
+		clientBootstrap.setPipelineFactory(clientPipelineFactory);
 	}
 	
 	@After
 	public void after() {
 		address = null;
-		serverPipeline = null;
-		serverChannel.close();
-		serverChannel = null;
-		
-		clientPipeline = null;
-		clientChannel.close();
-		clientChannel = null;
 	}
 	
 	private static DefaultLocalClientChannelFactory clientFactory;
 	private static DefaultLocalServerChannelFactory serverFactory;
+	private ParametrizableChannelPipelineFactory serverPipelineFactory;
+	private ParametrizableChannelPipelineFactory clientPipelineFactory;
 	private LocalAddress address;
-	private LocalChannel clientChannel;
-	private LocalServerChannel serverChannel;
-	private ChannelPipeline clientPipeline;
-	private ChannelPipeline serverPipeline;
+	private ServerBootstrap serverBootstrap;
+	private ClientBootstrap clientBootstrap;
+	private Channel clientChannel;
 
+	private class ParametrizableChannelPipelineFactory implements ChannelPipelineFactory {
+
+		private ArrayList<ChannelHandler> handlers = new ArrayList<ChannelHandler>();
+		
+		public void addChannelHandler(ChannelHandler handler) {
+			handlers.add(handler);
+		}
+		
+		@Override
+		public ChannelPipeline getPipeline() throws Exception {
+			return Channels.pipeline(handlers.toArray(new ChannelHandler[0]));
+		}
+		
+	}
+	
 	private class SimpleRecordingChannelHandler extends SimpleChannelHandler {
 
 		private List<Object> messages = new LinkedList<Object>();
@@ -117,8 +132,11 @@ public class LocalChannelTest extends BGPv4TestBase {
 		SimpleRecordingChannelHandler handler = new SimpleRecordingChannelHandler();
 		Object message = new Integer(1);
 		
-		serverPipeline.addLast("recording", handler);
+		serverPipelineFactory.addChannelHandler(handler);
 		
+		serverBootstrap.bind(address);
+		clientChannel = clientBootstrap.connect(address).getChannel();
+
 		// clientPipeline.sendUpstream(new UpstreamMessageEvent(clientChannel, message, address));
 		clientChannel.write(message);
 		
