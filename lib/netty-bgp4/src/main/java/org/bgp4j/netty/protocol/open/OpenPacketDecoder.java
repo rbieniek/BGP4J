@@ -67,7 +67,7 @@ public class OpenPacketDecoder {
 		return packet;
 	}
 
-	private static int IPV4_MULTICAST_MASK = 0xe0000000;
+	private static long IPV4_MULTICAST_MASK = 0xe0000000L;
 	
 	/**
 	 * decode the OPEN network packet. The passed channel buffer MUST point to the first packet octet AFTER the packet type and the buffer 

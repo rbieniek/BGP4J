@@ -57,7 +57,7 @@ public class BGPv4PacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(64512, open.getAutonomousSystem());
 		Assert.assertEquals(180, open.getHoldTime());
 		Assert.assertEquals(0, open.getCapabilities().size());
-		Assert.assertEquals(((192<<24) | (168 << 16) | (9 << 8) | 1), open.getBgpIdentifier());
+		Assert.assertEquals(((192L<<24) | (168L << 16) | (9L << 8) | 1), open.getBgpIdentifier());
 	}
 
 	@Test
