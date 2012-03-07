@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.PeerConnectionInformation;
+import org.bgp4j.netty.handlers.BgpEvent;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.service.BGPv4Client;
 import org.jboss.netty.channel.Channel;
@@ -38,6 +39,36 @@ import org.slf4j.Logger;
  */
 public class BGPv4FSM {
 
+	private class FSMChannelImpl implements FSMChannel {
+		private Channel channel;
+		private BGPv4Client peerClient;
+
+		public FSMChannelImpl(Channel channel) {
+			this.channel = channel;
+		}
+		
+		public FSMChannelImpl(Channel channel, BGPv4Client peerClient) {
+			this(channel);
+			
+			this.peerClient = peerClient;
+		}
+		
+		/**
+		 * @return the channel
+		 */
+		private Channel getChannel() {
+			return channel;
+		}
+
+		/**
+		 * @return the peerClient
+		 */
+		private BGPv4Client getPeerClient() {
+			return peerClient;
+		}
+
+	}
+	
 	/**
 	 * Internal proxy class to expose the peer connection information to interested handlers
 	 * 
@@ -192,8 +223,6 @@ public class BGPv4FSM {
 			// TODO Auto-generated method stub
 			
 		}
-
-		
 	}
 	
 	private @Inject Logger log;
@@ -205,7 +234,6 @@ public class BGPv4FSM {
 	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
 
 	private Channel peerChannel;
-	private BGPv4Client peerClient;
 	
 	private @Inject InternalFSM internalFsm;
 	private @Inject CapabilitesNegotiator capabilitiesNegotiator;
@@ -245,6 +273,11 @@ public class BGPv4FSM {
 
 	public void handleClientMessage(Channel channel, BGPv4Packet message) {
 		log.info("received message " + message);
+	}
+
+	public void handleClientEvent(Channel channel, BgpEvent message) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void handleClientConnected() {

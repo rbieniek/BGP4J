@@ -65,6 +65,8 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 		} else {
 			if(e.getMessage() instanceof BGPv4Packet) {
 				fsm.handleClientMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
+			} else if(e.getMessage() instanceof BgpEvent) {
+				fsm.handleClientEvent(ctx.getChannel(), (BgpEvent)e.getMessage());
 			} else {
 				log.error("unknown payload class " + e.getMessage().getClass().getName() + " received for peer " + remotePeer);
 			}
