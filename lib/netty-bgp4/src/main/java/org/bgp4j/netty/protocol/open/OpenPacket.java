@@ -89,7 +89,7 @@ public class OpenPacket extends BGPv4Packet {
 	/**
 	 * @param bgpIdentifier the bgpIdentifier to set
 	 */
-	public void setBgpIdentifier(int bgpIdentifier) {
+	public void setBgpIdentifier(long bgpIdentifier) {
 		this.bgpIdentifier = bgpIdentifier;
 	}
 	

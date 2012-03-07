@@ -19,6 +19,8 @@ package org.bgp4j.netty;
 
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
@@ -27,14 +29,12 @@ import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.ChildChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.ServerSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -49,17 +49,15 @@ import org.junit.BeforeClass;
  */
 public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 
-	private static ServerSocketChannelFactory serverSocketFactory;
+	public static Set<Integer> usedPorts = new HashSet<Integer>();
 	
 	@BeforeClass
 	public static void beforeClassLocalhostNetworkChannelBGPv4TestBase() {
-		serverSocketFactory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
+		usedPorts.clear();
 	}
 	
 	@AfterClass
 	public static void afterClassLocalhostNetworkChannelBGPv4TestBase() {
-		serverSocketFactory.releaseExternalResources();
-		serverSocketFactory = null;
 	}
 	
 	protected static class ProxyChannelHandler extends SimpleChannelHandler {
@@ -84,40 +82,19 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 		 * @param ctx
 		 * @param e
 		 * @throws Exception
-		 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
+		 * @see org.jboss.netty.channel.SimpleChannelHandler#handleUpstream(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelEvent)
 		 */
-		public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
+		public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e)
 				throws Exception {
-			proxiedHandler.messageReceived(ctx, e);
+			proxiedHandler.handleUpstream(ctx, e);
 		}
 
-		/**
-		 * @param ctx
-		 * @param e
-		 * @throws Exception
-		 * @see org.jboss.netty.channel.SimpleChannelHandler#exceptionCaught(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ExceptionEvent)
-		 */
-		public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
-				throws Exception {
-			proxiedHandler.exceptionCaught(ctx, e);
-		}
-
-		/**
-		 * @param ctx
-		 * @param e
-		 * @throws Exception
-		 * @see org.jboss.netty.channel.SimpleChannelHandler#childChannelOpen(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChildChannelStateEvent)
-		 */
-		public void childChannelOpen(ChannelHandlerContext ctx,
-				ChildChannelStateEvent e) throws Exception {
-			proxiedHandler.childChannelOpen(ctx, e);
-		}
 	}
 	
 	@Before
 	public void beforeLocalhostNetworkChannelBGPv4TestBase() throws Exception {
 		serverProxyChannelHandler = obtainInstance(ProxyChannelHandler.class);
-
+		serverSocketFactory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 		serverBootstrap = new ServerBootstrap(serverSocketFactory);
 		serverBootstrap.setPipelineFactory(new ChannelPipelineFactory() {
 			
@@ -131,20 +108,32 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 			}
 		});
 	
+		serverBootstrap.setOption("reuseAddress", true);
+		serverBootstrap.setOption("tcpNoDelay", true);
+		serverBootstrap.setOption("keepAlive", true);
+
 		serverPort = -1;
 		serverChannel = null;
 		for(int i=16000; (i<64000) && (serverPort < 0); i++) {
-			try {
-				serverChannel = serverBootstrap.bind(new InetSocketAddress(Inet4Address.getLocalHost(), i));
-				
-				serverPort = i;
-			} catch(ChannelException e) {
-				// ignore bind failure
+			if(!usedPorts.contains(i)) {
+				try {
+					serverChannel = serverBootstrap.bind(new InetSocketAddress(Inet4Address.getLocalHost(), i));
+
+					if (serverChannel != null) {
+						serverPort = i;
+						break;
+					}
+				} catch (ChannelException e) {
+					// ignore bind failure
+					e.printStackTrace();
+				}
 			}
 		}
 		
-		Assert.assertNotNull(serverChannel);
 		Assert.assertTrue(serverPort > 0);
+		usedPorts.add(serverPort);
+		
+		Assert.assertNotNull(serverChannel);
 	}
 	
 	@After
@@ -156,8 +145,12 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 		if(serverBootstrap != null)
 			serverBootstrap.releaseExternalResources();
 		serverBootstrap = null;
+
+		serverSocketFactory.releaseExternalResources();
+		serverSocketFactory = null;
 	}
 	
+	private ServerSocketChannelFactory serverSocketFactory;
 	private ServerBootstrap serverBootstrap;
 	protected ProxyChannelHandler serverProxyChannelHandler;
 	protected int serverPort;

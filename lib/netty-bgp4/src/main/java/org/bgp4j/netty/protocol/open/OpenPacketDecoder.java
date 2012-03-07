@@ -86,7 +86,7 @@ public class OpenPacketDecoder {
 			throw new UnsupportedVersionNumberException(BGPv4Constants.BGP_VERSION);
 		packet.setAutonomousSystem(buffer.readUnsignedShort());
 		packet.setHoldTime(buffer.readUnsignedShort());
-		packet.setBgpIdentifier(buffer.readInt());
+		packet.setBgpIdentifier(buffer.readUnsignedInt());
 		if((packet.getBgpIdentifier() & IPV4_MULTICAST_MASK) == IPV4_MULTICAST_MASK)
 			throw new BadBgpIdentifierException();
 		
