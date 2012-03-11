@@ -32,10 +32,34 @@ import org.jboss.netty.buffer.ChannelBuffers;
 public class OpenPacket extends BGPv4Packet {
 	private int protocolVersion;
 	private int autonomousSystem;
-	private int as4AutonomousSystem = -1;
 	private int holdTime;
 	private long bgpIdentifier;
 	private List<Capability> capabilities = new LinkedList<Capability>();
+	
+	public OpenPacket() {}
+	
+	public OpenPacket(int protocolVersion) {
+		this.protocolVersion = protocolVersion;
+	}
+	
+	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier) {
+		this(protocolVersion);
+		
+		this.autonomousSystem = autonomousSysten;
+		this.bgpIdentifier = bgpIdentifier;
+	}
+	
+	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier, int holdTime) {
+		this(protocolVersion, autonomousSysten, bgpIdentifier);
+		
+		this.holdTime = holdTime;
+	}
+	
+	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier, int holdTime, List<Capability> capabilities) {
+		this(protocolVersion, autonomousSysten, bgpIdentifier, holdTime);
+
+		this.capabilities = capabilities;
+	}
 	
 	/**
 	 * @return the protocolVersion
@@ -134,34 +158,6 @@ public class OpenPacket extends BGPv4Packet {
 		return BGPv4Constants.BGP_PACKET_TYPE_OPEN;
 	}
 
-	/**
-	 * @return the as4AutonomousSystem
-	 */
-	public int getAs4AutonomousSystem() {
-		return as4AutonomousSystem;
-	}
-
-	/**
-	 * @param as4AutonomousSystem the as4AutonomousSystem to set
-	 */
-	public void setAs4AutonomousSystem(int as4AutonomousSystem) {
-		this.as4AutonomousSystem = as4AutonomousSystem;
-	}
-	
-	/**
-	 * get the effective autonomous system number. RFC 4893 defines that the AS OPEN field carries the
-	 * magic number AS_TRANS and the the four-byte AS number is carried in capability field if the speakers
-	 * support four-byte AS numbers
-	 * 
-	 * @return
-	 */
-	public int getEffectiveAutonomousSystem() {
-		if(getAutonomousSystem() == BGPv4Constants.BGP_AS_TRANS)
-			return getAs4AutonomousSystem();
-		else
-			return getAutonomousSystem();
-	}
-	
 	/**
 	 * look up a specific capability in the list of provided capabilities
 	 * 

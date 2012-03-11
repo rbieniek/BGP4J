@@ -19,6 +19,8 @@ package org.bgp4j.netty.handlers;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformationAware;
 import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
@@ -64,16 +66,69 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 				return;
 			}
 
-			if(openPacket.getEffectiveAutonomousSystem() != peerConnInfo.getRemoteAS()) {	
-				log.error("expected remote autonomous systemr {}, received autonomous system {}", 
-						peerConnInfo.getRemoteAS(), 
-						openPacket.getAutonomousSystem());
+			if(peerConnInfo.getRemoteAS() > 65535) {
+				// we must have an AutonomousSystem4 capability at this point in the OPEN packet and a AS_TRANS 2-octet AS number
+				if(openPacket.getAutonomousSystem() != BGPv4Constants.BGP_AS_TRANS) {
+					log.error("expected remote autonomous system {}, received autonomous system {}", 
+							BGPv4Constants.BGP_AS_TRANS, 
+							openPacket.getAutonomousSystem());
+					
+					NotificationHelper.sendNotification(ctx, 
+							new BadPeerASNotificationPacket(), 
+							new BgpEventFireChannelFutureListener(ctx));
+					return;					
+				}
 				
-				NotificationHelper.sendNotification(ctx, 
-						new BadPeerASNotificationPacket(), 
-						new BgpEventFireChannelFutureListener(ctx));
-				return;
+				AutonomousSystem4Capability as4cap = openPacket.findCapability(AutonomousSystem4Capability.class);
+				
+				if(as4cap == null) {
+					log.error("missing Autonomous system 4-octet capability");
+					
+					NotificationHelper.sendNotification(ctx, 
+							new BadPeerASNotificationPacket(), 
+							new BgpEventFireChannelFutureListener(ctx));
+					return;					
+				}
+				
+				if(as4cap.getAutonomousSystem() != peerConnInfo.getRemoteAS()) {
+					log.error("expected remote autonomous system {}, received autonomous system {}", 
+							peerConnInfo.getRemoteAS(), 
+							as4cap.getAutonomousSystem());
+					
+					NotificationHelper.sendNotification(ctx, 
+							new BadPeerASNotificationPacket(), 
+							new BgpEventFireChannelFutureListener(ctx));
+					return;					
+				}
+			} else {
+				if(openPacket.getAutonomousSystem() != peerConnInfo.getRemoteAS()) {	
+					log.error("expected remote autonomous system {}, received autonomous system {}", 
+							peerConnInfo.getRemoteAS(), 
+							openPacket.getAutonomousSystem());
+					
+					NotificationHelper.sendNotification(ctx, 
+							new BadPeerASNotificationPacket(), 
+							new BgpEventFireChannelFutureListener(ctx));
+					return;
+				}
+				
+				// we may have an optional AS4 capability but if we have it it must carry the same AS number as the 2-octet AS number
+				AutonomousSystem4Capability as4cap = openPacket.findCapability(AutonomousSystem4Capability.class);
+				
+				if(as4cap != null) {
+					if(as4cap.getAutonomousSystem() != peerConnInfo.getRemoteAS()) {
+						log.error("expected remote autonomous system {}, received autonomous system {}", 
+								peerConnInfo.getRemoteAS(), 
+								as4cap.getAutonomousSystem());
+						
+						NotificationHelper.sendNotification(ctx, 
+								new BadPeerASNotificationPacket(), 
+								new BgpEventFireChannelFutureListener(ctx));
+						return;						
+					}
+				}
 			}
+			
 		}
 		
 		ctx.sendUpstream(e);

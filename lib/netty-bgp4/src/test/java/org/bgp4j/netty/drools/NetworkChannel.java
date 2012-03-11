@@ -17,7 +17,13 @@
  */
 package org.bgp4j.netty.drools;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -26,9 +32,34 @@ import org.jboss.netty.channel.Channel;
 public class NetworkChannel {
 
 	private Channel channel;
+	private FactUpdateInvoker updater;
+	private List<BGPv4Packet> sentStream = new LinkedList<BGPv4Packet>();
+	private List<BGPv4Packet> receivedStream = new LinkedList<BGPv4Packet>();
 	
 	public NetworkChannel(Channel channel) {
 		this.channel = channel;
 	}
 
+	public void sentPacket(final BGPv4Packet packet) {
+		channel.write(packet).addListener(new ChannelFutureListener() {
+			
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				sentStream.add(packet);
+				updater.invokeFactUpdate();
+			}
+		});
+	}
+	
+	public void receivePacket(BGPv4Packet packet) {
+		this.receivedStream.add(packet);
+		updater.invokeFactUpdate();
+	}
+
+	/**
+	 * @param updater the updater to set
+	 */
+	void setUpdater(FactUpdateInvoker updater) {
+		this.updater = updater;
+	}
 }

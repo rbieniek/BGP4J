@@ -19,6 +19,7 @@ package org.bgp4j.netty.drools;
 
 import junit.framework.Assert;
 
+import org.bgp4.config.nodes.PeerConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -37,9 +38,19 @@ import org.jboss.netty.channel.SimpleChannelHandler;
  */
 public class DroolsChannelHandler extends SimpleChannelHandler {
 
+	private class FactUpdateinvokerImpl implements FactUpdateInvoker {
+
+		@Override
+		public void invokeFactUpdate() {
+			session.update(channelHandle, channel);
+		}
+		
+	}
+	
 	private KnowledgeBase knowledgeBase;
 	private StatefulKnowledgeSession session;
 	private FactHandle channelHandle;
+	NetworkChannel channel;
 	
 	public DroolsChannelHandler(String rulesFile) {
 		KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -53,17 +64,26 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 		
 	}
 	
-	public void initialize() {
+	public void initialize(PeerConfiguration peerConfiguration) {
 		session = this.knowledgeBase.newStatefulKnowledgeSession();
+		
+		session.insert(peerConfiguration);
 	}
 
+	public void shutdown() {
+		if(session != null)
+			session.dispose();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelOpen(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
 	 */
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		channelHandle = session.insert(new NetworkChannel(e.getChannel()));
-		session.fireAllRules();
+		this.channel = new NetworkChannel(e.getChannel());
+		this.channel.setUpdater(new FactUpdateinvokerImpl());
+		this.channelHandle = session.insert(this.channel);
+		this.session.fireAllRules();
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +91,10 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		session.retract(channelHandle);
+		this.session.retract(channelHandle);
+		this.channelHandle = null;
+		this.channel = null;
+		this.channel.setUpdater(null);
 		session.fireAllRules();
 	}
 }

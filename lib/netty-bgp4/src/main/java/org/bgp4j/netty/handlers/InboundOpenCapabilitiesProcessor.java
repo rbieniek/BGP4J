@@ -78,7 +78,6 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 						return;						
 					}					
 				}
-				open.setAs4AutonomousSystem(capASNumber);
 			}
 		}
 		

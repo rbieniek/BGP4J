@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.AutonomousSystem4Capability;
 import org.bgp4j.netty.ASType;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.LocalChannelBGPv4TestBase;
@@ -117,7 +118,7 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
 		Assert.assertEquals(12345, consumed.getBgpIdentifier());
-		Assert.assertEquals(64172, consumed.getEffectiveAutonomousSystem());
+		Assert.assertEquals(64172, consumed.getAutonomousSystem());
 	}
 	
 	@Test
@@ -130,9 +131,9 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		OpenPacket open = new OpenPacket();
 		
 		open.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
-		open.setAs4AutonomousSystem(641720);
+		open.getCapabilities().add(new AutonomousSystem4Capability(641720));
 		open.setBgpIdentifier(12345);
-		
+			
 		clientChannel.write(open);
 		
 		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
@@ -141,7 +142,40 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
 		Assert.assertEquals(12345, consumed.getBgpIdentifier());
-		Assert.assertEquals(641720, consumed.getEffectiveAutonomousSystem());
+		Assert.assertEquals(BGPv4Constants.BGP_AS_TRANS, consumed.getAutonomousSystem());
+		AutonomousSystem4Capability as4cap = consumed.findCapability(AutonomousSystem4Capability.class);
+		
+		Assert.assertNotNull(as4cap);
+		Assert.assertEquals(641720, as4cap.getAutonomousSystem());
+	}
+	
+	
+	@Test
+	public void testPassOpenAS4MessageWith2OctetsAS() throws Exception {
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		peerInfo.setRemoteBgpIdentifier(12345);
+
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+		open.getCapabilities().add(new AutonomousSystem4Capability(64172));
+		open.setBgpIdentifier(12345);
+			
+		clientChannel.write(open);
+		
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+
+		Assert.assertEquals(12345, consumed.getBgpIdentifier());
+		Assert.assertEquals(64172, consumed.getAutonomousSystem());
+		AutonomousSystem4Capability as4cap = consumed.findCapability(AutonomousSystem4Capability.class);
+		
+		Assert.assertNotNull(as4cap);
+		Assert.assertEquals(64172, as4cap.getAutonomousSystem());
 	}
 	
 	@Test
@@ -185,4 +219,72 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		Assert.assertEquals(BadBgpIdentifierNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
 		assertNotificationEvent(BadBgpIdentifierNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}
+
+	@Test
+	public void testRejectOpenAS4MessageWith2OctetASNotMatching4OctetAS() throws Exception {
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setLocalAS(64172);
+		peerInfo.setRemoteAS(64172);
+		peerInfo.setRemoteBgpIdentifier(12345);
+
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+		open.getCapabilities().add(new AutonomousSystem4Capability(64173));
+		open.setBgpIdentifier(12345);
+			
+		clientChannel.write(open);
+		
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
+		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+	}
+
+	@Test
+	public void testRejectOpenAS4MessageWith2OctetASNotASTrans() throws Exception {
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setLocalAS(641720);
+		peerInfo.setRemoteAS(641720);
+		peerInfo.setRemoteBgpIdentifier(12345);
+
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+		open.getCapabilities().add(new AutonomousSystem4Capability(641720));
+		open.setBgpIdentifier(12345);
+			
+		clientChannel.write(open);
+		
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
+		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+	}
+	
+
+	@Test
+	public void testRejectOpenAS4MessageWith4OctetASNotMatching() throws Exception {
+		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_4OCTETS);
+		peerInfo.setLocalAS(641720);
+		peerInfo.setRemoteAS(641720);
+		peerInfo.setRemoteBgpIdentifier(12345);
+
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
+		open.getCapabilities().add(new AutonomousSystem4Capability(641721));
+		open.setBgpIdentifier(12345);
+			
+		clientChannel.write(open);
+		
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
+		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+	}
+	
 }

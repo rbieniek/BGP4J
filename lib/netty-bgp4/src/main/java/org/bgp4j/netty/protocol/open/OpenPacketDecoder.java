@@ -113,12 +113,6 @@ public class OpenPacketDecoder {
 			}
 		}
 		
-		for(Capability cap : packet.getCapabilities()) {
-			if(cap instanceof AutonomousSystem4Capability) {
-				packet.setAs4AutonomousSystem(((AutonomousSystem4Capability)cap).getAutonomousSystem());
-			}
-		}
-		
 		return packet;
 	}
 

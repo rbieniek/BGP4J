@@ -101,7 +101,7 @@ public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestB
 	
 		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
-		Assert.assertEquals(64172, consumed.getEffectiveAutonomousSystem());	
+		Assert.assertEquals(64172, consumed.getAutonomousSystem());	
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestB
 		OpenPacket open = new OpenPacket();
 		
 		open.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
-		open.setAs4AutonomousSystem(641723);
+		open.getCapabilities().add(new AutonomousSystem4Capability(641723));
 		
 		clientChannel.write(open);
 		
@@ -118,7 +118,12 @@ public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestB
 	
 		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
-		Assert.assertEquals(641723, consumed.getEffectiveAutonomousSystem());	
+		Assert.assertEquals(BGPv4Constants.BGP_AS_TRANS, consumed.getAutonomousSystem());	
+		
+		AutonomousSystem4Capability as4cap = consumed.findCapability(AutonomousSystem4Capability.class);
+		
+		Assert.assertNotNull(as4cap);
+		Assert.assertEquals(641723, as4cap.getAutonomousSystem());
 	}
 	
 	@Test
@@ -135,8 +140,12 @@ public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestB
 	
 		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
 
-		Assert.assertEquals(64172, consumed.getEffectiveAutonomousSystem());
+		Assert.assertEquals(64172, consumed.getAutonomousSystem());
 		
+		AutonomousSystem4Capability as4cap = consumed.findCapability(AutonomousSystem4Capability.class);
+		
+		Assert.assertNotNull(as4cap);
+		Assert.assertEquals(64172, as4cap.getAutonomousSystem());
 	}
 	
 	@Test

@@ -126,7 +126,6 @@ public class CapabilitesNegotiator {
 				AutonomousSystem4Capability as4cap = (AutonomousSystem4Capability)cap;
 				
 				if(as4cap.getAutonomousSystem() > 65536) {
-					packet.setAs4AutonomousSystem(((AutonomousSystem4Capability) cap).getAutonomousSystem());
 					packet.setAutonomousSystem(BGPv4Constants.BGP_AS_TRANS);
 				}
 			}
