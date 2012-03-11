@@ -54,21 +54,9 @@ import org.junit.Test;
  */
 public class LocalhostNetworkChannelTest extends LocalhostNetworkChannelBGPv4TestBase {
 
-	private static ClientSocketChannelFactory clientFactory;
-	
-	@BeforeClass
-	public static void beforeClass() {
-		clientFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-	}
-	
-	@AfterClass
-	public static void afterClass() {
-		clientFactory.releaseExternalResources();
-		clientFactory = null;
-	}
-	
 	@Before
 	public void before() throws Exception {
+		clientFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 		clientBootstrap = new ClientBootstrap(clientFactory);
 		clientProxyHander = obtainInstance(ProxyChannelHandler.class);
 		
@@ -93,8 +81,12 @@ public class LocalhostNetworkChannelTest extends LocalhostNetworkChannelBGPv4Tes
 			clientBootstrap.releaseExternalResources();
 		
 		clientBootstrap = null;
+
+		clientFactory.releaseExternalResources();
+		clientFactory = null;
 	}
 	
+	private ClientSocketChannelFactory clientFactory;	
 	private ProxyChannelHandler clientProxyHander;
 	private ClientBootstrap clientBootstrap;
 	private Channel clientChannel;
