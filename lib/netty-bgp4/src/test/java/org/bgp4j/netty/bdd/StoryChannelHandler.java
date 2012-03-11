@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.StoryChannelHandler.java 
  */
-package org.bgp4j.netty;
+package org.bgp4j.netty.bdd;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.jbehave.core.annotations.Alias;

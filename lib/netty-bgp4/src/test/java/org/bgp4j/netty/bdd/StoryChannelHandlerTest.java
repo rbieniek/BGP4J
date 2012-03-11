@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.StoryChannelHandlerTest.java 
  */
-package org.bgp4j.netty;
+package org.bgp4j.netty.bdd;
 
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
@@ -32,6 +32,10 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.ConfigurationParser;
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.LocalhostNetworkChannelBGPv4TestBase;
+import org.bgp4j.netty.MessageRecordingChannelHandler;
+import org.bgp4j.netty.ProxyChannelHandler;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.bgp4j.netty.protocol.open.OpenPacket;
@@ -102,7 +106,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 	public void testBgpReceiveOpen() throws Exception {
 		StoryChannelHandler serverHandler = new StoryChannelHandler();
 		MessageRecordingChannelHandler clientHandler = new MessageRecordingChannelHandler();
-		PeerConfiguration clientConfiguration = loadConfiguration("org/bgp4j/netty/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("client");
+		PeerConfiguration clientConfiguration = loadConfiguration("org/bgp4j/netty/bdd/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("client");
 		
 		serverProxyChannelHandler.setProxiedHandler(serverHandler);
 		clientProxyHander.setProxiedHandler(clientHandler);
@@ -111,7 +115,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 		final Condition doneCondition = lock.newCondition();
 		final AtomicBoolean done = new AtomicBoolean(false);
 		
-		serverHandler.runStory("org/bgp4j/netty/story-channel-handler-wait-for-client-open.story", 
+		serverHandler.runStory("org/bgp4j/netty/bdd/story-channel-handler-wait-for-client-open.story", 
 				new StoryChannelHandler.ClientCallbacks() {
 			
 			@Override
@@ -135,7 +139,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 					lock.unlock();
 				}
 			}
-		}, loadConfiguration("org/bgp4j/netty/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("server"));
+		}, loadConfiguration("org/bgp4j/netty/bdd/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("server"));
 		
 		lock.lock();
 		try {
@@ -156,7 +160,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 	public void testBgpEchoOpen() throws Exception {
 		StoryChannelHandler serverHandler = new StoryChannelHandler();
 		MessageRecordingChannelHandler clientHandler = new MessageRecordingChannelHandler();
-		final PeerConfiguration clientConfiguration = loadConfiguration("org/bgp4j/netty/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("client");
+		final PeerConfiguration clientConfiguration = loadConfiguration("org/bgp4j/netty/bdd/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("client");
 		
 		serverProxyChannelHandler.setProxiedHandler(serverHandler);
 		clientProxyHander.setProxiedHandler(clientHandler);
@@ -165,7 +169,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 		final Condition doneCondition = lock.newCondition();
 		final AtomicBoolean done = new AtomicBoolean(false);
 		
-		serverHandler.runStory("org/bgp4j/netty/story-channel-handler-echo-open.story", 
+		serverHandler.runStory("org/bgp4j/netty/bdd/story-channel-handler-echo-open.story", 
 				new StoryChannelHandler.ClientCallbacks() {
 			
 			@Override
@@ -197,7 +201,7 @@ public class StoryChannelHandlerTest extends LocalhostNetworkChannelBGPv4TestBas
 					lock.unlock();
 				}
 			}
-		}, loadConfiguration("org/bgp4j/netty/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("server"));
+		}, loadConfiguration("org/bgp4j/netty/bdd/StoryChannelHandler-Config-With-BgpPeers.xml").getPeer("server"));
 		
 		lock.lock();
 		try {

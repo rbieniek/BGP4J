@@ -29,13 +29,10 @@ import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.ServerSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.junit.After;
@@ -58,37 +55,6 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 	
 	@AfterClass
 	public static void afterClassLocalhostNetworkChannelBGPv4TestBase() {
-	}
-	
-	protected static class ProxyChannelHandler extends SimpleChannelHandler {
-		
-		SimpleChannelHandler proxiedHandler;
-
-		/**
-		 * @return the proxiedHandler
-		 */
-		public SimpleChannelHandler getProxiedHandler() {
-			return proxiedHandler;
-		}
-
-		/**
-		 * @param proxiedHandler the proxiedHandler to set
-		 */
-		public void setProxiedHandler(SimpleChannelHandler proxiedHandler) {
-			this.proxiedHandler = proxiedHandler;
-		}
-
-		/**
-		 * @param ctx
-		 * @param e
-		 * @throws Exception
-		 * @see org.jboss.netty.channel.SimpleChannelHandler#handleUpstream(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelEvent)
-		 */
-		public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e)
-				throws Exception {
-			proxiedHandler.handleUpstream(ctx, e);
-		}
-
 	}
 	
 	@Before
