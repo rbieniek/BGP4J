@@ -34,19 +34,23 @@ public class CapabilitiesImpl implements Capabilities {
 	private TreeSet<Capability> requiredCapabilities = new TreeSet<Capability>();
 	private TreeSet<Capability> optionalCapabilities = new TreeSet<Capability>();
 	
-	CapabilitiesImpl() {
+	public CapabilitiesImpl() {
 	}
 	
-	CapabilitiesImpl(Capability[] requiredCaps) {
-		for(Capability cap : requiredCaps)
-			requiredCapabilities.add(cap);
+	public CapabilitiesImpl(Capability[] requiredCaps) {
+		if(requiredCaps != null) {
+			for(Capability cap : requiredCaps)
+				requiredCapabilities.add(cap);
+		}
 	}
 
-	CapabilitiesImpl(Capability[] requiredCaps, Capability[] optionalCaps) {
+	public CapabilitiesImpl(Capability[] requiredCaps, Capability[] optionalCaps) {
 		this(requiredCaps);
-		
-		for(Capability cap : optionalCaps)
-			optionalCapabilities.add(cap);
+
+		if(optionalCaps != null) {
+			for(Capability cap : optionalCaps)
+				optionalCapabilities.add(cap);
+		}
 	}
 
 	@Override

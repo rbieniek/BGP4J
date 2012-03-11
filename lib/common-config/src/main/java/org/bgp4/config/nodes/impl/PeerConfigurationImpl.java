@@ -133,7 +133,9 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				allowAutomaticStart, allowAutomaticStop, automaticStartInterval ,dampPeerOscillation, passiveTcpEstablishment, delayOpen, delayOpenTime);
 		
 		setCollisionDetectEstablishedState(collisionDetectEstablishedState);
-		setCapabilities(capabilities);
+
+		if(capabilities != null)
+			setCapabilities(capabilities);
 	}
 
 	@Override
@@ -305,6 +307,7 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		/*
 		if(getClass() != obj.getClass())
 			return false;
 		
@@ -330,6 +333,33 @@ public class PeerConfigurationImpl implements PeerConfiguration {
 				.append(peerName, o.peerName)
 				.append(remoteAS, o.remoteAS)
 				.append(remoteBgpIdentifier, o.remoteBgpIdentifier)
+				.isEquals();
+				*/
+		if(!PeerConfiguration.class.isAssignableFrom(obj.getClass()))
+			return false;
+		
+		PeerConfiguration o = (PeerConfiguration)obj;
+		
+		return (new EqualsBuilder())
+				.append(allowAutomaticStart, o.isAllowAutomaticStart())
+				.append(allowAutomaticStop, o.isAllowAutomaticStop())
+				.append(automaticStartInterval, o.getAutomaticStartInterval())
+				.append(capabilities, o.getCapabilities())
+				.append(clientConfig, o.getClientConfig())
+				.append(collisionDetectEstablishedState, o.isCollisionDetectEstablishedState())
+				.append(connectRetryTime, o.getConnectRetryTime())
+				.append(dampPeerOscillation, o.isDampPeerOscillation())
+				.append(delayOpen, o.isDelayOpen())
+				.append(delayOpenTime, o.getDelayOpenTime())
+				.append(holdTime, o.getHoldTime())
+				.append(holdTimerDisabled, o.isHoldTimerDisabled())
+				.append(idleHoldTime, o.getIdleHoldTime())	
+				.append(localAS, o.getLocalAS())
+				.append(localBgpIdentifier, o.getLocalBgpIdentifier())
+				.append(passiveTcpEstablishment, o.isPassiveTcpEstablishment())
+				.append(peerName, o.getPeerName())
+				.append(remoteAS, o.getRemoteAS())
+				.append(remoteBgpIdentifier, o.getRemoteBgpIdentifier())
 				.isEquals();
 	}
 

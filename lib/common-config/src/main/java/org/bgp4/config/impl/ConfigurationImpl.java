@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.Configuration;
+import org.bgp4.config.nodes.AS4OctetPeerConfigurationDecorator;
 import org.bgp4.config.nodes.BgpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
@@ -66,6 +67,8 @@ public class ConfigurationImpl implements Configuration {
 		
 		if(!(peerConfig instanceof PeerConfigurationTimerDecorator))
 			peerConfig = new FixedDefaultsPeerConfigurationTimerDecorator(peerConfig);
+		
+		peerConfig = new AS4OctetPeerConfigurationDecorator(peerConfig);
 		
 		peerMap.put(peerConfig.getPeerName(), peerConfig);
 	}
