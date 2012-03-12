@@ -16,7 +16,6 @@
  */
 package org.bgp4j.netty.handlers;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 import javax.inject.Inject;
@@ -54,21 +53,20 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		InetAddress remotePeer = ((InetSocketAddress)e.getRemoteAddress()).getAddress();
 		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM(remotePeer);
+		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getRemoteAddress());
 			
 		if(fsm == null) {
-			log.error("Internal Error: client for address " + remotePeer + " is unknown");
+			log.error("Internal Error: client for address " + e.getRemoteAddress() + " is unknown");
 			
 			ctx.getChannel().close();
 		} else {
 			if(e.getMessage() instanceof BGPv4Packet) {
-				fsm.handleClientMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
+				fsm.handleMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
 			} else if(e.getMessage() instanceof BgpEvent) {
-				fsm.handleClientEvent(ctx.getChannel(), (BgpEvent)e.getMessage());
+				fsm.handleEvent(ctx.getChannel(), (BgpEvent)e.getMessage());
 			} else {
-				log.error("unknown payload class " + e.getMessage().getClass().getName() + " received for peer " + remotePeer);
+				log.error("unknown payload class " + e.getMessage().getClass().getName() + " received for peer " + e.getRemoteAddress());
 			}
 		}
 	}
@@ -78,15 +76,12 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
+		log.info("connected to client " + e.getChannel().getRemoteAddress());
 		
-		log.info("connected to client " + addr);
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
+		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
 		
 		if(fsm == null) {
-			log.error("Internal Error: client for address " + addr + " is unknown");
+			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
 			
 			ctx.getChannel().close();
 		} else {
@@ -97,13 +92,13 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 				ChannelHandler handler = pipeline.get(handlerName);
 
 				if(handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
-					log.info("attaching peer connection information " + pci + " to handler " + handlerName + " for client " + addr);
+					log.info("attaching peer connection information " + pci + " to handler " + handlerName + " for client " + e.getChannel().getRemoteAddress());
 					
 					pipeline.getContext(handlerName).setAttachment(pci);
 				}
 			}
 			
-			fsm.handleClientConnected();
+			fsm.handleClientConnected(e.getChannel());
 		}
 	}
 
@@ -112,20 +107,17 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
+		log.info("disconnected from client " + e.getChannel().getRemoteAddress());
 		
-		log.info("disconnected from client " + addr);
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
+		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
 		
 		if(fsm == null) {
-			log.error("Internal Error: client for address " + addr + " is unknown");
+			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
 			
 			ctx.getChannel().close();
 		} else {
 			
-			fsm.handleClientDisconnected();
+			fsm.handleDisconnected(e.getChannel());
 		}
 	}
 
@@ -134,17 +126,14 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		InetSocketAddress sa = (InetSocketAddress)e.getValue();
-		InetAddress addr = sa.getAddress();
+		log.info("closed channel to client " + e.getChannel().getRemoteAddress());
 		
-		log.info("connected to client " + addr);
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM(addr);
+		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
 		
 		if(fsm == null) {
-			log.error("Internal Error: client for address " + addr + " is unknown");
+			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
 		} else {
-			fsm.handleClientClosed();
+			fsm.handleClosed(e.getChannel());
 		}
 	}
 }

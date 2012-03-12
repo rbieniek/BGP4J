@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
-import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.Configuration;
 import org.bgp4.config.ConfigurationParser;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
@@ -51,8 +49,6 @@ public class LocalhostNetworkChannelBGPv4ClientTestBase extends
 	protected Channel clientChannel;
 	protected ClientSocketChannelFactory clientFactory;
 	protected ProxyChannelHandler clientProxyHander;
-	protected ConfigurationParser parser;
-
 	@After
 	public void afterLocalhostNetworkChannelBGPv4ClientTestBase() {
 		if(clientChannel != null)
@@ -66,14 +62,10 @@ public class LocalhostNetworkChannelBGPv4ClientTestBase extends
 		
 		clientFactory.releaseExternalResources();
 		clientFactory = null;
-	
-		parser = null;
 	}
 
 	@Before
 	public void beforeLocalhostNetworkChannelBGPv4ClientTestBase() throws Exception {
-		parser = obtainInstance(ConfigurationParser.class);
-	
 		clientFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 		clientBootstrap = new ClientBootstrap(clientFactory);
 		clientProxyHander = obtainInstance(ProxyChannelHandler.class);
@@ -110,11 +102,6 @@ public class LocalhostNetworkChannelBGPv4ClientTestBase extends
 		}
 		
 		Assert.assertNotNull(clientChannel);		
-	}
-
-	// -- end of test messages
-	protected Configuration loadConfiguration(String fileName) throws Exception {
-		return parser.parseConfiguration(new XMLConfiguration(fileName));
 	}
 
 }

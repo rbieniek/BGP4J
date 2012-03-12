@@ -16,7 +16,9 @@
  */
 package org.bgp4j.netty.fsm;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.New;
@@ -24,9 +26,22 @@ import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.ASType;
+import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.FSMState;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.handlers.BgpEvent;
+import org.bgp4j.netty.handlers.NotificationEvent;
 import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.netty.protocol.FiniteStateMachineErrorNotificationPacket;
+import org.bgp4j.netty.protocol.HoldTimerExpiredNotificationPacket;
+import org.bgp4j.netty.protocol.KeepalivePacket;
+import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.netty.protocol.UnspecifiedCeaseNotificationPacket;
+import org.bgp4j.netty.protocol.open.OpenNotificationPacket;
+import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.netty.protocol.open.UnsupportedVersionNumberNotificationPacket;
+import org.bgp4j.netty.protocol.update.UpdateNotificationPacket;
+import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.bgp4j.netty.service.BGPv4Client;
 import org.jboss.netty.channel.Channel;
 import org.quartz.SchedulerException;
@@ -166,88 +181,99 @@ public class BGPv4FSM {
 
 		@Override
 		public void fireConnectRemotePeer() {
-			// TODO Auto-generated method stub
+			BGPv4Client client = clientProvider.get();
 			
+			managedChannels.add(new FSMChannelImpl(client.startClient(peerConfig).getChannel(), client));
 		}
 
 		@Override
 		public void fireDisconnectRemotePeer(FSMChannel channel) {
-			// TODO Auto-generated method stub
+			if(managedChannels.contains(channel)) {
+				((FSMChannelImpl)channel).getChannel().close();
+				managedChannels.remove(channel);
+			}			
 			
 		}
 
 		@Override
 		public void fireSendOpenMessage(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
+			if(managedChannels.contains(channel)) {
+				OpenPacket packet = new OpenPacket();
+				
+				packet.setAutonomousSystem(peerConfig.getLocalAS());
+				packet.setBgpIdentifier(peerConfig.getLocalBgpIdentifier());
+				packet.setHoldTime(peerConfig.getHoldTime());
+				packet.setProtocolVersion(BGPv4Constants.BGP_VERSION);
+				
+				capabilitiesNegotiator.insertLocalCapabilities(packet);
+				
+				((FSMChannelImpl)channel).getChannel().write(packet);
+			}			
 		}
 
 		@Override
 		public void fireSendInternalErrorNotification(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
+			if(managedChannels.contains(channel)) {
+				((FSMChannelImpl)channel).getChannel().write(new FiniteStateMachineErrorNotificationPacket());
+			}			
 		}
 
 		@Override
 		public void fireSendCeaseNotification(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
+			if(managedChannels.contains(channel)) {
+				((FSMChannelImpl)channel).getChannel().write(new UnspecifiedCeaseNotificationPacket());
+			}			
 		}
 
 		@Override
 		public void fireSendKeepaliveMessage(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
+			if(managedChannels.contains(channel)) {
+				((FSMChannelImpl)channel).getChannel().write(new KeepalivePacket());
+			}			
 		}
 
 		@Override
 		public void fireReleaseBGPResources() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void fireCompleteBGPInitialization() {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void fireSendHoldTimerExpiredNotification(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
+			if(managedChannels.contains(channel)) {
+				((FSMChannelImpl)channel).getChannel().write(new HoldTimerExpiredNotificationPacket());
+			}			
 		}
 
 		@Override
 		public void fireSendUpdateErrorNotification(FSMChannel channel) {
-			// TODO Auto-generated method stub
-			
 		}
 	}
 	
 	private @Inject Logger log;
 	
-	private InetAddress remotePeerAddress;
-	private @Inject @New Instance<BGPv4Client> clientProvider;
+	private @Inject Instance<BGPv4Client> clientProvider;
 	
 	private PeerConfiguration peerConfig;
 	private ASType asTypeInUse = ASType.AS_NUMBER_2OCTETS;
 
-	private Channel peerChannel;
-	
 	private @Inject InternalFSM internalFsm;
 	private @Inject CapabilitesNegotiator capabilitiesNegotiator;
 	
+	private Set<FSMChannelImpl> managedChannels = new HashSet<FSMChannelImpl>();
+	
 	public void configure(PeerConfiguration peerConfig) throws SchedulerException {
-		this.remotePeerAddress = peerConfig.getClientConfig().getRemoteAddress().getAddress();
 		this.peerConfig = peerConfig;
 		
 		internalFsm.setup(peerConfig, new InternalFSMCallbacksImpl());
 		capabilitiesNegotiator.setup(peerConfig);
+		
 	}
 
-	public InetAddress getRemotePeerAddress() {
-		return this.remotePeerAddress;
+	public InetSocketAddress getRemotePeerAddress() {
+		return peerConfig.getClientConfig().getRemoteAddress();
 	}
 
 	public PeerConnectionInformation getPeerConnectionInformation() {
@@ -267,50 +293,85 @@ public class BGPv4FSM {
 	}
 	
 	public void destroyFSM() {
-		
 		internalFsm.destroyFSM();
 	}
 
-	public void handleClientMessage(Channel channel, BGPv4Packet message) {
+	public void handleMessage(Channel channel, BGPv4Packet message) {
 		log.info("received message " + message);
+
+		if(message instanceof OpenPacket) {
+			capabilitiesNegotiator.recordPeerCapabilities((OpenPacket)message);
+			internalFsm.handleEvent(FSMEvent.bgpOpen(findWrapperForChannel(channel)));
+		} else if(message instanceof KeepalivePacket) {
+			internalFsm.handleEvent(FSMEvent.keepAliveMessage());
+		} else if(message instanceof UpdatePacket) {
+			internalFsm.handleEvent(FSMEvent.updateMessage());
+		} else if(message instanceof UnsupportedVersionNumberNotificationPacket) {
+			internalFsm.handleEvent(FSMEvent.notifyMessageVersionError());
+		} else if(message instanceof OpenNotificationPacket) {
+			internalFsm.handleEvent(FSMEvent.bgpOpenMessageError());
+		} else if(message instanceof UpdateNotificationPacket) {
+			internalFsm.handleEvent(FSMEvent.updateMessageError());
+		} else if(message instanceof NotificationPacket) {
+			internalFsm.handleEvent(FSMEvent.notifyMessage());
+		}
 	}
 
-	public void handleClientEvent(Channel channel, BgpEvent message) {
-		// TODO Auto-generated method stub
+	public void handleEvent(Channel channel, BgpEvent message) {
+		if(message instanceof NotificationEvent) {
+			for(NotificationPacket packet :((NotificationEvent)message).getNotifications()) {
+				if(packet instanceof UnsupportedVersionNumberNotificationPacket) {
+					internalFsm.handleEvent(FSMEvent.notifyMessageVersionError());
+				} else if(packet instanceof OpenNotificationPacket) {
+					internalFsm.handleEvent(FSMEvent.bgpOpenMessageError());
+				} else if(packet instanceof UpdateNotificationPacket) {
+					internalFsm.handleEvent(FSMEvent.updateMessageError());
+				} else
+					internalFsm.handleEvent(FSMEvent.notifyMessage());
+			}
+		}
+	}
+
+	public void handleClientConnected(Channel channel) {
+		FSMChannelImpl wrapper = findWrapperForChannel(channel);
 		
+		if(wrapper != null)
+			internalFsm.handleEvent(FSMEvent.tcpConnectionRequestAcked(wrapper));
 	}
-
-	public void handleClientConnected() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleClientClosed() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleClientDisconnected() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void handleServerMessage(Channel channel, BGPv4Packet message) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	public void handleServerOpened(Channel channel) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleServerDisconnected() {
-		// TODO Auto-generated method stub
+	public void handleClosed(Channel channel) {
+		FSMChannel wrapper = findWrapperForChannel(channel);
 		
+		if(wrapper != null)
+			internalFsm.handleEvent(FSMEvent.tcpConnectionFails(wrapper));
+	}
+
+	public void handleDisconnected(Channel channel) {
 	}
 
 	public boolean isCanAcceptConnection() {
 		return internalFsm.isCanAcceptConnection();
+	}
+	
+	public FSMState getState() {
+		return internalFsm.getState();
+	}
+	
+	private FSMChannelImpl findWrapperForChannel(Channel channel) {
+		FSMChannelImpl wrapper = null;
+		
+		for(FSMChannelImpl impl : managedChannels) {
+			if(impl.getChannel().equals(channel)) {
+				wrapper = impl;
+				break;
+			}
+		}
+		
+		return wrapper;
 	}
 }

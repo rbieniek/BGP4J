@@ -40,6 +40,10 @@ public class NetworkChannel {
 		this.channel = channel;
 	}
 
+	public void close() {
+		this.channel.close();
+	}
+	
 	public void sendPacket(final BGPv4Packet packet) {
 		channel.write(packet).addListener(new ChannelFutureListener() {
 			
@@ -75,6 +79,10 @@ public class NetworkChannel {
 	 */
 	public List<BGPv4Packet> getReceivedStream() {
 		return receivedStream;
+	}
+	
+	public void removeFromReceivedStream(BGPv4Packet packet) {
+		receivedStream.remove(packet);
 	}
 	
 	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass) {

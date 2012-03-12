@@ -17,43 +17,63 @@
  */
 package org.bgp4j.netty.fsm;
 
-import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.Configuration;
-import org.bgp4.config.ConfigurationParser;
-import org.bgp4j.netty.LocalChannelBGPv4TestBase;
+import junit.framework.Assert;
+
+import org.bgp4j.netty.FSMState;
+import org.bgp4j.netty.LocalhostNetworkChannelBGPv4TestBase;
+import org.bgp4j.netty.drools.DroolsChannelHandler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4FSMTest extends LocalChannelBGPv4TestBase {
+public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 
-	public class StubbedBGPv4FSM extends BGPv4FSM {
-		
-	}
-	
 	@Before
 	public void before() {
-		parser = obtainInstance(ConfigurationParser.class);
-		fsm = obtainInstance(StubbedBGPv4FSM.class);
+		drlHandler = obtainInstance(DroolsChannelHandler.class);
+		fsm = obtainInstance(BGPv4FSM.class);
+		fsmRegistry = obtainInstance(FSMRegistry.class);
 	}
 	
 	@After
 	public void after() {
-		parser = null;
+		fsm.destroyFSM();
 		fsm = null;
+		
+		fsmRegistry = null;
+		
+		drlHandler.shutdown();
+		drlHandler = null;
 	}
 	
-	private StubbedBGPv4FSM fsm;
-	private ConfigurationParser parser;
+	private BGPv4FSM fsm;
+	private DroolsChannelHandler drlHandler;
+	private FSMRegistry fsmRegistry;
 	
 	// -- begin of test messages
+	@Test
+	public void testDialogUntiEstablished() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools1")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+		
+		for(int i=0; i<10; i++) {
+			if(fsm.getState() == FSMState.Established)
+				break;
+			Thread.sleep(1000L);
+		}
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
 	
 	// -- end of test messages
-	private Configuration loadConfiguration(String fileName) throws Exception {
-		return parser.parseConfiguration(new XMLConfiguration(fileName));
-	}
 	
 }

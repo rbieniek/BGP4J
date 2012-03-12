@@ -18,13 +18,22 @@
 package org.bgp4j.netty;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
+import org.apache.commons.configuration.XMLConfiguration;
+import org.bgp4.config.Configuration;
+import org.bgp4.config.ConfigurationParser;
+import org.bgp4.config.nodes.ClientConfiguration;
+import org.bgp4.config.nodes.ClientConfigurationDecorator;
+import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4.config.nodes.PeerConfigurationDecorator;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -46,6 +55,46 @@ import org.junit.BeforeClass;
  */
 public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 
+	private static class ServerPortAwarePeerConfiguration extends PeerConfigurationDecorator {
+
+		private static class ServerPortClientConfig extends ClientConfigurationDecorator {
+			private int serverPort;
+			
+			public ServerPortClientConfig(ClientConfiguration decorated, int serverPort) {
+				super(decorated);
+				this.serverPort = serverPort;
+			}
+
+			/* (non-Javadoc)
+			 * @see org.bgp4.config.nodes.ClientConfigurationDecorator#getRemoteAddress()
+			 */
+			@Override
+			public InetSocketAddress getRemoteAddress() {
+				try {
+					return new InetSocketAddress(InetAddress.getLocalHost(), this.serverPort);
+				} catch (UnknownHostException e) {
+					throw new RuntimeException(e);
+				}
+			}			
+		}
+		
+		private int serverPort;
+		
+		public ServerPortAwarePeerConfiguration(PeerConfiguration peerConfiguration, int serverPort) {
+			super(peerConfiguration);
+			
+			this.serverPort = serverPort;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.bgp4.config.nodes.PeerConfigurationDecorator#getClientConfig()
+		 */
+		@Override
+		public ClientConfiguration getClientConfig() {
+			return new ServerPortClientConfig(super.getClientConfig(), serverPort);
+		}
+	}
+	
 	public static Set<Integer> usedPorts = new HashSet<Integer>();
 	
 	@BeforeClass
@@ -59,6 +108,8 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 	
 	@Before
 	public void beforeLocalhostNetworkChannelBGPv4TestBase() throws Exception {
+		parser = obtainInstance(ConfigurationParser.class);
+		
 		serverProxyChannelHandler = obtainInstance(ProxyChannelHandler.class);
 		serverSocketFactory = new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 		serverBootstrap = new ServerBootstrap(serverSocketFactory);
@@ -114,6 +165,8 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 
 		serverSocketFactory.releaseExternalResources();
 		serverSocketFactory = null;
+		
+		parser = null;
 	}
 	
 	private ServerSocketChannelFactory serverSocketFactory;
@@ -121,4 +174,14 @@ public class LocalhostNetworkChannelBGPv4TestBase  extends BGPv4TestBase {
 	protected ProxyChannelHandler serverProxyChannelHandler;
 	protected int serverPort;
 	protected Channel serverChannel;
+	protected ConfigurationParser parser;
+
+	// -- end of test messages
+	protected Configuration loadConfiguration(String fileName) throws Exception {
+		return parser.parseConfiguration(new XMLConfiguration(fileName));
+	}
+	
+	protected PeerConfiguration buildServerPortAwarePeerConfiguration(PeerConfiguration configuration) {
+		return new ServerPortAwarePeerConfiguration(configuration, serverPort);
+	}
 }

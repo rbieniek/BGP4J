@@ -17,7 +17,7 @@
  */
 package org.bgp4j.netty.fsm;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 @Singleton
 public class FSMRegistry {
 	
-	private Map<InetAddress, BGPv4FSM> fsmMap = new HashMap<InetAddress, BGPv4FSM>();
+	private Map<InetSocketAddress, BGPv4FSM> fsmMap = new HashMap<InetSocketAddress, BGPv4FSM>();
 	
 	private @Inject @New Instance<BGPv4FSM> fsmProvider;
 	private @Inject ApplicationConfiguration applicationConfiguration;
@@ -64,14 +64,20 @@ public class FSMRegistry {
 		}
 	}
 	
-	public BGPv4FSM lookupFSM(InetAddress peerAddress) {
+	public void registerFSM(BGPv4FSM fsm) {
+		synchronized (fsmMap) {
+			fsmMap.put(fsm.getRemotePeerAddress(), fsm);
+		}		
+	}
+	
+	public BGPv4FSM lookupFSM(InetSocketAddress peerAddress) {
 		synchronized (fsmMap) {
 			return fsmMap.get(peerAddress);
 		}
 	}
 	
 	public void destroyRegistry() {
-		for(InetAddress addr : fsmMap.keySet())
+		for(InetSocketAddress addr : fsmMap.keySet())
 			fsmMap.get(addr).stopFSM();
 		
 		fsmMap.clear();
@@ -79,7 +85,7 @@ public class FSMRegistry {
 	
 	public void peerChanged(@Observes PeerConfigurationEvent event) {
 		BGPv4FSM fsm = null;
-		InetAddress remotePeerAddress = null;
+		InetSocketAddress remotePeerAddress = null;
 		
 		switch(event.getType()) {
 		case CONFIGURATION_ADDED:
@@ -99,7 +105,7 @@ public class FSMRegistry {
 
 			break;
 		case CONFIGURATION_REMOVED:
-			remotePeerAddress = event.getFormer().getClientConfig().getRemoteAddress().getAddress();
+			remotePeerAddress = event.getFormer().getClientConfig().getRemoteAddress();
 
 			synchronized (fsmMap) {
 				fsm = fsmMap.remove(remotePeerAddress);
