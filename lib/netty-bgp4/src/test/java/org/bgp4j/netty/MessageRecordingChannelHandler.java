@@ -20,6 +20,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 
@@ -43,6 +47,13 @@ public class MessageRecordingChannelHandler extends SimpleChannelHandler {
 
 	private Map<Channel, List<ChannelEvent>> events = new HashMap<Channel, List<ChannelEvent>>();
 	private PeerConnectionInformation peerInfo;
+	private Lock lock;
+	private Condition condition;
+	
+	public MessageRecordingChannelHandler() {
+		lock = new ReentrantLock();
+		condition = lock.newCondition();
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
@@ -58,8 +69,25 @@ public class MessageRecordingChannelHandler extends SimpleChannelHandler {
 		if(!events.containsKey(channel))
 			events.put(channel, new LinkedList<ChannelEvent>());
 		events.get(channel).add(e);
+		
+		lock.lock();
+		try {
+			condition.signal();
+		} finally {
+			lock.unlock();
+		}
 	}
 
+	public boolean waitOnMessageReceived(int secondsToWait) throws InterruptedException  {
+		lock.lock();
+		
+		try {
+			return condition.await(secondsToWait, TimeUnit.SECONDS);
+		} finally {
+			lock.unlock();
+		}
+	}
+	
 	/**
 	 * @return the events
 	 */

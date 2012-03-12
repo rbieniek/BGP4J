@@ -31,7 +31,7 @@ public class KeepalivePacket extends BGPv4Packet {
 	}
 
 	@Override
-	protected int getType() {
+	public int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_KEEPALIVE;
 	}
 

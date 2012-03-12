@@ -48,7 +48,7 @@ public abstract class BGPv4Packet {
 	 * 
 	 * @return
 	 */
-	protected abstract int getType();
+	public abstract int getType();
 	
 	/**
 	 * wrap the BGP payload in a BGPv4 header field

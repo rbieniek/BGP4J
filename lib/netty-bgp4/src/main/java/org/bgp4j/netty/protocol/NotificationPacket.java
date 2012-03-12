@@ -49,7 +49,7 @@ public class NotificationPacket extends BGPv4Packet {
 	}
 
 	@Override
-	protected final int getType() {
+	public final int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_NOTIFICATION;
 	}
 

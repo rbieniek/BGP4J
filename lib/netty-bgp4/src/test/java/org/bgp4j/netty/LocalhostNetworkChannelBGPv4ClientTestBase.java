@@ -54,7 +54,7 @@ public class LocalhostNetworkChannelBGPv4ClientTestBase extends
 	protected ConfigurationParser parser;
 
 	@After
-	public void after() {
+	public void afterLocalhostNetworkChannelBGPv4ClientTestBase() {
 		if(clientChannel != null)
 			clientChannel.close();
 		clientChannel = null;
@@ -71,7 +71,7 @@ public class LocalhostNetworkChannelBGPv4ClientTestBase extends
 	}
 
 	@Before
-	public void before() throws Exception {
+	public void beforeLocalhostNetworkChannelBGPv4ClientTestBase() throws Exception {
 		parser = obtainInstance(ConfigurationParser.class);
 	
 		clientFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());

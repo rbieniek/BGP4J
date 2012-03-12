@@ -1,0 +1,56 @@
+#created on: 11.03.2012
+package org.bgp4j.netty.drools
+
+#list any import classes here.
+import org.bgp4.config.nodes.PeerConfiguration;
+
+import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.drools.NetworkChannel;
+import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
+import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
+
+rule "If connected and received OpenPacket"
+
+    when
+        $config : PeerConfiguration() 
+        $nc : NetworkChannel()
+        $open : OpenPacket(type == BGPv4Constants.BGP_PACKET_TYPE_OPEN) from $nc.receivedStream      
+    then
+    	insert($open);
+		
+end
+
+rule "If received OpenPacket and AS number and BGP Identifier match, then send OpenPacket reply"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(autonomousSystem == $config.remoteAS, bgpIdentifier == $config.remoteBgpIdentifier)
+	then
+		retract($open);
+		$nc.sendPacket(new OpenPacket(4, $config.getLocalAS(), $config.getLocalBgpIdentifier()));
+end
+
+rule "If received OpenPacket and AS number mismatch, then send BadPeerASNotificationPacket reply"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(autonomousSystem != $config.remoteAS)
+	then
+		retract($open);
+		$nc.sendPacket(new BadPeerASNotificationPacket());
+end
+
+rule "If received OpenPacket and BGP Identifier mismatch, then send BadBgpIdentifierNotificationPacket reply"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(bgpIdentifier != $config.remoteBgpIdentifier)
+	then
+		retract($open);
+		$nc.sendPacket(new BadBgpIdentifierNotificationPacket());
+end
+		

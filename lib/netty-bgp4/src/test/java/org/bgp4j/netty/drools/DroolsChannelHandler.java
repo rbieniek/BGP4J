@@ -17,12 +17,16 @@
  */
 package org.bgp4j.netty.drools;
 
+import javax.inject.Inject;
+
 import junit.framework.Assert;
 
 import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
@@ -30,38 +34,50 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.slf4j.Logger;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class DroolsChannelHandler extends SimpleChannelHandler {
-
+public class DroolsChannelHandler extends SimpleChannelHandler {	
 	private class FactUpdateinvokerImpl implements FactUpdateInvoker {
 
 		@Override
 		public void invokeFactUpdate() {
-			session.update(channelHandle, channel);
+			if(channel != null && channelHandle != null)
+				session.update(channelHandle, channel);
 		}
 		
 	}
 	
+	private @Inject Logger log;
 	private KnowledgeBase knowledgeBase;
 	private StatefulKnowledgeSession session;
 	private FactHandle channelHandle;
-	NetworkChannel channel;
+	private NetworkChannel channel;
+	
+	public DroolsChannelHandler() {}
 	
 	public DroolsChannelHandler(String rulesFile) {
+		loadRulesFile(rulesFile);
+	}
+	
+	public void loadRulesFile(String rulesFile) {
 		KnowledgeBuilder knowledgeBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 		
-		knowledgeBuilder.add(ResourceFactory.newFileResource(rulesFile), ResourceType.DRL);
+		knowledgeBuilder.add(ResourceFactory.newClassPathResource(rulesFile, getClass()), ResourceType.DRL);
 		
+		if(knowledgeBuilder.hasErrors()) {
+			for(KnowledgeBuilderError error : knowledgeBuilder.getErrors())
+				log.error(error.toString());
+		}
 		Assert.assertFalse(knowledgeBuilder.hasErrors());
 		
 		this.knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
-		this.knowledgeBase.addKnowledgePackages(knowledgeBuilder.getKnowledgePackages());
-		
+		this.knowledgeBase.addKnowledgePackages(knowledgeBuilder.getKnowledgePackages());		
 	}
 	
 	public void initialize(PeerConfiguration peerConfiguration) {
@@ -95,6 +111,16 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 		this.channelHandle = null;
 		this.channel = null;
 		this.channel.setUpdater(null);
+		session.fireAllRules();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
+	 */
+	@Override
+	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		if(e.getMessage() instanceof BGPv4Packet)
+			channel.receivePacket((BGPv4Packet)e.getMessage());
 		session.fireAllRules();
 	}
 }

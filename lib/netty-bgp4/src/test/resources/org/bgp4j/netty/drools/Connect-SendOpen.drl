@@ -4,24 +4,15 @@ package org.bgp4j.netty.drools
 #list any import classes here.
 import org.bgp4.config.nodes.PeerConfiguration;
 
-import org.bgp4j.netty.BGPv4Constants.java;
+import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.drools.NetworkChannel;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 
-rule "Your First Rule"
+rule "If connected send packet"
 
     when
         $nc : NetworkChannel()
         $config : PeerConfiguration() 
     then
-		nc.sendPacket();
-end
-
-rule "Your Second Rule"
-    #include attributes such as "salience" here...
-    when
-        #conditions
-    then
-        #actions
-
+		$nc.sendPacket(new OpenPacket(4, $config.getLocalAS(), $config.getLocalBgpIdentifier()));
 end

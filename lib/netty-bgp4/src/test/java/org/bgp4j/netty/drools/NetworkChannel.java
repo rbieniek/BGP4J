@@ -40,7 +40,7 @@ public class NetworkChannel {
 		this.channel = channel;
 	}
 
-	public void sentPacket(final BGPv4Packet packet) {
+	public void sendPacket(final BGPv4Packet packet) {
 		channel.write(packet).addListener(new ChannelFutureListener() {
 			
 			@Override
@@ -61,5 +61,43 @@ public class NetworkChannel {
 	 */
 	void setUpdater(FactUpdateInvoker updater) {
 		this.updater = updater;
+	}
+
+	/**
+	 * @return the sentStream
+	 */
+	public List<BGPv4Packet> getSentStream() {
+		return sentStream;
+	}
+
+	/**
+	 * @return the receivedStream
+	 */
+	public List<BGPv4Packet> getReceivedStream() {
+		return receivedStream;
+	}
+	
+	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass) {
+		return selectReceivedPacket(packetClass, 0);
+	}
+	
+	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass, int index) {
+		return selectAllReceivedPackets(packetClass).get(index);
+	}
+
+	public <T extends BGPv4Packet> List<T> selectAllReceivedPackets(Class<T> packetClass) {
+		return selectAllPackets(this.receivedStream, packetClass);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends BGPv4Packet> List<T> selectAllPackets(List<BGPv4Packet> source, Class<T> packetClass) {
+		List<T> result = new LinkedList<T>();
+		
+		for(BGPv4Packet packet : source) {
+			if(packet.getClass().equals(packetClass))
+				result.add((T)packet);
+		}
+		
+		return result;
 	}
 }

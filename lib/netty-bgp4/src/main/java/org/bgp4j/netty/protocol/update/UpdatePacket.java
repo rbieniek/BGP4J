@@ -139,7 +139,7 @@ public class UpdatePacket extends BGPv4Packet {
 	 * @see org.bgp4j.netty.protocol.BGPv4Packet#getType()
 	 */
 	@Override
-	protected int getType() {
+	public int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_UPDATE;
 	}
 
