@@ -47,6 +47,11 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 
 		@Override
 		public void invokeFactUpdate() {
+			if(channel != null && channel.isClosed()) {
+				session.retract(channelHandle);
+				channelHandle = null;
+				channel = null;
+			}
 			if(channel != null && channelHandle != null)
 				session.update(channelHandle, channel);
 		}
@@ -88,6 +93,9 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 	}
 
 	public void shutdown() {
+		if(channel != null) 
+			channel.close();
+		
 		if(session != null)
 			session.dispose();
 	}

@@ -42,6 +42,7 @@ public class NetworkChannel {
 
 	public void close() {
 		this.channel.close();
+		updater.invokeFactUpdate();
 	}
 	
 	public void sendPacket(final BGPv4Packet packet) {
@@ -107,5 +108,9 @@ public class NetworkChannel {
 		}
 		
 		return result;
+	}
+
+	public boolean isClosed() {
+		return !this.channel.isOpen();
 	}
 }
