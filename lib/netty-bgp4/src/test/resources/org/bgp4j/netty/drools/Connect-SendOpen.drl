@@ -8,6 +8,8 @@ import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.drools.NetworkChannel;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 
+global org.slf4j.Logger log;
+
 rule "If connected send packet"
 
     when

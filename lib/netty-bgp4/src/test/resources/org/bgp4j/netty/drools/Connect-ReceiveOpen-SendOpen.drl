@@ -10,6 +10,8 @@ import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
 
+global org.slf4j.Logger log;
+
 rule "If connected and received OpenPacket"
 
     when
