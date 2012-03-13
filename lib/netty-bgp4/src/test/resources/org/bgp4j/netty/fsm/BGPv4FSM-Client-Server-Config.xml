@@ -3,9 +3,7 @@
     <BgpPeers>
         
         <!--
-            - IBGP connection
-            - local BGP identifier lower than remote BGP identifier
-            - active connection, no peer dampening, no open delay
+            - IBGP connection (client side)
         -->
         <BgpPeer name="fsm1">
             <Client remote="localhost" />
@@ -16,9 +14,8 @@
         </BgpPeer>
 
         <!--
-            - IBGP connection
-            - local BGP identifier lower than remote BGP identifier
-            - active connection, no peer dampening, no open delay
+            - IBGP connection (server side side)
+            - configuration matches fsm1, client FSM must move to Established
         -->
         <BgpPeer name="drools1">
             <Client remote="localhost" />
@@ -26,7 +23,28 @@
             <BgpIdentifier local="${ipv4:192.168.4.3}" remote="${ipv4:192.168.4.2}" />
             <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
         </BgpPeer>
+                
+        <!--
+            - IBGP connection (server side side)
+            - configuration mismatch to fsm1 on AS number, client FSM must move to Idle
+        -->
+        <BgpPeer name="drools2">
+            <Client remote="localhost" />
+            <AutonomousSystem local="65281" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.3}" remote="${ipv4:192.168.4.2}" />
+            <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
+        </BgpPeer>
         
+        <!--
+            - IBGP connection (server side side)
+            - configuration mismatch to fsm1 on BGP identifier, client FSM must move to Idle
+        -->
+        <BgpPeer name="drools3">
+            <Client remote="localhost" />
+            <AutonomousSystem local="65281" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.3}" remote="${ipv4:192.168.4.2}" />
+            <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
+        </BgpPeer>
     </BgpPeers>
 
 </Config>

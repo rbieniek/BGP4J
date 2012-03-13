@@ -70,9 +70,9 @@ rule "If connected and received Keepalive then send keepalive back"
         $nc : NetworkChannel()
         $keep : KeepalivePacket(type == BGPv4Constants.BGP_PACKET_TYPE_KEEPALIVE) from $nc.receivedStream      
     then
+		$nc.removeFromReceivedStream($keep);
 		log.info("sending Keepalive packet");
     	$nc.sendPacket(new KeepalivePacket());
-		$nc.removeFromReceivedStream($keep);
 		
 end
 

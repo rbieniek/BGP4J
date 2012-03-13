@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;

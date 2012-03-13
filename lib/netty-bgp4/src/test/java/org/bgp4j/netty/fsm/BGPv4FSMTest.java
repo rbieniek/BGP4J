@@ -56,7 +56,7 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 	
 	// -- begin of test messages
 	@Test
-	public void testDialogUntiEstablished() throws Exception {
+	public void testDialogUntilEstablished() throws Exception {
 		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
 		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
 		serverProxyChannelHandler.setProxiedHandler(drlHandler);
@@ -64,14 +64,44 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools1")));
 		fsmRegistry.registerFSM(fsm);
 		fsm.startFSMAutomatic();
+				
+		Thread.sleep(5000L);
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
+	
+	@Test
+	public void testDialogMismatchOnASNumberUntilIdle() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools2")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+		
+		Thread.sleep(5000L);
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+	}
+	
+	
+	@Test
+	public void testDialogMismatchOnBgpIdentifierUntilIdle() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools3")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
 		
 		for(int i=0; i<10; i++) {
-			if(fsm.getState() == FSMState.Established)
+			if(fsm.getState() == FSMState.Idle)
 				break;
 			Thread.sleep(1000L);
 		}
 		
-		Assert.assertEquals(FSMState.Established, fsm.getState());
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
 	}
 	
 	// -- end of test messages

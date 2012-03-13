@@ -101,7 +101,7 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 		scheduler.getListenerManager().removeTriggerListener(clearTriggerData.getName());
 	};
 	
-	void scheduleJob(int whenInSeconds) throws SchedulerException {
+	synchronized void scheduleJob(int whenInSeconds) throws SchedulerException {
 		triggerKey = TriggerKey.triggerKey(UUID.randomUUID().toString());
 		
 		if(scheduler.checkExists(jobKey)) {
@@ -120,13 +120,13 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 		}
 	}
 	
-	boolean isJobScheduled() throws SchedulerException {
+	synchronized boolean isJobScheduled() throws SchedulerException {
 		if(triggerKey == null)
 			return false;
 		return scheduler.checkExists(triggerKey);
 	}
 
-	void cancelJob() throws SchedulerException {
+	synchronized void cancelJob() throws SchedulerException {
 		if(triggerKey != null) {
 			scheduler.unscheduleJob(triggerKey);
 			triggerKey = null;
@@ -137,7 +137,7 @@ class FireEventTimeManager<T extends FireEventTimeJob> {
 	/**
 	 * @return the firedWhen
 	 */
-	Date getFiredWhen() {
+	synchronized Date getFiredWhen() {
 		return firedWhen;
 	}
 }
