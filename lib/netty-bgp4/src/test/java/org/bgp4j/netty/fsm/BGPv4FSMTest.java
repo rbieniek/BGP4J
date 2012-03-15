@@ -57,7 +57,7 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 	// -- begin of test messages
 	@Test
 	public void testDialogUntilEstablished() throws Exception {
-		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Move-To-Established.drl");
 		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
 		serverProxyChannelHandler.setProxiedHandler(drlHandler);
 		
@@ -72,7 +72,7 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 	
 	@Test
 	public void testDialogMismatchOnASNumberUntilIdle() throws Exception {
-		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Move-To-Established.drl");
 		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
 		serverProxyChannelHandler.setProxiedHandler(drlHandler);
 		
@@ -87,7 +87,7 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 	
 	@Test
 	public void testDialogMismatchOnBgpIdentifierUntilIdle() throws Exception {
-		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Mover-To-Established.drl");
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Move-To-Established.drl");
 		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm1"));
 		serverProxyChannelHandler.setProxiedHandler(drlHandler);
 		
