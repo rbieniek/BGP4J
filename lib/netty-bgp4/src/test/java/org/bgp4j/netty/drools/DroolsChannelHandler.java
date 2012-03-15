@@ -85,12 +85,18 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 		this.knowledgeBase.addKnowledgePackages(knowledgeBuilder.getKnowledgePackages());		
 	}
 	
-	public void initialize(PeerConfiguration peerConfiguration) {
+	public void initialize(PeerConfiguration peerConfiguration, CompletedWaiter waiter) {
 		session = this.knowledgeBase.newStatefulKnowledgeSession();
 
 		session.setGlobal("log", log);
-	
+		if(waiter != null)
+			session.setGlobal("waiter", waiter);
+		
 		session.insert(peerConfiguration);
+	}
+
+	public void initialize(PeerConfiguration peerConfiguration) {
+		initialize(peerConfiguration, null);
 	}
 
 	public void shutdown() {
