@@ -84,6 +84,7 @@ public class NetworkChannel {
 	
 	public void removeFromReceivedStream(BGPv4Packet packet) {
 		receivedStream.remove(packet);
+		updater.invokeFactUpdate();
 	}
 	
 	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass) {
