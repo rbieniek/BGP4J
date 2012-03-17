@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol.open;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,10 +56,18 @@ public class OpenPacket extends BGPv4Packet {
 		this.holdTime = holdTime;
 	}
 	
-	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier, int holdTime, List<Capability> capabilities) {
+	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier, int holdTime, Collection<Capability> capabilities) {
 		this(protocolVersion, autonomousSysten, bgpIdentifier, holdTime);
 
-		this.capabilities = capabilities;
+		this.capabilities.addAll(capabilities);
+	}
+	
+	
+	public OpenPacket(int protocolVersion, int autonomousSysten, long bgpIdentifier, int holdTime, Capability[] capabilities) {
+		this(protocolVersion, autonomousSysten, bgpIdentifier, holdTime);
+
+		for(Capability cap : capabilities)
+			this.capabilities.add(cap);
 	}
 	
 	/**

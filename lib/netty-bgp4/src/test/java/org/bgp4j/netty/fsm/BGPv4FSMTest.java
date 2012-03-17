@@ -84,7 +84,6 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 		Assert.assertEquals(FSMState.Idle, fsm.getState());
 	}
 	
-	
 	@Test
 	public void testDialogMismatchOnBgpIdentifierUntilIdle() throws Exception {
 		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Move-To-Established.drl");
@@ -104,6 +103,86 @@ public class BGPv4FSMTest extends LocalhostNetworkChannelBGPv4TestBase {
 		Assert.assertEquals(FSMState.Idle, fsm.getState());
 	}
 	
+	
+	@Test
+	public void testDialogIncompatibleCapabilitiesUntilIdle() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Return-OpenPacket-With-Capabilities.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm2"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools4")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+		
+		for(int i=0; i<10; i++) {
+			if(fsm.getState() == FSMState.Idle)
+				break;
+			Thread.sleep(1000L);
+		}
+		
+		Assert.assertEquals(FSMState.Idle, fsm.getState());
+	}
+	
+	@Test
+	public void testDialogUntilEstablishedWithServerIPv4ClientIpv4() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Return-OpenPacket-With-Capabilities.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm2"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools5")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+				
+		Thread.sleep(5000L);
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
+	
+	@Test
+	public void testDialogUntilEstablishedWithServerIPv4ClientIpv4Ipv6() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Return-OpenPacket-With-Capabilities.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm2"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools6")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+				
+		Thread.sleep(5000L);
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
+	
+	@Test
+	public void testDialogUntilEstablishedWithServerIPv4IPv6ClientIpv4() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Return-OpenPacket-With-Capabilities.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm3"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools5")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+				
+		Thread.sleep(5000L);
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
+	
+	@Test
+	public void testDialogUntilEstablishedWithServerIPv4IPv6ClientIpv4IPv6() throws Exception {
+		drlHandler.loadRulesFile("org/bgp4j/netty/fsm/BGPv4FSM-Return-OpenPacket-With-Capabilities.drl");
+		drlHandler.initialize(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("fsm3"));
+		serverProxyChannelHandler.setProxiedHandler(drlHandler);
+		
+		fsm.configure(buildServerPortAwarePeerConfiguration(loadConfiguration("org/bgp4j/netty/fsm/BGPv4FSM-Client-Server-Config.xml").getPeer("drools6")));
+		fsmRegistry.registerFSM(fsm);
+		fsm.startFSMAutomatic();
+				
+		Thread.sleep(5000L);
+		
+		Assert.assertEquals(FSMState.Established, fsm.getState());
+	}
+
 	// -- end of test messages
 	
 }

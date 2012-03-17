@@ -13,14 +13,46 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.rib.Dummy.java 
+ * File: org.bgp4j.rib.RoutingInformationBaseCreated.java 
  */
 package org.bgp4j.rib;
+
+import org.bgp4j.net.AddressFamilyKey;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class DummyTest {
+public class RoutingInformationBaseCreated {
 
+	private String peerName;
+	private RIBSide side;
+	private AddressFamilyKey addressFamilyKey;
+	
+	RoutingInformationBaseCreated(String peerName, RIBSide side, AddressFamilyKey addressFamilyKey) {
+		this.peerName = peerName;
+		this.side = side;
+		this.addressFamilyKey = addressFamilyKey;
+	}
+
+	/**
+	 * @return the peerName
+	 */
+	public String getPeerName() {
+		return peerName;
+	}
+
+	/**
+	 * @return the side
+	 */
+	public RIBSide getSide() {
+		return side;
+	}
+
+	/**
+	 * @return the addressFamilyKey
+	 */
+	public AddressFamilyKey getAddressFamilyKey() {
+		return addressFamilyKey;
+	}
 }

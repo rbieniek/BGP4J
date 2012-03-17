@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.rib.Dummy.java 
+ * File: org.bgp4j.rib.PeerRoutingInformationBaseCreatedEvent.java 
  */
 package org.bgp4j.rib;
 
@@ -21,6 +21,18 @@ package org.bgp4j.rib;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class Dummy {
+public class PeerRoutingInformationBaseCreated {
 
+	private String peerName;
+	
+	PeerRoutingInformationBaseCreated(String peerName) {
+		this.peerName = peerName;
+	}
+
+	/**
+	 * @return the peerName
+	 */
+	public String getPeerName() {
+		return peerName;
+	}
 }

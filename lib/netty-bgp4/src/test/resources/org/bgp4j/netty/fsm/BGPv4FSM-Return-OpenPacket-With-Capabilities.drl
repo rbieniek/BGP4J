@@ -1,0 +1,80 @@
+#created on: 11.03.2012
+package org.bgp4j.netty.drools
+
+#list any import classes here.
+import org.bgp4.config.nodes.PeerConfiguration;
+
+import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.netty.drools.NetworkChannel;
+import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
+import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
+import org.bgp4j.netty.protocol.KeepalivePacket;
+
+global org.slf4j.Logger log;
+
+rule "If connected and received OpenPacket"
+
+    when
+        $config : PeerConfiguration() 
+        $nc : NetworkChannel()
+        $open : OpenPacket(type == BGPv4Constants.BGP_PACKET_TYPE_OPEN) from $nc.receivedStream      
+    then
+    	log.info("received OPEN packet");
+    	insert($open);
+		$nc.removeFromReceivedStream($open);
+end
+
+rule "If received OpenPacket and AS number and BGP Identifier match, then send OpenPacket reply w/ IPv4 capabilities only"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(autonomousSystem == $config.remoteAS, bgpIdentifier == $config.remoteBgpIdentifier)
+	then
+		retract($open);
+		log.info("sending OPEN packet");
+		$nc.sendPacket(new OpenPacket(4, $config.getLocalAS(), $config.getLocalBgpIdentifier(), $config.getHoldTime(), 
+						$config.getCapabilities().getRequiredCapabilities()));
+end
+
+rule "If received OpenPacket and AS number mismatch, then send BadPeerASNotificationPacket reply"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(autonomousSystem != $config.remoteAS)
+	then
+		retract($open);
+		log.info("sending BadPeerASNotification packet");
+		$nc.sendPacket(new BadPeerASNotificationPacket());
+		$nc.close();
+end
+
+rule "If received OpenPacket and BGP Identifier mismatch, then send BadBgpIdentifierNotificationPacket reply"
+
+	when
+		$config : PeerConfiguration()
+        $nc : NetworkChannel()
+		$open : OpenPacket(bgpIdentifier != $config.remoteBgpIdentifier)
+	then
+		retract($open);
+		log.info("sending BadBgpIdentifierNotification packet");
+		$nc.sendPacket(new BadBgpIdentifierNotificationPacket());
+		$nc.close();
+end
+
+rule "If connected and received Keepalive then send keepalive back"
+
+    when
+        $config : PeerConfiguration() 
+        $nc : NetworkChannel()
+        $keep : KeepalivePacket(type == BGPv4Constants.BGP_PACKET_TYPE_KEEPALIVE) from $nc.receivedStream      
+    then
+		$nc.removeFromReceivedStream($keep);
+		log.info("sending Keepalive packet");
+    	$nc.sendPacket(new KeepalivePacket());
+		
+end
+
+		

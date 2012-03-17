@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
-import org.bgp4.config.ConfigurationParser;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.jboss.netty.bootstrap.ClientBootstrap;
