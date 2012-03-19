@@ -34,7 +34,7 @@ public class UpdatePacket extends BGPv4Packet {
 
 	private List<NetworkLayerReachabilityInformation> withdrawnRoutes = new LinkedList<NetworkLayerReachabilityInformation>();
 	private List<NetworkLayerReachabilityInformation> nlris = new LinkedList<NetworkLayerReachabilityInformation>();
-	private List<Attribute> pathAttributes = new LinkedList<Attribute>();
+	private List<PathAttribute> pathAttributes = new LinkedList<PathAttribute>();
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.protocol.BGPv4Packet#encodePayload()
@@ -80,8 +80,8 @@ public class UpdatePacket extends BGPv4Packet {
 		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
 
 		if(this.pathAttributes != null) {
-			for(Attribute pathAttribute : pathAttributes) {
-				buffer.writeBytes(pathAttribute.encodePathAttribute());
+			for(PathAttribute pathAttribute : pathAttributes) {
+				buffer.writeBytes(PathAttributeCodec.encodePathAttribute(pathAttribute));
 			}
 		}
 		
@@ -128,8 +128,8 @@ public class UpdatePacket extends BGPv4Packet {
 		int size = 0;
 		
 		if(this.pathAttributes != null) {
-			for(Attribute  attr : pathAttributes)
-				size += attr.calculateEncodedPathAttributeLength();
+			for(PathAttribute  attr : pathAttributes)
+				size += PathAttributeCodec.calculateEncodedPathAttributeLength(attr);
 		}
 		
 		return size;
@@ -174,14 +174,14 @@ public class UpdatePacket extends BGPv4Packet {
 	/**
 	 * @return the pathAttributes
 	 */
-	public List<Attribute> getPathAttributes() {
+	public List<PathAttribute> getPathAttributes() {
 		return pathAttributes;
 	}
 
 	/**
 	 * @param pathAttributes the pathAttributes to set
 	 */
-	public void setPathAttributes(List<Attribute> pathAttributes) {
+	public void setPathAttributes(List<PathAttribute> pathAttributes) {
 		this.pathAttributes = pathAttributes;
 	}
 

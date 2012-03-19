@@ -17,41 +17,14 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AtomicAggregatePathAttribute extends Attribute {
+public class AtomicAggregatePathAttribute extends PathAttribute {
 	
 	public AtomicAggregatePathAttribute() {
 		super(Category.WELL_KNOWN_DISCRETIONARY);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ATOMIC_AGGREGATE;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		return null;
-	}
-
 }

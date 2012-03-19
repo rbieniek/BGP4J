@@ -75,139 +75,139 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeAS2PathAttribute() {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x00, // Path attribute: AS_PATH emtpy 
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS)));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
 				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x5678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x03, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_CONFED_SEQUENCE 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SEQUENCE, new int[] {
 						0x1234, 0x5678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x04, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SET, new int[] {
 						0x1234, 0x5678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
 				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
 				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 0x9abc,
 				}),
-		})).encodePathAttribute());
+		})));
 		
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x1234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SEQUENCE 2 AS 0x1234 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x5678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
 				0x02, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
 				0x02, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x5678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
 				0x02, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0x9abc,
 				}),
-		})).encodePathAttribute());
+		})));
 	
 	}
 
@@ -215,121 +215,121 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeAS4PathAttribute() {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x00, // Path attribute: AS4_PATH emtpy 
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS)));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
 				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SET 2 AS 0x12341234 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x56785678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
 				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
 				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x12341234 0x9abc9abc 
 				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 0x9abc9abc,
 				}),
-		})).encodePathAttribute());
+		})));
 		
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
 				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x12341234
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 2 AS 0x12341234 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x56785678
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
 				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
 				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc 9abc
 				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x56785678
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 
 				}),
-		})).encodePathAttribute());
+		})));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc9abc 
 				0x02, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x56785678 0x9abc9abc
-		}, (new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
 				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 0x9abc9abc,
 				}),
-		})).encodePathAttribute());
+		})));
 	
 	}
 
@@ -1371,7 +1371,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeMultiExitDiscPathAttribute() {
 		assertBufferContents(new byte[] {
 				(byte)0x80, (byte)0x04, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x08, (byte)0x00, // Path attribute: MULT_EXIT_DISC 2048
-		}, (new MultiExitDiscPathAttribute(2048)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new MultiExitDiscPathAttribute(2048)));
 		
 	}
 
@@ -1379,7 +1379,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeNextHopPathAttribute() throws Exception {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x03, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: NEXT_HOP 192.168.4.2
-		}, (new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 })).encodePathAttribute()));
+		}, PathAttributeCodec.encodePathAttribute(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }))));
 	}
 
 	@Test
@@ -1454,15 +1454,15 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeOriginPathAttribute() {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN IGP
-		}, (new OriginPathAttribute(Origin.IGP)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new OriginPathAttribute(Origin.IGP)));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x01, // Path attribute: ORIGIN EGP
-		}, (new OriginPathAttribute(Origin.EGP)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new OriginPathAttribute(Origin.EGP)));
 	
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE
-		}, (new OriginPathAttribute(Origin.INCOMPLETE)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new OriginPathAttribute(Origin.INCOMPLETE)));
 	}
 
 	@Test
@@ -1642,7 +1642,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeOriginatorIDPathAttribute() throws Exception {
 		assertBufferContents(new byte[] {
 				(byte)0x80, (byte)0x09, (byte)0x04, (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Path attribute: NEXT_HOP 192.168.4.2
-		}, (new OriginatorIDPathAttribute(0xc0a80402)).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new OriginatorIDPathAttribute(0xc0a80402)));
 	}
 
 	@Test
@@ -1650,7 +1650,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x80, (byte)0x0a, (byte)0x04, // Path attribute CLUSTER_LIST (4 octets)
 				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Cluster ID NEXT_HOP 192.168.4.2
-		}, (new ClusterListPathAttribute(new int[] { 0xc0a80402 })).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new ClusterListPathAttribute(new int[] { 0xc0a80402 })));
 	}
 
 	@Test
@@ -1659,6 +1659,6 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x80, (byte)0x0a, (byte)0x08, // Path attribute CLUSTER_LIST (4 octets)
 				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Cluster ID NEXT_HOP 192.168.4.2
 				(byte)0xc0, (byte)0xa8, (byte)0x05, (byte)0x03, // Cluster ID NEXT_HOP 192.168.5.3
-		}, (new ClusterListPathAttribute(new int[] { 0xc0a80402, 0xc0a80503 })).encodePathAttribute());
+		}, PathAttributeCodec.encodePathAttribute(new ClusterListPathAttribute(new int[] { 0xc0a80402, 0xc0a80503 })));
 	}
 }

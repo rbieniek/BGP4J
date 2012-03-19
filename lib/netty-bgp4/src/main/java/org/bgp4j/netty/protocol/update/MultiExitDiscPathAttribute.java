@@ -17,15 +17,12 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MultiExitDiscPathAttribute extends Attribute {
+public class MultiExitDiscPathAttribute extends PathAttribute {
 
 	public MultiExitDiscPathAttribute() {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
@@ -39,34 +36,6 @@ public class MultiExitDiscPathAttribute extends Attribute {
 
 	private int discriminator;
 	
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		return 4;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(4);
-		
-		buffer.writeInt(discriminator);
-		
-		return buffer;
-	}
-
 	/**
 	 * @return the discriminator
 	 */

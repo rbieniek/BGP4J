@@ -20,15 +20,11 @@ package org.bgp4j.netty.protocol.update;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CommunityPathAttribute extends Attribute {
+public class CommunityPathAttribute extends PathAttribute {
 
 	public CommunityPathAttribute() {
 		super(Category.OPTIONAL_TRANSITIVE);
@@ -65,37 +61,6 @@ public class CommunityPathAttribute extends Attribute {
 	
 	private int community;
 	private List<CommunityMember> members = new LinkedList<CommunityPathAttribute.CommunityMember>();
-	
-	
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_COMMUNITIES;
-	}
-
-	@Override
-	protected int getValueLength() {
-		int size = 4;
-		
-		if(members != null)
-			size += 4*members.size();
-		
-		return size;
-	}
-
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-		
-		buffer.writeInt(community);
-		if(members != null) {
-			for(CommunityMember member : members) {
-				buffer.writeShort(member.getAsNumber());
-				buffer.writeShort(member.getMemberFlags());
-			}
-		}
-		
-		return buffer;
-	}
 
 	/**
 	 * @return the community

@@ -33,13 +33,14 @@ import org.bgp4j.netty.PeerConnectionInformationAware;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.ASTypeAware;
-import org.bgp4j.netty.protocol.update.Attribute;
+import org.bgp4j.netty.protocol.update.PathAttribute;
 import org.bgp4j.netty.protocol.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
 import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.netty.protocol.update.NextHopPathAttribute;
 import org.bgp4j.netty.protocol.update.OriginPathAttribute;
+import org.bgp4j.netty.protocol.update.PathAttributeCodec;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -57,10 +58,10 @@ import org.slf4j.Logger;
 public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {	
 	private @Inject Logger log;
 	
-	private Set<Class<? extends Attribute>> mandatoryIBGPAttributes = new HashSet<Class<? extends Attribute>>();
-	private Set<Class<? extends Attribute>> mandatoryEBGPAttributes = new HashSet<Class<? extends Attribute>>();
-	private Map<Class<? extends Attribute>, Integer> as2ClazzCodeMap = new HashMap<Class<? extends Attribute>, Integer>();
-	private Map<Class<? extends Attribute>, Integer> as4ClazzCodeMap = new HashMap<Class<? extends Attribute>, Integer>();
+	private Set<Class<? extends PathAttribute>> mandatoryIBGPAttributes = new HashSet<Class<? extends PathAttribute>>();
+	private Set<Class<? extends PathAttribute>> mandatoryEBGPAttributes = new HashSet<Class<? extends PathAttribute>>();
+	private Map<Class<? extends PathAttribute>, Integer> as2ClazzCodeMap = new HashMap<Class<? extends PathAttribute>, Integer>();
+	private Map<Class<? extends PathAttribute>, Integer> as4ClazzCodeMap = new HashMap<Class<? extends PathAttribute>, Integer>();
 	
 	private UpdateAttributeChecker() {
 		mandatoryEBGPAttributes.add(OriginPathAttribute.class);
@@ -90,12 +91,12 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 		if(e.getMessage() instanceof UpdatePacket) {
 			PeerConnectionInformation connInfo = (PeerConnectionInformation)ctx.getAttachment();
 			UpdatePacket update = (UpdatePacket)e.getMessage();
-			List<Attribute> attributeFlagsErrorList = new LinkedList<Attribute>();
-			List<Class<? extends Attribute>> missingWellKnownList = new LinkedList<Class<? extends Attribute>>();
-			Set<Class<? extends Attribute>> givenAttributes = new HashSet<Class<? extends Attribute>>();
+			List<PathAttribute> attributeFlagsErrorList = new LinkedList<PathAttribute>();
+			List<Class<? extends PathAttribute>> missingWellKnownList = new LinkedList<Class<? extends PathAttribute>>();
+			Set<Class<? extends PathAttribute>> givenAttributes = new HashSet<Class<? extends PathAttribute>>();
 			
 			// check if passed optional / transitive bits match the presettings of the attribute type
-			for(Attribute attribute : update.getPathAttributes()) {
+			for(PathAttribute attribute : update.getPathAttributes()) {
 				boolean badAttr = false;
 
 				givenAttributes.add(attribute.getClass());
@@ -127,21 +128,21 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 						new BgpEventFireChannelFutureListener(ctx));
 			} else {
 				// check presence of mandatory attributes
-				Set<Class<? extends Attribute>> mandatoryAttributes;
+				Set<Class<? extends PathAttribute>> mandatoryAttributes;
 
 				if (connInfo.isIBGPConnection())
 					mandatoryAttributes = mandatoryIBGPAttributes;
 				else
 					mandatoryAttributes = mandatoryEBGPAttributes;
 
-				for (Class<? extends Attribute> attrClass : mandatoryAttributes) {
+				for (Class<? extends PathAttribute> attrClass : mandatoryAttributes) {
 					if (!givenAttributes.contains(attrClass)) {
 						missingWellKnownList.add(attrClass);
 					}
 				}
 
 				if (missingWellKnownList.size() > 0) {
-					Map<Class<? extends Attribute>, Integer> codeMap;
+					Map<Class<? extends PathAttribute>, Integer> codeMap;
 					List<NotificationPacket> notifications = new LinkedList<NotificationPacket>();
 
 					if(connInfo.isAS4OctetsInUse())
@@ -155,7 +156,7 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					else
 						codeMap = as2ClazzCodeMap;
 						
-					for(Class<? extends Attribute> attrClass : missingWellKnownList) {
+					for(Class<? extends PathAttribute> attrClass : missingWellKnownList) {
 						int code = codeMap.get(attrClass);
 						
 						log.info("detected missing well-known atribute, type " + code);
@@ -169,7 +170,7 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					boolean haveBougsWidth = false;
 					
 					// check path attributes for AS number width (2 or 4) settings which mismatch the connection configuration
-					for(Attribute attribute : update.getPathAttributes()) {
+					for(PathAttribute attribute : update.getPathAttributes()) {
 						if(attribute instanceof ASTypeAware) {
 							if(((ASTypeAware)attribute).getAsType() != connInfo.getAsTypeInUse()) {
 								haveBougsWidth = true;
@@ -192,16 +193,16 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 	        ctx.sendUpstream(e);
 	}
 
-	private byte[] serializeAttributes(List<Attribute> attrs) {
+	private byte[] serializeAttributes(List<PathAttribute> attrs) {
 		int size = 0;
 		
-		for(Attribute attr : attrs)
-			size += attr.calculateEncodedPathAttributeLength();
+		for(PathAttribute attr : attrs)
+			size += PathAttributeCodec.calculateEncodedPathAttributeLength(attr);
 		
 		ChannelBuffer buffer = ChannelBuffers.buffer(size);
 		
-		for(Attribute attr : attrs)
-			buffer.writeBytes(attr.encodePathAttribute());
+		for(PathAttribute attr : attrs)
+			buffer.writeBytes(PathAttributeCodec.encodePathAttribute(attr));
 		
 		byte[] b = new byte[size];
 		

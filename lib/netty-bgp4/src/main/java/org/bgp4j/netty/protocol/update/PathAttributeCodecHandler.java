@@ -12,46 +12,22 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.update.PathAttributeCodecHandler.java 
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.net.Origin;
+import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
- * ORIGIN (type code 1) BGPv4 path attribute
- * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OriginPathAttribute extends PathAttribute {
+public abstract class PathAttributeCodecHandler<T extends PathAttribute> {
 
-	private Origin origin;
+	public abstract int typeCode(T attr);
 	
-	public OriginPathAttribute() {
-		super(Category.WELL_KNOWN_MANDATORY);
-		
-		origin = Origin.INCOMPLETE;
-	}
+	public abstract int valueLength(T attr);
 	
-	public OriginPathAttribute(Origin origin) {
-		super(Category.WELL_KNOWN_MANDATORY);
-		
-		this.origin = origin;
-	}
-	
-	/**
-	 * @return the origin
-	 */
-	public Origin getOrigin() {
-		return origin;
-	}
-
-	/**
-	 * @param origin the origin to set
-	 */
-	public void setOrigin(Origin origin) {
-		this.origin = origin;
-	}
-
+	public abstract ChannelBuffer encodeValue(T attr);
 }

@@ -23,16 +23,12 @@ import java.util.List;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.SubsequentAddressFamily;
-import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.NLRICodec;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MultiProtocolReachableNLRI extends Attribute {
+public class MultiProtocolReachableNLRI extends PathAttribute {
 
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
@@ -76,59 +72,6 @@ public class MultiProtocolReachableNLRI extends Attribute {
 			this.nlris.add(nlri);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MP_REACH_NLRI;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		int size = 5; // 2 octets AFI +  1 octet SAFI + 1 octet NextHop address length + 1 octet reserved
-		
-		if(this.nextHopAddress != null)
-			size += this.nextHopAddress.length;
-		
-		if(this.nlris != null) {
-			for(NetworkLayerReachabilityInformation nlri : this.nlris)
-				size += NLRICodec.calculateEncodedNLRILength(nlri);
-		}
-		
-		return size;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-		
-		buffer.writeShort(this.addressFamily.toCode());
-		buffer.writeByte(this.subsequentAddressFamily.toCode());
-		
-		if(this.nextHopAddress != null) {
-			buffer.writeByte(this.nextHopAddress.length);
-			buffer.writeBytes(this.nextHopAddress);
-		} else {
-			buffer.writeByte(0);
-		}
-
-		buffer.writeByte(0); // write reserved field
-
-		if(this.nlris != null) {
-			for(NetworkLayerReachabilityInformation nlri : this.nlris)
-				buffer.writeBytes(NLRICodec.encodeNLRI(nlri));
-		}
-
-		return buffer;
-	}
-
 	/**
 	 * @return the addressFamily
 	 */

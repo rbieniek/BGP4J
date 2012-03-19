@@ -16,15 +16,12 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OriginatorIDPathAttribute extends Attribute {
+public class OriginatorIDPathAttribute extends PathAttribute {
 
 	public OriginatorIDPathAttribute() {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
@@ -38,34 +35,6 @@ public class OriginatorIDPathAttribute extends Attribute {
 
 	private int originatorID;
 	
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGINATOR_ID;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		return 4;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(4);
-		
-		buffer.writeInt(this.originatorID);
-		
-		return buffer;
-	}
-
 	/**
 	 * @return the nextHop
 	 */

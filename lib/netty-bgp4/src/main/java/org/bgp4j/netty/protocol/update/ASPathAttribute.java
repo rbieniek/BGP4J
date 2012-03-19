@@ -21,15 +21,12 @@ import java.util.List;
 
 import org.bgp4j.net.PathSegmentType;
 import org.bgp4j.netty.ASType;
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ASPathAttribute extends Attribute implements ASTypeAware {
+public class ASPathAttribute extends PathAttribute implements ASTypeAware {
 
 	public static class PathSegment {
 		private ASType asType;
@@ -84,36 +81,6 @@ public class ASPathAttribute extends Attribute implements ASTypeAware {
 			this.pathSegmentType = type;
 		}
 
-		private int getValueLength() {
-			int size = 2; // type + length field
-
-			if(this.ases != null && this.ases.size() > 0) {
-				size += this.ases.size() * (asType == ASType.AS_NUMBER_4OCTETS ? 4 : 2);
-			}
-			
-			return size;
-		}
-
-		private ChannelBuffer encodeValue() {
-			ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-			
-			buffer.writeByte(PathSegmentTypeCodec.toCode(this.pathSegmentType));
-			if(this.ases != null && this.ases.size() > 0) {
-				buffer.writeByte(this.ases.size());
-				
-				for(int as : this.ases) {
-					if(asType == ASType.AS_NUMBER_4OCTETS) 
-						buffer.writeInt(as);
-					else
-						buffer.writeShort(as);
-				}
-					
-				
-			} else {
-				buffer.writeByte(0);
-			}
-			return buffer;
-		}
 	}
 	
 	private ASType asType;
@@ -131,37 +98,6 @@ public class ASPathAttribute extends Attribute implements ASTypeAware {
 		for(PathSegment seg : segs) {
 			this.pathSegments.add(seg);
 		}
-	}
-
-	@Override
-	protected int getTypeCode() {
-		return (isFourByteASNumber() 
-				? BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH 
-						: BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH);
-	}
-
-	@Override
-	protected int getValueLength() {
-		int size = 0; // type + length field
-
-		if(this.pathSegments!= null) {
-			for(PathSegment seg : this.pathSegments)
-				size += seg.getValueLength();
-		}
-		
-		return size;
-	}
-
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-		
-		if(this.pathSegments != null && this.pathSegments.size() > 0) {
-			for(PathSegment seg : this.pathSegments)
-				buffer.writeBytes(seg.encodeValue());
-		}
-		
-		return buffer;
 	}
 
 	/**

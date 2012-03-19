@@ -31,7 +31,7 @@ import org.bgp4j.netty.MockPeerConnectionInformation;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.update.ASPathAttribute;
 import org.bgp4j.netty.protocol.update.AggregatorPathAttribute;
-import org.bgp4j.netty.protocol.update.Attribute;
+import org.bgp4j.netty.protocol.update.PathAttribute;
 import org.bgp4j.netty.protocol.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.netty.protocol.update.LocalPrefPathAttribute;
 import org.bgp4j.netty.protocol.update.MalformedAttributeListNotificationPacket;
@@ -361,7 +361,7 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 	@Test
 	public void testInvalidAttributeFlags() throws Exception {
 		UpdatePacket update;
-		Attribute attr;
+		PathAttribute attr;
 		
 		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
 		peerInfo.setLocalAS(64172);

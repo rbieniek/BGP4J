@@ -18,15 +18,11 @@ package org.bgp4j.netty.protocol.update;
 
 import java.net.Inet4Address;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NextHopPathAttribute extends Attribute {
+public class NextHopPathAttribute extends PathAttribute {
 
 	public NextHopPathAttribute() {
 		super(Category.WELL_KNOWN_MANDATORY);
@@ -40,34 +36,6 @@ public class NextHopPathAttribute extends Attribute {
 
 	private Inet4Address nextHop;
 	
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_NEXT_HOP;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		return 4;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.PathAttribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(4);
-		
-		buffer.writeBytes(this.nextHop.getAddress());
-		
-		return buffer;
-	}
-
 	/**
 	 * @return the nextHop
 	 */

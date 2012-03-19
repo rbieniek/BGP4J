@@ -284,7 +284,7 @@ public class UpdatePacketDecoder {
 	private AggregatorPathAttribute decodeAggregatorPathAttribute(ChannelBuffer buffer, ASType asType) {
 		AggregatorPathAttribute attr = new AggregatorPathAttribute(asType);
 		
-		if(buffer.readableBytes() != attr.getValueLength())
+		if(buffer.readableBytes() != PathAttributeCodec.valueLength(attr))
 			throw new AttributeLengthException();		
 		
 		if(asType == ASType.AS_NUMBER_4OCTETS)
@@ -401,8 +401,8 @@ public class UpdatePacketDecoder {
 		return attr;
 	}
 	 
-	private List<Attribute> decodePathAttributes(ChannelBuffer buffer) {
-		List<Attribute> attributes = new LinkedList<Attribute>();
+	private List<PathAttribute> decodePathAttributes(ChannelBuffer buffer) {
+		List<PathAttribute> attributes = new LinkedList<PathAttribute>();
 		
 		while(buffer.readable()) {
 			buffer.markReaderIndex();
@@ -424,7 +424,7 @@ public class UpdatePacketDecoder {
 	
 				buffer.readBytes(valueBuffer);
 	
-				Attribute attr = null;
+				PathAttribute attr = null;
 			
 				switch (typeCode) {
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR:

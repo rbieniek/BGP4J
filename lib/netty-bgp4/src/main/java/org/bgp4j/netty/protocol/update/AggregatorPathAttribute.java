@@ -20,15 +20,12 @@ package org.bgp4j.netty.protocol.update;
 import java.net.Inet4Address;
 
 import org.bgp4j.netty.ASType;
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AggregatorPathAttribute extends Attribute implements ASTypeAware {
+public class AggregatorPathAttribute extends PathAttribute implements ASTypeAware {
 
 	private ASType asType;
 	private int asNumber;
@@ -59,41 +56,6 @@ public class AggregatorPathAttribute extends Attribute implements ASTypeAware {
 	 */
 	public ASType getAsType() {
 		return asType;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return (isFourByteASNumber() 
-				? BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_AGGREGATOR 
-						: BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AGGREGATOR);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		return (isFourByteASNumber() ? 8 : 6);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-		
-		if(isFourByteASNumber())
-			buffer.writeInt(this.asNumber);
-		else
-			buffer.writeShort(this.asNumber);
-		
-		buffer.writeBytes(aggregator.getAddress());
-		
-		return buffer;
 	}
 
 	/**

@@ -20,15 +20,11 @@ package org.bgp4j.netty.protocol.update;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ClusterListPathAttribute extends Attribute {
+public class ClusterListPathAttribute extends PathAttribute {
 
 	private List<Integer> clusterIds = new LinkedList<Integer>();
 	
@@ -47,40 +43,6 @@ public class ClusterListPathAttribute extends Attribute {
 		
 		for(int clusterId : clusterIds)
 			this.clusterIds.add(clusterId);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getTypeCode()
-	 */
-	@Override
-	protected int getTypeCode() {
-		return BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_CLUSTER_LIST;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#getValueLength()
-	 */
-	@Override
-	protected int getValueLength() {
-		int size = 0;
-		
-		if(this.clusterIds != null)
-			size += this.clusterIds.size() * 4;
-		
-		return size;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.update.Attribute#encodeValue()
-	 */
-	@Override
-	protected ChannelBuffer encodeValue() {
-		ChannelBuffer buffer = ChannelBuffers.buffer(getValueLength());
-		
-		for(int clusterId : clusterIds)
-			buffer.writeInt(clusterId);
-		
-		return buffer;
 	}
 
 	/**

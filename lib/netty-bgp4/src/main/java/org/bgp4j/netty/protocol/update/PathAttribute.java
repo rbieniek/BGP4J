@@ -16,9 +16,6 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * Superclass for all BGPv4 path attributes
@@ -26,7 +23,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public abstract class Attribute {
+public abstract class PathAttribute {
 
 	/**
 	 * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -44,7 +41,7 @@ public abstract class Attribute {
 	private boolean partial;
 	private Category category;
 	
-	protected Attribute(Category category) {
+	protected PathAttribute(Category category) {
 		this.category = category;
 		
 		switch(category) {
@@ -67,69 +64,6 @@ public abstract class Attribute {
 		}
 	}
 	
-	/**
-	 * encode the path attribute for network transmission
-	 * 
-	 * @return an encoded formatted path attribute
-	 */
-	public ChannelBuffer encodePathAttribute()  {
-		ChannelBuffer buffer = ChannelBuffers.buffer(BGPv4Constants.BGP_PACKET_MAX_LENGTH);
-		int valueLength = getValueLength();
-		int attrFlagsCode = 0;
-				
-		if(isOptional())
-			attrFlagsCode |= BGPv4Constants.BGP_PATH_ATTRIBUTE_OPTIONAL_BIT;
-		
-		if(isTransitive())
-			attrFlagsCode |= BGPv4Constants.BGP_PATH_ATTRIBUTE_TRANSITIVE_BIT;
-
-		if(isPartial())
-			attrFlagsCode |= BGPv4Constants.BGP_PATH_ATTRIBUTE_PARTIAL_BIT;
-		
-		if(valueLength > 255)
-			attrFlagsCode |= BGPv4Constants.BGP_PATH_ATTRIBUTE_EXTENDED_LENGTH_BIT;
-		
-		attrFlagsCode |= (getTypeCode() & BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MASK);
-
-		buffer.writeShort(attrFlagsCode);
-		
-		if(valueLength > 255)
-			buffer.writeShort(valueLength);
-		else
-			buffer.writeByte(valueLength);
-		
-		if(valueLength > 0)
-			buffer.writeBytes(encodeValue());
-		
-		return buffer;
-	}
-	
-	public int calculateEncodedPathAttributeLength() {
-		int size = 2; // attribute flags + type field;
-		int valueLength = getValueLength();
-		
-		size += (valueLength > 255) ? 2 : 1; // length field;
-		size += valueLength;
-		
-		return size;
-	}
-	
-	/**
-	 * get the specific type code (see RFC 4271)
-	 * @return
-	 */
-	protected abstract int getTypeCode();
-
-	/**
-	 * get the attribute value length
-	 * @return
-	 */
-	protected abstract int getValueLength();
-
-	/**
-	 * get the encoded attribute value
-	 */
-	protected abstract ChannelBuffer encodeValue();
 	
 	/**
 	 * @return the partial
