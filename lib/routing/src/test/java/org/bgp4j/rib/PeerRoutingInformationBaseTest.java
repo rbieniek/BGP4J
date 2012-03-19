@@ -34,23 +34,105 @@ import org.junit.Test;
 public class PeerRoutingInformationBaseTest extends WeldTestCaseBase {
 
 	private PeerRoutingInformationBase prib;
+	private CreatedEventCatcher createCatcher;
+	private DestroyedEventCatcher destroyCatcher;
 	
 	@Before
 	public void before() {
+		createCatcher = obtainInstance(CreatedEventCatcher.class);
+		createCatcher.reset();
+		destroyCatcher = obtainInstance(DestroyedEventCatcher.class);
+		destroyCatcher.reset();
+		
 		prib = obtainInstance(PeerRoutingInformationBase.class);
+		prib.setPeerName("peer");
 	}
 	
 	@After
 	public void after() {
 		prib = null;
+		createCatcher = null;
+		destroyCatcher = null;
 	}
 	
 	@Test
-	public void testCreateRIB() {
+	public void testCreateRIBIPv4Unicast() {
 		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
 		
 		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
 		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
 
+		Assert.assertEquals(1, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+
+	@Test
+	public void testCreateRIBIPv4UnicastMulticast() {
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING)));
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING)));
+
+		Assert.assertEquals(2, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING)));
+	}
+
+	@Test
+	public void testCreateRIBIPv4IPv6Unicast() {
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+
+		Assert.assertEquals(2, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+	
+	@Test
+	public void testCreateRIBIPv4UnicastDestroyRIBIPv4Unicast() {
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+
+		Assert.assertEquals(1, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(0, destroyCatcher.ribSize());
+		Assert.assertEquals(0, destroyCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+		prib.destroyRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(1, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(1, destroyCatcher.ribSize());
+		Assert.assertEquals(1, destroyCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+	
+	@Test
+	public void testCreateRIBIPv4UnicastDestroyRIBIPv6Unicast() {
+		Assert.assertNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+
+		Assert.assertEquals(1, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(0, destroyCatcher.ribSize());
+		Assert.assertEquals(0, destroyCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+		prib.destroyRoutingInformationBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		Assert.assertNotNull(prib.routingBase(RIBSide.Local, new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(1, createCatcher.ribSize());
+		Assert.assertEquals(1, createCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertEquals(0, destroyCatcher.ribSize());
+		Assert.assertEquals(0, destroyCatcher.getRIBCreatedCount(new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
 	}
 }

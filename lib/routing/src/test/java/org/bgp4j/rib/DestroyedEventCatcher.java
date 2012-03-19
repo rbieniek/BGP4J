@@ -9,16 +9,16 @@ import javax.inject.Singleton;
 import org.bgp4j.net.AddressFamilyKey;
 
 @Singleton
-public class CreatedEventCatcher {
+public class DestroyedEventCatcher {
 	
 	private Map<String, Integer> pribCounts = new HashMap<String, Integer>();
 	private Map<AddressFamilyKey, Integer> ribCounts = new HashMap<AddressFamilyKey, Integer>();
 	
-	public void peerRibCreated(@Observes PeerRoutingInformationBaseCreated event) {
+	public void peerRibDestroyed(@Observes PeerRoutingInformationBaseDestroyed event) {
 		addEvent(pribCounts, event.getPeerName());
 	}
 	
-	public void ribCreated(@Observes RoutingInformationBaseCreated event) {
+	public void ribDestroyed(@Observes RoutingInformationBaseDestroyed event) {
 		addEvent(ribCounts, event.getAddressFamilyKey());
 	}
 	

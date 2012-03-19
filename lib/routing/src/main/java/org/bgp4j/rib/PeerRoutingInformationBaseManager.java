@@ -39,6 +39,7 @@ public class PeerRoutingInformationBaseManager {
 
 	private Map<String, PeerRoutingInformationBase> peerRibs = Collections.synchronizedMap(new HashMap<String, PeerRoutingInformationBase>());
 	private @Inject Event<PeerRoutingInformationBaseCreated> peerRibCreated;
+	private @Inject Event<PeerRoutingInformationBaseDestroyed> peerRibDestroyed;
 	private @Inject Instance<PeerRoutingInformationBase> pribProvider;
 	
 	public PeerRoutingInformationBase peerRoutingInformationBase(String peerName) {
@@ -65,7 +66,17 @@ public class PeerRoutingInformationBaseManager {
 		return result;
 	}
 
-
+	public void destroyPeerRoutingInformationBase(String peerName) {
+		PeerRoutingInformationBase prib = null;
+		
+		synchronized (peerRibs) {
+			prib = peerRibs.remove(peerName);
+		}
+		
+		if(prib != null)
+			peerRibDestroyed.fire(new PeerRoutingInformationBaseDestroyed(prib.getPeerName()));
+	}
+	
 	void reset() {
 		peerRibs.clear();
 	}

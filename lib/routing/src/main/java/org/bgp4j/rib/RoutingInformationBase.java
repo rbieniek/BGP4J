@@ -29,7 +29,7 @@ public class RoutingInformationBase {
 	private RIBSide side;
 	private AddressFamilyKey addressFamilyKey;
 	
-	public RoutingInformationBase() {
+	RoutingInformationBase() {
 	}
 
 	/**

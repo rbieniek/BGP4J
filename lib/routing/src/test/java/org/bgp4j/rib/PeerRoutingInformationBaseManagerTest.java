@@ -34,8 +34,10 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 
 	@Before
 	public void before() {
-		catcher = obtainInstance(CreatedEventCatcher.class);
-		catcher.reset();
+		createCatcher = obtainInstance(CreatedEventCatcher.class);
+		createCatcher.reset();
+		destroyCatcher = obtainInstance(DestroyedEventCatcher.class);
+		destroyCatcher.reset();
 		manager = obtainInstance(PeerRoutingInformationBaseManager.class);
 		manager.reset();
 	}
@@ -43,11 +45,13 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 	@After
 	public void after() {
 		manager = null;
-		catcher = null;
+		createCatcher = null;
+		destroyCatcher = null;
 	}
 	
 	private PeerRoutingInformationBaseManager manager;
-	private CreatedEventCatcher catcher;
+	private CreatedEventCatcher createCatcher;
+	private DestroyedEventCatcher destroyCatcher;
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testNullName() {
@@ -63,7 +67,6 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 	public void testBlankName() {
 		manager.peerRoutingInformationBase("  ");
 	}
-
 	
 	@Test
 	public void testDifferentGet() {
@@ -71,9 +74,9 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 		PeerRoutingInformationBase base2 = manager.peerRoutingInformationBase("bar");
 		
 		Assert.assertFalse(base1.equals(base2));
-		Assert.assertEquals(2, catcher.pribSize());
-		Assert.assertEquals(1, catcher.getPRIBCreatedCount("foo"));
-		Assert.assertEquals(1, catcher.getPRIBCreatedCount("bar"));
+		Assert.assertEquals(2, createCatcher.pribSize());
+		Assert.assertEquals(1, createCatcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(1, createCatcher.getPRIBCreatedCount("bar"));
 	}
 
 	@Test
@@ -82,7 +85,39 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 		PeerRoutingInformationBase base2 = manager.peerRoutingInformationBase("foo");
 		
 		Assert.assertEquals(base1, base2);
-		Assert.assertEquals(1, catcher.pribSize());
-		Assert.assertEquals(1, catcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(1, createCatcher.pribSize());
+		Assert.assertEquals(1, createCatcher.getPRIBCreatedCount("foo"));
+	}
+
+	@Test 
+	public void testDestroyExisting() {
+		manager.peerRoutingInformationBase("foo");
+	
+		Assert.assertEquals(1, createCatcher.pribSize());
+		Assert.assertEquals(1, createCatcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(0, destroyCatcher.pribSize());
+		Assert.assertEquals(0, destroyCatcher.getPRIBCreatedCount("foo"));
+
+		manager.destroyPeerRoutingInformationBase("foo");
+
+		Assert.assertEquals(1, createCatcher.pribSize());
+		Assert.assertEquals(1, createCatcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(1, destroyCatcher.pribSize());
+		Assert.assertEquals(1, destroyCatcher.getPRIBCreatedCount("foo"));
+	}
+
+	@Test 
+	public void testDestroyNonExisting() {
+		Assert.assertEquals(0, createCatcher.pribSize());
+		Assert.assertEquals(0, createCatcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(0, destroyCatcher.pribSize());
+		Assert.assertEquals(0, destroyCatcher.getPRIBCreatedCount("foo"));
+
+		manager.destroyPeerRoutingInformationBase("foo");
+
+		Assert.assertEquals(0, createCatcher.pribSize());
+		Assert.assertEquals(0, createCatcher.getPRIBCreatedCount("foo"));
+		Assert.assertEquals(0, destroyCatcher.pribSize());
+		Assert.assertEquals(0, destroyCatcher.getPRIBCreatedCount("foo"));
 	}
 }
