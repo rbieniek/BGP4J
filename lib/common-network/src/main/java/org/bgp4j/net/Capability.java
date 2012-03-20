@@ -17,6 +17,7 @@
 package org.bgp4j.net;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 
@@ -50,6 +51,14 @@ public abstract class Capability implements Comparable<Capability> {
 	@Override
 	public final int hashCode() {
 		return (new HashCodeBuilder()).append(orderNumber()).append(hashCodeSubclass()).toHashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 	/* (non-Javadoc)

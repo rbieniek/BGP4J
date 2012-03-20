@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -167,5 +168,13 @@ public class OutboundRouteFilteringCapability extends Capability {
 		}
 		
 		return builder.toComparison();
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

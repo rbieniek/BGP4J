@@ -20,6 +20,7 @@ package org.bgp4j.net;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -100,6 +101,14 @@ public class MultiProtocolCapability extends Capability {
 				.append(getAfi(), mp.getAfi())
 				.append(getSafi(), mp.getSafi())
 				.toComparison();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 }

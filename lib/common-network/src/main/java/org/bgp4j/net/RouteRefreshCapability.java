@@ -16,6 +16,8 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,6 +31,14 @@ public class RouteRefreshCapability extends Capability {
 	@Override
 	protected int orderNumber() {
 		return ORDER_NUMBER_ROUTE_REFRESH_CAPABILITY;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 }
