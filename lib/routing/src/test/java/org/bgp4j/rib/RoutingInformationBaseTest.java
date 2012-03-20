@@ -115,4 +115,20 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
 		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
 	}
+	
+	@Test
+	public void testAddThreePrefixRemoveOne() {
+		rib.addRoutes(Arrays.asList(MORE_NLRI_1, MORE_NLRI_2, LESS_NLRI), attrs);
+		
+		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
+		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
+		
+		rib.withdrawRoutes(Arrays.asList(MORE_NLRI_2));
+		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
+		Assert.assertEquals(1, catcher.getRouteWithdrawnEvents().size());
+		catcher.getRouteWithdrawnEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
+	}
 }
