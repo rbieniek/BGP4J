@@ -20,7 +20,11 @@ package org.bgp4j.netty.handlers;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
@@ -51,6 +55,8 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 			OpenPacket open = (OpenPacket)e.getMessage();
 			AutonomousSystem4Capability as4Cap = open.findCapability(AutonomousSystem4Capability.class);
 			
+			//
+			// TODO decide wether this functionality can and should be removed
 			if(as4Cap != null) {
 				int openASNumber = open.getAutonomousSystem();
 				int capASNumber = as4Cap.getAutonomousSystem();
@@ -78,6 +84,17 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 						return;						
 					}					
 				}
+			}
+			
+			MultiProtocolCapability ipv4UnicastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+			MultiProtocolCapability ipv4AnycastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING);
+			
+			if(open.getCapabilities().contains(ipv4AnycastCap)) {
+				open.getCapabilities().remove(ipv4AnycastCap);
+				open.getCapabilities().add(ipv4UnicastCap);
+				open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING));
+			} else if(!open.getCapabilities().contains(ipv4UnicastCap)) {
+				open.getCapabilities().add(ipv4UnicastCap);
 			}
 		}
 		

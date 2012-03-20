@@ -21,7 +21,10 @@ import java.util.UUID;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.MultiProtocolCapability;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.LocalChannelBGPv4TestBase;
 import org.bgp4j.netty.MessageRecordingChannelHandler;
@@ -178,5 +181,54 @@ public class InboundOpenCapabilitiesProcessorTest extends LocalChannelBGPv4TestB
 	
 		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
 		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+	}
+	
+	public void testIPv4MissingCapabilty() {
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+
+		clientChannel.write(open);
+		
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+
+		Assert.assertTrue(consumed.getCapabilities().contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+	
+	public void testIPv4AvailableCapabilty() {
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		
+		clientChannel.write(open);
+				
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+
+		Assert.assertTrue(consumed.getCapabilities().contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+
+	
+	public void testIPv4AnycastAvailableCapabilty() {
+		OpenPacket open = new OpenPacket();
+		
+		open.setAutonomousSystem(64172);
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING));
+		
+		clientChannel.write(open);
+				
+		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
+		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+	
+		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+
+		Assert.assertTrue(consumed.getCapabilities().contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertTrue(consumed.getCapabilities().contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING)));
 	}
 }

@@ -24,7 +24,7 @@
             <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
             <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
             <Capabilities>
-                <MultiProtocol addressFamily="IPv4" subsequentAddressFamily="unicast" />
+                <MultiProtocol addressFamily="IPv6" subsequentAddressFamily="unicast" />
             </Capabilities>
         </BgpPeer>
         
@@ -87,7 +87,7 @@
             <BgpIdentifier local="${ipv4:192.168.4.3}" remote="${ipv4:192.168.4.2}" />
             <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
             <Capabilities>
-                <MultiProtocol addressFamily="IPv6" subsequentAddressFamily="unicast" />
+                <MultiProtocol addressFamily="IPv6" subsequentAddressFamily="multicast" />
             </Capabilities>
         </BgpPeer>
         
