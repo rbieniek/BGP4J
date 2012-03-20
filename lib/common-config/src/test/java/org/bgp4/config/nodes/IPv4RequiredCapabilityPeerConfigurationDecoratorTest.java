@@ -87,16 +87,61 @@ public class IPv4RequiredCapabilityPeerConfigurationDecoratorTest {
 				0, // delay open time
 				false, // collisition established detection
 				new CapabilitiesImpl(null, new Capability[] {
-						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)
+						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING),
+						new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)
 				}))); // capabilities
 		
 		Assert.assertEquals(10, peer.getLocalAS());
 		Assert.assertEquals(11, peer.getRemoteAS());
 		
 		MultiProtocolCapability ipv4Cap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		MultiProtocolCapability ipv6Cap = new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 		
 		Assert.assertTrue(peer.getCapabilities().getRequiredCapabilities().contains(ipv4Cap));
 		Assert.assertFalse(peer.getCapabilities().getOptionalCapabilities().contains(ipv4Cap));
+		Assert.assertFalse(peer.getCapabilities().getRequiredCapabilities().contains(ipv6Cap));
+		Assert.assertTrue(peer.getCapabilities().getOptionalCapabilities().contains(ipv6Cap));
+	}
+
+
+	@Test
+	public void testIPv4AnycastOptionalCapabiltiesSet() throws Exception {
+		PeerConfiguration peer = new IPv4RequiredCapabilityPeerConfigurationDecorator(new PeerConfigurationImpl("peer1", // peer name
+				new ClientConfigurationImpl(InetAddress.getLocalHost(), 17179),  // client config
+				10, // local AS
+				11, // remote AS
+				1024, // local BGP identifier
+				2048, // remote identifier
+				15, // connect retry time
+				15, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				true, // allow automatic start
+				true, // allow automatic stop
+				60,  // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				0, // delay open time
+				false, // collisition established detection
+				new CapabilitiesImpl(null, new Capability[] {
+						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING),
+						new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)
+				}))); // capabilities
+		
+		Assert.assertEquals(10, peer.getLocalAS());
+		Assert.assertEquals(11, peer.getRemoteAS());
+		
+		MultiProtocolCapability ipv4UnicastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		MultiProtocolCapability ipv4MulticastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
+		MultiProtocolCapability ipv6Cap = new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		
+		Assert.assertTrue(peer.getCapabilities().getRequiredCapabilities().contains(ipv4UnicastCap));
+		Assert.assertFalse(peer.getCapabilities().getOptionalCapabilities().contains(ipv4UnicastCap));
+		Assert.assertFalse(peer.getCapabilities().getRequiredCapabilities().contains(ipv6Cap));
+		Assert.assertTrue(peer.getCapabilities().getOptionalCapabilities().contains(ipv6Cap));
+		Assert.assertFalse(peer.getCapabilities().getRequiredCapabilities().contains(ipv4MulticastCap));
+		Assert.assertTrue(peer.getCapabilities().getOptionalCapabilities().contains(ipv4MulticastCap));
 	}
 
 	@Test
@@ -130,5 +175,41 @@ public class IPv4RequiredCapabilityPeerConfigurationDecoratorTest {
 		
 		Assert.assertTrue(peer.getCapabilities().getRequiredCapabilities().contains(ipv4Cap));
 		Assert.assertFalse(peer.getCapabilities().getOptionalCapabilities().contains(ipv4Cap));
+	}
+
+	@Test
+	public void testIPv4AnycastRequiredCapabiltiesSet() throws Exception {
+		PeerConfiguration peer = new IPv4RequiredCapabilityPeerConfigurationDecorator(new PeerConfigurationImpl("peer1", // peer name
+				new ClientConfigurationImpl(InetAddress.getLocalHost(), 17179),  // client config
+				10, // local AS
+				11, // remote AS
+				1024, // local BGP identifier
+				2048, // remote identifier
+				15, // connect retry time
+				15, // hold time
+				false, // hold timer disabled
+				30, // idle hold time
+				true, // allow automatic start
+				true, // allow automatic stop
+				60,  // automatic start interval
+				false, // damp peer oscillation
+				false, // passive tcp establishment
+				false, // delay open
+				0, // delay open time
+				false, // collisition established detection
+				new CapabilitiesImpl(new Capability[] {
+						new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING)
+				}))); // capabilities
+		
+		Assert.assertEquals(10, peer.getLocalAS());
+		Assert.assertEquals(11, peer.getRemoteAS());
+		
+		MultiProtocolCapability ipv4UnicastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		MultiProtocolCapability ipv4MulticastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
+		
+		Assert.assertTrue(peer.getCapabilities().getRequiredCapabilities().contains(ipv4UnicastCap));
+		Assert.assertFalse(peer.getCapabilities().getOptionalCapabilities().contains(ipv4UnicastCap));
+		Assert.assertTrue(peer.getCapabilities().getRequiredCapabilities().contains(ipv4MulticastCap));
+		Assert.assertFalse(peer.getCapabilities().getOptionalCapabilities().contains(ipv4MulticastCap));
 	}
 }

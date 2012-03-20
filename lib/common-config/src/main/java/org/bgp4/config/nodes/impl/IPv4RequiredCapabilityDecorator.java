@@ -34,7 +34,9 @@ import org.bgp4j.net.SubsequentAddressFamily;
  */
 public class IPv4RequiredCapabilityDecorator extends CapabilitiesDecorator {
 
-	private MultiProtocolCapability ipv4Cap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+	private MultiProtocolCapability ipv4UnicastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+	private MultiProtocolCapability ipv4AnycastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING);
+	private MultiProtocolCapability ipv4MulticastCap = new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
 	
 	public IPv4RequiredCapabilityDecorator(Capabilities decorated) {
 		super(decorated);
@@ -47,10 +49,18 @@ public class IPv4RequiredCapabilityDecorator extends CapabilitiesDecorator {
 	public Set<Capability> getRequiredCapabilities() {
 		Set<Capability> caps = super.getRequiredCapabilities();
 		
-		if(!caps.contains(ipv4Cap)) {
+		if(caps.contains(ipv4AnycastCap)) {
 			caps = new TreeSet<Capability>(caps);
 			
-			caps.add(ipv4Cap);
+			caps.remove(ipv4AnycastCap);
+			caps.add(ipv4MulticastCap);
+			caps.add(ipv4UnicastCap);
+			caps = Collections.unmodifiableSet(caps);
+		}
+		if(!caps.contains(ipv4UnicastCap)) {
+			caps = new TreeSet<Capability>(caps);
+			
+			caps.add(ipv4UnicastCap);
 			caps = Collections.unmodifiableSet(caps);
 		}
 		
@@ -64,10 +74,17 @@ public class IPv4RequiredCapabilityDecorator extends CapabilitiesDecorator {
 	public Set<Capability> getOptionalCapabilities() {
 		Set<Capability> caps = super.getOptionalCapabilities();
 		
-		if(caps.contains(ipv4Cap)) {
+		if(caps.contains(ipv4AnycastCap)) {
 			caps = new TreeSet<Capability>(caps);
 			
-			caps.remove(ipv4Cap);
+			caps.remove(ipv4AnycastCap);
+			caps.add(ipv4MulticastCap);
+			caps = Collections.unmodifiableSet(caps);
+		}
+		if(caps.contains(ipv4UnicastCap)) {
+			caps = new TreeSet<Capability>(caps);
+			
+			caps.remove(ipv4UnicastCap);
 			caps = Collections.unmodifiableSet(caps);
 		}
 		
