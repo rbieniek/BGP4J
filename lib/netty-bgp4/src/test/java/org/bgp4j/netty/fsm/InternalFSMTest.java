@@ -3626,6 +3626,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		}
 
 		verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage(testBundle.getMatcherArg());
+		verify(callbacks).fireEstablished();
 	}
 
 	private void assertMachineInEstablishedState(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {

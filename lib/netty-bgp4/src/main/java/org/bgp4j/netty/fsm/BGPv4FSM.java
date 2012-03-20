@@ -249,6 +249,12 @@ public class BGPv4FSM {
 		@Override
 		public void fireSendUpdateErrorNotification(FSMChannel channel) {
 		}
+
+		@Override
+		public void fireEstablished() {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	private @Inject Logger log;

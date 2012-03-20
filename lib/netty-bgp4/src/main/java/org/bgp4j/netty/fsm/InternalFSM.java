@@ -1147,6 +1147,8 @@ public class InternalFSM {
 		
 		this.state = FSMState.Established;		
 		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
+		
+		callbacks.fireEstablished();
 	}
 
 	/**

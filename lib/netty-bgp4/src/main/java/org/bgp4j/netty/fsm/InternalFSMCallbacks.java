@@ -75,4 +75,9 @@ public interface InternalFSMCallbacks {
 	 * fire an notification to the peer that it sent a bad update
 	 */
 	void fireSendUpdateErrorNotification(FSMChannel channel);
+
+	/**
+	 * The connection has been established and an initial update packet can be sent
+	 */
+	void fireEstablished();
 }
