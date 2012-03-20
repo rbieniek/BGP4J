@@ -88,6 +88,12 @@ public class RoutingInformationBase {
 		routingTree.destroy();
 	}
 	
+	/**
+	 * Add a NLRI collection sharing a common collection of path attributes to the routing tree 
+	 * 
+	 * @param nlris
+	 * @param pathAttributes
+	 */
 	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
 			if(routingTree.addRoute(nlri, pathAttributes))
@@ -98,10 +104,26 @@ public class RoutingInformationBase {
 						pathAttributes));
 	}
 
-	public void removeRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
+	/**
+	 * Withdraw a NLRI collection from the routing tree 
+	 * 
+	 * @param nlris
+	 * @param pathAttributes
+	 */
+	public void withdrawRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
 			if(routingTree.withdrawRoute(nlri))
 				routeWithdrawnEvent.fire(new RouteWithdrawn(getPeerName(), getSide(), getAddressFamilyKey(), nlri));
 		
+	}
+	
+	/**
+	 * Lookup a route by a NLRI prefix. The lookup process may result in a specific, less specific route or no route at all
+	 * 
+	 * @param nlri prefix to look up
+	 * @return the result or <code>null</code> if no result can be found.
+	 */
+	public LookupResult lookupRoute(NetworkLayerReachabilityInformation nlri) {
+		return routingTree.lookupRoute(nlri);
 	}
 }

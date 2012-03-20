@@ -166,20 +166,85 @@ class RoutingTree {
 	}
 	
 	/**
-	 * Withdraw the (NLRI, Path attributes) prefix from the tree. 
+	 * Withdraw the (NLRI, Path attributes) tuple from the tree. 
 	 * 
 	 * @param nlri the NLRI prefix to withdraw
 	 * @return <code>true</code> if the node was removed, <code>false</code> otherwise
 	 */
 	synchronized boolean withdrawRoute(NetworkLayerReachabilityInformation nlri) {
-		return false;
+		return withdrawRoute(this.rootNode, nlri);
 	}
 
+	/**
+	 * Withdraw the (NLRI prefix, Path attributes) tuple from the tree. The rules for this pürocess are as follows:
+	 * <ol>
+	 * <li>If the NLRI prefix of a child node matches the to be remove NLRI prefix, the child node is removed and all
+	 * child nodes of the child node are added to the parent node.</li>
+	 * <li>If a child node NLRI is a less specific prefix of the to be removed NLRI prefix, recursively descend into the tree rooted 
+	 * by the child node</li>
+	 * </ol>
+	 * 
+	 * @param parent
+	 * @param nlri
+	 * @return
+	 */
+	private boolean withdrawRoute(RoutingTreeNode parent, NetworkLayerReachabilityInformation nlri) {
+		boolean withdrawn = false;
+		RoutingTreeNode candidate = null;
+		
+		for(RoutingTreeNode child : parent.getChildNodes()) {
+			if(child.getNlri().equals(nlri)) {
+				candidate = child;
+				break;
+			} else if(child.getNlri().isPrefixOf(nlri)) {
+				withdrawn = withdrawRoute(child, nlri);
+				break;
+			}
+		}
+		
+		if(candidate != null) {
+			parent.getChildNodes().addAll(candidate.getChildNodes());
+			parent.getChildNodes().remove(candidate);
+			
+			withdrawn = true;
+		}
+		
+		return withdrawn;
+	}
+	
 	/**
 	 * @return the rootNode
 	 */
 	RoutingTreeNode getRootNode() {
 		return rootNode;
 	}
+
+	/**
+	 * 
+	 * @param nlri
+	 * @return
+	 */
+	LookupResult lookupRoute(NetworkLayerReachabilityInformation nlri) {
+		return lookupRoute(this.rootNode, nlri);
+	}
 	
+	private LookupResult lookupRoute(RoutingTreeNode parent, NetworkLayerReachabilityInformation nlri) {
+		LookupResult result = null;
+		
+		for(RoutingTreeNode child : parent.getChildNodes()) {
+			if(child.getNlri().equals(nlri)) {
+				result = new LookupResult(child.getNlri(), child.getPathAttributes());
+				break;
+			} else if(child.getNlri().isPrefixOf(nlri)) {
+				// child node NLRI is less specific match --> descend into child node
+				result = lookupRoute(child, nlri);
+				
+				// child node lookup did not yield result --> build result from less specific child node NLRI
+				if(result == null)
+					result = new LookupResult(child.getNlri(), child.getPathAttributes());
+			}
+		}
+		
+		return result;
+	}	
 }
