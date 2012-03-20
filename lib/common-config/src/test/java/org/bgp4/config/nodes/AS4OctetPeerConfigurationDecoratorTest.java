@@ -231,5 +231,4 @@ public class AS4OctetPeerConfigurationDecoratorTest {
 		}
 		return result;
 	}
-
 }
