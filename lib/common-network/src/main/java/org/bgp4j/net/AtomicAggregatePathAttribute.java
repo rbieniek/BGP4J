@@ -13,15 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.ASType.java 
+ * File: org.bgp4j.netty.protocol.update.AttomicAggregatePathAttribute.java 
  */
-package org.bgp4j.netty;
+package org.bgp4j.net;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public enum ASType {
-	AS_NUMBER_2OCTETS,
-	AS_NUMBER_4OCTETS,
+public class AtomicAggregatePathAttribute extends PathAttribute {
+	
+	public AtomicAggregatePathAttribute() {
+		super(Category.WELL_KNOWN_DISCRETIONARY);
+	}
 }

@@ -13,41 +13,50 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute.java 
+ * File: org.bgp4j.netty.protocol.update.ClusterListPathAttribute.java 
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MultiExitDiscPathAttribute extends PathAttribute {
+public class ClusterListPathAttribute extends PathAttribute {
 
-	public MultiExitDiscPathAttribute() {
-		super(Category.OPTIONAL_NON_TRANSITIVE);
-	}
-
-	public MultiExitDiscPathAttribute(int discriminator) {
-		super(Category.OPTIONAL_NON_TRANSITIVE);
-		
-		this.discriminator = discriminator;
-	}
-
-	private int discriminator;
+	private List<Integer> clusterIds = new LinkedList<Integer>();
 	
 	/**
-	 * @return the discriminator
+	 * @param category
 	 */
-	public int getDiscriminator() {
-		return discriminator;
+	public ClusterListPathAttribute() {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
 	}
 
 	/**
-	 * @param discriminator the discriminator to set
+	 * @param category
 	 */
-	public void setDiscriminator(int discriminator) {
-		this.discriminator = discriminator;
+	public ClusterListPathAttribute(int[] clusterIds) {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
+		
+		for(int clusterId : clusterIds)
+			this.clusterIds.add(clusterId);
+	}
+
+	/**
+	 * @return the clusterIds
+	 */
+	public List<Integer> getClusterIds() {
+		return clusterIds;
+	}
+
+	/**
+	 * @param clusterIds the clusterIds to set
+	 */
+	public void setClusterIds(List<Integer> clusterIds) {
+		this.clusterIds = clusterIds;
 	}
 
 }

@@ -13,18 +13,41 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.update.AttomicAggregatePathAttribute.java 
+ * File: org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute.java 
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AtomicAggregatePathAttribute extends PathAttribute {
-	
-	public AtomicAggregatePathAttribute() {
-		super(Category.WELL_KNOWN_DISCRETIONARY);
+public class MultiExitDiscPathAttribute extends PathAttribute {
+
+	public MultiExitDiscPathAttribute() {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
 	}
+
+	public MultiExitDiscPathAttribute(int discriminator) {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
+		
+		this.discriminator = discriminator;
+	}
+
+	private int discriminator;
+	
+	/**
+	 * @return the discriminator
+	 */
+	public int getDiscriminator() {
+		return discriminator;
+	}
+
+	/**
+	 * @param discriminator the discriminator to set
+	 */
+	public void setDiscriminator(int discriminator) {
+		this.discriminator = discriminator;
+	}
+
 }

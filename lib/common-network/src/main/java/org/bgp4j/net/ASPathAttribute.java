@@ -14,13 +14,12 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.net.PathSegmentType;
-import org.bgp4j.netty.ASType;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

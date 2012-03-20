@@ -15,11 +15,9 @@
  * 
  * File: org.bgp4j.netty.protocol.update.AggregatorPathAttribute.java 
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
 import java.net.Inet4Address;
-
-import org.bgp4j.netty.ASType;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

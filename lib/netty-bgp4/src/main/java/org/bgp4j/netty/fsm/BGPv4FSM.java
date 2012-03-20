@@ -24,7 +24,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;
-import org.bgp4j.netty.ASType;
+import org.bgp4j.net.ASType;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.FSMState;
 import org.bgp4j.netty.PeerConnectionInformation;

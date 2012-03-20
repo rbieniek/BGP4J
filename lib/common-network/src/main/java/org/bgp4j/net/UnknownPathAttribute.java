@@ -12,42 +12,39 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute.java 
+ *  
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class LocalPrefPathAttribute extends PathAttribute {
+public class UnknownPathAttribute extends PathAttribute {
 
-	public LocalPrefPathAttribute() {
-		super(Category.WELL_KNOWN_DISCRETIONARY);
-	}
-
-	public LocalPrefPathAttribute(int localPreference) {
-		super(Category.WELL_KNOWN_DISCRETIONARY);
-		
-		this.localPreference = localPreference;
-	}
-
-	private int localPreference;
+	private int typeCode;
+	private byte[] value;
 	
-	/**
-	 * @return the discriminator
-	 */
-	public int getLocalPreference() {
-		return localPreference;
+	public UnknownPathAttribute(int typeCode, byte[] value) {
+		super(Category.OPTIONAL_TRANSITIVE);
+		
+		this.typeCode = typeCode;
+		this.value = value;
 	}
 
 	/**
-	 * @param discriminator the discriminator to set
+	 * @return the value
 	 */
-	public void setLocalPreference(int discriminator) {
-		this.localPreference = discriminator;
+	public byte[] getValue() {
+		return value;
+	}
+
+	/**
+	 * @return the typeCode
+	 */
+	public int getTypeCode() {
+		return typeCode;
 	}
 
 }

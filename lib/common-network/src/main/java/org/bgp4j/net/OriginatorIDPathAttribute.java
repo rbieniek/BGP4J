@@ -12,51 +12,42 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.update.ClusterListPathAttribute.java 
+ *  
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ClusterListPathAttribute extends PathAttribute {
+public class OriginatorIDPathAttribute extends PathAttribute {
 
-	private List<Integer> clusterIds = new LinkedList<Integer>();
-	
-	/**
-	 * @param category
-	 */
-	public ClusterListPathAttribute() {
+	public OriginatorIDPathAttribute() {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
 	}
 
-	/**
-	 * @param category
-	 */
-	public ClusterListPathAttribute(int[] clusterIds) {
+	public OriginatorIDPathAttribute(int originatorID) {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
 		
-		for(int clusterId : clusterIds)
-			this.clusterIds.add(clusterId);
+		setOriginatorID(originatorID);
+	}
+
+	private int originatorID;
+	
+	/**
+	 * @return the nextHop
+	 */
+	public int getOriginatorID() {
+		return originatorID;
 	}
 
 	/**
-	 * @return the clusterIds
+	 * 
+	 * @param nextHop
 	 */
-	public List<Integer> getClusterIds() {
-		return clusterIds;
-	}
-
-	/**
-	 * @param clusterIds the clusterIds to set
-	 */
-	public void setClusterIds(List<Integer> clusterIds) {
-		this.clusterIds = clusterIds;
+	public void setOriginatorID(int nextHop) {
+		this.originatorID = nextHop;
 	}
 
 }

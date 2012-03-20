@@ -15,6 +15,8 @@
  */
 package org.bgp4j.netty;
 
+import org.bgp4j.net.ASType;
+
 
 /**
  * This bean contains all information about the BGP connection that needs to be accessible 

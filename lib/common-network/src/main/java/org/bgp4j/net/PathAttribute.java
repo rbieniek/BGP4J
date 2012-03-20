@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.netty.protocol.update;
+package org.bgp4j.net;
 
 
 /**

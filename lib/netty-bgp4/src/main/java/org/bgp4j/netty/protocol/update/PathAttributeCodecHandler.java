@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.PathAttribute;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 /**

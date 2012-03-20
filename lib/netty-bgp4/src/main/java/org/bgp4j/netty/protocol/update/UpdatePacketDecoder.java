@@ -24,17 +24,31 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.bgp4j.net.ASPathAttribute;
+import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AggregatorPathAttribute;
+import org.bgp4j.net.AtomicAggregatePathAttribute;
+import org.bgp4j.net.ClusterListPathAttribute;
+import org.bgp4j.net.CommunityPathAttribute;
+import org.bgp4j.net.LocalPrefPathAttribute;
+import org.bgp4j.net.MultiExitDiscPathAttribute;
+import org.bgp4j.net.MultiProtocolReachableNLRI;
+import org.bgp4j.net.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.NextHopPathAttribute;
+import org.bgp4j.net.OriginPathAttribute;
+import org.bgp4j.net.OriginatorIDPathAttribute;
+import org.bgp4j.net.PathAttribute;
 import org.bgp4j.net.SubsequentAddressFamily;
-import org.bgp4j.netty.ASType;
+import org.bgp4j.net.UnknownPathAttribute;
+import org.bgp4j.net.ASPathAttribute.PathSegment;
+import org.bgp4j.net.CommunityPathAttribute.CommunityMember;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.NotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
-import org.bgp4j.netty.protocol.update.ASPathAttribute.PathSegment;
-import org.bgp4j.netty.protocol.update.CommunityPathAttribute.CommunityMember;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
@@ -265,6 +279,8 @@ public class UpdatePacketDecoder {
 			
 			buffer.readBytes(addr);
 			attr.setNextHop((Inet4Address)Inet4Address.getByAddress(addr));
+		} catch(IllegalArgumentException e) {
+			throw new InvalidNextHopException();
 		} catch (UnknownHostException e) {
 			throw new InvalidNextHopException();
 		}

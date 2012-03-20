@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.BGPv4Packet;

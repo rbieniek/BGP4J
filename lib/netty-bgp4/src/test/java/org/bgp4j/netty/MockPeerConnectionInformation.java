@@ -17,6 +17,8 @@
  */
 package org.bgp4j.netty;
 
+import org.bgp4j.net.ASType;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *

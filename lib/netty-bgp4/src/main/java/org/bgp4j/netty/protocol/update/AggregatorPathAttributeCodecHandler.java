@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.AggregatorPathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;

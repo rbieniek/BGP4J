@@ -1,6 +1,4 @@
-package org.bgp4j.netty.protocol.update;
-
-import org.bgp4j.netty.ASType;
+package org.bgp4j.net;
 
 public interface ASTypeAware {
 
