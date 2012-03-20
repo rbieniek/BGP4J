@@ -17,7 +17,14 @@
  */
 package org.bgp4j.rib;
 
+import java.util.Collection;
+
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.PathAttribute;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -28,6 +35,9 @@ public class RoutingInformationBase {
 	private String peerName;
 	private RIBSide side;
 	private AddressFamilyKey addressFamilyKey;
+	private RoutingTree routingTree = new RoutingTree();
+	private @Inject Event<RouteAdded> routeAddedEvent;
+	private @Inject Event<RouteWithdrawn> routeWithdrawnEvent;
 	
 	RoutingInformationBase() {
 	}
@@ -75,8 +85,23 @@ public class RoutingInformationBase {
 	}
 
 	void destroyRIB() {
-		// TODO Auto-generated method stub
-		
+		routingTree.destroy();
+	}
+	
+	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes) {
+		for(NetworkLayerReachabilityInformation nlri : nlris)
+			if(routingTree.addRoute(nlri, pathAttributes))
+				routeAddedEvent.fire(new RouteAdded(getPeerName(), 
+						getSide(), 
+						getAddressFamilyKey(), 
+						nlri, 
+						pathAttributes));
 	}
 
+	public void removeRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
+		for(NetworkLayerReachabilityInformation nlri : nlris)
+			if(routingTree.withdrawRoute(nlri))
+				routeWithdrawnEvent.fire(new RouteWithdrawn(getPeerName(), getSide(), getAddressFamilyKey(), nlri));
+		
+	}
 }
