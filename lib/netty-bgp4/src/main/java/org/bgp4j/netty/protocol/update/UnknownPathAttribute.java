@@ -26,20 +26,20 @@ import org.jboss.netty.buffer.ChannelBuffers;
 public class UnknownPathAttribute extends PathAttribute {
 
 	private int typeCode;
-	private ChannelBuffer value;
+	private byte[] value;
 	
-	public UnknownPathAttribute(int typeCode, ChannelBuffer valueBuffer) {
+	public UnknownPathAttribute(int typeCode, byte[] value) {
 		super(Category.OPTIONAL_TRANSITIVE);
 		
 		this.typeCode = typeCode;
-		this.value = valueBuffer;
+		this.value = value;
 	}
 
 	/**
 	 * @return the value
 	 */
-	public ChannelBuffer getValue() {
-		return ChannelBuffers.copiedBuffer(value);
+	public byte[] getValue() {
+		return value;
 	}
 
 	/**

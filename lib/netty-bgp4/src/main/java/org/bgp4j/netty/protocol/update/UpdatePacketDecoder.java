@@ -469,8 +469,13 @@ public class UpdatePacketDecoder {
 				case BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_CLUSTER_LIST:
 					attr = decodeClusterListPathAttribute(valueBuffer);
 					break;
-				default:
-					attr = new UnknownPathAttribute(typeCode, valueBuffer);
+				default: 
+				    {
+						byte[] value = new byte[valueBuffer.readableBytes()];
+					
+						valueBuffer.readBytes(value);
+						attr = new UnknownPathAttribute(typeCode, value);
+				    }
 					break;
 				}
 				attr.setOptional(optional);

@@ -18,6 +18,7 @@
 package org.bgp4j.netty.protocol.update;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -39,7 +40,10 @@ public class UnknownPathAttributeCodecHandler extends
 	 */
 	@Override
 	public int valueLength(UnknownPathAttribute attr) {
-		return attr.getValue().readableBytes();
+		if(attr.getValue() != null)
+			return attr.getValue().length;
+		else
+			return 0;
 	}
 
 	/* (non-Javadoc)
@@ -47,7 +51,16 @@ public class UnknownPathAttributeCodecHandler extends
 	 */
 	@Override
 	public ChannelBuffer encodeValue(UnknownPathAttribute attr) {
-		return attr.getValue();
+		if(attr.getValue() != null) {
+			byte[] value = attr.getValue();
+			ChannelBuffer buffer = ChannelBuffers.buffer(value.length);
+			
+			buffer.writeBytes(value);
+			
+			return buffer;
+			
+		} else
+			return null;
 	}
 
 }
