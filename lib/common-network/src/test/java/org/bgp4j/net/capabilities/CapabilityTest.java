@@ -15,13 +15,22 @@
  * 
  * File: org.bgp4j.net.CapabilityTest.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.capabilities;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.ORFSendReceive;
+import org.bgp4j.net.ORFType;
+import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
+import org.bgp4j.net.capabilities.OutboundRouteFilteringCapability;
+import org.bgp4j.net.capabilities.RouteRefreshCapability;
+import org.bgp4j.net.capabilities.UnknownCapability;
 import org.junit.Test;
 
 /**

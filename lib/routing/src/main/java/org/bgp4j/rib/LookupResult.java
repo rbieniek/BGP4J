@@ -20,7 +20,7 @@ package org.bgp4j.rib;
 import java.util.Collection;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * Result bean for a NLRI prefix lookup in a RIB 

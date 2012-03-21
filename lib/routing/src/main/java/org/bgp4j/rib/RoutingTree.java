@@ -22,7 +22,7 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * This class builds and manages a tree of (NLRI, Path attributes) tuples. The tree is build top-down

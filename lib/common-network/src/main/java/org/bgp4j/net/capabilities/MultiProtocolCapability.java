@@ -15,12 +15,15 @@
  * 
  * File: org.bgp4j.netty.protocol.MultiProtocolCapability.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.capabilities;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.SubsequentAddressFamily;
 
 
 /**
@@ -75,6 +78,10 @@ public class MultiProtocolCapability extends Capability {
 		return ORDER_NUMBER_MULTI_PROTOCOL_CAPABILITY;
 	}
 
+	public AddressFamilyKey toAddressFamilyKey() {
+		return new AddressFamilyKey(getAfi(), getSafi());
+	}
+	
 	@Override
 	protected boolean equalsSubclass(Capability other) {
 		MultiProtocolCapability mp = (MultiProtocolCapability)other;

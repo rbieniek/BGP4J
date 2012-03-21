@@ -14,46 +14,44 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
-import java.net.Inet4Address;
+import org.bgp4j.net.Origin;
 
 /**
+ * ORIGIN (type code 1) BGPv4 path attribute
+ * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NextHopPathAttribute extends PathAttribute {
+public class OriginPathAttribute extends PathAttribute {
 
-	public NextHopPathAttribute() {
-		super(Category.WELL_KNOWN_MANDATORY);
-	}
-
-	public NextHopPathAttribute(Inet4Address nextHop) {
+	private Origin origin;
+	
+	public OriginPathAttribute() {
 		super(Category.WELL_KNOWN_MANDATORY);
 		
-		setNextHop(nextHop);
+		origin = Origin.INCOMPLETE;
 	}
-
-	private Inet4Address nextHop;
+	
+	public OriginPathAttribute(Origin origin) {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
+		this.origin = origin;
+	}
 	
 	/**
-	 * @return the nextHop
+	 * @return the origin
 	 */
-	public Inet4Address getNextHop() {
-		return nextHop;
+	public Origin getOrigin() {
+		return origin;
 	}
 
 	/**
-	 * set the next hop. If the next hop is semantically invalid, an exception is raised.
-	 * 
-	 * @param nextHop the nextHop to set, MUST NOT be an IP multicast address
-	 * @throws IllegalArgumentException next hop address is a multicast address.
+	 * @param origin the origin to set
 	 */
-	public void setNextHop(Inet4Address nextHop) {
-		if(nextHop.isMulticastAddress())
-			throw new IllegalArgumentException();
-		
-		this.nextHop = nextHop;
+	public void setOrigin(Origin origin) {
+		this.origin = origin;
 	}
 
 }

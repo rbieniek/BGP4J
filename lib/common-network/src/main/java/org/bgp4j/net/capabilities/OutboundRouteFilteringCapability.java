@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.net;
+package org.bgp4j.net.capabilities;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -24,6 +24,10 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.ORFSendReceive;
+import org.bgp4j.net.ORFType;
+import org.bgp4j.net.SubsequentAddressFamily;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

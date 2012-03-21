@@ -12,39 +12,19 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ * 
+ * File: org.bgp4j.netty.protocol.update.AttomicAggregatePathAttribute.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UnknownPathAttribute extends PathAttribute {
-
-	private int typeCode;
-	private byte[] value;
+public class AtomicAggregatePathAttribute extends PathAttribute {
 	
-	public UnknownPathAttribute(int typeCode, byte[] value) {
-		super(Category.OPTIONAL_TRANSITIVE);
-		
-		this.typeCode = typeCode;
-		this.value = value;
+	public AtomicAggregatePathAttribute() {
+		super(Category.WELL_KNOWN_DISCRETIONARY);
 	}
-
-	/**
-	 * @return the value
-	 */
-	public byte[] getValue() {
-		return value;
-	}
-
-	/**
-	 * @return the typeCode
-	 */
-	public int getTypeCode() {
-		return typeCode;
-	}
-
 }

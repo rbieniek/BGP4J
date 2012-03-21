@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 
 /**

@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

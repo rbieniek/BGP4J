@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * Event fired by a RoutingInformationBase instance when a route has been added to the RIB.

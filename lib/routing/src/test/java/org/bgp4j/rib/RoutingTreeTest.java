@@ -22,9 +22,9 @@ import java.util.HashSet;
 
 import junit.framework.Assert;
 
-import org.bgp4j.net.LocalPrefPathAttribute;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.LocalPrefPathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

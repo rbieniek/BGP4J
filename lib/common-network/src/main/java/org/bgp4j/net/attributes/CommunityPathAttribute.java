@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.protocol.update.CommunitiesPathAttribute.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 import java.util.LinkedList;
 import java.util.List;

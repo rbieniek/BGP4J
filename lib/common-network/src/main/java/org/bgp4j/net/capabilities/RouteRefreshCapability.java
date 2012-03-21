@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.net;
+package org.bgp4j.net.capabilities;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

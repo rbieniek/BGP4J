@@ -14,11 +14,13 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.net.ASType;
+import org.bgp4j.net.ASTypeAware;
 import org.bgp4j.net.PathSegmentType;
 
 /**

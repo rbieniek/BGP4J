@@ -15,12 +15,13 @@
  * 
  * File: org.bgp4j.netty.protocol.update.MultiProtocolReachableNLRI.java 
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.SubsequentAddressFamily;
 
@@ -104,4 +105,7 @@ public class MultiProtocolUnreachableNLRI extends PathAttribute {
 		this.nlris = nlris;
 	}
 
+	public AddressFamilyKey addressFamilyKey() {
+		return new AddressFamilyKey(getAddressFamily(), getSubsequentAddressFamily());
+	}
 }

@@ -12,42 +12,42 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.update.MultiExitDiscPathAttribute.java 
+ *  
  */
-package org.bgp4j.net;
+package org.bgp4j.net.attributes;
 
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class MultiExitDiscPathAttribute extends PathAttribute {
+public class OriginatorIDPathAttribute extends PathAttribute {
 
-	public MultiExitDiscPathAttribute() {
+	public OriginatorIDPathAttribute() {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
 	}
 
-	public MultiExitDiscPathAttribute(int discriminator) {
+	public OriginatorIDPathAttribute(int originatorID) {
 		super(Category.OPTIONAL_NON_TRANSITIVE);
 		
-		this.discriminator = discriminator;
+		setOriginatorID(originatorID);
 	}
 
-	private int discriminator;
+	private int originatorID;
 	
 	/**
-	 * @return the discriminator
+	 * @return the nextHop
 	 */
-	public int getDiscriminator() {
-		return discriminator;
+	public int getOriginatorID() {
+		return originatorID;
 	}
 
 	/**
-	 * @param discriminator the discriminator to set
+	 * 
+	 * @param nextHop
 	 */
-	public void setDiscriminator(int discriminator) {
-		this.discriminator = discriminator;
+	public void setOriginatorID(int nextHop) {
+		this.originatorID = nextHop;
 	}
 
 }
