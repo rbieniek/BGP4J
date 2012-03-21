@@ -17,6 +17,7 @@
  */
 package org.bgp4j.rib;
 
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -60,7 +61,7 @@ public class RoutingTreeTest {
 	public void testAddSingleNode() {
 		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(0, null); // default route prefix
 		
-		Assert.assertTrue(tree.addRoute(nlri, attrs1));
+		Assert.assertTrue(tree.addRoute(nlri, attrs1, null));
 		
 		RoutingTree.RoutingTreeNode node = tree.getRootNode().getChildNodes().first();
 		
@@ -75,8 +76,8 @@ public class RoutingTreeTest {
 		NetworkLayerReachabilityInformation higherNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x08 }); // prefix 192.168.8/24
 		RoutingTree.RoutingTreeNode node;
 		
-		Assert.assertTrue(tree.addRoute(lowerNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(higherNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lowerNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(higherNlri, attrs2, null));
 		
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -99,8 +100,8 @@ public class RoutingTreeTest {
 		NetworkLayerReachabilityInformation higherNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x08 }); // prefix 192.168.8/24
 		RoutingTree.RoutingTreeNode node;
 		
-		Assert.assertTrue(tree.addRoute(higherNlri, attrs2));
-		Assert.assertTrue(tree.addRoute(lowerNlri, attrs1));
+		Assert.assertTrue(tree.addRoute(higherNlri, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lowerNlri, attrs1, null));
 		
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -121,7 +122,7 @@ public class RoutingTreeTest {
 		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(0, null); // default route prefix
 		RoutingTree.RoutingTreeNode node;
 		
-		Assert.assertTrue(tree.addRoute(nlri, attrs1));
+		Assert.assertTrue(tree.addRoute(nlri, attrs1, null));
 		
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -129,7 +130,7 @@ public class RoutingTreeTest {
 		Assert.assertEquals(nlri, node.getNlri());
 		Assert.assertTrue(equalCollections(attrs1, node.getPathAttributes()));
 		
-		Assert.assertTrue(tree.addRoute(nlri, attrs2));
+		Assert.assertTrue(tree.addRoute(nlri, attrs2, null));
 		
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -145,8 +146,8 @@ public class RoutingTreeTest {
 				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x40 }); // prefix 192.168.4.16/28
 		RoutingTree.RoutingTreeNode node;
 
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -168,8 +169,8 @@ public class RoutingTreeTest {
 				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x40 }); // prefix 192.168.4.16/28
 		RoutingTree.RoutingTreeNode node;
 
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
 
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -194,9 +195,9 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 		RoutingTree.RoutingTreeNode parent;
 
-		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2));
-		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2));
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
+		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2, null));
+		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
 
 		parent = tree.getRootNode().getChildNodes().first();
 		
@@ -227,9 +228,9 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 		RoutingTree.RoutingTreeNode parent;
 
-		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2));
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2));
+		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2, null));
 
 		parent = tree.getRootNode().getChildNodes().first();
 		
@@ -254,7 +255,7 @@ public class RoutingTreeTest {
 	public void testAddAndRemoveSingleNode() {
 		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(0, null); // default route prefix
 		
-		Assert.assertTrue(tree.addRoute(nlri, attrs1));
+		Assert.assertTrue(tree.addRoute(nlri, attrs1, null));
 		
 		RoutingTree.RoutingTreeNode node = tree.getRootNode().getChildNodes().first();
 		
@@ -276,8 +277,8 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -315,8 +316,8 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -353,9 +354,9 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 		RoutingTree.RoutingTreeNode parent;
 
-		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2));
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2));
+		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2, null));
 
 		parent = tree.getRootNode().getChildNodes().first();
 		
@@ -397,8 +398,8 @@ public class RoutingTreeTest {
 		RoutingTree.RoutingTreeNode node;
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		node = tree.getRootNode().getChildNodes().first();
 		
@@ -429,14 +430,34 @@ public class RoutingTreeTest {
 				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x40 }); // prefix 192.168.4.64/28
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		LookupResult result = tree.lookupRoute(moreNlri);
 		
 		Assert.assertNotNull(result);
 		Assert.assertEquals(moreNlri, result.getNlri());
 		Assert.assertEquals(attrs2, result.getPathAttributes());
+	}
+
+	@Test
+	public void testLookupExactMatchNextHop() throws Exception {
+		NetworkLayerReachabilityInformation lessNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04 }); // prefix 192.168.4/24
+		NetworkLayerReachabilityInformation moreNlri = new NetworkLayerReachabilityInformation(28, 
+				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x40 }); // prefix 192.168.4.64/28
+		InetAddress lessNextHop = InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01 });
+		InetAddress moreNextHop = InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x02 });
+
+		// add nodes
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1,  new InetAddressNextHop<InetAddress>(lessNextHop)));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2,  new InetAddressNextHop<InetAddress>(moreNextHop)));
+
+		LookupResult result = tree.lookupRoute(moreNlri);
+		
+		Assert.assertNotNull(result);
+		Assert.assertEquals(moreNlri, result.getNlri());
+		Assert.assertEquals(attrs2, result.getPathAttributes());
+		Assert.assertEquals(new InetAddressNextHop<InetAddress>(moreNextHop), result.getNextHop());
 	}
 
 	@Test
@@ -448,8 +469,8 @@ public class RoutingTreeTest {
 				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x00 }); // prefix 192.168.4.0/26
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		LookupResult result = tree.lookupRoute(lookupNlri);
 		
@@ -458,6 +479,27 @@ public class RoutingTreeTest {
 		Assert.assertEquals(attrs1, result.getPathAttributes());
 	}
 
+	@Test
+	public void testLookupInexactMatchNextHop() throws Exception {
+		NetworkLayerReachabilityInformation lessNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04 }); // prefix 192.168.4/24
+		NetworkLayerReachabilityInformation moreNlri = new NetworkLayerReachabilityInformation(28, 
+				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x10 }); // prefix 192.168.4.16/28
+		NetworkLayerReachabilityInformation lookupNlri = new NetworkLayerReachabilityInformation(26, 
+				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x00 }); // prefix 192.168.4.0/26
+		InetAddress lessNextHop = InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01 });
+		InetAddress moreNextHop = InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x02 });
+		
+		// add nodes
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, new InetAddressNextHop<InetAddress>(lessNextHop)));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, new InetAddressNextHop<InetAddress>(moreNextHop)));
+
+		LookupResult result = tree.lookupRoute(lookupNlri);
+		
+		Assert.assertNotNull(result);
+		Assert.assertEquals(lessNlri, result.getNlri());
+		Assert.assertEquals(attrs1, result.getPathAttributes());
+		Assert.assertEquals(new InetAddressNextHop<InetAddress>(lessNextHop), result.getNextHop());
+	}
 
 	@Test
 	public void testLookupNoMatch() {
@@ -468,8 +510,8 @@ public class RoutingTreeTest {
 				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x05 }); // prefix 192.168.5.0/24
 
 		// add nodes
-		Assert.assertTrue(tree.addRoute(lessNlri, attrs1));
-		Assert.assertTrue(tree.addRoute(moreNlri, attrs2));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		Assert.assertNull(tree.lookupRoute(lookupNlri));
 	}

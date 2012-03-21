@@ -17,6 +17,7 @@
  */
 package org.bgp4j.rib;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -78,57 +79,69 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 	
 	@Test
 	public void testAddSinglePrefix() {
-		rib.addRoutes(Arrays.asList(LESS_NLRI), attrs);
+		rib.addRoutes(Arrays.asList(LESS_NLRI), attrs, null);
 
 		Assert.assertEquals(1, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
 	}
-	
+
+	@Test
+	public void testAddSinglePrefixNextHop() throws Exception {
+		InetAddressNextHop<InetAddress> nextHop = new InetAddressNextHop<InetAddress>(
+				InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01 }));
+		
+		rib.addRoutes(Arrays.asList(LESS_NLRI), attrs, nextHop);
+
+		Assert.assertEquals(1, catcher.getRouteAddedEvents().size());
+		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, nextHop));
+	}
+
 	@Test
 	public void testAddTwoPrefixFirstLessSecondMore() {
-		rib.addRoutes(Arrays.asList(LESS_NLRI, MORE_NLRI_1), attrs);
+		rib.addRoutes(Arrays.asList(LESS_NLRI, MORE_NLRI_1), attrs, null);
 		
 		Assert.assertEquals(2, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
 	}
 	
 	@Test
 	public void testAddTwoPrefixFirstMoreSecondLess() {
-		rib.addRoutes(Arrays.asList(MORE_NLRI_1, LESS_NLRI), attrs);
+		rib.addRoutes(Arrays.asList(MORE_NLRI_1, LESS_NLRI), attrs, null);
 		
 		Assert.assertEquals(2, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
 	}
 	
 	@Test
 	public void testAddThreePrefix() {
-		rib.addRoutes(Arrays.asList(MORE_NLRI_1, MORE_NLRI_2, LESS_NLRI), attrs);
+		rib.addRoutes(Arrays.asList(MORE_NLRI_1, MORE_NLRI_2, LESS_NLRI), attrs, null);
 		
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
 	}
 	
 	@Test
 	public void testAddThreePrefixRemoveOne() {
-		rib.addRoutes(Arrays.asList(MORE_NLRI_1, MORE_NLRI_2, LESS_NLRI), attrs);
+		rib.addRoutes(Arrays.asList(MORE_NLRI_1, MORE_NLRI_2, LESS_NLRI), attrs, null);
 		
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
+		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
 		
 		rib.withdrawRoutes(Arrays.asList(MORE_NLRI_2));
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(1, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteWithdrawnEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs));
+		catcher.getRouteWithdrawnEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
 	}
 }

@@ -94,14 +94,14 @@ public class RoutingInformationBase {
 	 * @param nlris
 	 * @param pathAttributes
 	 */
-	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes) {
+	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
-			if(routingTree.addRoute(nlri, pathAttributes))
+			if(routingTree.addRoute(nlri, pathAttributes, nextHop))
 				routeAddedEvent.fire(new RouteAdded(getPeerName(), 
 						getSide(), 
 						getAddressFamilyKey(), 
 						nlri, 
-						pathAttributes));
+						pathAttributes, nextHop));
 	}
 
 	/**

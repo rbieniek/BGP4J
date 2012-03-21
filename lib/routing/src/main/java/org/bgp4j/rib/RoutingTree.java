@@ -43,11 +43,13 @@ class RoutingTree {
 	class RoutingTreeNode implements Comparable<RoutingTreeNode> {
 		private NetworkLayerReachabilityInformation nlri;
 		private Collection<PathAttribute> pathAttributes;
+		private NextHop nextHop;
 		private NavigableSet<RoutingTreeNode> childNodes = new TreeSet<RoutingTree.RoutingTreeNode>();
 
-		public RoutingTreeNode(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes) {
+		public RoutingTreeNode(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 			this.nlri = nlri;
 			this.pathAttributes = pathAttributes;
+			this.nextHop = nextHop;
 		}
 		
 		@Override
@@ -88,10 +90,17 @@ class RoutingTree {
 		NavigableSet<RoutingTreeNode> getChildNodes() {
 			return childNodes;
 		}
+
+		/**
+		 * @return the nextHop
+		 */
+		NextHop getNextHop() {
+			return nextHop;
+		}
 	}
 	
 	// the root of all nodes managed by this routing tree. This is the only node w/o a (NLRI prefix, Path attributes) tuple attached to it
-	private RoutingTreeNode rootNode = new RoutingTreeNode(null, null);
+	private RoutingTreeNode rootNode = new RoutingTreeNode(null, null, null);
 	
 	/**
 	 * Destroy the routing tree and delete all information held within.
@@ -107,8 +116,8 @@ class RoutingTree {
 	 * @param pathAttributes the path attributes belonging to this prefix
 	 * @return <code>true<code> if the node was added, <code>false</code> if the node was not added
 	 */
-	synchronized boolean addRoute(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes) {
-		return addRoute(this.rootNode, new RoutingTreeNode(nlri, pathAttributes));
+	synchronized boolean addRoute(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
+		return addRoute(this.rootNode, new RoutingTreeNode(nlri, pathAttributes, nextHop));
 	}
 
 	/**
@@ -233,7 +242,7 @@ class RoutingTree {
 		
 		for(RoutingTreeNode child : parent.getChildNodes()) {
 			if(child.getNlri().equals(nlri)) {
-				result = new LookupResult(child.getNlri(), child.getPathAttributes());
+				result = new LookupResult(child.getNlri(), child.getPathAttributes(), child.getNextHop());
 				break;
 			} else if(child.getNlri().isPrefixOf(nlri)) {
 				// child node NLRI is less specific match --> descend into child node
@@ -241,7 +250,7 @@ class RoutingTree {
 				
 				// child node lookup did not yield result --> build result from less specific child node NLRI
 				if(result == null)
-					result = new LookupResult(child.getNlri(), child.getPathAttributes());
+					result = new LookupResult(child.getNlri(), child.getPathAttributes(), child.getNextHop());
 			}
 		}
 		

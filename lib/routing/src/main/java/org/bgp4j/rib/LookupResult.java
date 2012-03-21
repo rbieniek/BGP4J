@@ -32,10 +32,12 @@ public class LookupResult {
 
 	private NetworkLayerReachabilityInformation nlri;
 	private Collection<PathAttribute> pathAttributes;
+	private NextHop nextHop;
 	
-	LookupResult(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes) {
+	LookupResult(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 		this.nlri = nlri;
 		this.pathAttributes = pathAttributes;
+		this.nextHop = nextHop;
 	}
 
 	/**
@@ -50,5 +52,12 @@ public class LookupResult {
 	 */
 	public Collection<PathAttribute> getPathAttributes() {
 		return pathAttributes;
+	}
+
+	/**
+	 * @return the nextHop
+	 */
+	public NextHop getNextHop() {
+		return nextHop;
 	}
 }

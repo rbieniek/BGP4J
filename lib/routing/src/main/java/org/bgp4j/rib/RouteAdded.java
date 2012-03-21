@@ -38,13 +38,16 @@ public class RouteAdded {
 	private AddressFamilyKey addressFamilyKey;
 	private NetworkLayerReachabilityInformation nlri;
 	private Collection<PathAttribute> pathAttributes;
+	private NextHop nextHop;
 	
-	RouteAdded(String peerName, RIBSide side, AddressFamilyKey addressFamilyKey, NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes) {
+	RouteAdded(String peerName, RIBSide side, AddressFamilyKey addressFamilyKey, NetworkLayerReachabilityInformation nlri, 
+			Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 		this.peerName = peerName;
 		this.side = side;
 		this.addressFamilyKey = addressFamilyKey;
 		this.nlri = nlri;
 		this.pathAttributes = pathAttributes;
+		this.nextHop = nextHop;
 	}
 
 	/**
@@ -93,6 +96,7 @@ public class RouteAdded {
 				.append(getPathAttributes())
 				.append(getPeerName())
 				.append(getSide())
+				.append(getNextHop())
 				.toHashCode();
 	}
 
@@ -116,6 +120,14 @@ public class RouteAdded {
 				.append(getPathAttributes(), other.getPathAttributes())
 				.append(getPeerName(), other.getPeerName())
 				.append(getSide(), other.getSide())
+				.append(getNextHop(), other.getNextHop())
 				.isEquals();
+	}
+
+	/**
+	 * @return the nextHop
+	 */
+	public NextHop getNextHop() {
+		return nextHop;
 	}
 }
