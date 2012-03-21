@@ -68,7 +68,7 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 		
 		negotiator.insertLocalCapabilities(open);
 		
-		Assert.assertEquals(0, open.getCapabilities().size());
+		Assert.assertEquals(1, open.getCapabilities().size()); // enforced IPv4 unicast on open
 	}
 	
 	@Test
@@ -82,7 +82,7 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 		
 		negotiator.insertLocalCapabilities(open);
 		
-		Assert.assertEquals(1, open.getCapabilities().size());
+		Assert.assertEquals(2, open.getCapabilities().size()); // + enforced IPv4 unicast routing capability 
 		
 		Iterator<Capability> capIt = open.getCapabilities().iterator();
 		
@@ -90,6 +90,8 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 		AutonomousSystem4Capability as4Cap = (AutonomousSystem4Capability)capIt.next();
 		Assert.assertEquals(65280, as4Cap.getAutonomousSystem());
 		
+		Assert.assertTrue(capIt.hasNext()); // enforced IPv4 unicast routing capability
+		Assert.assertNotNull(capIt.next()); // enforced IPv4 unicast routing capability
 		Assert.assertFalse(capIt.hasNext());
 	}
 	
@@ -141,6 +143,8 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 		Iterator<Capability> intersectCapIt = negotiator.intersectLocalAndRemoteCapabilities().iterator();
 		Iterator<Capability> missingCapId = negotiator.missingRequiredCapabilities().iterator();
 
+		Assert.assertTrue(intersectCapIt.hasNext()); // enforced IPv4 unicast routing capability
+		Assert.assertNotNull(intersectCapIt.next()); // enforced IPv4 unicast routing capability
 		Assert.assertFalse(intersectCapIt.hasNext());
 		Assert.assertFalse(missingCapId.hasNext());
 	}
@@ -166,6 +170,8 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 		AutonomousSystem4Capability as4Cap = (AutonomousSystem4Capability)intersectCapIt.next();
 		Assert.assertEquals(65280, as4Cap.getAutonomousSystem());
 		
+		Assert.assertTrue(intersectCapIt.hasNext()); // enforced IPv4 unicast routing capability
+		Assert.assertNotNull(intersectCapIt.next()); // enforced IPv4 unicast routing capability
 		Assert.assertFalse(intersectCapIt.hasNext());
 		
 		Assert.assertFalse(missingCapId.hasNext());
