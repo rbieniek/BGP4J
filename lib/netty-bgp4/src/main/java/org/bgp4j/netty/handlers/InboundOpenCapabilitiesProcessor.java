@@ -22,7 +22,6 @@ import javax.inject.Singleton;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
 import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.netty.BGPv4Constants;

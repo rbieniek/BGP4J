@@ -45,6 +45,36 @@
         </BgpPeer>
         
         <!--
+            - IBGP connection (client side)
+            - explicitly requires IPv4
+        -->
+        <BgpPeer name="fsm4">
+            <Client remote="localhost" />
+            <AutonomousSystem local="65280" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.2}" remote="${ipv4:192.168.4.3}" />
+            <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
+            <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
+            <Capabilities>
+                <MultiProtocol addressFamily="IPv6" subsequentAddressFamily="unicast" optional="true"/>
+            </Capabilities>
+        </BgpPeer>
+        
+        <!--
+            - IBGP connection (client side)
+            - explicitly requires IPv4
+        -->
+        <BgpPeer name="fsm5">
+            <Client remote="localhost" />
+            <AutonomousSystem local="65280" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.2}" remote="${ipv4:192.168.4.3}" />
+            <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
+            <Timers holdTime="20" idleHoldTime="5" delayOpen="5" connectRetryTime="5" automaticStartInterval="10" />
+            <Capabilities>
+                <MultiProtocol addressFamily="IPv4" subsequentAddressFamily="unicast" />
+            </Capabilities>
+        </BgpPeer>
+        
+        <!--
             - IBGP connection (server side side)
             - configuration matches fsm1, client FSM must move to Established
         -->

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.ASType;
+import org.bgp4j.net.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.FSMState;
 import org.bgp4j.netty.PeerConnectionInformation;
@@ -306,7 +307,14 @@ public class BGPv4FSM {
 
 		if(message instanceof OpenPacket) {
 			capabilitiesNegotiator.recordPeerCapabilities((OpenPacket)message);
-			internalFsm.handleEvent(FSMEvent.bgpOpen(findWrapperForChannel(channel)));
+			
+			if(capabilitiesNegotiator.missingRequiredCapabilities().size() > 0) {
+				for(Capability cap : capabilitiesNegotiator.missingRequiredCapabilities())
+					log.error("Missing required capability: " + cap);
+				
+				internalFsm.handleEvent(FSMEvent.bgpOpenMessageError());
+			} else
+				internalFsm.handleEvent(FSMEvent.bgpOpen(findWrapperForChannel(channel)));
 		} else if(message instanceof KeepalivePacket) {
 			internalFsm.handleEvent(FSMEvent.keepAliveMessage());
 		} else if(message instanceof UpdatePacket) {
