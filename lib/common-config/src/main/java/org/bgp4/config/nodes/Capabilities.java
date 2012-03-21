@@ -19,7 +19,7 @@ package org.bgp4.config.nodes;
 
 import java.util.Set;
 
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.Capability;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)

@@ -27,13 +27,13 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.bgp4.config.nodes.Capabilities;
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.ORFSendReceive;
 import org.bgp4j.net.ORFType;
-import org.bgp4j.net.OutboundRouteFilteringCapability;
-import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
+import org.bgp4j.net.capabilities.OutboundRouteFilteringCapability;
+import org.bgp4j.net.capabilities.RouteRefreshCapability;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)

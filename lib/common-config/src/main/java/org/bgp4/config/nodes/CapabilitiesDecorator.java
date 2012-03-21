@@ -20,7 +20,7 @@ package org.bgp4.config.nodes;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.Capability;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

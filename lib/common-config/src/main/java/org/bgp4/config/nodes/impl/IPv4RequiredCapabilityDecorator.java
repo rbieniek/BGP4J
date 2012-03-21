@@ -24,9 +24,9 @@ import java.util.TreeSet;
 import org.bgp4.config.nodes.Capabilities;
 import org.bgp4.config.nodes.CapabilitiesDecorator;
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.Capability;
-import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

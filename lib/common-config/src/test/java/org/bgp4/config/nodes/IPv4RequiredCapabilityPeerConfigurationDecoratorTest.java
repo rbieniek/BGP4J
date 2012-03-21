@@ -25,9 +25,9 @@ import org.bgp4.config.nodes.impl.CapabilitiesImpl;
 import org.bgp4.config.nodes.impl.ClientConfigurationImpl;
 import org.bgp4.config.nodes.impl.PeerConfigurationImpl;
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.Capability;
-import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.junit.Test;
 
 /**

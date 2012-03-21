@@ -25,8 +25,8 @@ import junit.framework.Assert;
 import org.bgp4.config.nodes.impl.CapabilitiesImpl;
 import org.bgp4.config.nodes.impl.ClientConfigurationImpl;
 import org.bgp4.config.nodes.impl.PeerConfigurationImpl;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
 import org.junit.Test;
 
 /**

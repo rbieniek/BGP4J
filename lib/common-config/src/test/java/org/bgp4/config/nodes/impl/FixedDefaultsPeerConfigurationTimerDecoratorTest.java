@@ -7,8 +7,8 @@ import junit.framework.Assert;
 import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
 import org.junit.Test;
 
 public class FixedDefaultsPeerConfigurationTimerDecoratorTest {

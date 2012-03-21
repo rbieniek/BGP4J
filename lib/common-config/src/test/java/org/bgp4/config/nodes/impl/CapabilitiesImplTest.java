@@ -20,10 +20,10 @@ package org.bgp4.config.nodes.impl;
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.MultiProtocolCapability;
-import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
+import org.bgp4j.net.capabilities.RouteRefreshCapability;
 import org.junit.Test;
 
 /**

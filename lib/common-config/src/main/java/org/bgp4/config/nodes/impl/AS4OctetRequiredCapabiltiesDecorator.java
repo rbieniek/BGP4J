@@ -22,8 +22,8 @@ import java.util.TreeSet;
 
 import org.bgp4.config.nodes.Capabilities;
 import org.bgp4.config.nodes.CapabilitiesDecorator;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

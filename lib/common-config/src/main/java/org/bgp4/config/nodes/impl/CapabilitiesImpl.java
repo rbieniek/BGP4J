@@ -23,7 +23,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.bgp4.config.nodes.Capabilities;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.Capability;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
