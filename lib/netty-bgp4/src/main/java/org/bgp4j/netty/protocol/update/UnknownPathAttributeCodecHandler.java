@@ -17,7 +17,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.net.UnknownPathAttribute;
+import org.bgp4j.net.attributes.UnknownPathAttribute;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 

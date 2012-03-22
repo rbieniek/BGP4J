@@ -16,11 +16,14 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.BGPv4Packet;
@@ -186,4 +189,36 @@ public class UpdatePacket extends BGPv4Packet {
 		this.pathAttributes = pathAttributes;
 	}
 
+	/**
+	 * look up path attributes of a given type passed in this update packet
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends PathAttribute> Set<T> lookupPathAttributes(Class<T> paClass) {
+		Set<T> result = new HashSet<T>();
+		
+		for(PathAttribute pa : pathAttributes) {
+			if(pa.getClass().equals(paClass))
+				result.add((T)pa);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * get the path attributes of this packet filtered by given PathAttribute classes
+	 * 
+	 * @param filteredClasses
+	 * @return
+	 */
+	public Set<PathAttribute> filterPathAttributes(Class<? extends PathAttribute>... filteredClasses) {
+		Set<PathAttribute> attrs = new HashSet<PathAttribute>();
+		Set<Class<? extends PathAttribute>> filter = new HashSet<Class<? extends PathAttribute>>(Arrays.asList(filteredClasses));
+
+		for(PathAttribute attr : getPathAttributes()) {
+			if(!filter.contains(attr.getClass()))
+				attrs.add(attr);
+		}
+		
+		return attrs;
+	}
 }

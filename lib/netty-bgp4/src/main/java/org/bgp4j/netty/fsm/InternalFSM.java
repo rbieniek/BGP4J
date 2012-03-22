@@ -1109,7 +1109,7 @@ public class InternalFSM {
 			haveFSMError = true;
 		}
 		
-		callbacks.fireCompleteBGPInitialization();
+		callbacks.fireCompleteBGPLocalInitialization();
 		connectedChannelManager.fireSendOpenMessage();
 		activeChannelManager.fireSendOpenMessage();
 		
@@ -1161,11 +1161,13 @@ public class InternalFSM {
 	 */
 	private void moveStateToOpenConfirm(boolean sendOpenMessage) {
 		if(sendOpenMessage) {
-			callbacks.fireCompleteBGPInitialization();
+			callbacks.fireCompleteBGPLocalInitialization();
 			activeChannelManager.fireSendOpenMessage();
 			connectedChannelManager.fireSendOpenMessage();
 		}
 
+		callbacks.fireCompleteBGPPeerInitialization();
+		
 		activeChannelManager.fireSendKeepaliveMessage();
 		connectedChannelManager.fireSendKeepaliveMessage();
 		

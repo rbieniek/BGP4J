@@ -3538,7 +3538,7 @@ public class InternalFSMTest extends WeldTestCaseBase {
 		Assert.assertNull(fsm.getKeepaliveTimerDueWhen());
 		
 		verify(callbacks, atLeastOnce()).fireSendOpenMessage(testBundle.getMatcherArg());			
-		verify(callbacks, atLeastOnce()).fireCompleteBGPInitialization();
+		verify(callbacks, atLeastOnce()).fireCompleteBGPLocalInitialization();
 	}
 
 	/**
@@ -3581,7 +3581,8 @@ public class InternalFSMTest extends WeldTestCaseBase {
 			verify(callbacks, times(numberOfKeepalivesSent)).fireSendKeepaliveMessage(testBundle.getMatcherArg());
 		else
 			verify(callbacks, never()).fireSendKeepaliveMessage(testBundle.getMatcherArg());
-		verify(callbacks).fireCompleteBGPInitialization();
+		verify(callbacks).fireCompleteBGPLocalInitialization();
+		verify(callbacks).fireCompleteBGPPeerInitialization();
 	}
 
 	private void assertMachineInOpenConfirmState(InternalFSMTestBundle testBundle, boolean mustHaveHoldAndKeepaliveTimer) throws Exception {

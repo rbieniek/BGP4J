@@ -19,23 +19,23 @@ package org.bgp4j.netty.protocol.update;
 
 import java.net.Inet4Address;
 
-import org.bgp4j.net.ASPathAttribute;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.AggregatorPathAttribute;
-import org.bgp4j.net.AtomicAggregatePathAttribute;
-import org.bgp4j.net.ClusterListPathAttribute;
-import org.bgp4j.net.LocalPrefPathAttribute;
-import org.bgp4j.net.MultiExitDiscPathAttribute;
-import org.bgp4j.net.MultiProtocolReachableNLRI;
-import org.bgp4j.net.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHopPathAttribute;
 import org.bgp4j.net.Origin;
-import org.bgp4j.net.OriginPathAttribute;
-import org.bgp4j.net.OriginatorIDPathAttribute;
 import org.bgp4j.net.PathSegmentType;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.attributes.ASPathAttribute;
+import org.bgp4j.net.attributes.AggregatorPathAttribute;
+import org.bgp4j.net.attributes.AtomicAggregatePathAttribute;
+import org.bgp4j.net.attributes.ClusterListPathAttribute;
+import org.bgp4j.net.attributes.LocalPrefPathAttribute;
+import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
+import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
+import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
+import org.bgp4j.net.attributes.NextHopPathAttribute;
+import org.bgp4j.net.attributes.OriginPathAttribute;
+import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.Test;
 

@@ -19,6 +19,7 @@ package org.bgp4j.rib;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
@@ -129,5 +130,15 @@ public class PeerRoutingInformationBase {
 	 */
 	void setPeerName(String peerName) {
 		this.peerName = peerName;
+	}
+
+	public void destroyAllRoutingInformationBases() {
+		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : localRIBs.entrySet())
+			entry.getValue().destroyRIB();
+		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : remoteRIBs.entrySet())
+			entry.getValue().destroyRIB();
+		
+		localRIBs.clear();
+		remoteRIBs.clear();
 	}
 }

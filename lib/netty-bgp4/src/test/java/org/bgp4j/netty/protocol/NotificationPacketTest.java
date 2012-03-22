@@ -22,11 +22,11 @@ import java.util.Iterator;
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
-import org.bgp4j.net.MultiProtocolCapability;
-import org.bgp4j.net.RouteRefreshCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
+import org.bgp4j.net.capabilities.RouteRefreshCapability;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.protocol.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.junit.After;

@@ -53,5 +53,25 @@
             </Capabilities>
         </BgpPeer>
         
+        
+        <!--
+            - IBGP connection
+            - local BGP identifier lower than remote BGP identifier
+            - active connection, no peer dampening, no open delay
+            - AS4 capability
+            - IPv4 multiprotocol only routing enabled
+        -->
+        <BgpPeer name="peer4">
+            <Client remote="192.168.4.3" />
+            <AutonomousSystem local="65280" remote="65280" />
+            <BgpIdentifier local="${ipv4:192.168.4.2}" remote="${ipv4:192.168.4.3}" />
+            <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
+            <Timers holdTime="180" idleHoldTime="15" delayOpen="15" connectRetryTime="5" automaticStartInterval="10" />
+            <Capabilities>
+                <LargeAutonomousSystem local="65280" />
+                <MultiProtocol addressFamily="ipv4" subsequentAddressFamily="unicast"/>
+            </Capabilities>
+        </BgpPeer>
+
     </BgpPeers>
 </Config>

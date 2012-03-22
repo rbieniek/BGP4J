@@ -17,8 +17,8 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import org.bgp4j.net.MultiProtocolReachableNLRI;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NLRICodec;
 import org.jboss.netty.buffer.ChannelBuffer;

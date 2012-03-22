@@ -62,9 +62,14 @@ public interface InternalFSMCallbacks {
 	void fireReleaseBGPResources();
 	
 	/**
-	 * complete the initialization
+	 * complete the initialization for the local end
 	 */
-	void fireCompleteBGPInitialization();
+	void fireCompleteBGPLocalInitialization();
+
+	/**
+	 * complete the initialization for the remote end
+	 */
+	void fireCompleteBGPPeerInitialization();
 
 	/**
 	 * fire a notification to the peer that the hold timer expired
@@ -80,4 +85,5 @@ public interface InternalFSMCallbacks {
 	 * The connection has been established and an initial update packet can be sent
 	 */
 	void fireEstablished();
+
 }

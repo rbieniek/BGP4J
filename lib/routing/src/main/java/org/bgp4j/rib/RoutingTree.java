@@ -18,6 +18,7 @@
 package org.bgp4j.rib;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
@@ -42,13 +43,14 @@ class RoutingTree {
 	 */
 	class RoutingTreeNode implements Comparable<RoutingTreeNode> {
 		private NetworkLayerReachabilityInformation nlri;
-		private Collection<PathAttribute> pathAttributes;
+		private Collection<PathAttribute> pathAttributes = new HashSet<PathAttribute>();
 		private NextHop nextHop;
 		private NavigableSet<RoutingTreeNode> childNodes = new TreeSet<RoutingTree.RoutingTreeNode>();
 
 		public RoutingTreeNode(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 			this.nlri = nlri;
-			this.pathAttributes = pathAttributes;
+			if(pathAttributes != null)
+				this.pathAttributes.addAll(pathAttributes);
 			this.nextHop = nextHop;
 		}
 		

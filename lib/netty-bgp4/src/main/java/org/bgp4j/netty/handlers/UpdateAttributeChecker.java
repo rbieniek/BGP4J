@@ -27,12 +27,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4j.net.ASPathAttribute;
 import org.bgp4j.net.ASTypeAware;
-import org.bgp4j.net.LocalPrefPathAttribute;
-import org.bgp4j.net.NextHopPathAttribute;
-import org.bgp4j.net.OriginPathAttribute;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.ASPathAttribute;
+import org.bgp4j.net.attributes.LocalPrefPathAttribute;
+import org.bgp4j.net.attributes.NextHopPathAttribute;
+import org.bgp4j.net.attributes.OriginPathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformationAware;

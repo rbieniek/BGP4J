@@ -45,28 +45,28 @@ public class RouteWithdrawn {
 	/**
 	 * @return the peerName
 	 */
-	String getPeerName() {
+	public String getPeerName() {
 		return peerName;
 	}
 
 	/**
 	 * @return the side
 	 */
-	RIBSide getSide() {
+	public RIBSide getSide() {
 		return side;
 	}
 
 	/**
 	 * @return the addressFamilyKey
 	 */
-	AddressFamilyKey getAddressFamilyKey() {
+	public AddressFamilyKey getAddressFamilyKey() {
 		return addressFamilyKey;
 	}
 
 	/**
 	 * @return the nlri
 	 */
-	NetworkLayerReachabilityInformation getNlri() {
+	public NetworkLayerReachabilityInformation getNlri() {
 		return nlri;
 	}
 

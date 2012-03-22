@@ -16,15 +16,7 @@
  */
 package org.bgp4j.netty.service;
 
-import java.net.InetAddress;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 
 import org.bgp4.config.global.ApplicationConfiguration;

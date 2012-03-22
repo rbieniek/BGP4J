@@ -22,7 +22,7 @@ import java.util.UUID;
 import junit.framework.Assert;
 
 import org.bgp4j.net.ASType;
-import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.LocalChannelBGPv4TestBase;
 import org.bgp4j.netty.MessageRecordingChannelHandler;

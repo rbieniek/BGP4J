@@ -20,6 +20,7 @@ package org.bgp4j.netty.fsm;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
@@ -41,7 +42,7 @@ public class FSMRegistry {
 	
 	private Map<InetSocketAddress, BGPv4FSM> fsmMap = new HashMap<InetSocketAddress, BGPv4FSM>();
 	
-	private @Inject @New Instance<BGPv4FSM> fsmProvider;
+	private @Inject Instance<BGPv4FSM> fsmProvider;
 	private @Inject ApplicationConfiguration applicationConfiguration;
 	private @Inject Logger log;
 	
@@ -56,10 +57,8 @@ public class FSMRegistry {
 
 				fsm.configure(peerConfig);
 				fsmMap.put(fsm.getRemotePeerAddress(), fsm);
-
-				fsm.startFSMAutomatic();
 			} catch(Exception e) {
-				log.error("Internal error: cannot create peer " + peerConfig.getPeerName());
+				log.error("Internal error: cannot create peer " + peerConfig.getPeerName(), e);
 			}
 		}
 	}
@@ -78,7 +77,7 @@ public class FSMRegistry {
 	
 	public void destroyRegistry() {
 		for(InetSocketAddress addr : fsmMap.keySet())
-			fsmMap.get(addr).stopFSM();
+			fsmMap.get(addr).destroyFSM();
 		
 		fsmMap.clear();
 	}
@@ -118,12 +117,18 @@ public class FSMRegistry {
 	}
 
 	public void startFiniteStateMachines() {
-		// TODO Auto-generated method stub
-		
+		for(Entry<InetSocketAddress, BGPv4FSM> entry : fsmMap.entrySet()) {
+			log.info("starting FSM automatic for connection to " + entry.getKey());
+			
+			entry.getValue().startFSMAutomatic();
+		}
 	}
 
 	public void stopFiniteStateMachines() {
-		// TODO Auto-generated method stub
-		
+		for(Entry<InetSocketAddress, BGPv4FSM> entry : fsmMap.entrySet()) {
+			log.info("stopping FSM automatic for connection to " + entry.getKey());
+			
+			entry.getValue().stopFSM();
+		}
 	}
 }

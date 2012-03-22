@@ -18,14 +18,15 @@
 package org.bgp4j.netty.fsm;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.bgp4.config.nodes.PeerConfiguration;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 
@@ -94,6 +95,22 @@ public class CapabilitesNegotiator {
 	}
 
 	/**
+	 * build an intersection of the locally configured capabilities and the capabilites passed in from the peer.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Capability> Set<T> intersectLocalAndRemoteCapabilities(Class<T> capClass) {
+		Set<T> caps = new TreeSet<T>();
+		
+		for(Capability cap : listLocalCapabilities(capClass))
+			if(remoteCapabilities.contains(cap))
+				caps.add((T)cap);
+		
+		return caps;
+	}
+
+	/**
 	 * build a set of capabilites which are marked as required in the local configuration and which
 	 * are not supported by the peer.
 	 * The local speaker may build an Unsupported Capabilities notification message based on that info
@@ -107,6 +124,34 @@ public class CapabilitesNegotiator {
 			if(!remoteCapabilities.contains(cap))
 				caps.add(cap);
 
+		return caps;
+	}
+	
+	/**
+	 * List all locally configured capabilities of a given type
+	 * 
+	 * @param capClass
+	 * @return
+	 */
+	public <T extends Capability> Set<T> listLocalCapabilities(Class<T> capClass) {
+		Set<T> caps = new HashSet<T>();
+
+		caps.addAll(listCapabilities(peerConfiguration.getCapabilities().getRequiredCapabilities(), capClass));
+		caps.addAll(listCapabilities(peerConfiguration.getCapabilities().getOptionalCapabilities(), capClass));
+		
+		return caps;
+	}
+
+	/**
+	 * list all capabilities sent by the remote peer of a given type
+	 * @param capClass
+	 * @return
+	 */
+	public <T extends Capability> Set<T> listRemoteCapabilities(Class<T> capClass) {
+		Set<T> caps = new HashSet<T>();
+
+		caps.addAll(listCapabilities(remoteCapabilities, capClass));
+		
 		return caps;
 	}
 	
@@ -132,5 +177,17 @@ public class CapabilitesNegotiator {
 			
 			packet.getCapabilities().add(cap);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Capability> Set<T> listCapabilities(Collection<Capability> src, Class<T> capClass) {
+		Set<T> caps = new HashSet<T>();
+
+		for(Capability cap : src) {
+			if(cap.getClass().equals(capClass))
+				caps.add((T)cap);
+		}
+		
+		return caps;
 	}
 }

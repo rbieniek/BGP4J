@@ -24,7 +24,6 @@ import javax.inject.Inject;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressPrefixBasedORFEntry;
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.ORFAction;
 import org.bgp4j.net.ORFEntry;
 import org.bgp4j.net.ORFMatch;

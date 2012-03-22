@@ -23,15 +23,15 @@ import java.util.UUID;
 
 import junit.framework.Assert;
 
-import org.bgp4j.net.ASPathAttribute;
 import org.bgp4j.net.ASType;
-import org.bgp4j.net.AggregatorPathAttribute;
-import org.bgp4j.net.LocalPrefPathAttribute;
-import org.bgp4j.net.NextHopPathAttribute;
 import org.bgp4j.net.Origin;
-import org.bgp4j.net.OriginPathAttribute;
-import org.bgp4j.net.OriginatorIDPathAttribute;
-import org.bgp4j.net.PathAttribute;
+import org.bgp4j.net.attributes.ASPathAttribute;
+import org.bgp4j.net.attributes.AggregatorPathAttribute;
+import org.bgp4j.net.attributes.LocalPrefPathAttribute;
+import org.bgp4j.net.attributes.NextHopPathAttribute;
+import org.bgp4j.net.attributes.OriginPathAttribute;
+import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.LocalChannelBGPv4TestBase;
 import org.bgp4j.netty.MessageRecordingChannelHandler;
 import org.bgp4j.netty.MockPeerConnectionInformation;

@@ -19,7 +19,7 @@ package org.bgp4j.netty.handlers;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4j.net.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.PeerConnectionInformation;
 import org.bgp4j.netty.PeerConnectionInformationAware;

@@ -16,16 +16,27 @@
  */
 package org.bgp4j.netty.fsm;
 
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.ASType;
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
+import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
+import org.bgp4j.net.attributes.NextHopPathAttribute;
+import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.net.capabilities.Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.FSMState;
 import org.bgp4j.netty.PeerConnectionInformation;
@@ -40,9 +51,16 @@ import org.bgp4j.netty.protocol.UnspecifiedCeaseNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenNotificationPacket;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.netty.protocol.open.UnsupportedVersionNumberNotificationPacket;
+import org.bgp4j.netty.protocol.update.InvalidNextHopException;
 import org.bgp4j.netty.protocol.update.UpdateNotificationPacket;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.bgp4j.netty.service.BGPv4Client;
+import org.bgp4j.rib.InetAddressNextHop;
+import org.bgp4j.rib.PeerRoutingInformationBase;
+import org.bgp4j.rib.PeerRoutingInformationBaseManager;
+import org.bgp4j.rib.RIBSide;
+import org.bgp4j.rib.RouteAdded;
+import org.bgp4j.rib.RouteWithdrawn;
 import org.jboss.netty.channel.Channel;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -234,10 +252,32 @@ public class BGPv4FSM {
 
 		@Override
 		public void fireReleaseBGPResources() {
+			prib.destroyAllRoutingInformationBases();
 		}
 
 		@Override
-		public void fireCompleteBGPInitialization() {
+		public void fireCompleteBGPLocalInitialization() {
+			prib = pribManager.peerRoutingInformationBase(peerConfig.getPeerName());
+			
+			// allocate all RIBs for the local end which are configured
+			for(MultiProtocolCapability mpcap : capabilitiesNegotiator.listLocalCapabilities(MultiProtocolCapability.class)) {
+				prib.allocateRoutingInformationBase(RIBSide.Local, mpcap.toAddressFamilyKey());
+			}
+			
+		}
+
+		@Override
+		public void fireCompleteBGPPeerInitialization() {
+			// allocate all RIBs for the local end which are configured
+			for(MultiProtocolCapability mpcap : capabilitiesNegotiator.listRemoteCapabilities(MultiProtocolCapability.class)) {
+				prib.allocateRoutingInformationBase(RIBSide.Remote, mpcap.toAddressFamilyKey());
+			}
+
+			// build a routing update filter for outbound routing updates 
+			for(MultiProtocolCapability mpcap : capabilitiesNegotiator.intersectLocalAndRemoteCapabilities(MultiProtocolCapability.class)) {
+				outboundAddressFamilyMask.add(mpcap.toAddressFamilyKey());
+			}
+
 		}
 
 		@Override
@@ -256,6 +296,7 @@ public class BGPv4FSM {
 			// TODO Auto-generated method stub
 			
 		}
+
 	}
 	
 	private @Inject Logger log;
@@ -267,8 +308,11 @@ public class BGPv4FSM {
 
 	private @Inject InternalFSM internalFsm;
 	private @Inject CapabilitesNegotiator capabilitiesNegotiator;
+	private @Inject PeerRoutingInformationBaseManager pribManager;
 	
 	private Set<FSMChannelImpl> managedChannels = new HashSet<FSMChannelImpl>();
+	private PeerRoutingInformationBase prib;
+	private Set<AddressFamilyKey> outboundAddressFamilyMask = new HashSet<AddressFamilyKey>();
 	
 	public void configure(PeerConfiguration peerConfig) throws SchedulerException {
 		this.peerConfig = peerConfig;
@@ -295,7 +339,7 @@ public class BGPv4FSM {
 	}
 
 	public void stopFSM() {
-		
+		internalFsm.handleEvent(FSMEvent.automaticStop());
 	}
 	
 	public void destroyFSM() {
@@ -319,6 +363,14 @@ public class BGPv4FSM {
 			internalFsm.handleEvent(FSMEvent.keepAliveMessage());
 		} else if(message instanceof UpdatePacket) {
 			internalFsm.handleEvent(FSMEvent.updateMessage());
+			
+			try {
+				processRemoteUpdate((UpdatePacket)message);
+			} catch(Exception e) {
+				log.error("error processing UPDATE packet from peer: " + peerConfig.getPeerName());
+
+				internalFsm.handleEvent(FSMEvent.updateMessageError());
+			}
 		} else if(message instanceof UnsupportedVersionNumberNotificationPacket) {
 			internalFsm.handleEvent(FSMEvent.notifyMessageVersionError());
 		} else if(message instanceof OpenNotificationPacket) {
@@ -375,6 +427,22 @@ public class BGPv4FSM {
 		return internalFsm.getState();
 	}
 	
+	public void handleRouteAdded(@Observes RouteAdded event) {
+		if(event.getSide() == RIBSide.Local) {
+			if(StringUtils.equals(event.getPeerName(), peerConfig.getPeerName())) {
+				// TODO enqueue route added update
+			}
+		}
+	}
+	
+	public void handleRouteWithdrawn(@Observes RouteWithdrawn event) {
+		if(event.getSide() == RIBSide.Local) {
+			if(StringUtils.equals(event.getPeerName(), peerConfig.getPeerName())) {
+				// TODO enqueue route withdrawn update
+			}
+		}
+	}
+	
 	private FSMChannelImpl findWrapperForChannel(Channel channel) {
 		FSMChannelImpl wrapper = null;
 		
@@ -386,5 +454,49 @@ public class BGPv4FSM {
 		}
 		
 		return wrapper;
+	}
+	
+	/**
+	 * process the UPDATE packet received from the remote peer
+	 * 
+	 * @param message
+	 */
+	@SuppressWarnings("unchecked")
+	private void processRemoteUpdate(UpdatePacket message) {
+		Set<MultiProtocolReachableNLRI> mpReachables = message.lookupPathAttributes(MultiProtocolReachableNLRI.class);
+		Set<MultiProtocolUnreachableNLRI> mpUnreachables = message.lookupPathAttributes(MultiProtocolUnreachableNLRI.class);
+		Set<PathAttribute> otherAttributes = message.filterPathAttributes(MultiProtocolReachableNLRI.class, 
+				MultiProtocolUnreachableNLRI.class);
+		AddressFamilyKey ipv4Unicast = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		
+		if(mpReachables.size() > 0)
+			processRemoteUpdateMultiProtocolReachables(mpReachables, otherAttributes);
+		if(mpUnreachables.size() > 0)
+			processRemoteUp(mpUnreachables, otherAttributes);
+		
+		// withdraw IPv4 prefixes
+		prib.routingBase(RIBSide.Remote, ipv4Unicast).withdrawRoutes(message.getWithdrawnRoutes());
+		
+		// add IPV4 routes
+		InetAddressNextHop<Inet4Address> nextHop = null;
+		
+		Set<NextHopPathAttribute> nextHops = message.lookupPathAttributes(NextHopPathAttribute.class);
+		
+		if(nextHops.size() > 1)
+			throw new InvalidNextHopException();
+		nextHop = new InetAddressNextHop<Inet4Address>(nextHops.iterator().next().getNextHop());
+		
+		prib.routingBase(RIBSide.Remote, ipv4Unicast).addRoutes(message.getNlris(), otherAttributes, nextHop);
+		
+	}
+
+	private void processRemoteUp(Set<MultiProtocolUnreachableNLRI> mpUnreachables, Set<PathAttribute> attrs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processRemoteUpdateMultiProtocolReachables(Set<MultiProtocolReachableNLRI> mpReachables, Set<PathAttribute> attrs) {
+		// TODO Auto-generated method stub
+		
 	}
 }

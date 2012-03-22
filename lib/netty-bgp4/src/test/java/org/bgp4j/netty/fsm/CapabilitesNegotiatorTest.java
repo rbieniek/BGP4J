@@ -18,6 +18,7 @@
 package org.bgp4j.netty.fsm;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -26,10 +27,10 @@ import org.bgp4.config.Configuration;
 import org.bgp4.config.ConfigurationParser;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.AddressFamily;
-import org.bgp4j.net.AutonomousSystem4Capability;
-import org.bgp4j.net.Capability;
-import org.bgp4j.net.MultiProtocolCapability;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.capabilities.Capability;
+import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;
@@ -313,6 +314,72 @@ public class CapabilitesNegotiatorTest  extends WeldTestCaseBase {
 
 		Assert.assertFalse(missingCapId.hasNext());
 		
+	}
+
+	@Test
+	public void testIntersectLocalAndRemoteByType() throws Exception {
+		PeerConfiguration peerConfig = loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers-With-Capabilities.xml").getPeer("peer3");
+		
+		negotiator.setup(peerConfig);
+		
+		OpenPacket open = new OpenPacket();
+		open.setAutonomousSystem(65280);
+		open.getCapabilities().add(new AutonomousSystem4Capability(65280));
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+
+		negotiator.recordPeerCapabilities(open);
+		
+		Set<MultiProtocolCapability> intersectCap = negotiator.intersectLocalAndRemoteCapabilities(MultiProtocolCapability.class);
+
+		Assert.assertNotNull(intersectCap);
+		Assert.assertEquals(2, intersectCap.size());
+		Assert.assertTrue(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertTrue(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		
+	}
+
+	@Test
+	public void testIntersectLocalAndRemoteByTypeIPv4UnicastOnly() throws Exception {
+		PeerConfiguration peerConfig = loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers-With-Capabilities.xml").getPeer("peer3");
+		
+		negotiator.setup(peerConfig);
+		
+		OpenPacket open = new OpenPacket();
+		open.setAutonomousSystem(65280);
+		open.getCapabilities().add(new AutonomousSystem4Capability(65280));
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+
+		negotiator.recordPeerCapabilities(open);
+		
+		Set<MultiProtocolCapability> intersectCap = negotiator.intersectLocalAndRemoteCapabilities(MultiProtocolCapability.class);
+
+		Assert.assertNotNull(intersectCap);
+		Assert.assertEquals(1, intersectCap.size());
+		Assert.assertTrue(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertFalse(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+	}
+
+
+	@Test
+	public void testIntersectLocalAndRemoteByTypeEmptyResult() throws Exception {
+		PeerConfiguration peerConfig = loadConfiguration("org/bgp4j/netty/fsm/Config-With-BgpPeers-With-Capabilities.xml").getPeer("peer4");
+		
+		negotiator.setup(peerConfig);
+		
+		OpenPacket open = new OpenPacket();
+		open.setAutonomousSystem(65280);
+		open.getCapabilities().add(new AutonomousSystem4Capability(65280));
+		open.getCapabilities().add(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING));
+
+		negotiator.recordPeerCapabilities(open);
+		
+		Set<MultiProtocolCapability> intersectCap = negotiator.intersectLocalAndRemoteCapabilities(MultiProtocolCapability.class);
+
+		Assert.assertNotNull(intersectCap);
+		Assert.assertEquals(0, intersectCap.size());
+		Assert.assertFalse(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
+		Assert.assertFalse(intersectCap.contains(new MultiProtocolCapability(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)));
 	}
 
 	// -- end of test messages

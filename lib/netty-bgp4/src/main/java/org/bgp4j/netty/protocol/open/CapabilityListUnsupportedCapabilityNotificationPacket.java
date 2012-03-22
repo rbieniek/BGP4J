@@ -19,7 +19,7 @@ package org.bgp4j.netty.protocol.open;
 
 import java.util.List;
 
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.Capability;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 /**

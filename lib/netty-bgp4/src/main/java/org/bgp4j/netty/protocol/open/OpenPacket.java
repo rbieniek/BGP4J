@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bgp4j.net.Capability;
+import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.buffer.ChannelBuffer;
