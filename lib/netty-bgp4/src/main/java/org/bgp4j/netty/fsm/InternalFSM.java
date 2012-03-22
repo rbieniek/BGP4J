@@ -18,6 +18,7 @@
 package org.bgp4j.netty.fsm;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -51,6 +52,7 @@ public class InternalFSM {
 	
 	private int peerProposedHoldTime = 0;
 	private boolean haveFSMError = false;
+	private long lastConnectStamp = 0;
 
 	private InternalFSMChannelManager connectedChannelManager;
 	private InternalFSMChannelManager activeChannelManager;
@@ -69,9 +71,6 @@ public class InternalFSM {
 		fireKeepaliveTimerExpired.createJobDetail(FireSendKeepalive.class, this);
 		
 		fireRepeatedAutomaticStart.createJobDetail(FireAutomaticStart.class, this);
-		
-		if(peerConfiguration.isAllowAutomaticStart())
-			fireRepeatedAutomaticStart.startRepeatedJob(peerConfiguration.getAutomaticStartInterval()); 
 		
 		this.connectedChannelManager = new InternalFSMChannelManager(callbacks);
 		this.activeChannelManager = new InternalFSMChannelManager(callbacks);
@@ -106,7 +105,7 @@ public class InternalFSM {
 		switch(event.getType()) {
 		case AutomaticStart:
 		case ManualStart:
-			handleStartEvent();
+			handleStartEvent(event.getType());
 			break;
 		case AutomaticStop:
 		case ManualStop:
@@ -202,8 +201,10 @@ public class InternalFSM {
 	 * <li>If passive TCP estalishment is disabled then fire the connect remote peer callback and move to <code>Connect</code> state</li>
 	 * <li>If passive TCP estalishment is ensabled then move to <code>Connect</code> state</li>
 	 * </ul>
+	 * @param fsmEventType 
+	 * @throws SchedulerException 
 	 */
-	private void handleStartEvent() {
+	private void handleStartEvent(FSMEventType fsmEventType)  {
 		if(state == FSMState.Idle) {
 			this.connectRetryCounter = 0;
 			canAcceptConnection = true;
@@ -217,10 +218,26 @@ public class InternalFSM {
 				haveFSMError = true;
 			}
 			
-			if(!peerConfiguration.isPassiveTcpEstablishment())
+			boolean temporaryPassive = false;
+			
+			if(fsmEventType == FSMEventType.AutomaticStart)
+				temporaryPassive = (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - lastConnectStamp) <  peerConfiguration.getConnectRetryTime());
+
+			if(!peerConfiguration.isPassiveTcpEstablishment() && !temporaryPassive) {
 				moveStateToConnect();
-			else
+			} else {
 				moveStateToActive();
+			}
+			
+			try {
+				if(fsmEventType == FSMEventType.AutomaticStart && peerConfiguration.isAllowAutomaticStart())
+					fireRepeatedAutomaticStart.startRepeatedJob(peerConfiguration.getAutomaticStartInterval()); 
+			} catch(SchedulerException e) {
+				log.error("failed to start automatic restart timer");
+				
+				haveFSMError = true;
+			}
+
 		}
 	}
 
@@ -1007,6 +1024,7 @@ public class InternalFSM {
 		}
 
 		callbacks.fireConnectRemotePeer();
+		lastConnectStamp = System.currentTimeMillis();
 		
 		this.state = FSMState.Connect;
 		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
@@ -1205,5 +1223,5 @@ public class InternalFSM {
 		this.state = FSMState.OpenConfirm;
 		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
-	
+
 }

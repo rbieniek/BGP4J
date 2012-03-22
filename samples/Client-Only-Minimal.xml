@@ -7,26 +7,14 @@
             - local BGP identifier lower than remote BGP identifier
             - active connection, no peer dampening, no open delay
         -->
-        <BgpPeer name="client">
-            <Client remote="192.168.4.3" />
-            <AutonomousSystem local="65280" remote="65280" />
-            <BgpIdentifier local="${ipv4:192.168.4.2}" remote="${ipv4:192.168.4.3}" />
+        <BgpPeer name="coyote">
+            <Client remote="192.168.9.254" />
+            <AutonomousSystem local="64512" remote="64512" />
+            <BgpIdentifier local="${ipv4:192.168.9.1}" remote="${ipv4:192.168.9.254}" />
             <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
             <Timers holdTime="180" idleHoldTime="15" delayOpen="15" connectRetryTime="5" automaticStartInterval="10" />
         </BgpPeer>
 
-        <!--
-            - IBGP connection
-            - local BGP identifier lower than remote BGP identifier
-            - active connection, no peer dampening, no open delay
-        -->
-        <BgpPeer name="server">
-            <Client remote="192.168.4.2" />
-            <AutonomousSystem local="65280" remote="65280" />
-            <BgpIdentifier local="${ipv4:192.168.4.3}" remote="${ipv4:192.168.4.2}" />
-            <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
-            <Timers holdTime="180" idleHoldTime="15" delayOpen="15" connectRetryTime="5" automaticStartInterval="10" />
-        </BgpPeer>
     </BgpPeers>
             
 </Config>

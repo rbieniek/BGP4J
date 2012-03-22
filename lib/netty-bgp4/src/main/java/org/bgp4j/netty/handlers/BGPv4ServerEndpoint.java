@@ -26,12 +26,15 @@ import org.bgp4j.netty.PeerConnectionInformationAware;
 import org.bgp4j.netty.fsm.BGPv4FSM;
 import org.bgp4j.netty.fsm.FSMRegistry;
 import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.slf4j.Logger;
 
 /**
@@ -47,13 +50,14 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 
 	private @Inject Logger log;
 	private @Inject FSMRegistry fsmRegistry;
+	private ChannelGroup trackedChannels = new DefaultChannelGroup(HANDLER_NAME);
 	
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
 	 */
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getRemoteAddress());
+		BGPv4FSM fsm = fsmRegistry.lookupFSM(((InetSocketAddress)e.getRemoteAddress()).getAddress());
 			
 		if(fsm == null) {
 			log.error("Internal Error: client for address " + e.getRemoteAddress() + " is unknown");
@@ -73,14 +77,16 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("connected to client " + e.getChannel().getRemoteAddress());
+		Channel clientChannel = e.getChannel();
+		log.info("connected to client " + clientChannel.getRemoteAddress());
 		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
+		BGPv4FSM fsm = fsmRegistry.lookupFSM(((InetSocketAddress)clientChannel.getRemoteAddress()).getAddress());
 		
 		if(fsm == null) {
-			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
+			log.error("Internal Error: client for address " + clientChannel.getRemoteAddress() + " is unknown");
 			
-			ctx.getChannel().close();
+			clientChannel.close();
+			clientChannel = null;
 		} else if(fsm.isCanAcceptConnection()) {
 			ChannelPipeline pipeline = ctx.getPipeline();
 			PeerConnectionInformation pci = fsm.getPeerConnectionInformation();
@@ -91,18 +97,22 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 				if (handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
 					log.info("attaching peer connection information " + pci
 							+ " to handler " + handlerName + " for client "
-							+ e.getChannel().getRemoteAddress());
+							+ clientChannel.getRemoteAddress());
 
 					pipeline.getContext(handlerName).setAttachment(pci);
 				}
 			}
 
-			fsm.handleServerOpened(ctx.getChannel());
+			fsm.handleServerOpened(clientChannel);
 		} else {
 			log.info("Connection from client " + e.getChannel().getRemoteAddress() + " cannot be accepted");
 			
-			ctx.getChannel().close();			
+			clientChannel.close();
+			clientChannel = null;
 		}
+		
+		if(clientChannel != null)
+			trackedChannels.add(clientChannel);
 	}
 
 	/* (non-Javadoc)
@@ -110,9 +120,9 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 	 */
 	@Override
 	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("disconnected from client " + e.getChannel().getRemoteAddress());
+		log.info("closed connection to client " + e.getChannel().getRemoteAddress());
 		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
+		BGPv4FSM fsm = fsmRegistry.lookupFSM(((InetSocketAddress)e.getChannel().getRemoteAddress()).getAddress());
 		
 		if(fsm == null) {
 			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
@@ -122,5 +132,14 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 			
 			fsm.handleClosed(e.getChannel());
 		}
+		
+		trackedChannels.remove(e.getChannel());
+	}
+
+	/**
+	 * @return the trackedChannels
+	 */
+	public ChannelGroup getTrackedChannels() {
+		return trackedChannels;
 	}
 }

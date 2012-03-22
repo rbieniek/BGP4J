@@ -17,14 +17,16 @@
  */
 package org.bgp4j.netty.fsm;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -74,7 +76,28 @@ public class FSMRegistry {
 			return fsmMap.get(peerAddress);
 		}
 	}
+
 	
+	public BGPv4FSM lookupFSM(InetAddress peerAddress) {
+		List<BGPv4FSM> candidates = new LinkedList<BGPv4FSM>();
+		BGPv4FSM fsm = null;
+		
+		synchronized (fsmMap) {
+			for(Entry<InetSocketAddress, BGPv4FSM> fsmEntry : fsmMap.entrySet()) {
+				if(fsmEntry.getKey().getAddress().equals(peerAddress)) {
+					candidates.add(fsmEntry.getValue());
+				}
+			}
+		}
+		
+		if(candidates.size() > 1)
+			throw new IllegalStateException("Having more than one FSM instance for address " + peerAddress);
+		else if(candidates.size() == 1)
+			fsm = candidates.get(0);
+		
+		return fsm;
+	}
+
 	public void destroyRegistry() {
 		for(InetSocketAddress addr : fsmMap.keySet())
 			fsmMap.get(addr).destroyFSM();

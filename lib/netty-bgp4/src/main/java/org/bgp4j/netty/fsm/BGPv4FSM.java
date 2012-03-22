@@ -252,7 +252,9 @@ public class BGPv4FSM {
 
 		@Override
 		public void fireReleaseBGPResources() {
-			prib.destroyAllRoutingInformationBases();
+			if(prib != null)
+				prib.destroyAllRoutingInformationBases();
+			prib = null;
 		}
 
 		@Override
@@ -350,6 +352,8 @@ public class BGPv4FSM {
 		log.info("received message " + message);
 
 		if(message instanceof OpenPacket) {
+			internalFsm.setPeerProposedHoldTime(((OpenPacket) message).getHoldTime());
+			
 			capabilitiesNegotiator.recordPeerCapabilities((OpenPacket)message);
 			
 			if(capabilitiesNegotiator.missingRequiredCapabilities().size() > 0) {
@@ -405,8 +409,10 @@ public class BGPv4FSM {
 	}
 	
 	public void handleServerOpened(Channel channel) {
-		// TODO Auto-generated method stub
+		FSMChannelImpl wrapper= new FSMChannelImpl(channel);
 		
+		managedChannels.add(wrapper);
+		internalFsm.handleEvent(FSMEvent.tcpConnectionConfirmed(wrapper));
 	}
 
 	public void handleClosed(Channel channel) {

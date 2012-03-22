@@ -29,9 +29,7 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
  */
 public class ChannelFactoryProducer {
 
-	private ChannelFactory clientFactory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
-	
 	@Produces @ClientFactory ChannelFactory produceClientChannelFactory() {
-		return clientFactory;
+		return new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
 	}
 }
