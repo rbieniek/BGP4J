@@ -47,6 +47,7 @@ public class FSMRegistry {
 	private @Inject Instance<BGPv4FSM> fsmProvider;
 	private @Inject ApplicationConfiguration applicationConfiguration;
 	private @Inject Logger log;
+	private boolean haveRunningMachines = false;
 	
 	public FSMRegistry() {
 		
@@ -120,7 +121,8 @@ public class FSMRegistry {
 					fsmMap.put(fsm.getRemotePeerAddress(), fsm);				
 				}
 				
-				fsm.startFSMAutomatic();
+				if(haveRunningMachines)
+					fsm.startFSMAutomatic();
 			} catch(Exception e) {
 				log.error("Internal error: cannot create peer " + event.getCurrent().getPeerName());
 			}
@@ -133,8 +135,10 @@ public class FSMRegistry {
 				fsm = fsmMap.remove(remotePeerAddress);
 			}
 
-			if (fsm != null)
+			if (fsm != null) {
+				fsm.stopFSM();
 				fsm.destroyFSM();
+			}
 			break;
 		}
 	}
@@ -145,9 +149,12 @@ public class FSMRegistry {
 			
 			entry.getValue().startFSMAutomatic();
 		}
+		haveRunningMachines = true;
 	}
 
 	public void stopFiniteStateMachines() {
+		haveRunningMachines = false;
+		
 		for(Entry<InetSocketAddress, BGPv4FSM> entry : fsmMap.entrySet()) {
 			log.info("stopping FSM automatic for connection to " + entry.getKey());
 			

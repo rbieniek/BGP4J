@@ -99,6 +99,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 			}
 			
 			fsm.handleClientConnected(e.getChannel());
+			ctx.sendUpstream(e);
 		}
 	}
 
@@ -118,6 +119,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 		} else {
 			
 			fsm.handleDisconnected(e.getChannel());
+			ctx.sendUpstream(e);
 		}
 	}
 
@@ -134,6 +136,7 @@ public class BGPv4ClientEndpoint extends SimpleChannelHandler {
 			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
 		} else {
 			fsm.handleClosed(e.getChannel());
+			ctx.sendUpstream(e);
 		}
 	}
 }

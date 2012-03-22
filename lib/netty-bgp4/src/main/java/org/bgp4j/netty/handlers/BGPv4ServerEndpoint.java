@@ -111,8 +111,10 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 			clientChannel = null;
 		}
 		
-		if(clientChannel != null)
+		if(clientChannel != null) {
 			trackedChannels.add(clientChannel);
+			ctx.sendUpstream(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -131,6 +133,7 @@ public class BGPv4ServerEndpoint extends SimpleChannelHandler {
 		} else {
 			
 			fsm.handleClosed(e.getChannel());
+			ctx.sendUpstream(e);
 		}
 		
 		trackedChannels.remove(e.getChannel());

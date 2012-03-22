@@ -16,7 +16,7 @@
       <Client remote="192.168.9.254" />
       <AutonomousSystem local="64512" remote="64512" />
       <BgpIdentifier local="${ipv4:192.168.9.1}" remote="${ipv4:192.168.9.254}" />
-      <Options passiveTcpEstablishment="true" dampPeerOscillation="false" delayOpen="false"/>
+      <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
       <Timers holdTime="180" idleHoldTime="15" delayOpen="15" connectRetryTime="180" automaticStartInterval="5" />
     </BgpPeer>
     
