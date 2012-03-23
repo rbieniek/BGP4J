@@ -20,6 +20,10 @@ package org.bgp4j.net.attributes;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -30,7 +34,7 @@ public class CommunityPathAttribute extends PathAttribute {
 		super(Category.OPTIONAL_TRANSITIVE);
 	}
 
-	public static class CommunityMember {
+	public static class CommunityMember implements Comparable<CommunityMember> {
 		private int asNumber;
 		private int memberFlags;
 		/**
@@ -56,6 +60,41 @@ public class CommunityPathAttribute extends PathAttribute {
 		 */
 		public void setMemberFlags(int memberFlags) {
 			this.memberFlags = memberFlags;
+		}
+		
+		@Override
+		public int compareTo(CommunityMember o) {
+			return (new CompareToBuilder())
+				.append(getAsNumber(), o.getAsNumber())
+				.append(getMemberFlags(), o.getMemberFlags())
+				.toComparison();
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode() {
+			return (new HashCodeBuilder())
+				.append(getAsNumber())
+				.append(getMemberFlags())
+				.toHashCode();
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if(!(obj instanceof CommunityMember))
+				return false;
+			
+			CommunityMember o = (CommunityMember)obj;
+			
+			return (new EqualsBuilder())
+				.append(getAsNumber(), o.getAsNumber())
+				.append(getMemberFlags(), o.getMemberFlags())
+				.isEquals();
 		}
 	}
 	
@@ -88,6 +127,29 @@ public class CommunityPathAttribute extends PathAttribute {
 	 */
 	public void setMembers(List<CommunityMember> members) {
 		this.members = members;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.COMMUNITY;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute o) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

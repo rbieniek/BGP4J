@@ -18,6 +18,10 @@ package org.bgp4j.net.attributes;
 
 import java.net.Inet4Address;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -54,6 +58,30 @@ public class NextHopPathAttribute extends PathAttribute {
 			throw new IllegalArgumentException();
 		
 		this.nextHop = nextHop;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.NEXT_HOP;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		NextHopPathAttribute o = (NextHopPathAttribute)obj;
+		
+		return (new EqualsBuilder()).append(getNextHop(), o.getNextHop()).isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder()).append(getNextHop()).toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		NextHopPathAttribute o = (NextHopPathAttribute)obj;
+		
+		return (new CompareToBuilder()).append(getNextHop(), o.getNextHop()).toComparison();
 	}
 
 }

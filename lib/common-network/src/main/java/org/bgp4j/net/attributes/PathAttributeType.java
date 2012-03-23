@@ -13,38 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.update.AttomicAggregatePathAttribute.java 
+ * File: org.bgp4j.net.attributes.PathAttributeType.java 
  */
 package org.bgp4j.net.attributes;
 
-
 /**
+ * Path attribute type used internally for sorting, ocmparing and hash-code building.
+ * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AtomicAggregatePathAttribute extends PathAttribute {
-	
-	public AtomicAggregatePathAttribute() {
-		super(Category.WELL_KNOWN_DISCRETIONARY);
-	}
-
-	@Override
-	protected PathAttributeType internalType() {
-		return PathAttributeType.ATOMIC_AGGREGATE;
-	}
-
-	@Override
-	protected boolean subclassEquals(PathAttribute obj) {
-		return true;
-	}
-
-	@Override
-	protected int sublcassHashCode() {
-		return 0;
-	}
-
-	@Override
-	protected int subclassCompareTo(PathAttribute o) {
-		return 0;
-	}
+public enum PathAttributeType {
+	AGGREGATOR,
+	AS_PATH,
+	ATOMIC_AGGREGATE,
+	CLUSTER_LIST,
+	COMMUNITY,
+	LOCAL_PREF,
+	MULTI_EXIT_DISC,
+	MULTI_PROTOCOL_REACHABLE,
+	MULTI_PROTOCOL_UNREACHABLE,
+	NEXT_HOP,
+	ORIGINATOR_ID,
+	ORIGIN,
+	UNKNOWN
 }

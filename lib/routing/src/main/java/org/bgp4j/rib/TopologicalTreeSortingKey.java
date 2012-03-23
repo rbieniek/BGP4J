@@ -13,38 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.netty.protocol.update.AttomicAggregatePathAttribute.java 
+ * File: org.bgp4j.rib.TopologicalTreeSortingKey.java 
  */
-package org.bgp4j.net.attributes;
-
+package org.bgp4j.rib;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AtomicAggregatePathAttribute extends PathAttribute {
-	
-	public AtomicAggregatePathAttribute() {
-		super(Category.WELL_KNOWN_DISCRETIONARY);
-	}
+public class TopologicalTreeSortingKey {
 
-	@Override
-	protected PathAttributeType internalType() {
-		return PathAttributeType.ATOMIC_AGGREGATE;
-	}
-
-	@Override
-	protected boolean subclassEquals(PathAttribute obj) {
-		return true;
-	}
-
-	@Override
-	protected int sublcassHashCode() {
-		return 0;
-	}
-
-	@Override
-	protected int subclassCompareTo(PathAttribute o) {
-		return 0;
-	}
 }

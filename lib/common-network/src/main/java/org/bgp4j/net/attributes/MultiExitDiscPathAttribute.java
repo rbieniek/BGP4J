@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -48,6 +52,30 @@ public class MultiExitDiscPathAttribute extends PathAttribute {
 	 */
 	public void setDiscriminator(int discriminator) {
 		this.discriminator = discriminator;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.MULTI_EXIT_DISC;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		MultiExitDiscPathAttribute o = (MultiExitDiscPathAttribute)obj;
+		
+		return (new EqualsBuilder()).append(getDiscriminator(), o.getDiscriminator()).isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder()).append(getDiscriminator()).toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		MultiExitDiscPathAttribute o = (MultiExitDiscPathAttribute)obj;
+		
+		return (new CompareToBuilder()).append(getDiscriminator(), o.getDiscriminator()).toComparison();
 	}
 
 }

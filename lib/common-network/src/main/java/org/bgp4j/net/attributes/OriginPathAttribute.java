@@ -16,6 +16,9 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.Origin;
 
 /**
@@ -52,6 +55,30 @@ public class OriginPathAttribute extends PathAttribute {
 	 */
 	public void setOrigin(Origin origin) {
 		this.origin = origin;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.ORIGIN;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		OriginPathAttribute o = (OriginPathAttribute)obj;
+		
+		return (new EqualsBuilder()).append(getOrigin(), o.getOrigin()).isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder()).append(getOrigin()).toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		OriginPathAttribute o = (OriginPathAttribute)obj;
+		
+		return (new CompareToBuilder()).append(getOrigin(), o.getOrigin()).toComparison();
 	}
 
 }

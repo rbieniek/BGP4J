@@ -19,6 +19,9 @@ package org.bgp4j.net.attributes;
 
 import java.net.Inet4Address;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.ASTypeAware;
 
@@ -85,6 +88,42 @@ public class AggregatorPathAttribute extends PathAttribute implements ASTypeAwar
 	 */
 	public void setAggregator(Inet4Address aggregator) {
 		this.aggregator = aggregator;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.AGGREGATOR;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		AggregatorPathAttribute o = (AggregatorPathAttribute)obj;
+		
+		return (new EqualsBuilder())
+			.append(getAsNumber(), o.getAsNumber())
+			.append(getAggregator(), o.getAggregator())
+			.append(getAsType(), o.getAsType())
+			.isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder())
+			.append(getAsNumber())
+			.append(getAggregator())
+			.append(getAsType())
+			.toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		AggregatorPathAttribute o = (AggregatorPathAttribute)obj;
+		
+		return (new CompareToBuilder())
+			.append(getAsNumber(), o.getAsNumber())
+			.append(getAggregator(), o.getAggregator())
+			.append(getAsType(), o.getAsType())
+			.toComparison();
 	}
 
 }

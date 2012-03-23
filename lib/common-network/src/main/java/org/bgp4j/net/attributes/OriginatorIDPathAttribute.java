@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -48,6 +52,30 @@ public class OriginatorIDPathAttribute extends PathAttribute {
 	 */
 	public void setOriginatorID(int nextHop) {
 		this.originatorID = nextHop;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.ORIGINATOR_ID;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		OriginatorIDPathAttribute o = (OriginatorIDPathAttribute)obj;
+		
+		return (new EqualsBuilder()).append(getOriginatorID(), o.getOriginatorID()).isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder()).append(getOriginatorID()).toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		OriginatorIDPathAttribute o = (OriginatorIDPathAttribute)obj;
+		
+		return (new CompareToBuilder()).append(getOriginatorID(), o.getOriginatorID()).toComparison();
 	}
 
 }

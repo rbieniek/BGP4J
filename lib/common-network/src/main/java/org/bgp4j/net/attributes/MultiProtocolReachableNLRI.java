@@ -17,9 +17,13 @@
  */
 package org.bgp4j.net.attributes;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
@@ -132,6 +136,67 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 
 	public AddressFamilyKey addressFamilyKey() {
 		return new AddressFamilyKey(getAddressFamily(), getSubsequentAddressFamily());
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.MULTI_PROTOCOL_REACHABLE;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		MultiProtocolReachableNLRI o = (MultiProtocolReachableNLRI)obj;
+		
+		EqualsBuilder builer = (new EqualsBuilder())
+				.append(getAddressFamily(), o.getAddressFamily())
+				.append(getSubsequentAddressFamily(), o.getSubsequentAddressFamily())
+				.append(getNextHopAddress(), o.getNextHopAddress())
+				.append(getNlris().size(), o.getNlris().size());
+		
+		if(builer.isEquals()) {
+			Iterator<NetworkLayerReachabilityInformation> lit = getNlris().iterator();
+			Iterator<NetworkLayerReachabilityInformation> rit = o.getNlris().iterator();
+			
+			while(lit.hasNext())
+				builer.append(lit.next(), rit.next());
+		}
+		
+		return builer.isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		HashCodeBuilder builder = (new HashCodeBuilder())
+				.append(getAddressFamily())
+				.append(getSubsequentAddressFamily())
+				.append(getNextHopAddress());
+		Iterator<NetworkLayerReachabilityInformation> it = getNlris().iterator();
+		
+		while(it.hasNext())
+			builder.append(it.next());
+		
+		return builder.toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		MultiProtocolReachableNLRI o = (MultiProtocolReachableNLRI)obj;
+		
+		CompareToBuilder builer = (new CompareToBuilder())
+				.append(getAddressFamily(), o.getAddressFamily())
+				.append(getSubsequentAddressFamily(), o.getSubsequentAddressFamily())
+				.append(getNextHopAddress(), o.getNextHopAddress())
+				.append(getNlris().size(), o.getNlris().size());
+		
+		if(builer.toComparison() == 0) {
+			Iterator<NetworkLayerReachabilityInformation> lit = getNlris().iterator();
+			Iterator<NetworkLayerReachabilityInformation> rit = o.getNlris().iterator();
+			
+			while(lit.hasNext())
+				builer.append(lit.next(), rit.next());
+		}
+		
+		return builer.toComparison();
 	}
 	
 }

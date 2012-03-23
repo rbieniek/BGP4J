@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * Superclass for all BGPv4 path attributes
@@ -23,7 +27,7 @@ package org.bgp4j.net.attributes;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public abstract class PathAttribute {
+public abstract class PathAttribute implements Comparable<PathAttribute> {
 
 	/**
 	 * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -127,5 +131,94 @@ public abstract class PathAttribute {
 	public Category getCategory() {
 		return category;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(PathAttribute o) {
+		CompareToBuilder builder = new CompareToBuilder();
+		
+		builder.append(internalType(), o.internalType())
+			.append(getCategory(), o.getCategory())
+			.append(isOptional(), o.isOptional())
+			.append(isPartial(), o.isPartial())
+			.append(isTransitive(), o.isTransitive());
+		
+		if(internalType() == o.internalType())
+			builder.appendSuper(subclassCompareTo(o));
+		
+		return builder.toComparison();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return (new HashCodeBuilder())
+			.append(internalType())
+			.append(getCategory())
+			.append(isOptional())
+			.append(isPartial())
+			.append(isTransitive())
+			.appendSuper(sublcassHashCode())
+			.toHashCode();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof PathAttribute))
+			return false;
+		
+		PathAttribute o = (PathAttribute)obj;
+		
+		EqualsBuilder builder = new EqualsBuilder();
+		
+		builder.append(internalType(), o.internalType())
+			.append(getCategory(), o.getCategory())
+			.append(isOptional(), o.isOptional())
+			.append(isPartial(), o.isPartial())
+			.append(isTransitive(), o.isTransitive());
+		
+		if(internalType() == o.internalType())
+			builder.appendSuper(subclassEquals(o));
+		
+		return builder.isEquals();
+	}
 	
+	/**
+	 * get the internal type of the path attribute
+	 * 
+	 * @return
+	 */
+	protected abstract PathAttributeType internalType();
+	
+	/**
+	 * handles equals on subclass.
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	protected abstract boolean subclassEquals(PathAttribute obj);
+	
+	/**
+	 * handle hashCode on subclass
+	 * @return
+	 */
+	protected abstract int sublcassHashCode();
+	
+	/**
+	 * handle compareTo on subclass
+	 * 
+	 * @param o
+	 * @return
+	 */
+	protected abstract int subclassCompareTo(PathAttribute o);
 }

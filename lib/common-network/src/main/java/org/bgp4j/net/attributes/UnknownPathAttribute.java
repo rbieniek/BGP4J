@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -45,6 +49,39 @@ public class UnknownPathAttribute extends PathAttribute {
 	 */
 	public int getTypeCode() {
 		return typeCode;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.UNKNOWN;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		UnknownPathAttribute o =(UnknownPathAttribute)obj;
+		
+		return (new EqualsBuilder())
+				.append(getTypeCode(), o.getTypeCode())
+				.append(getValue(), o.getValue())
+				.isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder())
+			.append(getTypeCode())
+			.append(getValue())
+			.toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		UnknownPathAttribute o =(UnknownPathAttribute)obj;
+		
+		return (new CompareToBuilder())
+				.append(getTypeCode(), o.getTypeCode())
+				.append(getValue(), o.getValue())
+				.toComparison();
 	}
 
 }

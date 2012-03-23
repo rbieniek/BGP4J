@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -48,6 +52,30 @@ public class LocalPrefPathAttribute extends PathAttribute {
 	 */
 	public void setLocalPreference(int discriminator) {
 		this.localPreference = discriminator;
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.LOCAL_PREF;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		LocalPrefPathAttribute  o = (LocalPrefPathAttribute)obj;
+		
+		return (new EqualsBuilder()).append(getLocalPreference(), o.getLocalPreference()).isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		return (new HashCodeBuilder()).append(getLocalPreference()).toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		LocalPrefPathAttribute  o = (LocalPrefPathAttribute)obj;
+		
+		return (new CompareToBuilder()).append(getLocalPreference(), o.getLocalPreference()).toComparison();
 	}
 
 }

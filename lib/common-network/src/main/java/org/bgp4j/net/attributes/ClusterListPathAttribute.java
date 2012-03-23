@@ -17,8 +17,13 @@
  */
 package org.bgp4j.net.attributes;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -56,7 +61,62 @@ public class ClusterListPathAttribute extends PathAttribute {
 	 * @param clusterIds the clusterIds to set
 	 */
 	public void setClusterIds(List<Integer> clusterIds) {
-		this.clusterIds = clusterIds;
+		if(clusterIds != null)
+			this.clusterIds = clusterIds;
+		else
+			this.clusterIds = new LinkedList<Integer>();
+	}
+
+	@Override
+	protected PathAttributeType internalType() {
+		return PathAttributeType.CLUSTER_LIST;
+	}
+
+	@Override
+	protected boolean subclassEquals(PathAttribute obj) {
+		EqualsBuilder builder = new EqualsBuilder();
+		ClusterListPathAttribute o = (ClusterListPathAttribute)obj;
+		
+		builder.append(getClusterIds().size(), o.getClusterIds().size());
+		
+		if(builder.isEquals()) {
+			Iterator<Integer> lit = getClusterIds().iterator();
+			Iterator<Integer> rit = o.getClusterIds().iterator();
+			
+			while(lit.hasNext())
+				builder.append(lit.next(), rit.next());
+		}
+		
+		return builder.isEquals();
+	}
+
+	@Override
+	protected int sublcassHashCode() {
+		HashCodeBuilder builder = new HashCodeBuilder();
+		Iterator<Integer> it = getClusterIds().iterator();
+		
+		while(it.hasNext())
+			builder.append(it.next());
+		
+		return builder.toHashCode();
+	}
+
+	@Override
+	protected int subclassCompareTo(PathAttribute obj) {
+		CompareToBuilder builder = new CompareToBuilder();
+		ClusterListPathAttribute o = (ClusterListPathAttribute)obj;
+		
+		builder.append(getClusterIds().size(), o.getClusterIds().size());
+		
+		if(builder.toComparison() == 0) {
+			Iterator<Integer> lit = getClusterIds().iterator();
+			Iterator<Integer> rit = o.getClusterIds().iterator();
+			
+			while(lit.hasNext())
+				builder.append(lit.next(), rit.next());
+		}
+		
+		return builder.toComparison();
 	}
 
 }
