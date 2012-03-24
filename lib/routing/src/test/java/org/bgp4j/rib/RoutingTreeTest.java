@@ -23,6 +23,7 @@ import java.util.HashSet;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;

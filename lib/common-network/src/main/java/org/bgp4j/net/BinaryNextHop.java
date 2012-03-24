@@ -13,12 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.rib.IPv4NextHop.java 
+ * File: org.bgp4j.rib.BinaryNextHop.java 
  */
-package org.bgp4j.rib;
+package org.bgp4j.net;
 
-import java.net.InetAddress;
-
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -26,18 +25,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class InetAddressNextHop<T extends InetAddress> implements NextHop {
+public class BinaryNextHop implements NextHop {
 
-	private T address;
+	private byte[] address;
 	
-	public InetAddressNextHop(T address) {
+	public BinaryNextHop(byte[] address) {
 		this.address = address;
 	}
-	
+
 	/**
-	 * @return the address
+	 * @return the nextHop
 	 */
-	public T getAddress() {
+	public byte[] getAddress() {
 		return address;
 	}
 
@@ -53,14 +52,29 @@ public class InetAddressNextHop<T extends InetAddress> implements NextHop {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
-		if(!(obj instanceof InetAddressNextHop))
+		if(!(obj instanceof BinaryNextHop))
 			return false;
-
-		InetAddressNextHop<T> o = (InetAddressNextHop<T>)obj;
+		
+		BinaryNextHop o = (BinaryNextHop)obj;
 		
 		return (new EqualsBuilder()).append(getAddress(), o.getAddress()).isEquals();
 	}
 
+	@Override
+	public int compareTo(NextHop o) {
+		CompareToBuilder builder = (new CompareToBuilder())
+				.append(getType(), o.getType());
+		
+		if(o.getType() == Type.Binary) {
+			builder.append(getAddress(), ((BinaryNextHop)o).getAddress());
+		}
+		
+		return builder.toComparison();
+	}
+
+	@Override
+	public Type getType() {
+		return Type.Binary;
+	}
 }

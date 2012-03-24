@@ -20,6 +20,7 @@ package org.bgp4j.rib;
 import java.util.Collection;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.NextHop;
 import org.bgp4j.net.attributes.PathAttribute;
 
 /**

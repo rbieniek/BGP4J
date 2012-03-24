@@ -15,10 +15,11 @@
  * 
  * File: org.bgp4j.rib.BinaryNextHopTest.java 
  */
-package org.bgp4j.rib;
+package org.bgp4j.net;
 
 import junit.framework.Assert;
 
+import org.bgp4j.net.BinaryNextHop;
 import org.junit.Test;
 
 /**
@@ -57,5 +58,45 @@ public class BinaryNextHopTest {
 		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3, 4, 5});
 		
 		Assert.assertFalse(a.hashCode() == b.hashCode());		
+	}
+	
+	@Test
+	public void testAllEquals() {
+		BinaryNextHop a = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		
+		Assert.assertTrue(a.compareTo(b) == 0);		
+	}
+	
+	@Test
+	public void testSmallerSize() {
+		BinaryNextHop a = new BinaryNextHop(new byte[] {1, 2, 3});
+		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		
+		Assert.assertTrue(a.compareTo(b) < 0);		
+	}
+	
+	@Test
+	public void testLargerSize() {
+		BinaryNextHop a = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3});
+		
+		Assert.assertTrue(a.compareTo(b) > 0);		
+	}
+	
+	@Test
+	public void testSmallerContent() {
+		BinaryNextHop a = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3, 5});
+		
+		Assert.assertTrue(a.compareTo(b) < 0);		
+	}
+	
+	@Test
+	public void testLargerContent() {
+		BinaryNextHop a = new BinaryNextHop(new byte[] {1, 2, 3, 5});
+		BinaryNextHop b = new BinaryNextHop(new byte[] {1, 2, 3, 4});
+		
+		Assert.assertTrue(a.compareTo(b) > 0);		
 	}
 }

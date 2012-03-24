@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.rib.NextHop.java 
  */
-package org.bgp4j.rib;
+package org.bgp4j.net;
 
 /**
  * Generic next-hop information
@@ -23,8 +23,13 @@ package org.bgp4j.rib;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface NextHop {
+public interface NextHop extends Comparable<NextHop> {
 
+	public enum Type {
+		InetAddress,
+		Binary;
+	}
+	
 	/**
 	 * Equals other instance
 	 * 
@@ -39,4 +44,11 @@ public interface NextHop {
 	 * @return
 	 */
 	public int hashCode();
+	
+	/**
+	 * get the type of the next hop
+	 * 
+	 * @return
+	 */
+	public Type getType();
 }

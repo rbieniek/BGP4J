@@ -26,6 +26,7 @@ import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.PathAttribute;

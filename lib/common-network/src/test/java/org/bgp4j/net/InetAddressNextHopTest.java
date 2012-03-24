@@ -15,13 +15,14 @@
  * 
  * File: org.bgp4j.rib.InetAddressNextHopTest.java 
  */
-package org.bgp4j.rib;
+package org.bgp4j.net;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.bgp4j.net.InetAddressNextHop;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -71,6 +72,36 @@ public class InetAddressNextHopTest {
 				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x02}));
 		
 		Assert.assertFalse(a.hashCode() == b.hashCode());
+	}
+
+	@Test
+	public void testComparesEqualInet4AddressInet4Address() throws UnknownHostException {
+		InetAddressNextHop<Inet4Address> a = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01}));
+		InetAddressNextHop<Inet4Address> b = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01}));
+		
+		Assert.assertTrue(a.compareTo(b) == 0);
+	}
+	
+	@Test
+	public void testComparesSmallerInet4AddressInet4Address() throws UnknownHostException {
+		InetAddressNextHop<Inet4Address> a = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x00}));
+		InetAddressNextHop<Inet4Address> b = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01}));
+		
+		Assert.assertTrue(a.compareTo(b) < 0);
+	}
+	
+	@Test
+	public void testComparesLargerInet4AddressInet4Address() throws UnknownHostException {
+		InetAddressNextHop<Inet4Address> a = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x02}));
+		InetAddressNextHop<Inet4Address> b = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01}));
+		
+		Assert.assertTrue(a.compareTo(b) > 0);
 	}
 
 	// Inet6 Inet6
@@ -128,6 +159,48 @@ public class InetAddressNextHopTest {
 		}));
 		
 		Assert.assertFalse(a.hashCode() == b.hashCode());
+	}
+
+	@Test
+	public void testComparesEqualInet6AddressInet6Address() throws UnknownHostException {
+		InetAddressNextHop<Inet6Address> a = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1
+		}));
+		InetAddressNextHop<Inet6Address> b = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1
+		}));
+		
+		Assert.assertTrue(a.compareTo(b) == 0);
+	}
+
+	@Test
+	public void testComparesSmallerInet6AddressInet6Address() throws UnknownHostException {
+		InetAddressNextHop<Inet6Address> a = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe0
+		}));
+		InetAddressNextHop<Inet6Address> b = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1
+		}));
+		
+		Assert.assertTrue(a.compareTo(b) < 0);
+	}
+
+	@Test
+	public void testComparesLargerInet6AddressInet6Address() throws UnknownHostException {
+		InetAddressNextHop<Inet6Address> a = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe2
+		}));
+		InetAddressNextHop<Inet6Address> b = new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1
+		}));
+		
+		Assert.assertTrue(a.compareTo(b) > 0);
 	}
 
 	// Inet4 Inet
@@ -227,5 +300,30 @@ public class InetAddressNextHopTest {
 		}));
 		
 		Assert.assertFalse(a.hashCode() == b.hashCode());
+	}
+	
+	// Inet 4 Inet 6
+	@Test
+	public void testComparesSmallerInet4AddressInet6Address() throws UnknownHostException {
+		InetAddressNextHop<InetAddress> a = new InetAddressNextHop<InetAddress>(InetAddress.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x00}));
+		InetAddressNextHop<InetAddress> b = new InetAddressNextHop<InetAddress>(InetAddress.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe2
+		}));
+		
+		Assert.assertTrue(a.compareTo(b) < 0);
+	}
+
+	@Test
+	public void testComparesLargerInet6AddressInet4Address() throws UnknownHostException {
+		InetAddressNextHop<InetAddress> a = new InetAddressNextHop<InetAddress>(InetAddress.getByAddress(new byte[] { 
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe2
+		}));
+		InetAddressNextHop<InetAddress> b = new InetAddressNextHop<InetAddress>(InetAddress.getByAddress(new byte[] { 
+				(byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x00}));
+		
+		Assert.assertTrue(a.compareTo(b) > 0);
 	}
 }

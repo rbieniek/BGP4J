@@ -23,6 +23,7 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.NextHop;
 import org.bgp4j.net.attributes.PathAttribute;
 
 /**
