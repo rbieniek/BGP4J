@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.ASTypeAware;
+import org.bgp4j.net.InetAddressComparator;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -121,7 +122,7 @@ public class AggregatorPathAttribute extends PathAttribute implements ASTypeAwar
 		
 		return (new CompareToBuilder())
 			.append(getAsNumber(), o.getAsNumber())
-			.append(getAggregator(), o.getAggregator())
+			.append(getAggregator(), o.getAggregator(), new InetAddressComparator())
 			.append(getAsType(), o.getAsType())
 			.toComparison();
 	}
