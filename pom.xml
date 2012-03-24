@@ -150,6 +150,7 @@
     <version.org.quartz-scheduler>2.1.3</version.org.quartz-scheduler>
     <version.org.jbehave>3.5.4</version.org.jbehave>
     <version.org.drools>5.3.1.Final</version.org.drools>
+    <version.org.eclipse.jetty>8.1.2.v20120308</version.org.eclipse.jetty>
   </properties>
 
   <modules>
@@ -261,6 +262,26 @@
 	<groupId>org.apache.commons</groupId>
 	<artifactId>commons-lang3</artifactId>
 	<version>${version.commons.lang}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.eclipse.jetty</groupId>
+	<artifactId>jetty-http</artifactId>
+	<version>${version.org.eclipse.jetty}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.eclipse.jetty</groupId>
+	<artifactId>jetty-server</artifactId>
+	<version>${version.org.eclipse.jetty}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.eclipse.jetty</groupId>
+	<artifactId>jetty-servlet</artifactId>
+	<version>${version.org.eclipse.jetty}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.eclipse.jetty</groupId>
+	<artifactId>jetty-webapp</artifactId>
+	<version>${version.org.eclipse.jetty}</version>
       </dependency>
       <dependency>
 	<groupId>org.jboss.arquillian</groupId>
