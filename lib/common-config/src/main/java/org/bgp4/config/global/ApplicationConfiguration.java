@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.ModifiableConfiguration;
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.HttpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
@@ -42,14 +43,17 @@ import org.bgp4.config.nodes.PeerConfiguration;
 @Singleton
 public class ApplicationConfiguration implements ModifiableConfiguration {
 
-	private BgpServerConfiguration serverConfiguration;
+	private BgpServerConfiguration bgpServerConfiguration;
+	private HttpServerConfiguration httpServerConfiguration;
 	private Map<String, PeerConfiguration> peers = new HashMap<String, PeerConfiguration>();
 	
-	private @Any @Inject Event<BgpServerConfigurationEvent> serverConfigurationEvent;
+	private @Any @Inject Event<BgpServerConfigurationEvent> bgpServerConfigurationEvent;
+	private @Any @Inject Event<HttpServerConfigurationEvent> httpServerConfigurationEvent;
 	private @Any @Inject Event<PeerConfigurationEvent> peerConfigurationEvent;
 	
 	void resetConfiguration() {
-		this.serverConfiguration = null;
+		this.bgpServerConfiguration = null;
+		this.httpServerConfiguration = null;
 		this.peers = new HashMap<String, PeerConfiguration>();
 	}
 	
@@ -65,17 +69,30 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	 */
 	@Override
 	public BgpServerConfiguration getBgpServerConfiguration() {
-		return serverConfiguration;
+		return bgpServerConfiguration;
 	}
 	
 	@Override
 	public void setBgpServerConfiguration(BgpServerConfiguration serverConfiguration) {
-		EventType type = EventType.determineEvent(this.serverConfiguration, serverConfiguration);
+		EventType type = EventType.determineEvent(this.bgpServerConfiguration, serverConfiguration);
 		
-		this.serverConfiguration = serverConfiguration;
+		this.bgpServerConfiguration = serverConfiguration;
 
 		if(type != null)
-			serverConfigurationEvent.fire(new BgpServerConfigurationEvent(type, this.serverConfiguration));
+			bgpServerConfigurationEvent.fire(new BgpServerConfigurationEvent(type, this.bgpServerConfiguration));
+	}
+
+	public HttpServerConfiguration getHttpServerConfiguration() {
+		return httpServerConfiguration;
+	}
+
+	public void setHttpServerConfiguration(HttpServerConfiguration httpServerConfiguration) {
+		EventType type = EventType.determineEvent(this.httpServerConfiguration, httpServerConfiguration);
+
+		this.httpServerConfiguration = httpServerConfiguration;
+		
+		if(type != null)
+			httpServerConfigurationEvent.fire(new HttpServerConfigurationEvent(type, this.httpServerConfiguration));
 	}
 
 	/* (non-Javadoc)

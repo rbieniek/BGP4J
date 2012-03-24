@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <HttpServer>
+        <Server listen="192.168.4.1" port="8080" />
+    </HttpServer>
+</Config>

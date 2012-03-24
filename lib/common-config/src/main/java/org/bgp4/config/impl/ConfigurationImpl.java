@@ -29,6 +29,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.nodes.AS4OctetPeerConfigurationDecorator;
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.HttpServerConfiguration;
 import org.bgp4.config.nodes.IPv4RequiredCapabilityPeerConfigurationDecorator;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4.config.nodes.PeerConfigurationTimerDecorator;
@@ -41,6 +42,8 @@ import org.bgp4.config.nodes.impl.FixedDefaultsPeerConfigurationTimerDecorator;
 public class ConfigurationImpl implements Configuration {
 
 	private BgpServerConfiguration bgpServerConfigImpl;
+	private HttpServerConfiguration httpServerConfiguration;
+	
 	private Map<String, PeerConfiguration> peerMap = new HashMap<String, PeerConfiguration>();
 	
 	@Override
@@ -50,6 +53,16 @@ public class ConfigurationImpl implements Configuration {
 	
 	void setBgpServerConfiguration(BgpServerConfiguration bgpServerConfigImpl) {
 		this.bgpServerConfigImpl = bgpServerConfigImpl;
+	}
+
+	@Override
+	public HttpServerConfiguration getHttpServerConfiguration() {
+		return httpServerConfiguration;
+	}
+
+	public void setHttpServerConfiguration(
+			HttpServerConfiguration httpServerConfiguration) {
+		this.httpServerConfiguration = httpServerConfiguration;
 	}
 
 	@Override

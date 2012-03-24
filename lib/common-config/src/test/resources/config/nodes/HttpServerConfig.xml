@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+    <HttpServer>
+        <!-- no <Server/> element given -->
+    </HttpServer>
+    
+    <HttpServer>
+        <!-- explizit <Server/> element given -->
+        <Server />
+    </HttpServer>
+    
+    <HttpServer>
+        <!-- explizit <Server/> element w/ port given -->
+        <Server port="17179" />
+    </HttpServer>
+
+    <HttpServer>
+        <!-- bogus, only one xplizit <Server/> element allowed -->
+        <Server port="17179" />
+        <Server port="17178" />
+    </HttpServer>
+    
+    
+</Config>

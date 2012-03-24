@@ -53,6 +53,7 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		
 		Assert.assertNotNull(config);
 		Assert.assertNull(config.getBgpServerConfiguration());
+		Assert.assertNull(config.getHttpServerConfiguration());
 	}
 
 	@Test(expected=ConfigurationException.class)
@@ -61,6 +62,7 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		
 		Assert.assertNotNull(config);
 		Assert.assertNull(config.getBgpServerConfiguration());
+		Assert.assertNull(config.getHttpServerConfiguration());
 	}
 	
 	@Test
@@ -71,13 +73,36 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		Assert.assertNotNull(config.getBgpServerConfiguration());
 		Assert.assertEquals(17179, config.getBgpServerConfiguration().getServerConfiguration().getListenAddress().getPort());
 		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), config.getBgpServerConfiguration().getServerConfiguration().getListenAddress().getAddress());
+		Assert.assertNull(config.getHttpServerConfiguration());
+	}
+
+
+	@Test(expected=ConfigurationException.class)
+	public void testConfigurationDuplicateHttpServerConfiguration() throws Exception {
+		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-DuplicateHttpServer.xml"));
+		
+		Assert.assertNotNull(config);
+		Assert.assertNull(config.getBgpServerConfiguration());
+		Assert.assertNull(config.getHttpServerConfiguration());
 	}
 	
+	@Test
+	public void testConfigurationWithHttpServerConfiguration() throws Exception {
+		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-HttpServer.xml"));
+		
+		Assert.assertNotNull(config);
+		Assert.assertNotNull(config.getHttpServerConfiguration());
+		Assert.assertEquals(8080, config.getHttpServerConfiguration().getServerConfiguration().getListenAddress().getPort());
+		Assert.assertEquals(InetAddress.getByName("192.168.4.1"), config.getHttpServerConfiguration().getServerConfiguration().getListenAddress().getAddress());
+		Assert.assertNull(config.getBgpServerConfiguration());
+	}
+
 	@Test
 	public void testConfigurationWithTwoBgpPeers() throws Exception {
 		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-BgpPeers.xml"));
 		PeerConfiguration peerConfig;
 		
+		Assert.assertNull(config.getHttpServerConfiguration());
 		Assert.assertEquals(2, config.listPeerNames().size());
 		
 		peerConfig = config.getPeer("foo1");
@@ -102,6 +127,7 @@ public class ConfigurationParserImplTest extends ConfigTestBase {
 		Configuration config = parser.parseConfiguration(loadConfiguration("config/Config-With-BgpPeers-IPv4BGPIdentifier.xml"));
 		PeerConfiguration peerConfig;
 		
+		Assert.assertNull(config.getHttpServerConfiguration());
 		Assert.assertEquals(2, config.listPeerNames().size());
 		
 		peerConfig = config.getPeer("foo1");

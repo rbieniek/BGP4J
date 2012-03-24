@@ -27,6 +27,7 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4.config.Configuration;
 import org.bgp4.config.nodes.impl.BgpServerConfigurationParser;
+import org.bgp4.config.nodes.impl.HttpServerConfigurationParser;
 import org.bgp4.config.nodes.impl.PeerConfigurationParser;
 
 /**
@@ -37,17 +38,24 @@ import org.bgp4.config.nodes.impl.PeerConfigurationParser;
 public class ConfigurationParserImpl {
 
 	private @Inject BgpServerConfigurationParser bgpServerConfigurationParser;
+	private @Inject HttpServerConfigurationParser httpServerConfigurationParser;
 	private @Inject PeerConfigurationParser peerConfigurationParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
 		ConfigurationImpl configImpl = new ConfigurationImpl();
 		List<HierarchicalConfiguration> bgpServerNodes = configuration.configurationsAt("BgpServer");
+		List<HierarchicalConfiguration> httpServerNodes = configuration.configurationsAt("HttpServer");
 		List<HierarchicalConfiguration> bgpPeerNodes = configuration.configurationsAt("BgpPeers.BgpPeer");
 		
 		if(bgpServerNodes.size() > 1)
 			throw new ConfigurationException("Duplicate <BgpServer /> element");
 		else if(bgpServerNodes.size() == 1)
 			configImpl.setBgpServerConfiguration(bgpServerConfigurationParser.parseConfiguration(bgpServerNodes.get(0)));
+		
+		if(httpServerNodes.size() > 1)
+			throw new ConfigurationException("Duplicate <HttpServer /> element");
+		else if(httpServerNodes.size() == 1)
+			configImpl.setHttpServerConfiguration(httpServerConfigurationParser.parseConfiguration(httpServerNodes.get(0)));
 		
 		for(HierarchicalConfiguration bgpPeerNode : bgpPeerNodes) {
 			configImpl.addPeer(peerConfigurationParser.parseConfiguration(bgpPeerNode));
