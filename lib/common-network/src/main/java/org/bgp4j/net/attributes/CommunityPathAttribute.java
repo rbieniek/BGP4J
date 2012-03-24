@@ -17,6 +17,7 @@
  */
 package org.bgp4j.net.attributes;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,13 +31,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class CommunityPathAttribute extends PathAttribute {
 
-	public CommunityPathAttribute() {
-		super(Category.OPTIONAL_TRANSITIVE);
-	}
-
 	public static class CommunityMember implements Comparable<CommunityMember> {
 		private int asNumber;
 		private int memberFlags;
+		
+		public CommunityMember() {}
+		
+		public CommunityMember(int asNumber, int memberFlags) {
+			this.asNumber = asNumber;
+			this.memberFlags = memberFlags;
+		}
+		
 		/**
 		 * @return the asNumber
 		 */
@@ -101,6 +106,22 @@ public class CommunityPathAttribute extends PathAttribute {
 	private int community;
 	private List<CommunityMember> members = new LinkedList<CommunityPathAttribute.CommunityMember>();
 
+	public CommunityPathAttribute() {
+		super(Category.OPTIONAL_TRANSITIVE);
+	}
+
+	public CommunityPathAttribute(int community) {
+		super(Category.OPTIONAL_TRANSITIVE);
+		
+		this.community = community;
+	}
+
+	public CommunityPathAttribute(int community, List<CommunityMember> members) {
+		this(community);
+		
+		if(members != null)
+			this.members.addAll(members);
+	}
 	/**
 	 * @return the community
 	 */
@@ -126,7 +147,10 @@ public class CommunityPathAttribute extends PathAttribute {
 	 * @param members the members to set
 	 */
 	public void setMembers(List<CommunityMember> members) {
-		this.members = members;
+		if(members != null)
+			this.members = members;
+		else
+			this.members = new LinkedList<CommunityPathAttribute.CommunityMember>();
 	}
 
 	@Override
@@ -136,20 +160,51 @@ public class CommunityPathAttribute extends PathAttribute {
 
 	@Override
 	protected boolean subclassEquals(PathAttribute obj) {
-		// TODO Auto-generated method stub
-		return false;
+		CommunityPathAttribute o = (CommunityPathAttribute)obj;
+		
+		EqualsBuilder builder = (new EqualsBuilder())
+			.append(getCommunity(), o.getCommunity())
+			.append(getMembers().size(), o.getMembers().size());
+		
+		if(builder.isEquals()) {
+			Iterator<CommunityMember> lit = getMembers().iterator();
+			Iterator<CommunityMember> rit = o.getMembers().iterator();
+			
+			while(lit.hasNext())
+				builder.append(lit.next(), rit.next());
+		}
+		
+		return builder.isEquals();
 	}
 
 	@Override
 	protected int sublcassHashCode() {
-		// TODO Auto-generated method stub
-		return 0;
+		HashCodeBuilder builder = (new HashCodeBuilder())
+				.append(getCommunity());
+		Iterator<CommunityMember> it = getMembers().iterator();
+		
+		while(it.hasNext())
+			builder.append(it.next());
+		
+		return builder.toHashCode();
 	}
 
 	@Override
-	protected int subclassCompareTo(PathAttribute o) {
-		// TODO Auto-generated method stub
-		return 0;
+	protected int subclassCompareTo(PathAttribute obj) {
+		CommunityPathAttribute o = (CommunityPathAttribute)obj;
+		CompareToBuilder builder = (new CompareToBuilder())
+			.append(getCommunity(), o.getCommunity())
+			.append(getMembers().size(), o.getMembers().size());
+		
+		if(builder.toComparison() == 0) {
+			Iterator<CommunityMember> lit = getMembers().iterator();
+			Iterator<CommunityMember> rit = o.getMembers().iterator();
+			
+			while(lit.hasNext())
+				builder.append(lit.next(), rit.next());
+		}
+		
+		return builder.toComparison();
 	}
 
 }

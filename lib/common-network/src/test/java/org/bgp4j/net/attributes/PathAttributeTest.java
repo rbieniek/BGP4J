@@ -49,14 +49,18 @@ public class PathAttributeTest {
 		for(int i=0; i<attrs.length; i++) {
 			for(int j=0; j<attrs.length; j++) {
 				if(i != j) {
-					Assert.assertFalse(attrs[i].equals(attrs[j]));
-					Assert.assertFalse(attrs[i].hashCode() != attrs[j].hashCode());
+					Assert.assertFalse("comparing " + attrs[i].getClass().getName() + " to " + attrs[j].getClass().getName(),
+							attrs[i].equals(attrs[j]));
+					Assert.assertFalse("comparing " + attrs[i].getClass().getName() + " to " + attrs[j].getClass().getName(),
+							attrs[i].hashCode() == attrs[j].hashCode());
 				}
 			}
 		}
+		
 		for(int i=0; i<attrs.length; i++) {
 			for(int j=i+1; j<attrs.length; j++) {
-				Assert.assertTrue(attrs[i].compareTo(attrs[j]) < 0);
+				Assert.assertTrue("comparing " + attrs[i].getClass().getName() + " to " + attrs[j].getClass().getName(),
+						attrs[i].compareTo(attrs[j]) < 0);
 			}
 		}
 	}
