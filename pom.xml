@@ -151,6 +151,7 @@
     <version.org.jbehave>3.5.4</version.org.jbehave>
     <version.org.drools>5.3.1.Final</version.org.drools>
     <version.org.eclipse.jetty>8.1.2.v20120308</version.org.eclipse.jetty>
+    <version.org.jboss.resteasy>2.3.1.GA</version.org.jboss.resteasy>
   </properties>
 
   <modules>
@@ -227,6 +228,13 @@
 	<groupId>org.hibernate</groupId>
 	<artifactId>hibernate-validator</artifactId>
 	<version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+	<groupId>org.jboss.resteasy</groupId>
+	<artifactId>resteasy-bom</artifactId>
+	<version>${version.org.jboss.resteasy}</version>
+	<type>pom</type>
+	<scope>import</scope>
       </dependency>
       <dependency>
 	<groupId>org.quartz-scheduler</groupId>
