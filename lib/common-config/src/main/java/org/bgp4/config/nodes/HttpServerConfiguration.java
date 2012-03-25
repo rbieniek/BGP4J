@@ -13,31 +13,36 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.ModifiableConfiguration.java 
+ * File: org.bgp4.config.BgpServerConfiguration.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.nodes;
 
-import org.bgp4.config.nodes.BgpServerConfiguration;
-import org.bgp4.config.nodes.HttpServerConfiguration;
 
 /**
- * Interface implemented by configuration obejct which support modifications of its contents
+ * BGP server configuration
  * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface ModifiableConfiguration extends Configuration {
-	/**
-	 * 
-	 * 
-	 * @param serverConfiguration
-	 */
-	public void setBgpServerConfiguration(BgpServerConfiguration serverConfiguration);
+public interface HttpServerConfiguration {
 
 	/**
+	 * get the server configuration
 	 * 
-	 * 
-	 * @param serverConfiguration
+	 * @return
 	 */
-	public void setHttpServerConfiguration(HttpServerConfiguration serverConfiguration);
+	public ServerConfiguration getServerConfiguration();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean equals(Object other);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int hashCode();
+
 }

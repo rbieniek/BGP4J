@@ -13,31 +13,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4.config.ModifiableConfiguration.java 
+ * File: org.bgp4.config.nodes.impl.BgpServerPortConfigurationDecorator.java 
  */
-package org.bgp4.config;
+package org.bgp4.config.nodes.impl;
 
-import org.bgp4.config.nodes.BgpServerConfiguration;
-import org.bgp4.config.nodes.HttpServerConfiguration;
+import org.bgp4.config.nodes.ServerConfiguration;
+import org.bgp4.config.nodes.ServerPortConfigurationDecorator;
 
 /**
- * Interface implemented by configuration obejct which support modifications of its contents
- * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface ModifiableConfiguration extends Configuration {
-	/**
-	 * 
-	 * 
-	 * @param serverConfiguration
-	 */
-	public void setBgpServerConfiguration(BgpServerConfiguration serverConfiguration);
+public class HttpServerPortConfigurationDecorator extends ServerPortConfigurationDecorator {
 
-	/**
-	 * 
-	 * 
-	 * @param serverConfiguration
+	private static final int HTTP_NON_ROOT_PORT = 8080;
+	
+	public HttpServerPortConfigurationDecorator(ServerConfiguration decorated) {
+		super(decorated);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.bgp4.config.nodes.ServerPortConfigurationDecorator#getDefaultPort()
 	 */
-	public void setHttpServerConfiguration(HttpServerConfiguration serverConfiguration);
+	@Override
+	protected int getDefaultPort() {
+		return HTTP_NON_ROOT_PORT;
+	}
+
 }

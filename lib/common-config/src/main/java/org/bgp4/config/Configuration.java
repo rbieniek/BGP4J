@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bgp4.config.nodes.BgpServerConfiguration;
+import org.bgp4.config.nodes.HttpServerConfiguration;
 import org.bgp4.config.nodes.PeerConfiguration;
 
 /**
@@ -37,6 +38,13 @@ public interface Configuration {
 	 * @return
 	 */
 	public BgpServerConfiguration getBgpServerConfiguration();
+	
+	/**
+	 * get the HTTP server configuration
+	 * 
+	 * @return
+	 */
+	public HttpServerConfiguration getHttpServerConfiguration();
 	
 	/**
 	 * list peer names
