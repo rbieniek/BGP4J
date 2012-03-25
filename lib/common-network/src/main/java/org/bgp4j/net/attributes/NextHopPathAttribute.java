@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bgp4j.net.InetAddressNextHop;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -35,16 +36,35 @@ public class NextHopPathAttribute extends PathAttribute {
 	public NextHopPathAttribute(Inet4Address nextHop) {
 		super(Category.WELL_KNOWN_MANDATORY);
 		
+		setNextHop(new InetAddressNextHop<Inet4Address>(nextHop));
+	}
+
+	public NextHopPathAttribute(InetAddressNextHop<Inet4Address> nextHop) {
+		super(Category.WELL_KNOWN_MANDATORY);
+		
 		setNextHop(nextHop);
 	}
 
-	private Inet4Address nextHop;
+	private InetAddressNextHop<Inet4Address> nextHop;
 	
 	/**
 	 * @return the nextHop
 	 */
-	public Inet4Address getNextHop() {
+	public InetAddressNextHop<Inet4Address> getNextHop() {
 		return nextHop;
+	}
+
+	/**
+	 * set the next hop. If the next hop is semantically invalid, an exception is raised.
+	 * 
+	 * @param nextHop the nextHop to set, MUST NOT be an IP multicast address
+	 * @throws IllegalArgumentException next hop address is a multicast address.
+	 */
+	public void setNextHop(InetAddressNextHop<Inet4Address> nextHop) {
+		if(nextHop.getAddress().isMulticastAddress())
+			throw new IllegalArgumentException();
+		
+		this.nextHop = nextHop;
 	}
 
 	/**
@@ -57,7 +77,7 @@ public class NextHopPathAttribute extends PathAttribute {
 		if(nextHop.isMulticastAddress())
 			throw new IllegalArgumentException();
 		
-		this.nextHop = nextHop;
+		this.nextHop = new InetAddressNextHop<Inet4Address>(nextHop);
 	}
 
 	@Override

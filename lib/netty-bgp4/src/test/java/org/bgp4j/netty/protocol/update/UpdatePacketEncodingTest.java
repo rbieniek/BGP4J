@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.BinaryNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.Origin;
 import org.bgp4j.net.PathSegmentType;
@@ -1336,7 +1337,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	
 		update.getPathAttributes().add(new MultiProtocolReachableNLRI(AddressFamily.IPv4, 
 				SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
-				null,
+				(BinaryNextHop)null,
 				new NetworkLayerReachabilityInformation[] {
 				new NetworkLayerReachabilityInformation(12, new byte[] { (byte)0xac, (byte)0x10, }),
 		}));

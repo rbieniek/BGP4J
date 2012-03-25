@@ -150,7 +150,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		NextHopPathAttribute nextHop = (NextHopPathAttribute)packet.getPathAttributes().remove(0);
 		
-		Assert.assertEquals(Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop());
+		Assert.assertEquals(Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop().getAddress());
 	}
 	
 	@Test
@@ -221,7 +221,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(0, asPath.getPathSegments().size());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_NEXT_HOP, PathAttributeCodec.typeCode(nextHop));
-		Assert.assertEquals(Inet4Address.getByAddress(new byte[] {(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop());
+		Assert.assertEquals(Inet4Address.getByAddress(new byte[] {(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop().getAddress());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_MULTI_EXIT_DISC, PathAttributeCodec.typeCode(multiExitDisc));
 		Assert.assertEquals(2048, multiExitDisc.getDiscriminator());
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_LOCAL_PREF, PathAttributeCodec.typeCode(localPref));
@@ -1962,7 +1962,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		Assert.assertNull(mp.getNextHopAddress());
+		Assert.assertNull(mp.getNextHop());
 		Assert.assertEquals(0, mp.getNlris().size());
 	}	
 
@@ -1987,7 +1987,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHop().getAddress());
 		Assert.assertEquals(0, mp.getNlris().size());
 	}	
 
@@ -2015,7 +2015,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHop().getAddress());
 		Assert.assertEquals(1, mp.getNlris().size());
 		
 		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
@@ -2049,7 +2049,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHop().getAddress());
 		Assert.assertEquals(2, mp.getNlris().size());
 
 		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);
@@ -2087,7 +2087,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		Assert.assertNull(mp.getNextHopAddress());
+		Assert.assertNull(mp.getNextHop());
 		Assert.assertEquals(1, mp.getNlris().size());
 		
 		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);

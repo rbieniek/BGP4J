@@ -483,16 +483,12 @@ public class BGPv4FSM {
 		// withdraw IPv4 prefixes
 		prib.routingBase(RIBSide.Remote, ipv4Unicast).withdrawRoutes(message.getWithdrawnRoutes());
 		
-		// add IPV4 routes
-		InetAddressNextHop<Inet4Address> nextHop = null;
-		
 		Set<NextHopPathAttribute> nextHops = message.lookupPathAttributes(NextHopPathAttribute.class);
 		
 		if(nextHops.size() > 1)
 			throw new InvalidNextHopException();
-		nextHop = new InetAddressNextHop<Inet4Address>(nextHops.iterator().next().getNextHop());
 		
-		prib.routingBase(RIBSide.Remote, ipv4Unicast).addRoutes(message.getNlris(), otherAttributes, nextHop);
+		prib.routingBase(RIBSide.Remote, ipv4Unicast).addRoutes(message.getNlris(), otherAttributes, nextHops.iterator().next().getNextHop());
 		
 	}
 

@@ -26,6 +26,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.BinaryNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.SubsequentAddressFamily;
 
@@ -37,7 +38,7 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
-	private byte[] nextHopAddress;
+	private BinaryNextHop nextHop;
 	private List<NetworkLayerReachabilityInformation> nlris = new LinkedList<NetworkLayerReachabilityInformation>();
 	
 	/**
@@ -63,7 +64,16 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 	public MultiProtocolReachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, byte[] nextHopAddress) {
 		this(addressFamily, subsequentAddressFamily);
 		
-		this.nextHopAddress = nextHopAddress;
+		setNextHopAddress(nextHopAddress);
+	}
+	
+	/**
+	 * @param category
+	 */
+	public MultiProtocolReachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, BinaryNextHop nextHop) {
+		this(addressFamily, subsequentAddressFamily);
+		
+		this.nextHop = nextHop;
 	}
 	
 	/**
@@ -72,6 +82,17 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 	public MultiProtocolReachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, byte[] nextHopAddress, 
 			NetworkLayerReachabilityInformation[] nlris) {
 		this(addressFamily, subsequentAddressFamily, nextHopAddress);
+		
+		for(NetworkLayerReachabilityInformation nlri : nlris)
+			this.nlris.add(nlri);
+	}
+	
+	/**
+	 * @param category
+	 */
+	public MultiProtocolReachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, BinaryNextHop nextHop, 
+			NetworkLayerReachabilityInformation[] nlris) {
+		this(addressFamily, subsequentAddressFamily, nextHop);
 		
 		for(NetworkLayerReachabilityInformation nlri : nlris)
 			this.nlris.add(nlri);
@@ -109,15 +130,25 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 	/**
 	 * @return the nextHopAddress
 	 */
-	public byte[] getNextHopAddress() {
-		return nextHopAddress;
+	public BinaryNextHop getNextHop() {
+		return nextHop;
 	}
 
 	/**
 	 * @param nextHopAddress the nextHopAddress to set
 	 */
 	public void setNextHopAddress(byte[] nextHopAddress) {
-		this.nextHopAddress = nextHopAddress;
+		if(nextHopAddress != null)
+			this.nextHop = new BinaryNextHop(nextHopAddress);
+		else
+			this.nextHop = null;
+	}
+
+	/**
+	 * @param nextHopAddress the nextHopAddress to set
+	 */
+	public void setNextHop(BinaryNextHop nextHop) {
+		this.nextHop = nextHop;
 	}
 
 	/**
@@ -150,7 +181,7 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 		EqualsBuilder builer = (new EqualsBuilder())
 				.append(getAddressFamily(), o.getAddressFamily())
 				.append(getSubsequentAddressFamily(), o.getSubsequentAddressFamily())
-				.append(getNextHopAddress(), o.getNextHopAddress())
+				.append(getNextHop(), o.getNextHop())
 				.append(getNlris().size(), o.getNlris().size());
 		
 		if(builer.isEquals()) {
@@ -169,7 +200,7 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 		HashCodeBuilder builder = (new HashCodeBuilder())
 				.append(getAddressFamily())
 				.append(getSubsequentAddressFamily())
-				.append(getNextHopAddress());
+				.append(getNextHop());
 		Iterator<NetworkLayerReachabilityInformation> it = getNlris().iterator();
 		
 		while(it.hasNext())
@@ -185,7 +216,7 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 		CompareToBuilder builer = (new CompareToBuilder())
 				.append(getAddressFamily(), o.getAddressFamily())
 				.append(getSubsequentAddressFamily(), o.getSubsequentAddressFamily())
-				.append(getNextHopAddress(), o.getNextHopAddress())
+				.append(getNextHop(), o.getNextHop())
 				.append(getNlris().size(), o.getNlris().size());
 		
 		if(builer.toComparison() == 0) {

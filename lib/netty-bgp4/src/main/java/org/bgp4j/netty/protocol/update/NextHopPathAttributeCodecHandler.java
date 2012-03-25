@@ -52,7 +52,7 @@ public class NextHopPathAttributeCodecHandler extends
 	public ChannelBuffer encodeValue(NextHopPathAttribute attr) {
 		ChannelBuffer buffer = ChannelBuffers.buffer(4);
 		
-		buffer.writeBytes(attr.getNextHop().getAddress());
+		buffer.writeBytes(attr.getNextHop().getAddress().getAddress());
 		
 		return buffer;
 	}

@@ -452,7 +452,7 @@ public class BGPv4CodecTest extends LocalChannelBGPv4TestBase {
 		Assert.assertEquals(Origin.INCOMPLETE, origin.getOrigin());
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(0, asPath.getPathSegments().size());
-		Assert.assertEquals(Inet4Address.getByAddress(new byte[] {(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop());
+		Assert.assertEquals(Inet4Address.getByAddress(new byte[] {(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02 }), nextHop.getNextHop().getAddress());
 		Assert.assertEquals(2048, multiExitDisc.getDiscriminator());
 		Assert.assertEquals(100, localPref.getLocalPreference());
 		
@@ -885,7 +885,7 @@ public class BGPv4CodecTest extends LocalChannelBGPv4TestBase {
 		
 		Assert.assertEquals(AddressFamily.IPv4, mp.getAddressFamily());
 		Assert.assertEquals(SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, mp.getSubsequentAddressFamily());
-		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHopAddress());
+		assertArraysEquals(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x02, }, mp.getNextHop().getAddress());
 		Assert.assertEquals(2, mp.getNlris().size());
 
 		NetworkLayerReachabilityInformation nlri = mp.getNlris().remove(0);

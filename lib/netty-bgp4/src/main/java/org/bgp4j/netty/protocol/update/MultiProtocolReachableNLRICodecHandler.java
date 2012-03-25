@@ -46,8 +46,8 @@ public class MultiProtocolReachableNLRICodecHandler extends
 	public int valueLength(MultiProtocolReachableNLRI attr) {
 		int size = 5; // 2 octets AFI +  1 octet SAFI + 1 octet NextHop address length + 1 octet reserved
 		
-		if(attr.getNextHopAddress() != null)
-			size += attr.getNextHopAddress().length;
+		if(attr.getNextHop() != null)
+			size += attr.getNextHop().getAddress().length;
 		
 		if(attr.getNlris() != null) {
 			for(NetworkLayerReachabilityInformation nlri : attr.getNlris())
@@ -67,9 +67,9 @@ public class MultiProtocolReachableNLRICodecHandler extends
 		buffer.writeShort(attr.getAddressFamily().toCode());
 		buffer.writeByte(attr.getSubsequentAddressFamily().toCode());
 		
-		if(attr.getNextHopAddress() != null) {
-			buffer.writeByte(attr.getNextHopAddress().length);
-			buffer.writeBytes(attr.getNextHopAddress());
+		if(attr.getNextHop() != null) {
+			buffer.writeByte(attr.getNextHop().getAddress().length);
+			buffer.writeBytes(attr.getNextHop().getAddress());
 		} else {
 			buffer.writeByte(0);
 		}
