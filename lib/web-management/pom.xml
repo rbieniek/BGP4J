@@ -12,12 +12,18 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.urb.quagga</groupId>
-  <artifactId>snmp4j-easybox</artifactId>
+  <artifactId>web-management</artifactId>
   <version>${version.de.urb.quagga}</version>
-  <name>SNMP4J interface to easybox</name>
-  <description>SNMP4J interface to easybox</description>
+  <name>Web managment app</name>
+  <description>Web management app</description>
 
   <dependencies>
+    
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-config</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
     
     <dependency>
       <groupId>de.urb.quagga</groupId>
@@ -44,6 +50,41 @@
     </dependency>
 
     <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxb-provider</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -52,12 +93,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-ext</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.snmp4j</groupId>
-      <artifactId>snmp4j</artifactId>
-    </dependency>
-    
+        
     <dependency> 
       <groupId>junit</groupId> 
       <artifactId>junit</artifactId> 
