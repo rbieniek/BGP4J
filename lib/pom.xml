@@ -18,6 +18,7 @@
     <module>common-network</module>
     <module>common-config</module>
     <module>routing</module>
+    <module>routing-web</module>
     <module>netty-bgp4</module>
     <module>snmp4j-easybox</module>
     <module>web-management</module>

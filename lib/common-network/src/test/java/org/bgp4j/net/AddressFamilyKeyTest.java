@@ -34,6 +34,7 @@ public class AddressFamilyKeyTest {
 		
 		Assert.assertTrue(k1.equals(k2));
 		Assert.assertTrue(k1.hashCode() == k2.hashCode());
+		Assert.assertTrue(k1.compareTo(k2) == 0);
 	}
 
 	@Test
@@ -54,4 +55,43 @@ public class AddressFamilyKeyTest {
 		Assert.assertFalse(k1.hashCode() == k2.hashCode());
 	}
 
+	@Test
+	public void testSmallerAddressFamily() {
+		AddressFamilyKey a = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		AddressFamilyKey b = new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+
+		Assert.assertFalse(a.equals(b));
+		Assert.assertFalse(a.hashCode() == b.hashCode());
+		Assert.assertTrue(a.compareTo(b) < 0);
+	}
+
+	@Test
+	public void testLargerAddressFamily() {
+		AddressFamilyKey a = new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		AddressFamilyKey b = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+
+		Assert.assertFalse(a.equals(b));
+		Assert.assertFalse(a.hashCode() == b.hashCode());
+		Assert.assertTrue(a.compareTo(b) > 0);
+	}
+
+	@Test
+	public void testSmallerSubsequentAddressFamily() {
+		AddressFamilyKey a = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+		AddressFamilyKey b = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
+
+		Assert.assertFalse(a.equals(b));
+		Assert.assertFalse(a.hashCode() == b.hashCode());
+		Assert.assertTrue(a.compareTo(b) < 0);
+	}
+
+	@Test
+	public void testLargerSubsequentAddressFamily() {
+		AddressFamilyKey a = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
+		AddressFamilyKey b = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+
+		Assert.assertFalse(a.equals(b));
+		Assert.assertFalse(a.hashCode() == b.hashCode());
+		Assert.assertTrue(a.compareTo(b) > 0);
+	}
 }

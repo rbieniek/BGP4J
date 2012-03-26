@@ -17,6 +17,7 @@
  */
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -25,7 +26,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class AddressFamilyKey {
+public class AddressFamilyKey implements Comparable<AddressFamilyKey> {
 
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
@@ -71,5 +72,13 @@ public class AddressFamilyKey {
 				.append(addressFamily, o.addressFamily)
 				.append(subsequentAddressFamily, o.subsequentAddressFamily)
 				.isEquals();
+	}
+
+	@Override
+	public int compareTo(AddressFamilyKey o) {
+		return (new CompareToBuilder())
+				.append(addressFamily, o.addressFamily)
+				.append(subsequentAddressFamily, o.subsequentAddressFamily)
+				.toComparison();
 	}
 }
