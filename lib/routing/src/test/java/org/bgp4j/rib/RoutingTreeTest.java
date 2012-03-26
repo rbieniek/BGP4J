@@ -20,11 +20,17 @@ package org.bgp4j.rib;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.NextHop;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.junit.After;
@@ -344,7 +350,6 @@ public class RoutingTreeTest {
 		Assert.assertEquals(0, node.getChildNodes().size());
 	}
 
-	
 	@Test
 	public void testAddTwoNodesFirstLessSpecificSecondMoreSpecificAddMoreSpecificChildRemoveLessSpecific() {
 		NetworkLayerReachabilityInformation lessNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04 }); // prefix 192.168.4/24
@@ -515,6 +520,124 @@ public class RoutingTreeTest {
 		Assert.assertTrue(tree.addRoute(moreNlri, attrs2, null));
 
 		Assert.assertNull(tree.lookupRoute(lookupNlri));
+	}
+
+	public static class RecordingNodeVisitor implements RoutingTreeVisitor {
+
+		public static class Record {
+			private NetworkLayerReachabilityInformation nlri;
+			private NextHop nextHop;
+			private Collection<PathAttribute> pathAttributes;
+			
+			public Record(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
+				this.nlri = nlri;
+				this.nextHop = nextHop;
+				this.pathAttributes = pathAttributes;
+			}
+
+			/* (non-Javadoc)
+			 * @see java.lang.Object#hashCode()
+			 */
+			@Override
+			public int hashCode() {
+				HashCodeBuilder builder = (new HashCodeBuilder())
+						.append(nlri)
+						.append(nextHop);
+				
+				for(PathAttribute a : pathAttributes)
+					builder.append(a);
+				
+				return builder.toHashCode();
+			}
+
+			/* (non-Javadoc)
+			 * @see java.lang.Object#equals(java.lang.Object)
+			 */
+			@Override
+			public boolean equals(Object obj) {
+				if(!(obj instanceof Record))
+					return false;
+				
+				Record o = (Record)obj;
+				EqualsBuilder builder = (new EqualsBuilder())
+						.append(getNextHop(), o.getNextHop())
+						.append(getNlri(), o.getNlri())
+						.append(getPathAttributes().size(), o.getPathAttributes().size());
+				
+				if(builder.isEquals()) {
+					Iterator<PathAttribute> lit = getPathAttributes().iterator();
+					Iterator<PathAttribute> rit = o.getPathAttributes().iterator();
+					
+					while(lit.hasNext())
+						builder.append(lit.next(), rit.next());
+				}
+				
+				return builder.isEquals();
+			}
+
+			/**
+			 * @return the nlri
+			 */
+			public NetworkLayerReachabilityInformation getNlri() {
+				return nlri;
+			}
+
+			/**
+			 * @return the nextHop
+			 */
+			public NextHop getNextHop() {
+				return nextHop;
+			}
+
+			/**
+			 * @return the pathAttributes
+			 */
+			public Collection<PathAttribute> getPathAttributes() {
+				return pathAttributes;
+			}
+		}
+
+		private List<Record> records = new LinkedList<RoutingTreeTest.RecordingNodeVisitor.Record>();
+
+		@Override
+		public void visitRouteTreeNode(
+				NetworkLayerReachabilityInformation nlri, NextHop nextHop,
+				Collection<PathAttribute> pathAttributes) {
+			records.add(new Record(nlri, nextHop, pathAttributes));
+		}
+
+		/**
+		 * @return the records
+		 */
+		public List<Record> getRecords() {
+			return records;
+		}
+	}
+	
+	@Test
+	public void testVisitNodes() {
+		NetworkLayerReachabilityInformation lessNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04 }); // prefix 192.168.4/24
+		NetworkLayerReachabilityInformation moreNlri1 = new NetworkLayerReachabilityInformation(28, 
+				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x10 }); // prefix 192.168.4.16/28
+		NetworkLayerReachabilityInformation moreNlri2 = new NetworkLayerReachabilityInformation(28, 
+				new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x20 }); // prefix 192.168.4.32/28
+		RecordingNodeVisitor visitor = new RecordingNodeVisitor();
+		
+		Assert.assertTrue(tree.addRoute(moreNlri1, attrs2, null));
+		Assert.assertTrue(tree.addRoute(lessNlri, attrs1, null));
+		Assert.assertTrue(tree.addRoute(moreNlri2, attrs2, null));
+
+		tree.visitTree(visitor);
+		
+		Iterator<RecordingNodeVisitor.Record> it = visitor.getRecords().iterator();
+		
+		Assert.assertTrue(it.hasNext());
+		Assert.assertEquals(new RecordingNodeVisitor.Record(lessNlri, null, attrs1), it.next());
+		Assert.assertTrue(it.hasNext());
+		Assert.assertEquals(new RecordingNodeVisitor.Record(moreNlri1, null, attrs2), it.next());
+		Assert.assertTrue(it.hasNext());
+		Assert.assertEquals(new RecordingNodeVisitor.Record(moreNlri2, null, attrs2), it.next());
+		Assert.assertFalse(it.hasNext());		
 	}
 
 	private <T> boolean equalCollections(Collection<T> col1, Collection<T> col2) {

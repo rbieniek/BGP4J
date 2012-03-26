@@ -188,6 +188,15 @@ class RoutingTree {
 	}
 
 	/**
+	 * recursively descend into the tree
+	 * 
+	 * @param visitor
+	 */
+	synchronized void visitTree(RoutingTreeVisitor visitor) {
+		visitTree(this.rootNode, visitor);
+	}
+	
+	/**
 	 * Withdraw the (NLRI prefix, Path attributes) tuple from the tree. The rules for this pürocess are as follows:
 	 * <ol>
 	 * <li>If the NLRI prefix of a child node matches the to be remove NLRI prefix, the child node is removed and all
@@ -258,5 +267,17 @@ class RoutingTree {
 		}
 		
 		return result;
-	}	
+	}
+	/**
+	 * recursively descend into the tree
+	 * 
+	 * @param visitor
+	 */
+	synchronized void visitTree(RoutingTreeNode parent, RoutingTreeVisitor visitor) {
+		for(RoutingTreeNode child : parent.getChildNodes()) {
+			visitor.visitRouteTreeNode(child.getNlri(), child.getNextHop(), child.getPathAttributes());
+			
+			visitTree(child, visitor);
+		}
+	}
 }

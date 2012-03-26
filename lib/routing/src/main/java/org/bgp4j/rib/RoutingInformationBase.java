@@ -127,4 +127,19 @@ public class RoutingInformationBase {
 	public LookupResult lookupRoute(NetworkLayerReachabilityInformation nlri) {
 		return routingTree.lookupRoute(nlri);
 	}
+	
+	/**
+	 * Visit all nodes in the routing tree
+	 * 
+	 * @param visitor
+	 */
+	public void visitRoutingNodes(final RoutingInformationBaseVisitor visitor) {
+		this.routingTree.visitTree(new RoutingTreeVisitor() {
+			
+			@Override
+			public void visitRouteTreeNode(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
+				visitor.visitRouteNode(getPeerName(), getAddressFamilyKey(), getSide(), nlri, nextHop, pathAttributes);
+			}
+		});
+	}
 }
