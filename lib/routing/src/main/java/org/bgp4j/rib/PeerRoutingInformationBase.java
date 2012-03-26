@@ -20,6 +20,7 @@ package org.bgp4j.rib;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
@@ -100,6 +101,31 @@ public class PeerRoutingInformationBase {
 		return rib;
 	}
 	
+	public void visitRoutingBases(RIBSide side, RoutingInformationBaseVisitor visitor, Set<AddressFamilyKey> wanted) {
+		switch(side) {
+		case Local:
+			visitRoutingBases(localRIBs, visitor, wanted);
+		break;
+		case Remote:
+			visitRoutingBases(remoteRIBs, visitor, wanted);
+			break;
+		}
+		
+	}
+
+	public void visitRoutingBases(RIBSide side, RoutingInformationBaseVisitor visitor) {
+		visitRoutingBases(side, visitor, null);
+	}
+
+	private void visitRoutingBases(Map<AddressFamilyKey, RoutingInformationBase> ribs, RoutingInformationBaseVisitor visitor, Set<AddressFamilyKey> wanted) {
+		if(wanted == null)
+			wanted = ribs.keySet();
+		
+		for(Entry<AddressFamilyKey, RoutingInformationBase> ribEntry : ribs.entrySet())
+			if(wanted.contains(ribEntry.getKey()))
+				ribEntry.getValue().visitRoutingNodes(visitor);
+	}
+
 	private RoutingInformationBase allocateRoutingInformationBase(Map<AddressFamilyKey, RoutingInformationBase> ribs, RIBSide side, AddressFamilyKey afk) {
 		RoutingInformationBase rib = null;
 
