@@ -28,6 +28,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class AddressFamilyKey implements Comparable<AddressFamilyKey> {
 
+	public static final AddressFamilyKey IPV4_UNICAST_FORWARDING = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+	
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;
 	
@@ -80,5 +82,9 @@ public class AddressFamilyKey implements Comparable<AddressFamilyKey> {
 				.append(addressFamily, o.addressFamily)
 				.append(subsequentAddressFamily, o.subsequentAddressFamily)
 				.toComparison();
+	}
+	
+	public boolean matches(AddressFamily afi, SubsequentAddressFamily safi) {
+		return ((getAddressFamily() == afi) && (getSubsequentAddressFamily() == safi));
 	}
 }

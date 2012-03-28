@@ -1224,4 +1224,8 @@ public class InternalFSM {
 		log.info("FSM for peer " + peerConfiguration.getPeerName() + " moved to " + this.state);
 	}
 
+	public void flagFSMError() {
+		haveFSMError = true;
+	}
+
 }

@@ -16,6 +16,8 @@
  */
 package org.bgp4j.weld;
 
+import java.lang.annotation.Annotation;
+
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.apache.log4j.BasicConfigurator;
@@ -67,7 +69,8 @@ public class WeldTestCaseBase {
 		return beanManager;
 	}
 		
-	protected <T> T obtainInstance(final Class<T> clazz) {
-		return weldContainer.instance().select(clazz).get();
+	protected <T> T obtainInstance(final Class<T> clazz, Annotation...annotations) {
+		return weldContainer.instance().select(clazz, annotations).get();
 	}
+
 }

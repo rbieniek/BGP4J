@@ -19,13 +19,17 @@ package org.bgp4j.netty;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.handlers.NotificationEvent;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -141,6 +145,40 @@ public class BGPv4TestBase extends WeldTestCaseBase {
 		while(wantedIt.hasNext())
 			Assert.assertTrue(notifications.remove(wantedIt.next()));
 	}
+
+	protected void assertUpdatePacket(UpdatePacket packet, Collection<NetworkLayerReachabilityInformation> nlris, Collection<NetworkLayerReachabilityInformation> withdrawn,
+			Collection<PathAttribute> pathAttributes) {
+				
+				if(nlris != null) {
+					Assert.assertEquals(nlris.size(), packet.getNlris().size());
+					
+					Iterator<NetworkLayerReachabilityInformation> it = nlris.iterator();
+					
+					while(it.hasNext())
+						Assert.assertTrue(packet.getNlris().contains(it.next()));
+				} else {
+					Assert.assertEquals(0, packet.getNlris().size());
+				}
+				if(withdrawn != null) {
+					Assert.assertEquals(withdrawn.size(), packet.getWithdrawnRoutes().size());
+					
+					Iterator<NetworkLayerReachabilityInformation> it = withdrawn.iterator();
+					
+					while(it.hasNext())
+						Assert.assertTrue(packet.getWithdrawnRoutes().contains(it.next()));
+				} else {
+					Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
+				}
+				
+				if(pathAttributes != null) {
+					Assert.assertEquals(pathAttributes.size(), packet.getPathAttributes().size());
+					
+					Iterator<PathAttribute> it = pathAttributes.iterator();
+					
+					while(it.hasNext())
+						Assert.assertTrue(packet.getPathAttributes().contains(it.next()));
+				}
+			}
 
 	public abstract class AssertExecption {
 		@SuppressWarnings("unchecked")

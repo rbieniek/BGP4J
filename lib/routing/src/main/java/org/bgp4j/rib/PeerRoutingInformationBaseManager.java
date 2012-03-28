@@ -77,7 +77,11 @@ public class PeerRoutingInformationBaseManager {
 			peerRibDestroyed.fire(new PeerRoutingInformationBaseDestroyed(prib.getPeerName()));
 	}
 	
-	void reset() {
+	/**
+	 * completely reset the manager and release all RIB instances inside
+	 */
+	public void resetManager() {
 		peerRibs.clear();
 	}
+
 }

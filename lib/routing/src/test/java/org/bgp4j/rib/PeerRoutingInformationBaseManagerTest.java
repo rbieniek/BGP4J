@@ -39,7 +39,7 @@ public class PeerRoutingInformationBaseManagerTest extends WeldTestCaseBase{
 		destroyCatcher = obtainInstance(DestroyedEventCatcher.class);
 		destroyCatcher.reset();
 		manager = obtainInstance(PeerRoutingInformationBaseManager.class);
-		manager.reset();
+		manager.resetManager();
 	}
 
 	@After

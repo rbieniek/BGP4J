@@ -255,6 +255,12 @@ public class BGPv4FSM {
 			if(prib != null)
 				prib.destroyAllRoutingInformationBases();
 			prib = null;
+			
+			try {
+				oruq.shutdown();
+			} catch (SchedulerException e) {
+				log.error("failed to shutdown UPDATE send trigger", e);
+			}
 		}
 
 		@Override
@@ -280,6 +286,7 @@ public class BGPv4FSM {
 				outboundAddressFamilyMask.add(mpcap.toAddressFamilyKey());
 			}
 
+			oruq.setUpdateMask(outboundAddressFamilyMask);
 		}
 
 		@Override
@@ -295,8 +302,15 @@ public class BGPv4FSM {
 
 		@Override
 		public void fireEstablished() {
-			// TODO Auto-generated method stub
+			prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), outboundAddressFamilyMask);
 			
+			try {
+				oruq.startSendingUpdates(internalFsm.getNegotiatedHoldTime() / 3);
+			} catch (SchedulerException e) {
+				log.error("failed to start UPDATE send trigger", e);
+				
+				internalFsm.flagFSMError();
+			}
 		}
 
 	}
@@ -311,6 +325,7 @@ public class BGPv4FSM {
 	private @Inject InternalFSM internalFsm;
 	private @Inject CapabilitesNegotiator capabilitiesNegotiator;
 	private @Inject PeerRoutingInformationBaseManager pribManager;
+	private @Inject OutboundRoutingUpdateQueue oruq;
 	
 	private Set<FSMChannelImpl> managedChannels = new HashSet<FSMChannelImpl>();
 	private PeerRoutingInformationBase prib;
@@ -321,7 +336,7 @@ public class BGPv4FSM {
 		
 		internalFsm.setup(peerConfig, new InternalFSMCallbacksImpl());
 		capabilitiesNegotiator.setup(peerConfig);
-		
+		oruq.setPeerName(peerConfig.getPeerName());
 	}
 
 	public InetSocketAddress getRemotePeerAddress() {
@@ -432,23 +447,7 @@ public class BGPv4FSM {
 	public FSMState getState() {
 		return internalFsm.getState();
 	}
-	
-	public void handleRouteAdded(@Observes RouteAdded event) {
-		if(event.getSide() == RIBSide.Local) {
-			if(StringUtils.equals(event.getPeerName(), peerConfig.getPeerName())) {
-				// TODO enqueue route added update
-			}
-		}
-	}
-	
-	public void handleRouteWithdrawn(@Observes RouteWithdrawn event) {
-		if(event.getSide() == RIBSide.Local) {
-			if(StringUtils.equals(event.getPeerName(), peerConfig.getPeerName())) {
-				// TODO enqueue route withdrawn update
-			}
-		}
-	}
-	
+		
 	private FSMChannelImpl findWrapperForChannel(Channel channel) {
 		FSMChannelImpl wrapper = null;
 		
