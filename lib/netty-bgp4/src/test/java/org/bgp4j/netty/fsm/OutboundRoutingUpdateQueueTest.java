@@ -77,6 +77,8 @@ public class OutboundRoutingUpdateQueueTest extends BGPv4TestBase {
 		pribManager.resetManager();
 		
 		prib = pribManager.peerRoutingInformationBase(PEER_NAME);
+		prib.addRoutingListener(oruq);
+		
 		callback = new RecordingCallback();
 		
 		oruq.setPeerName(PEER_NAME);
@@ -85,6 +87,7 @@ public class OutboundRoutingUpdateQueueTest extends BGPv4TestBase {
 	
 	@After
 	public void after() throws Exception {
+		prib.removeRoutingListener(oruq);
 		oruq.shutdown();
 		oruq = null;
 		callback = null;
@@ -124,6 +127,41 @@ public class OutboundRoutingUpdateQueueTest extends BGPv4TestBase {
 		oruq.setUpdateMask(allowed);
 		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
 		
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+		
+		assertUpdatePacket(updatePackets.remove(0), Arrays.asList(nlri), null, Arrays.asList(localPref, multiExit, nextHop));
+	}
+	
+	@Test
+	public void testBatchSingleRouteIPv4WhileActive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		InetAddressNextHop<Inet4Address> gateway = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] {
+				(byte)0xc0, (byte)0xa8, (byte)0x02, (byte)0x01}));
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		PathAttribute nextHop = new NextHopPathAttribute(gateway);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		
+		allowed.add(AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		oruq.startSendingUpdates(0);
+		
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+
+		rib.addRoutes(Arrays.asList(nlri), 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+
 		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
 		
 		List<UpdatePacket> updatePackets = oruq.buildUpdates();

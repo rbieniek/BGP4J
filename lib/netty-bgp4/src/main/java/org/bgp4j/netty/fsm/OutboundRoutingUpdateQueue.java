@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,10 +48,12 @@ import org.bgp4j.netty.protocol.update.UpdatePacket;
 import org.bgp4j.rib.RIBSide;
 import org.bgp4j.rib.RouteAdded;
 import org.bgp4j.rib.RouteWithdrawn;
+import org.bgp4j.rib.RoutingEventListener;
 import org.bgp4j.rib.RoutingInformationBaseVisitor;
 import org.bgp4j.rib.TopologicalTreeSortingKey;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -67,13 +68,18 @@ import org.quartz.TriggerKey;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OutboundRoutingUpdateQueue {
+public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 
-	private class BatchJob implements Job {
+	public static class BatchJob implements Job {
 
+		public static final String CALLBACK_KEY = "Callback";
+		public static final String QUEUE_KEY = "Queue";
+		
 		@Override
 		public void execute(JobExecutionContext context) throws JobExecutionException {
-			callback.sendUpdates(buildUpdates());
+			((OutboundRoutingUpdateCallback)context.getMergedJobDataMap().get(CALLBACK_KEY))
+				.sendUpdates(((OutboundRoutingUpdateQueue)context.getMergedJobDataMap().get(QUEUE_KEY))
+						.buildUpdates());
 		}
 		
 	}
@@ -104,13 +110,13 @@ public class OutboundRoutingUpdateQueue {
 		return new QueueingVisitor();
 	}
 	
-	public void handleRouteAdded(@Observes RouteAdded event) {
+	public void routeAdded(RouteAdded event) {
 		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getAddressFamilyKey())) {
 			addRoute(peerName, event.getAddressFamilyKey(), event.getSide(), event.getNlri(), event.getNextHop(), event.getPathAttributes());
 		}
 	}
 	
-	public void handleRouteWithdrawn(@Observes RouteWithdrawn event) {
+	public void routeWithdrawn(RouteWithdrawn event) {
 		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getAddressFamilyKey())) {
 		}
 	}
@@ -163,8 +169,13 @@ public class OutboundRoutingUpdateQueue {
 			if(isJobScheduled())
 				cancelJob();
 
+			JobDataMap map = new JobDataMap();
+
+			map.put(BatchJob.CALLBACK_KEY, callback);
+			map.put(BatchJob.QUEUE_KEY, this);
+			
 			jobKey = new JobKey(UUID.randomUUID().toString());
-			jobDetail = JobBuilder.newJob(BatchJob.class).withIdentity(jobKey).build();
+			jobDetail = JobBuilder.newJob(BatchJob.class).usingJobData(map).withIdentity(jobKey).build();
 			triggerKey = TriggerKey.triggerKey(UUID.randomUUID().toString());
 
 			scheduler.scheduleJob(jobDetail, TriggerBuilder.newTrigger()
@@ -292,6 +303,6 @@ public class OutboundRoutingUpdateQueue {
 			scheduler.unscheduleJob(triggerKey);
 			triggerKey = null;
 		}
-	}	
+	}
 
 }

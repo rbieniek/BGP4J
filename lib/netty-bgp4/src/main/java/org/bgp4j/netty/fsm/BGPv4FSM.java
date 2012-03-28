@@ -16,23 +16,19 @@
  */
 package org.bgp4j.netty.fsm;
 
-import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bgp4.config.nodes.PeerConfiguration;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
-import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
 import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
@@ -61,8 +57,6 @@ import org.bgp4j.netty.service.BGPv4Client;
 import org.bgp4j.rib.PeerRoutingInformationBase;
 import org.bgp4j.rib.PeerRoutingInformationBaseManager;
 import org.bgp4j.rib.RIBSide;
-import org.bgp4j.rib.RouteAdded;
-import org.bgp4j.rib.RouteWithdrawn;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
@@ -276,6 +270,7 @@ public class BGPv4FSM {
 				prib.allocateRoutingInformationBase(RIBSide.Local, mpcap.toAddressFamilyKey());
 			}
 			
+			prib.addRoutingListener(oruq);
 		}
 
 		@Override
@@ -325,16 +320,17 @@ public class BGPv4FSM {
 		
 		@Override
 		public void sendUpdates(List<UpdatePacket> updates) {
-			UpdatePacket packet;
+			UpdatePacket packet = null;
 			
 			synchronized (updates) {
 				this.updates.addAll(updates);
-				packet = this.updates.remove(0);
+				if(this.updates.size() > 0)
+					packet = this.updates.remove(0);
 			}
 			
 			if(managedChannels.size() != 1) {
 				internalFsm.flagFSMError();
-			} else {
+			} else if(packet != null) {
 				Channel channel = managedChannels.iterator().next().getChannel();
 
 				channel.write(packet).addListener(this);
@@ -344,13 +340,15 @@ public class BGPv4FSM {
 
 		@Override
 		public void operationComplete(ChannelFuture future) throws Exception {
-			UpdatePacket packet;
+			UpdatePacket packet = null;
 			
 			synchronized (updates) {
-				packet = this.updates.remove(0);
+				if(updates.size() > 0)
+					packet = this.updates.remove(0);
 			}
 			
-			future.getChannel().write(packet).addListener(this);
+			if(packet != null)
+				future.getChannel().write(packet).addListener(this);
 		}
 		
 	}
