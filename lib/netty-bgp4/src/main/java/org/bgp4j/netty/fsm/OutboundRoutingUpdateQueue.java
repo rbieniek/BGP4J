@@ -254,6 +254,8 @@ public class OutboundRoutingUpdateQueue {
 						mpNLRI.getNlris().add(nlri);
 					}
 				}
+				
+				current = null;
 			}
 			
 			addedRoutes.clear();

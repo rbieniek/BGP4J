@@ -168,4 +168,93 @@ public class OutboundRoutingUpdateQueueTest extends BGPv4TestBase {
 		
 		assertUpdatePacket(updatePackets.remove(0), nlris, null, Arrays.asList(localPref, multiExit, nextHop));
 	}
+	
+	
+	@Test
+	public void testBatchMultipleRouteIPv4WhileInactiveWithTwoUpdatePackets() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		List<NetworkLayerReachabilityInformation> nlris = new LinkedList<NetworkLayerReachabilityInformation>();
+		InetAddressNextHop<Inet4Address> gateway = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] {
+				(byte)0xc0, (byte)0xa8, (byte)0x02, (byte)0x01}));
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		List<NetworkLayerReachabilityInformation> resultNlris = new LinkedList<NetworkLayerReachabilityInformation>();		
+		
+		for(int i=0; i<6; i++) {
+			for(int j=0; j<256; j++) {
+				nlris.add(new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)(0xa8+i), (byte)j}));
+			}
+		}
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		
+		rib.addRoutes(nlris, 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+
+		allowed.add(AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(2, updatePackets.size());
+
+		UpdatePacket packet = updatePackets.remove(0);
+		
+		Assert.assertEquals(1008, packet.getNlris().size());
+		resultNlris.addAll(packet.getNlris());
+		
+		packet = updatePackets.remove(0);
+		
+		Assert.assertEquals(528, packet.getNlris().size());
+		resultNlris.addAll(packet.getNlris());
+		
+		for(NetworkLayerReachabilityInformation nlri : nlris) {
+			Assert.assertTrue(resultNlris.contains(nlri));
+		}
+	}
+
+	@Test
+	public void testBatchTwoDifferentRoutesIPv4WhileInactive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation firstNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		NetworkLayerReachabilityInformation secondNlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x02});
+		InetAddressNextHop<Inet4Address> gateway = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] {
+				(byte)0xc0, (byte)0xa8, (byte)0x02, (byte)0x01}));
+		PathAttribute firstLocalPref = new LocalPrefPathAttribute(100);
+		PathAttribute firstMultiExit = new MultiExitDiscPathAttribute(10);
+		PathAttribute secondLocalPref = new LocalPrefPathAttribute(200);
+		PathAttribute secondMultiExit = new MultiExitDiscPathAttribute(20);
+		PathAttribute nextHop = new NextHopPathAttribute(gateway);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		
+		rib.addRoutes(Arrays.asList(firstNlri), 
+				Arrays.asList(firstLocalPref, firstMultiExit), 
+				gateway);
+		rib.addRoutes(Arrays.asList(secondNlri), 
+				Arrays.asList(secondLocalPref, secondMultiExit), 
+				gateway);
+
+		allowed.add(AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(2, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(2, updatePackets.size());
+		
+		assertUpdatePacket(updatePackets.remove(0), Arrays.asList(firstNlri), null, Arrays.asList(firstLocalPref, firstMultiExit, nextHop));
+		assertUpdatePacket(updatePackets.remove(0), Arrays.asList(secondNlri), null, Arrays.asList(secondLocalPref, secondMultiExit, nextHop));
+	}
+
 }
