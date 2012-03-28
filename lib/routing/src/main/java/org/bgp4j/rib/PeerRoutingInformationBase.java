@@ -17,7 +17,10 @@
  */
 package org.bgp4j.rib;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -40,6 +43,7 @@ public class PeerRoutingInformationBase {
 	private @Inject Instance<RoutingInformationBase> ribProvider;
 	private @Inject Event<RoutingInformationBaseCreated> created;
 	private @Inject Event<RoutingInformationBaseDestroyed> destroyed;
+	private List<RoutingEventListener> listeners = Collections.synchronizedList(new LinkedList<RoutingEventListener>());
 	
 	public PeerRoutingInformationBase() {
 	}
@@ -65,6 +69,7 @@ public class PeerRoutingInformationBase {
 		
 		if(rib != null) {
 			created.fire(new RoutingInformationBaseCreated(this.peerName, side, afk));
+			rib.setListeners(listeners);
 		}
 	}
 	
@@ -166,5 +171,13 @@ public class PeerRoutingInformationBase {
 		
 		localRIBs.clear();
 		remoteRIBs.clear();
+	}
+	
+	public void addRoutingListener(RoutingEventListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeRoutingListener(RoutingEventListener listener) {
+		listeners.remove(listener);
 	}
 }

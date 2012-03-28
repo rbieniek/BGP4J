@@ -47,6 +47,7 @@ import org.junit.Test;
  */
 public class RoutingInformationBaseTest extends WeldTestCaseBase {
 
+	
 	private static final String RIB_NAME = "rib1";
 	private static final AddressFamilyKey RIB_AFK = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 	private static final RIBSide RIB_SIDE = RIBSide.Local;
@@ -61,11 +62,17 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 	public void before() {
 		catcher = obtainInstance(RouteEventCatcher.class);
 		catcher.reset();
+
+		listener = new RouteEventCatchListener();
+		List<RoutingEventListener> listeners = new LinkedList<RoutingEventListener>();
+		
+		listeners.add(listener);
 		
 		rib = obtainInstance(RoutingInformationBase.class);
 		rib.setPeerName(RIB_NAME);
 		rib.setAddressFamilyKey(RIB_AFK);
 		rib.setSide(RIB_SIDE);
+		rib.setListeners(listeners);
 		
 		attrs = new HashSet<PathAttribute>();
 	}
@@ -75,12 +82,14 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		catcher = null;
 		
 		rib.destroyRIB();
+		rib.setListeners(null);
 		rib = null;
 		
 		attrs = null;
 	}
 	
 	private RouteEventCatcher catcher;
+	private RouteEventCatchListener listener;
 	private RoutingInformationBase rib;
 	private Collection<PathAttribute> attrs;
 	
@@ -90,7 +99,8 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 
 		Assert.assertEquals(1, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
 	}
 
 	@Test
@@ -102,7 +112,8 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 
 		Assert.assertEquals(1, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, nextHop));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, nextHop)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, nextHop)));
 	}
 
 	@Test
@@ -111,8 +122,10 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		
 		Assert.assertEquals(2, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
 	}
 	
 	@Test
@@ -121,8 +134,10 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		
 		Assert.assertEquals(2, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
 	}
 	
 	@Test
@@ -131,9 +146,12 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
 	}
 	
 	@Test
@@ -142,14 +160,20 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
 		
 		rib.withdrawRoutes(Arrays.asList(MORE_NLRI_2));
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(1, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteWithdrawnEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
+		Assert.assertTrue(catcher.getRouteWithdrawnEvents().contains(new RouteWithdrawn(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2)));
+		Assert.assertEquals(3, listener.getRouteAddedEvents().size());
+		Assert.assertEquals(1, listener.getRouteWithdrawnEvents().size());
+		Assert.assertTrue(listener.getRouteWithdrawnEvents().contains(new RouteWithdrawn(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2)));
 	}
 	
 	public static class RecordingNodeVisitor implements RoutingInformationBaseVisitor {
@@ -286,9 +310,12 @@ public class RoutingInformationBaseTest extends WeldTestCaseBase {
 		
 		Assert.assertEquals(3, catcher.getRouteAddedEvents().size());
 		Assert.assertEquals(0, catcher.getRouteWithdrawnEvents().size());
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null));
-		catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(catcher.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, LESS_NLRI, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_1, attrs, null)));
+		Assert.assertTrue(listener.getRouteAddedEvents().contains(new RouteAdded(RIB_NAME, RIB_SIDE, RIB_AFK, MORE_NLRI_2, attrs, null)));
 		
 		RecordingNodeVisitor visitor = new RecordingNodeVisitor();
 		

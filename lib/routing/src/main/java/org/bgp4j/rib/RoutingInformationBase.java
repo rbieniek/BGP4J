@@ -39,6 +39,7 @@ public class RoutingInformationBase {
 	private RoutingTree routingTree = new RoutingTree();
 	private @Inject Event<RouteAdded> routeAddedEvent;
 	private @Inject Event<RouteWithdrawn> routeWithdrawnEvent;
+	private Collection<RoutingEventListener> listeners;
 	
 	RoutingInformationBase() {
 	}
@@ -97,12 +98,18 @@ public class RoutingInformationBase {
 	 */
 	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
-			if(routingTree.addRoute(nlri, pathAttributes, nextHop))
-				routeAddedEvent.fire(new RouteAdded(getPeerName(), 
+			if(routingTree.addRoute(nlri, pathAttributes, nextHop)) {
+				RouteAdded event = new RouteAdded(getPeerName(), 
 						getSide(), 
 						getAddressFamilyKey(), 
 						nlri, 
-						pathAttributes, nextHop));
+						pathAttributes, nextHop);
+				
+				routeAddedEvent.fire(event);
+				
+				for(RoutingEventListener listener : listeners)
+					listener.routeAdded(event);
+			}
 	}
 
 	/**
@@ -113,8 +120,14 @@ public class RoutingInformationBase {
 	 */
 	public void withdrawRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
-			if(routingTree.withdrawRoute(nlri))
-				routeWithdrawnEvent.fire(new RouteWithdrawn(getPeerName(), getSide(), getAddressFamilyKey(), nlri));
+			if(routingTree.withdrawRoute(nlri)) {
+				RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), getAddressFamilyKey(), nlri);
+				
+				routeWithdrawnEvent.fire(event);
+				
+				for(RoutingEventListener listener : listeners)
+					listener.routeWithdrawn(event);
+			}
 		
 	}
 	
@@ -141,5 +154,12 @@ public class RoutingInformationBase {
 				visitor.visitRouteNode(getPeerName(), getAddressFamilyKey(), getSide(), nlri, nextHop, pathAttributes);
 			}
 		});
+	}
+
+	/**
+	 * @param listeners the listeners to set
+	 */
+	void setListeners(Collection<RoutingEventListener> listeners) {
+		this.listeners = listeners;
 	}
 }
