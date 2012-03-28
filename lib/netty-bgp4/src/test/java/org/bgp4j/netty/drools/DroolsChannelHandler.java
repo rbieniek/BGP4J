@@ -17,6 +17,8 @@
  */
 package org.bgp4j.netty.drools;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import junit.framework.Assert;
@@ -138,5 +140,35 @@ public class DroolsChannelHandler extends SimpleChannelHandler {
 		if(e.getMessage() instanceof BGPv4Packet)
 			channel.receivePacket((BGPv4Packet)e.getMessage());
 		session.fireAllRules();
+	}
+
+	/**
+	 * @param packetClass
+	 * @return
+	 * @see org.bgp4j.netty.drools.NetworkChannel#selectReceivedPacket(java.lang.Class)
+	 */
+	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass) {
+		return channel.selectReceivedPacket(packetClass);
+	}
+
+	/**
+	 * @param packetClass
+	 * @param index
+	 * @return
+	 * @see org.bgp4j.netty.drools.NetworkChannel#selectReceivedPacket(java.lang.Class, int)
+	 */
+	public <T extends BGPv4Packet> T selectReceivedPacket(Class<T> packetClass,
+			int index) {
+		return channel.selectReceivedPacket(packetClass, index);
+	}
+
+	/**
+	 * @param packetClass
+	 * @return
+	 * @see org.bgp4j.netty.drools.NetworkChannel#selectAllReceivedPackets(java.lang.Class)
+	 */
+	public <T extends BGPv4Packet> List<T> selectAllReceivedPackets(
+			Class<T> packetClass) {
+		return channel.selectAllReceivedPackets(packetClass);
 	}
 }

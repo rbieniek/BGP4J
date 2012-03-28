@@ -1227,5 +1227,4 @@ public class InternalFSM {
 	public void flagFSMError() {
 		haveFSMError = true;
 	}
-
 }

@@ -19,6 +19,8 @@ package org.bgp4j.netty.fsm;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.event.Observes;
@@ -62,6 +64,8 @@ import org.bgp4j.rib.RIBSide;
 import org.bgp4j.rib.RouteAdded;
 import org.bgp4j.rib.RouteWithdrawn;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 
@@ -315,6 +319,42 @@ public class BGPv4FSM {
 
 	}
 	
+	private class SendLocalRoutingUpdateCallback implements OutboundRoutingUpdateCallback, ChannelFutureListener {
+
+		private List<UpdatePacket> updates = new LinkedList<UpdatePacket>();
+		
+		@Override
+		public void sendUpdates(List<UpdatePacket> updates) {
+			UpdatePacket packet;
+			
+			synchronized (updates) {
+				this.updates.addAll(updates);
+				packet = this.updates.remove(0);
+			}
+			
+			if(managedChannels.size() != 1) {
+				internalFsm.flagFSMError();
+			} else {
+				Channel channel = managedChannels.iterator().next().getChannel();
+
+				channel.write(packet).addListener(this);
+			}
+				
+		}
+
+		@Override
+		public void operationComplete(ChannelFuture future) throws Exception {
+			UpdatePacket packet;
+			
+			synchronized (updates) {
+				packet = this.updates.remove(0);
+			}
+			
+			future.getChannel().write(packet).addListener(this);
+		}
+		
+	}
+	
 	private @Inject Logger log;
 	
 	private @Inject Instance<BGPv4Client> clientProvider;
@@ -337,6 +377,7 @@ public class BGPv4FSM {
 		internalFsm.setup(peerConfig, new InternalFSMCallbacksImpl());
 		capabilitiesNegotiator.setup(peerConfig);
 		oruq.setPeerName(peerConfig.getPeerName());
+		oruq.setCallback(new SendLocalRoutingUpdateCallback());
 	}
 
 	public InetSocketAddress getRemotePeerAddress() {
