@@ -21,12 +21,14 @@ import java.net.Inet4Address;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -40,6 +42,7 @@ import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.NextHop;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
+import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.attributes.NextHopPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
@@ -100,6 +103,8 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 	private boolean active;
 	private Map<TopologicalTreeSortingKey, List<NetworkLayerReachabilityInformation>> addedRoutes = 
 			new TreeMap<TopologicalTreeSortingKey, List<NetworkLayerReachabilityInformation>>();
+	private Map<AddressFamilyKey, List<NetworkLayerReachabilityInformation>> withdrawnRoutes =
+			new TreeMap<AddressFamilyKey, List<NetworkLayerReachabilityInformation>>();
 	private @Inject Scheduler scheduler;
 	private JobDetail jobDetail;
 	private TriggerKey triggerKey;
@@ -118,6 +123,7 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 	
 	public void routeWithdrawn(RouteWithdrawn event) {
 		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getAddressFamilyKey())) {
+			withdrawRoute(peerName, event.getAddressFamilyKey(), event.getSide(), event.getNlri());
 		}
 	}
 
@@ -219,6 +225,32 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 		}
 	}
 
+	private void withdrawRoute(String ribName, AddressFamilyKey addressFamilyKey, RIBSide side, NetworkLayerReachabilityInformation nlri) {
+		// remove the NLRI from any scheduled route add updates
+		synchronized (addedRoutes) {
+			Set<TopologicalTreeSortingKey> removeableKeys = new HashSet<TopologicalTreeSortingKey>();
+			
+			for(TopologicalTreeSortingKey key : addedRoutes.keySet()) {
+				if(key.getAddressFamilyKey().equals(addressFamilyKey)) {
+					addedRoutes.get(key).remove(nlri);
+					
+					if(addedRoutes.get(key).size() == 0)
+						removeableKeys.add(key);
+				}
+			}
+			
+			for(TopologicalTreeSortingKey key : removeableKeys)
+				addedRoutes.remove(key);
+		}
+		
+		synchronized (withdrawnRoutes) {
+			if(!withdrawnRoutes.containsKey(addressFamilyKey))
+				withdrawnRoutes.put(addressFamilyKey, new LinkedList<NetworkLayerReachabilityInformation>());
+			
+			withdrawnRoutes.get(addressFamilyKey).add(nlri);
+		}
+	}
+
 	private Collection<PathAttribute> filterAttribute(Collection<PathAttribute> source, 
 			Collection<? extends Class<? extends PathAttribute>> filteredClasses) {
 		LinkedList<PathAttribute> result = new LinkedList<PathAttribute>();
@@ -272,6 +304,37 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 			addedRoutes.clear();
 		}
 		
+		synchronized (withdrawnRoutes) {
+			for(Entry<AddressFamilyKey, List<NetworkLayerReachabilityInformation>> withdrawnRouteEntry : withdrawnRoutes.entrySet()) {
+				for(NetworkLayerReachabilityInformation nlri : withdrawnRouteEntry.getValue()) {
+					MultiProtocolUnreachableNLRI mpUnreachable = null;
+					AddressFamilyKey afk = withdrawnRouteEntry.getKey();
+					
+					if((current == null  
+							|| (current.calculatePacketSize() + NLRICodec.calculateEncodedNLRILength(nlri) 
+									> (BGPv4Constants.BGP_PACKET_MAX_LENGTH - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)))) {
+						current = new UpdatePacket();
+						
+						if(!afk.equals(AddressFamilyKey.IPV4_UNICAST_FORWARDING)) {
+							mpUnreachable = new MultiProtocolUnreachableNLRI(afk.getAddressFamily(), afk.getSubsequentAddressFamily());
+							
+							current.getPathAttributes().add(mpUnreachable);
+						}
+						updates.add(current);
+					}
+					
+					if(afk.matches(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)) {					
+						current.getWithdrawnRoutes().add(nlri);
+					} else {
+						mpUnreachable.getNlris().add(nlri);
+					}
+				}
+				current = null;
+			}
+			
+			withdrawnRoutes.clear();
+		}
+		
 		return updates;
 	}
 	
@@ -282,6 +345,10 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 			result += addedRoutes.size();
 		}
 		
+		synchronized (withdrawnRoutes) {
+			result += withdrawnRoutes.size();
+		}
+
 		return result;
 	}
 	

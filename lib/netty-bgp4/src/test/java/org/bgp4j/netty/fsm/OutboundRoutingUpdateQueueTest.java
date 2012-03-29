@@ -36,6 +36,7 @@ import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
+import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.attributes.NextHopPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4TestBase;
@@ -501,5 +502,182 @@ public class OutboundRoutingUpdateQueueTest extends BGPv4TestBase {
 //				new NetworkLayerReachabilityInformation[] { nlri });
 //		
 //		assertUpdatePacket(updatePackets.remove(0), null, null, Arrays.asList(localPref, multiExit, mpNlri));
+	}
+	
+	@Test
+	public void testAddSingleRouteIPv4RemoveSingleRouteIPv4WhileActive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		InetAddressNextHop<Inet4Address> gateway = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] {
+				(byte)0xc0, (byte)0xa8, (byte)0x02, (byte)0x01}));
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		PathAttribute nextHop = new NextHopPathAttribute(gateway);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		
+		allowed.add(AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		oruq.startSendingUpdates(0);
+		
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+
+		rib.addRoutes(Arrays.asList(nlri), 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+		
+		assertUpdatePacket(updatePackets.remove(0), Arrays.asList(nlri), null, Arrays.asList(localPref, multiExit, nextHop));
+
+		// removal
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+		
+		rib.withdrawRoutes(Arrays.asList(nlri));
+		
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+		
+		assertUpdatePacket(updatePackets.remove(0), null, Arrays.asList(nlri), null);		
+	}
+	
+	@Test
+	public void testAddSingleRouteIPv6RemoveSingleRouteIPv6WhileActive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		BinaryNextHop gateway = (new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] {
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1 }))).toBinaryNextHop();
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+		
+		allowed.add(AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		oruq.startSendingUpdates(0);
+		
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+
+		rib.addRoutes(Arrays.asList(nlri), 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+
+		MultiProtocolReachableNLRI mpNlri = new MultiProtocolReachableNLRI(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, gateway, 
+				new NetworkLayerReachabilityInformation[] { nlri });
+		
+		assertUpdatePacket(updatePackets.remove(0), null, null, Arrays.asList(localPref, multiExit, mpNlri));
+
+		// removal
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+		
+		rib.withdrawRoutes(Arrays.asList(nlri));
+		
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+		
+		MultiProtocolUnreachableNLRI mpUnNLRI= new MultiProtocolUnreachableNLRI(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {nlri });
+		
+		assertUpdatePacket(updatePackets.remove(0), null, null, Arrays.asList((PathAttribute)mpUnNLRI));		
+	}
+
+	
+	@Test
+	public void testAddSingleRouteIPv4RemoveSingleRouteIPv4ImmediatelyWhileActive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		InetAddressNextHop<Inet4Address> gateway = new InetAddressNextHop<Inet4Address>((Inet4Address)Inet4Address.getByAddress(new byte[] {
+				(byte)0xc0, (byte)0xa8, (byte)0x02, (byte)0x01}));
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		
+		allowed.add(AddressFamilyKey.IPV4_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		oruq.startSendingUpdates(0);
+		
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+
+		rib.addRoutes(Arrays.asList(nlri), 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+		rib.withdrawRoutes(Arrays.asList(nlri));
+
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+				
+		assertUpdatePacket(updatePackets.remove(0), null, Arrays.asList(nlri), null);		
+	}
+	
+	@Test
+	public void testAddSingleRouteIPv6RemoveSingleRouteIPv6ImmediatelyWhileActive() throws Exception {
+		Set<AddressFamilyKey> allowed = new HashSet<AddressFamilyKey>();
+		NetworkLayerReachabilityInformation nlri = new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01});
+		BinaryNextHop gateway = (new InetAddressNextHop<Inet6Address>((Inet6Address)Inet6Address.getByAddress(new byte[] {
+				(byte)0xfe, (byte)0x80, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+				(byte)0x02, (byte)0x22, (byte)0x15, (byte)0xff, (byte)0xfe, (byte)0x85, (byte)0xd9, (byte)0xe1 }))).toBinaryNextHop();
+		PathAttribute localPref = new LocalPrefPathAttribute(100);
+		PathAttribute multiExit = new MultiExitDiscPathAttribute(10);
+		
+		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+
+		RoutingInformationBase rib = prib.routingBase(RIBSide.Local, AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+		
+		allowed.add(AddressFamilyKey.IPV6_UNICAST_FORWARDING);
+		oruq.setUpdateMask(allowed);
+		oruq.startSendingUpdates(0);
+		
+		prib.visitRoutingBases(RIBSide.Local, oruq.getImportVisitor(), allowed);
+		
+		Assert.assertEquals(0, oruq.getNumberOfPendingUpdates());
+
+		rib.addRoutes(Arrays.asList(nlri), 
+				Arrays.asList(localPref, multiExit), 
+				gateway);
+		rib.withdrawRoutes(Arrays.asList(nlri));
+
+		Assert.assertEquals(1, oruq.getNumberOfPendingUpdates());
+		
+		List<UpdatePacket> updatePackets = oruq.buildUpdates();
+		
+		Assert.assertEquals(1, updatePackets.size());
+		
+		MultiProtocolUnreachableNLRI mpUnNLRI= new MultiProtocolUnreachableNLRI(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {nlri });
+		
+		assertUpdatePacket(updatePackets.remove(0), null, null, Arrays.asList((PathAttribute)mpUnNLRI));		
 	}
 }
