@@ -48,7 +48,7 @@ public class InternalFSM {
 	private @Inject FireEventTimeManager<FireDelayOpenTimerExpired> fireDelayOpenTimerExpired;
 	private @Inject FireEventTimeManager<FireHoldTimerExpired> fireHoldTimerExpired;
 	private @Inject FireRepeatedEventTimeManager<FireAutomaticStart> fireRepeatedAutomaticStart;
-	private @Inject FireRepeatedEventTimeManager<FireSendKeepalive> fireKeepaliveTimerExpired;
+	private @Inject FireEventTimeManager<FireSendKeepalive> fireKeepaliveTimerExpired;
 	
 	private int peerProposedHoldTime = 0;
 	private boolean haveFSMError = false;
@@ -681,6 +681,14 @@ public class InternalFSM {
 				activeChannelManager.fireSendKeepaliveMessage();
 			if(connectedChannelManager.hasSeenInboundFSMEvent(FSMEventType.BGPOpen))
 				connectedChannelManager.fireSendKeepaliveMessage();
+
+			try {
+				fireKeepaliveTimerExpired.scheduleJob(getSendKeepaliveTime());
+			} catch(SchedulerException e) {
+				log.error("cannont start send keepalive timer", e);
+				
+				haveFSMError = true;				
+			}
 			break;
 		case Idle:
 			// do nothing
@@ -939,7 +947,7 @@ public class InternalFSM {
 	 * @throws SchedulerException
 	 */
 	public Date getKeepaliveTimerDueWhen() throws SchedulerException {
-		return fireKeepaliveTimerExpired.getNextFireWhen();
+		return fireKeepaliveTimerExpired.getFiredWhen();
 	}
 	
 	/**
@@ -1206,7 +1214,7 @@ public class InternalFSM {
 
 		if(!peerConfiguration.isHoldTimerDisabled()) {
 			try {
-				fireKeepaliveTimerExpired.startRepeatedJob(getSendKeepaliveTime());
+				fireKeepaliveTimerExpired.scheduleJob(getSendKeepaliveTime());
 			} catch(SchedulerException e) {
 				log.error("cannont start send keepalive timer", e);
 				

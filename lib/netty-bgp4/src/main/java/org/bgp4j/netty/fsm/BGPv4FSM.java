@@ -72,16 +72,9 @@ public class BGPv4FSM {
 
 	private class FSMChannelImpl implements FSMChannel {
 		private Channel channel;
-		private BGPv4Client peerClient;
 
 		public FSMChannelImpl(Channel channel) {
 			this.channel = channel;
-		}
-		
-		public FSMChannelImpl(Channel channel, BGPv4Client peerClient) {
-			this(channel);
-			
-			this.peerClient = peerClient;
 		}
 		
 		/**
@@ -89,13 +82,6 @@ public class BGPv4FSM {
 		 */
 		private Channel getChannel() {
 			return channel;
-		}
-
-		/**
-		 * @return the peerClient
-		 */
-		private BGPv4Client getPeerClient() {
-			return peerClient;
 		}
 
 	}
@@ -199,7 +185,7 @@ public class BGPv4FSM {
 		public void fireConnectRemotePeer() {
 			BGPv4Client client = clientProvider.get();
 			
-			managedChannels.add(new FSMChannelImpl(client.startClient(peerConfig).getChannel(), client));
+			managedChannels.add(new FSMChannelImpl(client.startClient(peerConfig).getChannel()));
 		}
 
 		@Override
