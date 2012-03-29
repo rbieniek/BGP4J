@@ -82,4 +82,7 @@ public class InetAddressNextHop<T extends InetAddress> implements NextHop {
 		return Type.InetAddress;
 	}
 
+	public BinaryNextHop toBinaryNextHop() {
+		return new BinaryNextHop(getAddress().getAddress());
+	}
 }

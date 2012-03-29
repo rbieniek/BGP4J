@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class AddressFamilyKey implements Comparable<AddressFamilyKey> {
 
 	public static final AddressFamilyKey IPV4_UNICAST_FORWARDING = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
+	public static final AddressFamilyKey IPV6_UNICAST_FORWARDING = new AddressFamilyKey(AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 	
 	private AddressFamily addressFamily;
 	private SubsequentAddressFamily subsequentAddressFamily;

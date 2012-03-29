@@ -17,6 +17,7 @@
  */
 package org.bgp4j.net.attributes;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,6 +99,16 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 			this.nlris.add(nlri);
 	}
 	
+	/**
+	 * @param category
+	 */
+	public MultiProtocolReachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, BinaryNextHop nextHop, 
+			Collection<NetworkLayerReachabilityInformation> nlris) {
+		this(addressFamily, subsequentAddressFamily, nextHop);
+		
+		if(nlris != null)
+			this.nlris.addAll(nlris);
+	}
 	/**
 	 * @return the addressFamily
 	 */
