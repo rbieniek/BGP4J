@@ -105,6 +105,15 @@
       <artifactId>arquillian-junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-weld</artifactId>
+      <version>${version.de.urb.quagga}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>
