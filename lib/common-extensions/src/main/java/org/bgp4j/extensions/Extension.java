@@ -39,14 +39,14 @@ public interface Extension {
 	 * 
 	 * @throws Exception
 	 */
-	public void start() throws Exception;
+	public void startExtension() throws Exception;
 	
 	/**
 	 * Stop the extension
 	 * 
 	 * @throws Exception
 	 */
-	public void stop() throws Exception;
+	public void stopExtension() throws Exception;
 	
 	/**
 	 * get the list of Routing Information Bases provided by this extension. An extensions may define

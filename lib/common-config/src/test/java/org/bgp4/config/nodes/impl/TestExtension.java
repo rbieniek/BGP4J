@@ -41,14 +41,14 @@ public class TestExtension implements Extension {
 	 * @see org.bgp4j.extensions.Extension#start()
 	 */
 	@Override
-	public void start() throws Exception {
+	public void startExtension() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.bgp4j.extensions.Extension#stop()
 	 */
 	@Override
-	public void stop() throws Exception {
+	public void stopExtension() throws Exception {
 	}
 
 	/* (non-Javadoc)

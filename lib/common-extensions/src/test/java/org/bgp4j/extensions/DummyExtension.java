@@ -36,7 +36,7 @@ public class DummyExtension implements Extension {
 	 * @see org.bgp4j.extensions.Extension#start()
 	 */
 	@Override
-	public void start() throws Exception {
+	public void startExtension() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
@@ -45,7 +45,7 @@ public class DummyExtension implements Extension {
 	 * @see org.bgp4j.extensions.Extension#stop()
 	 */
 	@Override
-	public void stop() throws Exception {
+	public void stopExtension() throws Exception {
 		// TODO Auto-generated method stub
 
 	}
