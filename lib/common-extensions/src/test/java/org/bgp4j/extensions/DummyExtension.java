@@ -59,4 +59,9 @@ public class DummyExtension implements Extension {
 		return null;
 	}
 
+	@Override
+	public boolean isReadyForService() {
+		return false;
+	}
+
 }

@@ -55,4 +55,9 @@ public interface Extension {
 	 * @return
 	 */
 	public Collection<ProvidedRIBs> getProvidedRIBs();
+	
+	/**
+	 * Check if the extension is ready for service and should be started
+	 */
+	public boolean isReadyForService();
 }

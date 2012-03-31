@@ -72,7 +72,8 @@ public class BgpDaemonApplicationListener {
 			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
 
 			for(Extension extension : extensionsFactory.listExtensions()) {
-				extension.startExtension();
+				if(extension.isReadyForService())
+					extension.startExtension();
 			}
 			
 			webManagementService.startService();			

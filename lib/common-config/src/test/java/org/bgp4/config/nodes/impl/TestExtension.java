@@ -64,5 +64,10 @@ public class TestExtension implements Extension {
 		return configured;
 	}
 
+	@Override
+	public boolean isReadyForService() {
+		return true;
+	}
+
 
 }
