@@ -52,6 +52,12 @@
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
+      <artifactId>common-extensions</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
       <artifactId>common-network</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>
