@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Unit test file, Root element does not matter
+ -->
+<Config>
+
+    <Extensions>
+        <Extension name="test" >
+            <Foo bar="1" />
+        </Extension>
+    </Extensions>
+    
+</Config>
