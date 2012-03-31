@@ -156,6 +156,7 @@
 
   <modules>
     <module>lib</module>
+    <module>extensions</module>
     <module>apps</module>
 <!--
     <module>clients</module>1
