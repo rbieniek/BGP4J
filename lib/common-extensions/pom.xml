@@ -20,6 +20,11 @@
   <dependencies>
     
     <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>de.urb.quagga</groupId>
       <artifactId>common-network</artifactId>
       <version>${version.de.urb.quagga}</version>

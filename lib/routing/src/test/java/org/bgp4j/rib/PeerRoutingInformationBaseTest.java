@@ -21,6 +21,7 @@ import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.RIBSide;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;

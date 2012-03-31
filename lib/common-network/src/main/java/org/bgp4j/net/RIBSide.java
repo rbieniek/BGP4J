@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.rib.RIBSide.java 
  */
-package org.bgp4j.rib;
+package org.bgp4j.net;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

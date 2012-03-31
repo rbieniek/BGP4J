@@ -18,6 +18,7 @@
 package org.bgp4j.rib;
 
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.RIBSide;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

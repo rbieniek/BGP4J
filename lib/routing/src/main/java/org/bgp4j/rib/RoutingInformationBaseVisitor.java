@@ -22,6 +22,7 @@ import java.util.Collection;
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.NextHop;
+import org.bgp4j.net.RIBSide;
 import org.bgp4j.net.attributes.PathAttribute;
 
 /**
