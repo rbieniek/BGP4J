@@ -35,7 +35,7 @@ public class SeApplicationBootstrap {
 		WeldContainer weldContainer = weld.initialize();
 		
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook(weld));
-		weldContainer.event().select(ApplicationBootstrapEvent.class).fire(new ApplicationBootstrapEvent());
+		weldContainer.event().select(ApplicationBootstrapEvent.class).fire(new ApplicationBootstrapEvent(weldContainer));
 		weldContainer.event().select(SeApplicationStartEvent.class, selection).fire(new SeApplicationStartEvent());
 	}
 

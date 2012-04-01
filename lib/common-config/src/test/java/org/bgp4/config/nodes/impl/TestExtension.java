@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.bgp4j.extensions.Extension;
+import org.bgp4j.extensions.ExtensionBeanFactory;
 import org.bgp4j.extensions.ProvidedRIBs;
 
 /**
@@ -67,6 +68,12 @@ public class TestExtension implements Extension {
 	@Override
 	public boolean isReadyForService() {
 		return true;
+	}
+
+	@Override
+	public void initialize(ExtensionBeanFactory beanFactory) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

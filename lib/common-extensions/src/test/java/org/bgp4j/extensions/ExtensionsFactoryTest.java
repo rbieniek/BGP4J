@@ -46,6 +46,7 @@ public class ExtensionsFactoryTest extends WeldTestCaseBase {
 
 		Assert.assertNotNull(ext);
 		Assert.assertEquals(DummyExtension.class, ext.getClass());
+		Assert.assertTrue(((DummyExtension)ext).isReadyForService());
 		
 		Assert.assertNull(factory.getExtensionByName("foo"));
 	}

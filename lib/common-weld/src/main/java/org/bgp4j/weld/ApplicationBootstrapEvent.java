@@ -18,6 +18,8 @@ package org.bgp4j.weld;
 
 import java.io.Serializable;
 
+import org.jboss.weld.environment.se.WeldContainer;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,5 +30,15 @@ public class ApplicationBootstrapEvent implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -4817298678737234951L;
+
+	private WeldContainer weldContainer;
+	
+	public ApplicationBootstrapEvent(WeldContainer weldContainer) {
+		this.weldContainer = weldContainer;
+	}
+
+	public WeldContainer getWeldContainer() {
+		return weldContainer;
+	}
 
 }

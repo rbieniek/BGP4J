@@ -14,6 +14,8 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
  */
 public class DummyExtension implements Extension {
 
+	private boolean readyForService;
+	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.extensions.Extension#getName()
 	 */
@@ -61,7 +63,12 @@ public class DummyExtension implements Extension {
 
 	@Override
 	public boolean isReadyForService() {
-		return false;
+		return readyForService;
+	}
+
+	@Override
+	public void initialize(ExtensionBeanFactory beanFactory) {
+		readyForService = (beanFactory.getBeanInstance(DummyExtensionBean.class) != null);
 	}
 
 }

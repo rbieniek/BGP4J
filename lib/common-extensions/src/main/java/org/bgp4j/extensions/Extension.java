@@ -25,6 +25,13 @@ public interface Extension {
 	public String getName();
 	
 	/**
+	 * Initialize the extension
+	 * 
+	 * @param beanManager
+	 */
+	public void initialize(ExtensionBeanFactory beanFactory);
+	
+	/**
 	 * Configure the exception. The configurations framework passes the top level extensions node
 	 * into the extensions' configuration mechanism and otherwise treats it as opaque configuration
 	 * information

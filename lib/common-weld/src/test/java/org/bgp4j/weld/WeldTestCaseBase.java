@@ -48,7 +48,7 @@ public class WeldTestCaseBase {
 		weld = new Weld();
 		
 		weldContainer = weld.initialize();
-		weldContainer.event().select(ApplicationBootstrapEvent.class).fire(new ApplicationBootstrapEvent());
+		weldContainer.event().select(ApplicationBootstrapEvent.class).fire(new ApplicationBootstrapEvent(weldContainer));
 	}
 	
 	@AfterClass
