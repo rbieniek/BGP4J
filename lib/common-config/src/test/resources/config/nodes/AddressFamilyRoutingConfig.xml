@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    
+    <AddressFamily addressFamily="IPv4" subsequentAddressFamily="unicast" >
+        <Route>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+            </PathAttributes>
+        </Route>
+    </AddressFamily>
+
+    <AddressFamily addressFamily="IPv4" subsequentAddressFamily="unicast" >
+        <Route>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+            </PathAttributes>
+        </Route>
+        <Route>
+            <Prefix value="ipv4:192.168.2.0/24" />
+            <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+            </PathAttributes>
+        </Route>
+    </AddressFamily>
+    
+    <AddressFamily subsequentAddressFamily="unicast" >
+        <Route>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+            </PathAttributes>
+        </Route>
+    </AddressFamily>
+    
+    <AddressFamily addressFamily="IPv4"  >
+        <Route>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+            </PathAttributes>
+        </Route>
+    </AddressFamily>
+    
+</Configuration>
