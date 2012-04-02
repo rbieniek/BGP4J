@@ -85,6 +85,14 @@
     </dependency>
 
     <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-config</artifactId>
+      <version>${version.de.urb.quagga}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <PathAttributes>
+        <LocalPreference value="100" />
+    </PathAttributes>
+
+    <PathAttributes>
+        <LocalPreference value="100" />
+        <LocalPreference value="200" />
+    </PathAttributes>
+    
+    <PathAttributes>
+        <MultiExitDisc value="1" />
+    </PathAttributes>
+    
+    <PathAttributes>
+        <MultiExitDisc value="1" />
+        <MultiExitDisc value="2" />
+    </PathAttributes>
+
+    <PathAttributes>
+        <Foo />
+    </PathAttributes>
+    
+    <PathAttributes>
+        <LocalPreference value="100" />
+        <MultiExitDisc value="1" />        
+    </PathAttributes>
+    
+</Configuration>

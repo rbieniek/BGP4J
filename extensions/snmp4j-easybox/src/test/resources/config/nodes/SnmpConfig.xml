@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <SnmpConfiguration address="192.168.1.1" community="public" />
+    
+    <SnmpConfiguration community="public" />
+    
+    <SnmpConfiguration address="192.168.1.1" />
+
+    <SnmpConfiguration address="192.168.1.1" community="" />
+</Configuration>
