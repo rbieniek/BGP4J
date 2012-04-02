@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <EasyBox name="test1" interfaceMac="00:00">
+        <Snmp address="192.168.1.1" community="public" />
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+    
+    <EasyBox interfaceMac="00:00">
+        <Snmp address="192.168.1.1" community="public" />
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+    
+    <EasyBox name=" " interfaceMac="00:00">
+        <Snmp address="192.168.1.1" community="public" />
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+    
+    <EasyBox name="test1">
+        <Snmp address="192.168.1.1" community="public" />
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+
+    <EasyBox name="test1" interfaceMac=" ">
+        <Snmp address="192.168.1.1" community="public" />
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+    
+    <EasyBox name="test1" interfaceMac="00:00">
+        <Routing>
+            <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+                <Route>
+                    <Prefix value="ipv4:0.0.0.0/0" />
+                    <PathAttributes>
+                        <LocalPreference value="100" />
+                    </PathAttributes>
+                </Route>
+            </AddressFamily>
+        </Routing>
+    </EasyBox>
+    
+    <EasyBox name="test1" interfaceMac="00:00">
+        <Snmp address="192.168.1.1" community="public" />
+    </EasyBox>
+</Configuration>
