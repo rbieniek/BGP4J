@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Routing>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:192.168.1.0/24" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>            
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+    </Routing>
+    
+    <Routing>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:192.168.1.0/24" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>            
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+        <AddressFamily addressFamily="IPV6" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv6:2001:0DB8:0:CD30::/60" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+            
+            <!-- Good configuration, default route -->
+            <Route>
+                <Prefix value="ipv6:::/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+    </Routing>
+
+    <Routing>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:192.168.1.0/24" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>            
+        </AddressFamily>
+    </Routing>
+    
+    <Routing>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+            <Route>
+                <Prefix value="ipv4:192.168.1.0/24" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>            
+        </AddressFamily>
+    </Routing>
+    
+    <Routing>
+        <AddressFamily addressFamily="IPV6" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv6:2001:0DB8:0:CD30::/60" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+            
+            <!-- Good configuration, default route -->
+            <Route>
+                <Prefix value="ipv6:::/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:192.168.1.0/24" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>            
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+    </Routing>
+
+    <Routing>
+        <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv4:0.0.0.0/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+    </Routing>
+
+    <Routing>
+        <AddressFamily addressFamily="IPV6" subsequentAddressFamily="unicast">
+            <Route>
+                <Prefix value="ipv6:2001:0DB8:0:CD30::/60" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+            
+            <!-- Good configuration, default route -->
+            <Route>
+                <Prefix value="ipv6:::/0" />
+                <PathAttributes>
+                    <LocalPreference value="100" />
+                </PathAttributes>
+            </Route>
+        </AddressFamily>
+    </Routing>
+</Configuration>

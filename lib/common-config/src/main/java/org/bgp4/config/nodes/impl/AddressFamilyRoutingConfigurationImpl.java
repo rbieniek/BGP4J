@@ -59,7 +59,10 @@ public class AddressFamilyRoutingConfigurationImpl implements AddressFamilyRouti
 	 * @param routes the routes to set
 	 */
 	void setRoutes(Set<RouteConfiguration> routes) {
-		this.routes = routes;
+		this.routes.clear();
+		
+		if(routes != null)
+			this.routes.addAll(routes);
 	}
 
 	/* (non-Javadoc)

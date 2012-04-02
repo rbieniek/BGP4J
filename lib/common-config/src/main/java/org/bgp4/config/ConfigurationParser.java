@@ -18,20 +18,29 @@
 package org.bgp4.config;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4.config.impl.ConfigurationParserImpl;
+import org.bgp4.config.nodes.RoutingConfiguration;
+import org.bgp4.config.nodes.impl.RoutingConfigurationParser;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@Singleton
 public class ConfigurationParser {
 
 	private @Inject ConfigurationParserImpl parserImpl;
+	private @Inject RoutingConfigurationParser routingParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
 		return parserImpl.parseConfiguration(configuration);
+	}
+
+	public RoutingConfiguration parseRoutingConfiguration(XMLConfiguration configuration) throws ConfigurationException {
+		return routingParser.parseConfiguration(configuration);
 	}
 }
