@@ -30,9 +30,9 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4.config.global.ApplicationConfiguration;
-import org.bgp4.config.global.PeerConfigurationEvent;
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.global.ApplicationConfiguration;
+import org.bgp4j.config.global.PeerConfigurationEvent;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.slf4j.Logger;
 
 /**

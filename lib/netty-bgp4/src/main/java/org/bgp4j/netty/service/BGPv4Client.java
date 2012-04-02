@@ -18,7 +18,7 @@ package org.bgp4j.netty.service;
 
 import javax.inject.Inject;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.handlers.BGPv4ClientEndpoint;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;

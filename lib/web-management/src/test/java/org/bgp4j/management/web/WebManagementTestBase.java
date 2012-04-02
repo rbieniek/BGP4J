@@ -23,8 +23,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.bgp4.config.nodes.HttpServerConfiguration;
-import org.bgp4.config.nodes.ServerConfiguration;
+import org.bgp4j.config.nodes.HttpServerConfiguration;
+import org.bgp4j.config.nodes.ServerConfiguration;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;
 import org.junit.Before;

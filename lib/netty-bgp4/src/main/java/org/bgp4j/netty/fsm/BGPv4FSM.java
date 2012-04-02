@@ -25,7 +25,7 @@ import java.util.Set;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.netty.BGPv4Constants;

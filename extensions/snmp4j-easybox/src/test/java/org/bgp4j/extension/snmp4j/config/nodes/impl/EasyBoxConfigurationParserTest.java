@@ -9,8 +9,8 @@ import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.ConfigTestBase;
-import org.bgp4.config.nodes.RoutingConfiguration;
+import org.bgp4j.config.ConfigTestBase;
+import org.bgp4j.config.nodes.RoutingConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.EasyboxConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration;
 import org.junit.After;

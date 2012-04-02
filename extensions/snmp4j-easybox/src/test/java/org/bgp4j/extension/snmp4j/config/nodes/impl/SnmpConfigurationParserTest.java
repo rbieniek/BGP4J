@@ -9,7 +9,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.ConfigTestBase;
+import org.bgp4j.config.ConfigTestBase;
 import org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.impl.SnmpConfigurationParser;
 import org.junit.After;

@@ -3,7 +3,7 @@
  */
 package org.bgp4j.extension.snmp4j.config.nodes.impl;
 
-import org.bgp4.config.nodes.RoutingConfiguration;
+import org.bgp4j.config.nodes.RoutingConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.EasyboxConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration;
 

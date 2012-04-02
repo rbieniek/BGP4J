@@ -20,8 +20,8 @@ package org.bgp4j.management.web.service;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.bgp4.config.global.ApplicationConfiguration;
-import org.bgp4.config.nodes.HttpServerConfiguration;
+import org.bgp4j.config.global.ApplicationConfiguration;
+import org.bgp4j.config.nodes.HttpServerConfiguration;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)

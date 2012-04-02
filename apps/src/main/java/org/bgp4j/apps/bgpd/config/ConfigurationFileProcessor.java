@@ -22,8 +22,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.ConfigurationParser;
-import org.bgp4.config.global.ApplicationConfiguration;
+import org.bgp4j.config.ConfigurationParser;
+import org.bgp4j.config.global.ApplicationConfiguration;
 
 /**
  * This class manages the access to the configuration file provided on the command line. 

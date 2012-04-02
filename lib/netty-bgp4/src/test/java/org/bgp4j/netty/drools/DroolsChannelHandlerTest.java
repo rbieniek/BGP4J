@@ -19,7 +19,7 @@ package org.bgp4j.netty.drools;
 
 import junit.framework.Assert;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.LocalhostNetworkChannelBGPv4ClientTestBase;
 import org.bgp4j.netty.MessageRecordingChannelHandler;

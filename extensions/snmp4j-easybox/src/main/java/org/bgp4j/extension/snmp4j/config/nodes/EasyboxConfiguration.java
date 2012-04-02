@@ -3,7 +3,7 @@
  */
 package org.bgp4j.extension.snmp4j.config.nodes;
 
-import org.bgp4.config.nodes.RoutingConfiguration;
+import org.bgp4j.config.nodes.RoutingConfiguration;
 
 /**
  * @author rainer

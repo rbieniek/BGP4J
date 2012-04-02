@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.bgp4j.netty.protocol.open.OpenPacket;

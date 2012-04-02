@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 import junit.framework.Assert;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;

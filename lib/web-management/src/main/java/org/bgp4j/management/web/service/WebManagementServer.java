@@ -17,7 +17,7 @@
  */
 package org.bgp4j.management.web.service;
 
-import org.bgp4.config.nodes.HttpServerConfiguration;
+import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.management.web.application.ManagementApplication;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

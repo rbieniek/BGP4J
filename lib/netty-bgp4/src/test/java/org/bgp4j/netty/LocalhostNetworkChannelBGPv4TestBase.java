@@ -28,12 +28,12 @@ import java.util.concurrent.Executors;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.Configuration;
-import org.bgp4.config.ConfigurationParser;
-import org.bgp4.config.nodes.ClientConfiguration;
-import org.bgp4.config.nodes.ClientConfigurationDecorator;
-import org.bgp4.config.nodes.PeerConfiguration;
-import org.bgp4.config.nodes.PeerConfigurationDecorator;
+import org.bgp4j.config.Configuration;
+import org.bgp4j.config.ConfigurationParser;
+import org.bgp4j.config.nodes.ClientConfiguration;
+import org.bgp4j.config.nodes.ClientConfigurationDecorator;
+import org.bgp4j.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfigurationDecorator;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.jboss.netty.bootstrap.ServerBootstrap;

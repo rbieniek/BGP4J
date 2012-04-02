@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.bgp4.config.nodes.impl.RoutingConfigurationParser;
+import org.bgp4j.config.nodes.impl.RoutingConfigurationParser;
 import org.bgp4j.extension.snmp4j.config.nodes.EasyboxConfiguration;
 
 /**

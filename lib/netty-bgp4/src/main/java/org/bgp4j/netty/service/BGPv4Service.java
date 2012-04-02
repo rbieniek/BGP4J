@@ -19,7 +19,7 @@ package org.bgp4j.netty.service;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.bgp4.config.global.ApplicationConfiguration;
+import org.bgp4j.config.global.ApplicationConfiguration;
 import org.bgp4j.netty.fsm.FSMRegistry;
 import org.slf4j.Logger;
 

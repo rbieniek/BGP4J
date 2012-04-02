@@ -29,8 +29,8 @@ import java.util.Date;
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.XMLConfiguration;
-import org.bgp4.config.Configuration;
-import org.bgp4.config.ConfigurationParser;
+import org.bgp4j.config.Configuration;
+import org.bgp4j.config.ConfigurationParser;
 import org.bgp4j.netty.FSMState;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;

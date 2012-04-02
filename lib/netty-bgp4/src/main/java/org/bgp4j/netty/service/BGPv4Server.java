@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
-import org.bgp4.config.global.ApplicationConfiguration;
+import org.bgp4j.config.global.ApplicationConfiguration;
 import org.bgp4j.netty.handlers.BGPv4Codec;
 import org.bgp4j.netty.handlers.BGPv4Reframer;
 import org.bgp4j.netty.handlers.BGPv4ServerEndpoint;

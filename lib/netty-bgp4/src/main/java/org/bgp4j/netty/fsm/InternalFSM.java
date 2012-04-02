@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import org.bgp4.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.netty.FSMState;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
