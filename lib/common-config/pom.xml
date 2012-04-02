@@ -17,6 +17,21 @@
   <name>Common configuration support</name>
   <description>Common configuration support</description>
 
+  <build>
+    <plugins>
+      <plugin>
+	<artifactId>maven-jar-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>test-jar</goal>
+	    </goals>
+	  </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
 
     <dependency>

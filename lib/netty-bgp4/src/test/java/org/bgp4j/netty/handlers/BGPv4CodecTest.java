@@ -457,7 +457,9 @@ public class BGPv4CodecTest extends LocalChannelBGPv4TestBase {
 		Assert.assertEquals(100, localPref.getLocalPreference());
 		
 		Assert.assertEquals(0, nlri.getPrefixLength());
-		Assert.assertNull(nlri.getPrefix());
+		Assert.assertNotNull(nlri.getPrefix());
+		Assert.assertEquals(1, nlri.getPrefix().length);
+		Assert.assertEquals(0, nlri.getPrefix()[0]);
 	}
 	
 	@Test
