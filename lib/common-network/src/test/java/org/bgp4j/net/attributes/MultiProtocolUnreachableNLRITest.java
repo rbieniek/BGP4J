@@ -57,18 +57,29 @@ public class MultiProtocolUnreachableNLRITest {
 				new NetworkLayerReachabilityInformation[] {
 				new NetworkLayerReachabilityInformation(0, null)
 		});
+		MultiProtocolUnreachableNLRI i = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, 
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(1, new byte[] {(byte)0x80})
+		});
+		MultiProtocolUnreachableNLRI j = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, 
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(1, new byte[] {(byte)0x80})
+		});
 		
 		Assert.assertTrue(a.equals(b));
 		Assert.assertTrue(e.equals(f));
 		Assert.assertTrue(g.equals(h));
+		Assert.assertTrue(i.equals(j));
 		
 		Assert.assertTrue(a.hashCode() == b.hashCode());
 		Assert.assertTrue(e.hashCode() == f.hashCode());
 		Assert.assertTrue(g.hashCode() == h.hashCode());
+		Assert.assertTrue(i.hashCode() == j.hashCode());
 
 		Assert.assertTrue(a.compareTo(b) == 0);
 		Assert.assertTrue(e.compareTo(f) == 0);
 		Assert.assertTrue(g.compareTo(h) == 0);
+		Assert.assertTrue(i.compareTo(j) == 0);
 	}
 
 	@Test
@@ -201,12 +212,34 @@ public class MultiProtocolUnreachableNLRITest {
 				new NetworkLayerReachabilityInformation[] {
 				new NetworkLayerReachabilityInformation(1, new byte[] { 1 })
 		});
+		MultiProtocolUnreachableNLRI i = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(2, new byte[] { (byte)0x80 })
+		});
+		MultiProtocolUnreachableNLRI j = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(2, new byte[] { (byte)0xc0 })
+		});
+		MultiProtocolUnreachableNLRI k = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(8, new byte[] { (byte)0xfe })
+		});
+		MultiProtocolUnreachableNLRI l = new MultiProtocolUnreachableNLRI(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING,
+				new NetworkLayerReachabilityInformation[] {
+				new NetworkLayerReachabilityInformation(8, new byte[] { (byte)0xff })
+		});
 		
 		Assert.assertFalse(g.equals(h));
+		Assert.assertFalse(i.equals(j));
+		Assert.assertFalse(k.equals(l));
 		
 		Assert.assertFalse(g.hashCode() == h.hashCode());
+		Assert.assertFalse(i.hashCode() == j.hashCode());
+		Assert.assertFalse(k.hashCode() == l.hashCode());
 
 		Assert.assertTrue(g.compareTo(h) < 0);
+		Assert.assertTrue(i.compareTo(j) < 0);
+		Assert.assertTrue(k.compareTo(l) < 0);
 	}
 
 	@Test

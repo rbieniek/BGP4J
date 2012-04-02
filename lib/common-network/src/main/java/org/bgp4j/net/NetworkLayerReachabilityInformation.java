@@ -17,7 +17,10 @@
 package org.bgp4j.net;
 
 import java.io.Serializable;
-import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 /**
@@ -79,6 +82,9 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 		if(prefix == null) {
 			if(prefixLength != 0)
 				throw new IllegalArgumentException("cannot set null prefix if prefix length greater 0");
+			this.prefix = new byte[] {0};
+		} else if(prefixLength == 0) {
+			this.prefix = new byte[] {0};
 		} else {			
 			int prefixSize = calculateOctetsForPrefixLength(this.prefixLength);
 			
@@ -159,11 +165,10 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Arrays.hashCode(prefix);
-		result = prime * result + prefixLength;
-		return result;
+		return (new HashCodeBuilder())
+				.append(getPrefixLength())
+				.append(getPrefix())
+				.toHashCode();
 	}
 
 	/* (non-Javadoc)
@@ -171,82 +176,57 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
+		if(!(obj instanceof NetworkLayerReachabilityInformation))
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-
-		NetworkLayerReachabilityInformation other = (NetworkLayerReachabilityInformation) obj;
 		
-		if (prefixLength != other.prefixLength)
-			return false;
-		if (!Arrays.equals(prefix, other.prefix))
-			return false;
-		return true;
+		NetworkLayerReachabilityInformation o =(NetworkLayerReachabilityInformation)obj;
+		
+		return (new EqualsBuilder())
+				.append(getPrefixLength(), o.getPrefixLength())
+				.append(getPrefix(), o.getPrefix())
+				.isEquals();
 	}
 
 	@Override
 	public int compareTo(NetworkLayerReachabilityInformation other) {
-		int result = 0;
+		CompareToBuilder builder = new CompareToBuilder();
 		
-		if(this.prefixLength == 0 && other.prefixLength > 0) {
-			result = -1;
-		} else if(this.prefixLength > 0 && other.prefixLength == 0) {
-			result = 1;
-		} else if(this.prefixLength == 0 && other.prefixLength == 0) {
-			result = 0;
-		} else {
+		builder.append(getPrefixLength(), other.getPrefixLength());
+		
+		if(builder.toComparison() == 0) {
 			int byteLen = calculateOctetsForPrefixLength(this.prefixLength);
 			int otherByteLen = calculateOctetsForPrefixLength(other.prefixLength);
 			int commonByteLen = (byteLen > otherByteLen) ? otherByteLen : byteLen;
 			int commonPrefixLen = (prefixLength > other.prefixLength) ? other.prefixLength : prefixLength;
 			
 			for (int i = 0; i < commonByteLen - 1; i++) {
-				if (this.prefix[i] > other.prefix[i]) {
-					result = 1;
-					break;
-				} else if(this.prefix[i] < other.prefix[i]) {
-					result = -1;
-					break;
-				}
+				builder.append(getPrefix()[i], other.getPrefix()[i]);
 			}
 			
-			if(result == 0) {
+			if(builder.toComparison() == 0) {
 				int bitsToCheck = commonPrefixLen% 8;
 
 				if (bitsToCheck == 0) {
-					if(this.prefix[commonByteLen - 1] > other.prefix[commonByteLen - 1]) {
-						result = 1;
-					} else if(this.prefix[commonByteLen - 1] < other.prefix[commonByteLen - 1]) {
-						result = -1;
-					}
+					if(commonByteLen > 0)
+						builder.append(getPrefix()[commonByteLen-1], other.getPrefix()[commonByteLen-1]);
 				} else {
 					for (int i = 0; i < bitsToCheck; i++) {
 						int mask = 1 << (7 - i);
 
-						if ((this.prefix[commonByteLen - 1] & mask) > (other.prefix[commonByteLen - 1] & mask)) {
-							result = 1;
+						builder.append(getPrefix()[commonByteLen - 1] & mask, other.getPrefix()[commonByteLen - 1] & mask);
+						if(builder.toComparison() != 0)
 							break;
-						} else if ((this.prefix[commonByteLen - 1] & mask) < (other.prefix[commonByteLen - 1] & mask)) {
-							result = -1;
-							break;
-						}
 					}
 				}
 				
-				if(result == 0) {
-					if(prefixLength > other.prefixLength)
-						result = 1;
-					else if(prefixLength < other.prefixLength)
-						result = -1;
+				if(builder.toComparison() == 0) {
+					builder.append(getPrefixLength(), other.getPrefixLength());
 				}
 			}
 
 		}
 		
-		return result;
+		return builder.toComparison();
 	}
 
 	public static final int calculateOctetsForPrefixLength(int prefixLength) {

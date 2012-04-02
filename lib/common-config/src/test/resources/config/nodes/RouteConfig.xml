@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <!-- IPv4 cases 0-12 -->
+    <!-- Good configuration -->
+    <Route>
+        <Prefix value="ipv4:192.168.1.0/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Good configuration, default route -->
+    <Route>
+        <Prefix value="ipv4:0.0.0.0/0" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, blank prefix -->
+    <Route>
+        <Prefix value="" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, missing prefix value -->
+    <Route>
+        <Prefix  />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, missing prefix -->
+    <Route>
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, invalid prefix type -->
+    <Route>
+        <Prefix value="foo:192.168.1.0/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, prefix length -->
+    <Route>
+        <Prefix value="ipv4:192.168.1.0/33" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, prefix length -->
+    <Route>
+        <Prefix value="ipv4:192.168.1.0/a24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, prefix length -->
+    <Route>
+        <Prefix value="ipv4:192.168.1.0/-1" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, IP address -->
+    <Route>
+        <Prefix value="ipv4:a192.168.1.0/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+        
+    <!-- Bad configuration, IP address -->
+    <Route>
+        <Prefix value="ipv4:-192.168.1.0/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, IP address -->
+    <Route>
+        <Prefix value="ipv4:256.168.1.0/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, IP address -->
+    <Route>
+        <Prefix value="ipv4:192.168.1/24" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- IPv6 cases 13-22 -->    
+    <!-- Good configuration -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0000:CD30:0000:0000:0000:0000/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Good configuration -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8::CD30:0:0:0:0/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Good configuration -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0:CD30::/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Good configuration, default route -->
+    <Route>
+        <Prefix value="ipv6:::/0" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, prefix length -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0000:CD30:0000:0000:0000:0000/-1" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, prefix length -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0000:CD30:0000:0000:0000:0000/129" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, address too short -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0000:CD30:0000:0000:0000/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, address to long -->
+    <Route>
+        <Prefix value="ipv6:2001:0DB8:0000:CD30:0000:0000:0000:0000:0000/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- bad configuration, address part too long -->
+    <Route>
+        <Prefix value="ipv6:02001:0DB8:0000:CD30:0000:0000:0000:0000/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+
+    <!-- Bad configuration, double double-colons -->
+    <Route> 
+        <Prefix value="ipv6:2001:0DB8::CD30:0000::0000:0000/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Binary cases 23-27 -->    
+    <!-- Good configuration -->
+    <Route>
+        <Prefix value="binary:20010DB80000CD30/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, invalid char -->
+    <Route>
+        <Prefix value="binary:20010DB80000CG30/60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, prefix too short -->
+    <Route>
+        <Prefix value="binary:20010DB80000CD30/72" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Prefix too long configuration -->
+    <Route>
+        <Prefix value="binary:20010DB80000CD30/48" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+    <!-- Bad configuration, negative length -->
+    <Route>
+        <Prefix value="binary:20010DB80000CD30/-60" />
+        <PathAttributes>
+            <LocalPreference value="100" />
+        </PathAttributes>
+    </Route>
+    
+</Configuration>
