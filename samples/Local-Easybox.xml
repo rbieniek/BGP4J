@@ -1,0 +1,6 @@
+<Configuration>
+  <Easybox name="box1" interfaceMac="7C-4F-B5-E0-3A-90" >
+    <Snmp targeAddress="192.168.12.253" localPort="16161" community="public" />
+    <Routing />
+  </Easybox>
+</Configuration>
