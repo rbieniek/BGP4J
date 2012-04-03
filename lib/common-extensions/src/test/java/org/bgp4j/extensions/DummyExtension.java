@@ -12,7 +12,7 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
  * @author rainer
  *
  */
-public class DummyExtension implements Extension {
+public class DummyExtension extends ExtensionBase implements Extension {
 
 	private boolean readyForService;
 	

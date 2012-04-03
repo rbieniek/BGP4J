@@ -12,15 +12,21 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.rib.web.DummyTest.java 
+ *  
  */
-package org.bgp4j.management.web;
+package org.bgp4j.apps.easybox;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import javax.inject.Qualifier;
 
 /**
- * @author Rainer Bieniek (rainer@bgp4j.org)
+ * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class DummyTest {
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+public @interface EasyboxDaemonApplicationSelector {
 
 }

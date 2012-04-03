@@ -4,6 +4,7 @@
 package org.bgp4j.extensions;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -67,4 +68,11 @@ public interface Extension {
 	 * Check if the extension is ready for service and should be started
 	 */
 	public boolean isReadyForService();
+	
+	/**
+	 * get a set of management objects accessible through web management
+	 * 
+	 * @return
+	 */
+	public Set<Object> getManagementObjects();
 }

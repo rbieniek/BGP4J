@@ -238,6 +238,11 @@
 	<scope>import</scope>
       </dependency>
       <dependency>
+	<groupId>org.jboss.resteasy</groupId>
+	<artifactId>resteasy-cdi</artifactId>
+	<version>${version.org.jboss.resteasy}</version>
+      </dependency>
+      <dependency>
 	<groupId>org.quartz-scheduler</groupId>
 	<artifactId>quartz</artifactId>
 	<version>${version.org.quartz-scheduler}</version>

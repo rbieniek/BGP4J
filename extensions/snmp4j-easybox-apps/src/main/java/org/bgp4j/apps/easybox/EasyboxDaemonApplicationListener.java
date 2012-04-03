@@ -14,9 +14,7 @@
  *  limitations under the License.
  *  
  */
-package org.bgp4j.apps.bgpd;
-
-import java.util.Set;
+package org.bgp4j.apps.easybox;
 
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -28,11 +26,8 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.bgp4j.apps.bgpd.config.ConfigurationFileProcessor;
-import org.bgp4j.extensions.Extension;
-import org.bgp4j.extensions.ExtensionsFactory;
+import org.bgp4j.config.global.ApplicationConfiguration;
 import org.bgp4j.management.web.service.WebManagementService;
-import org.bgp4j.netty.service.BGPv4Service;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
 import org.slf4j.Logger;
@@ -41,15 +36,14 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BgpDaemonApplicationListener {
+public class EasyboxDaemonApplicationListener {
 	private @Inject Logger log;
 	private @Inject @Parameters String[] commandLine;
 	private @Inject ConfigurationFileProcessor configurationFileProcessor;
-	private @Inject BGPv4Service  bgpService;
 	private @Inject WebManagementService webManagementService;
-	private @Inject ExtensionsFactory extensionsFactory;
+	private @Inject ApplicationConfiguration appConfig;
 	
-	public void listen(@Observes @BgpDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
+	public void listen(@Observes @EasyboxDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
 		BasicConfigurator.configure();
 
 		try {
@@ -72,22 +66,9 @@ public class BgpDaemonApplicationListener {
 			}
 			
 			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
-
-			for(Extension extension : extensionsFactory.listExtensions()) {
-				if(extension.isReadyForService()) {
-					Set<Object> managementObjects = extension.getManagementObjects();
-					
-					if(managementObjects != null) {
-						for(Object managementObject : managementObjects)
-							webManagementService.registerSingleton(managementObject);
-					}
-					
-					extension.startExtension();
-				}
-			}
+			appConfig.setHttpServerConfiguration(configurationFileProcessor.getApplicationConfiguration().getHttpServer());
 			
 			webManagementService.startService();			
-			bgpService.startService();
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			

@@ -37,7 +37,7 @@ public class EasyboxSnmpExtension extends ExtensionBase implements Extension {
 		Set<String> keys = new HashSet<String>();
 		
 		for(HierarchicalConfiguration subConfig : config.configurationsAt("Easybox")) {
-			EasyboxConfiguration ebc =parser.parseConfguration(subConfig);
+			EasyboxConfiguration ebc = parser.parseConfguration(subConfig);
 			
 			if(keys.contains(ebc.getName()))
 				throw new ConfigurationException("duplicate Easybox " + ebc.getName());

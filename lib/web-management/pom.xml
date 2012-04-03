@@ -17,6 +17,21 @@
   <name>Web managment app</name>
   <description>Web management app</description>
 
+  <build>
+    <plugins>
+      <plugin>
+	<artifactId>maven-jar-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>test-jar</goal>
+	    </goals>
+	  </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     
     <dependency>
@@ -84,6 +99,11 @@
       <artifactId>resteasy-jaxrs</artifactId>
     </dependency>
     
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-cdi</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

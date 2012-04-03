@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.bgp4j.extensions.Extension;
+import org.bgp4j.extensions.ExtensionBase;
 import org.bgp4j.extensions.ExtensionBeanFactory;
 import org.bgp4j.extensions.ProvidedRIBs;
 
@@ -15,7 +16,7 @@ import org.bgp4j.extensions.ProvidedRIBs;
  * @author rainer
  *
  */
-public class TestExtension implements Extension {
+public class TestExtension extends ExtensionBase implements Extension {
 
 	private boolean configured;
 	

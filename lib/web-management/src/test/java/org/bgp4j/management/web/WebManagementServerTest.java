@@ -26,6 +26,7 @@ import junit.framework.Assert;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.bgp4j.management.web.application.ManagementApplication;
 import org.bgp4j.management.web.service.WebManagementServer;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +40,11 @@ public class WebManagementServerTest extends WebManagementTestBase {
 	@Before
 	public void before() {
 		server = obtainInstance(WebManagementServer.class);
+		testResource = obtainInstance(TestResource.class);
 	}
 	
 	private WebManagementServer server;
+	private TestResource testResource;
 	
 	@Test
 	public void testStartServer() throws Exception {
@@ -56,6 +59,26 @@ public class WebManagementServerTest extends WebManagementTestBase {
 		
 		Assert.assertEquals(HttpServletResponse.SC_OK, client.executeMethod(method));
 		Assert.assertTrue(method.getResponseBodyAsString().startsWith("{ \"Time\":"));
+		
+		server.stopServer();
+	}
+
+	
+	@Test
+	public void testInjectedTestBean() throws Exception {
+		ManagementApplication.addRegisteredSingleton(testResource);
+		
+		server.setConfiguration(httpServerConfiguration);
+		server.startServer();
+		
+		Thread.sleep(1000);
+		
+		InetSocketAddress serverAddress = httpServerConfiguration.getServerConfiguration().getListenAddress();
+		HttpClient client = new HttpClient();
+		HttpMethod method = new GetMethod("http://" + serverAddress.getAddress().getHostAddress() + ":" + serverAddress.getPort() + "/rest/test/bean");
+		
+		Assert.assertEquals(HttpServletResponse.SC_OK, client.executeMethod(method));
+		Assert.assertEquals("found", method.getResponseBodyAsString());
 		
 		server.stopServer();
 	}

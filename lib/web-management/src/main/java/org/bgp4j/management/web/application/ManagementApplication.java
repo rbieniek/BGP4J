@@ -17,6 +17,9 @@
  */
 package org.bgp4j.management.web.application;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.ws.rs.core.Application;
 
 /**
@@ -25,4 +28,30 @@ import javax.ws.rs.core.Application;
  */
 public class ManagementApplication extends Application {
 
+	private static Set<Class<?>> registeredClasses = new HashSet<Class<?>>();
+	private static Set<Object> registeredSingletons = new HashSet<Object>();
+	
+	/* (non-Javadoc)
+	 * @see javax.ws.rs.core.Application#getClasses()
+	 */
+	@Override
+	public Set<Class<?>> getClasses() {
+		return registeredClasses;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.ws.rs.core.Application#getSingletons()
+	 */
+	@Override
+	public Set<Object> getSingletons() {
+		return registeredSingletons;
+	}
+
+	public static void addRegisteredClass(Class<?> clazz) {
+		registeredClasses.add(clazz);
+	}
+	
+	public static void addRegisteredSingleton(Object singleton) {
+		registeredSingletons.add(singleton);
+	}
 }

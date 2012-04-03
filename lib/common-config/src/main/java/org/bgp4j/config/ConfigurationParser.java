@@ -21,9 +21,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4j.config.impl.ConfigurationParserImpl;
+import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.config.nodes.RoutingConfiguration;
+import org.bgp4j.config.nodes.impl.HttpServerConfigurationParser;
 import org.bgp4j.config.nodes.impl.RoutingConfigurationParser;
 
 /**
@@ -35,12 +38,17 @@ public class ConfigurationParser {
 
 	private @Inject ConfigurationParserImpl parserImpl;
 	private @Inject RoutingConfigurationParser routingParser;
+	private @Inject HttpServerConfigurationParser httpServerParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
 		return parserImpl.parseConfiguration(configuration);
 	}
 
-	public RoutingConfiguration parseRoutingConfiguration(XMLConfiguration configuration) throws ConfigurationException {
+	public RoutingConfiguration parseRoutingConfiguration(HierarchicalConfiguration configuration) throws ConfigurationException {
 		return routingParser.parseConfiguration(configuration);
+	}
+	
+	public HttpServerConfiguration parseHttpServerConfiguration(HierarchicalConfiguration configuration) throws ConfigurationException {
+		return httpServerParser.parseConfiguration(configuration);
 	}
 }

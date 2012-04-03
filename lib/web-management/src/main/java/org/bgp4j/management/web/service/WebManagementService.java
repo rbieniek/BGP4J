@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.bgp4j.config.global.ApplicationConfiguration;
 import org.bgp4j.config.nodes.HttpServerConfiguration;
+import org.bgp4j.management.web.application.ManagementApplication;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
@@ -46,5 +47,9 @@ public class WebManagementService {
 	public void stopService() throws Exception {
 		if(httpServer != null)
 			httpServer.stopServer();
+	}
+	
+	public void registerSingleton(Object singleton) {
+		ManagementApplication.addRegisteredSingleton(singleton);
 	}
 }
