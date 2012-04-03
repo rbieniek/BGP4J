@@ -24,7 +24,7 @@ public class SnmpConfigurationParser {
 		SnmpConfigurationImpl impl = new SnmpConfigurationImpl();
 		
 		try {
-			String addr = config.getString("[@address]");
+			String addr = config.getString("[@targetAddress]");
 			
 			if(StringUtils.isBlank(addr))
 				throw new ConfigurationException("empty SNMP address given");
@@ -36,6 +36,8 @@ public class SnmpConfigurationParser {
 		impl.setCommunity(config.getString("[@community]"));
 		if(StringUtils.isBlank(impl.getCommunity()))
 			throw new ConfigurationException("empty SNMP community name given");
+
+		impl.setLocalPort(config.getInt("[@localPort]", 0));
 		
 		return impl;
 	}

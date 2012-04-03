@@ -5,6 +5,7 @@ package org.bgp4j.extension.snmp4j.config.nodes.impl;
 
 import java.net.InetAddress;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration;
@@ -24,12 +25,13 @@ class SnmpConfigurationImpl implements SnmpConfiguration {
 	
 	private InetAddress address;
 	private String community;
+	private int localPort;
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration#getAddress()
 	 */
 	@Override
-	public InetAddress getAddress() {
+	public InetAddress getTargetAddress() {
 		return address;
 	}
 
@@ -61,8 +63,9 @@ class SnmpConfigurationImpl implements SnmpConfiguration {
 	@Override
 	public int hashCode() {
 		return (new HashCodeBuilder())
-				.append(getAddress())
+				.append(getTargetAddress())
 				.append(getCommunity())
+				.append(getLocalPort())
 				.toHashCode();
 	}
 
@@ -77,8 +80,21 @@ class SnmpConfigurationImpl implements SnmpConfiguration {
 		SnmpConfiguration o = (SnmpConfiguration)obj;
 		
 		return (new EqualsBuilder())
-				.append(getAddress(), o.getAddress())
+				.append(getTargetAddress(), o.getTargetAddress())
 				.append(getCommunity(), o.getCommunity())
+				.append(getLocalPort(), o.getLocalPort())
 				.isEquals();
+	}
+
+	@Override
+	public int getLocalPort() {
+		return localPort;
+	}
+	
+	void setLocalPort(int localPort) throws ConfigurationException {
+		if(localPort >= 0 && localPort < 65536)
+			this.localPort = localPort;
+		else 
+			throw new ConfigurationException("Invalid local port number: " + localPort);
 	}
 }

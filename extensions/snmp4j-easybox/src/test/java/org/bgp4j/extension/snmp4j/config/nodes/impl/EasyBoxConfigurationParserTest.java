@@ -49,7 +49,7 @@ public class EasyBoxConfigurationParserTest extends ConfigTestBase {
 		
 		Assert.assertNotNull(snmp);
 		Assert.assertEquals("public", snmp.getCommunity());
-		Assert.assertEquals(InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01 }), snmp.getAddress());
+		Assert.assertEquals(InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, (byte)0x01, (byte)0x01 }), snmp.getTargetAddress());
 		
 		RoutingConfiguration routing = eb.getRoutingConfiguration();
 		

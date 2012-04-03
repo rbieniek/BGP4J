@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <EasyBox name="test1" interfaceMac="00:00">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
         <Routing>
             <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
                 <Route>
@@ -15,7 +15,7 @@
     </EasyBox>
     
     <EasyBox interfaceMac="00:00">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
         <Routing>
             <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
                 <Route>
@@ -29,7 +29,7 @@
     </EasyBox>
     
     <EasyBox name=" " interfaceMac="00:00">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
         <Routing>
             <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
                 <Route>
@@ -43,7 +43,7 @@
     </EasyBox>
     
     <EasyBox name="test1">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
         <Routing>
             <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
                 <Route>
@@ -57,7 +57,7 @@
     </EasyBox>
 
     <EasyBox name="test1" interfaceMac=" ">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
         <Routing>
             <AddressFamily addressFamily="IPV4" subsequentAddressFamily="unicast">
                 <Route>
@@ -84,6 +84,6 @@
     </EasyBox>
     
     <EasyBox name="test1" interfaceMac="00:00">
-        <Snmp address="192.168.1.1" community="public" />
+        <Snmp targetAddress="192.168.1.1" community="public" />
     </EasyBox>
 </Configuration>

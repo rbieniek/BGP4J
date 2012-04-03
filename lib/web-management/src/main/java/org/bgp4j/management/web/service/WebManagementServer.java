@@ -18,6 +18,7 @@
 package org.bgp4j.management.web.service;
 
 import org.bgp4j.config.nodes.HttpServerConfiguration;
+import org.bgp4j.management.web.application.IllegalArgumentExceptionMapper;
 import org.bgp4j.management.web.application.ManagementApplication;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -51,6 +52,7 @@ public class WebManagementServer {
 
 		handler.setContextPath("/rest");
 		handler.setInitParameter("javax.ws.rs.Application", ManagementApplication.class.getName());
+		handler.setInitParameter("resteasy.providers", IllegalArgumentExceptionMapper.class.getName());
 		
 		handler.addServlet(new ServletHolder(new PingServlet()), "/ping");
 		handler.addServlet(new ServletHolder(new HttpServletDispatcher()), "/*");

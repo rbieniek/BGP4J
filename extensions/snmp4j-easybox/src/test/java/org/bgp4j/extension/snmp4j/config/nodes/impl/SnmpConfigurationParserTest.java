@@ -41,8 +41,9 @@ public class SnmpConfigurationParserTest extends ConfigTestBase {
 	public void testCorrectConfiguration() throws Exception {
 		SnmpConfiguration snmp = parser.parseConfiguration(config.configurationAt("SnmpConfiguration(0)"));
 		
-		Assert.assertEquals(InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x01, 0x01 }), snmp.getAddress());
+		Assert.assertEquals(InetAddress.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x01, 0x01 }), snmp.getTargetAddress());
 		Assert.assertEquals("public", snmp.getCommunity());
+		Assert.assertEquals(16161, snmp.getLocalPort());
 	}
 	
 	@Test(expected=ConfigurationException.class)

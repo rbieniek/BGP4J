@@ -16,7 +16,14 @@ public interface SnmpConfiguration {
 	 * 
 	 * @return
 	 */
-	public InetAddress getAddress();
+	public InetAddress getTargetAddress();
+	
+	/**
+	 * get the local binding port
+	 * 
+	 * @return
+	 */
+	public int getLocalPort();
 	
 	/**
 	 * get the community

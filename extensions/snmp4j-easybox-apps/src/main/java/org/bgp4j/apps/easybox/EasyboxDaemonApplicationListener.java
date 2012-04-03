@@ -27,6 +27,8 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.bgp4j.config.global.ApplicationConfiguration;
+import org.bgp4j.extension.snmp4j.service.EasyboxService;
+import org.bgp4j.extension.snmp4j.web.EasyboxWebApplication;
 import org.bgp4j.management.web.service.WebManagementService;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
@@ -42,6 +44,8 @@ public class EasyboxDaemonApplicationListener {
 	private @Inject ConfigurationFileProcessor configurationFileProcessor;
 	private @Inject WebManagementService webManagementService;
 	private @Inject ApplicationConfiguration appConfig;
+	private @Inject EasyboxService easyboxService;
+	private @Inject EasyboxWebApplication webApplication;
 	
 	public void listen(@Observes @EasyboxDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
 		BasicConfigurator.configure();
@@ -67,8 +71,13 @@ public class EasyboxDaemonApplicationListener {
 			
 			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
 			appConfig.setHttpServerConfiguration(configurationFileProcessor.getApplicationConfiguration().getHttpServer());
+			easyboxService.configure(configurationFileProcessor.getApplicationConfiguration().getEasyboxes());
+			
+			webApplication.setService(easyboxService);
+			webManagementService.registerSingleton(webApplication);
 			
 			webManagementService.startService();			
+			easyboxService.startService();
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			

@@ -33,7 +33,10 @@ public class EasyBoxConfigurationParser {
 		if(StringUtils.isBlank(ebc.getInterfaceMacAddress()))
 			throw new ConfigurationException("Interface MAC address missing");
 
-		ebc.setSnmpConfiguration(snmpConfigParser.parseConfiguration(first(config.configurationsAt("Snmp"), "Snmp")));
+		ebc.setSnmpConfiguration(
+				new SnmpConfigurationDefaultLocalPortDecorator(
+						snmpConfigParser.parseConfiguration(
+								first(config.configurationsAt("Snmp"), "Snmp"))));
 		ebc.setRoutingConfiguration(routingConfigParser.parseConfiguration(first(config.configurationsAt("Routing"), "Routing")));
 		
 		return ebc;
