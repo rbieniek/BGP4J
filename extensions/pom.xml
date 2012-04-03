@@ -15,6 +15,7 @@
 
   <modules>
     <module>snmp4j-easybox</module>
+    <module>snmp4j-easybox-apps</module>
   </modules>
 
 </project>

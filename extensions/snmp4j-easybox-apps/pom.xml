@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>de.urb.quagga</groupId>
+    <artifactId>quagga-java</artifactId>
+    <version>${version.de.urb.quagga}</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.urb.quagga</groupId>
+  <artifactId>apps</artifactId>
+  <version>${version.de.urb.quagga}</version>
+  <name>Standalone applications project</name>
+  <description>Standalone applications project</description>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-config</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-extensions</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-network</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-weld</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>web-management</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>snmp4j-easybox</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency> 
+      <groupId>log4j</groupId> 
+      <artifactId>log4j</artifactId> 
+    </dependency> 
+    
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-jexl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-vfs2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-ext</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    
+  </dependencies>
+
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <version>${version.org.codehaus.mojo.appassembler_maven_plugin}</version>
+	<executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+            <configuration>
+              <repositoryLayout>flat</repositoryLayout>
+	      <extraJvmArguments>-XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:CMSInitiatingOccupancyFraction=80</extraJvmArguments>
+              <programs>
+        	<program>
+        	  <mainClass>org.bgp4j.apps.easybox.EasyboxDaemon</mainClass>
+        	  <name>EasyboxDaemon</name>
+        	</program>
+              </programs>
+            </configuration>
+	     </execution>
+	  </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:nil
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
