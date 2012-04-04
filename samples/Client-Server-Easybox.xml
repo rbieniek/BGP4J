@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+
+  <HttpServer>
+    <Server port="8080" />
+  </HttpServer>
+
+  <BgpServer>
+    <!-- explizit <Server/> element w/ port given -->
+    <Server port="17179" />
+  </BgpServer>
+
+  <BgpPeers>
+    <!--
+        - IBGP connection
+        - local BGP identifier lower than remote BGP identifier
+        - active connection, no peer dampening, no open delay
+      -->
+    <BgpPeer name="coyote">
+      <Client remote="192.168.9.254" />
+      <AutonomousSystem local="64512" remote="64512" />
+      <BgpIdentifier local="${ipv4:192.168.9.1}" remote="${ipv4:192.168.9.254}" />
+      <Options passiveTcpEstablishment="false" dampPeerOscillation="false" delayOpen="false"/>
+      <Timers holdTime="180" idleHoldTime="15" delayOpen="15" connectRetryTime="180" automaticStartInterval="5" />
+    </BgpPeer>
+    
+  </BgpPeers>
+
+  <Extensions>
+    <Extension name="snmp4j-easybox">
+      <Easybox name="box1" interfaceMac="7C4FB5E03A90" >
+	<Snmp targetAddress="192.168.12.253" localPort="16161" community="public" />
+	<Routing>
+	  <AddressFamily addressFamily="IPv4" subsequentAddressFamily="unicast" >
+            <Route>
+              <Prefix value="ipv4:159.153.0.0/16" />
+              <PathAttributes>
+                <LocalPreference value="100" />
+                <MultiExitDisc value="1" />
+		<Origin value="incomplete" />
+              </PathAttributes>
+            </Route>
+            <Route>
+              <Prefix value="ipv4:0.0.0.0/0" />
+              <PathAttributes>
+                <LocalPreference value="150" />
+                <MultiExitDisc value="1" />
+		<Origin value="incomplete" />
+              </PathAttributes>
+            </Route>
+	  </AddressFamily>
+	</Routing>
+      </Easybox>
+    </Extension>
+  </Extensions>
+
+</Config>
