@@ -5,6 +5,8 @@ package org.bgp4j.extension.snmp4j.service.impl;
 
 import java.net.Inet4Address;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.bgp4j.extension.snmp4j.service.EasyboxInterface;
 
 /**
@@ -21,6 +23,19 @@ public class EasyboxInterfaceImpl implements EasyboxInterface {
 	private long octetsIn;
 	private long octetsOut;
 	private Inet4Address address;
+	
+	public EasyboxInterfaceImpl() {}
+	
+	public EasyboxInterfaceImpl(EasyboxInterface src) {
+		setDescription(src.getDescription());
+		setMtu(src.getMtu());
+		setSpeed(src.getSpeed());
+		setAdminUp(src.isAdminUp());
+		setOperUp(src.isOperUp());
+		setOctetsIn(src.getOctetsIn());
+		setOctetsOut(src.getOctetsOut());
+		setAddress(src.getAddress());
+	}
 	
 	/**
 	 * @return the description
@@ -125,7 +140,54 @@ public class EasyboxInterfaceImpl implements EasyboxInterface {
 	 */
 	void setAddress(Inet4Address address) {
 		this.address = address;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return (new HashCodeBuilder())
+				.append(getMtu())
+				.append(getOctetsIn())
+				.append(getOctetsOut())
+				.append(getSpeed())
+				.append(getAddress())
+				.append(isAdminUp())
+				.append(isOperUp())
+				.toHashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof EasyboxInterface))
+			return false;
+		
+		EasyboxInterface o = (EasyboxInterface)obj;
+		
+		return (new EqualsBuilder())
+				.append(getMtu(), o.getMtu())
+				.append(getOctetsIn(), o.getOctetsIn())
+				.append(getOctetsOut(), o.getOctetsOut())
+				.append(getSpeed(), o.getSpeed())
+				.append(getAddress(), o.getAddress())
+				.append(isAdminUp(), o.isAdminUp())
+				.append(isOperUp(), o.isOperUp())
+				.isEquals();
 	} 
-	
-	
+		
+	@Override
+	public boolean isChanged(EasyboxInterface o) {
+		if(o == null)
+			return true;
+		
+		return !((new EqualsBuilder())
+				.append(getAddress(), o.getAddress())
+				.append(isAdminUp(), o.isAdminUp())
+				.append(isOperUp(), o.isOperUp())
+				.isEquals());
+	} 
 }

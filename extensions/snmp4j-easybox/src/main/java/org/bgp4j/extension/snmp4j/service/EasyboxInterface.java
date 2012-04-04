@@ -27,4 +27,6 @@ public interface EasyboxInterface {
 
 	public String getDescription();
 
+	boolean isChanged(EasyboxInterface o);
+
 }

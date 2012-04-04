@@ -22,6 +22,8 @@ import org.bgp4j.extension.snmp4j.config.nodes.EasyboxConfiguration;
 import org.bgp4j.extension.snmp4j.config.nodes.SnmpConfiguration;
 import org.bgp4j.extension.snmp4j.service.EasyboxInstance;
 import org.bgp4j.extension.snmp4j.service.EasyboxInterface;
+import org.bgp4j.extension.snmp4j.service.EasyboxInterfaceEvent;
+import org.bgp4j.extension.snmp4j.service.EasyboxInterfaceListener;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -277,6 +279,8 @@ public class EasyboxInstanceImpl implements EasyboxInstance {
 	private Snmp snmp;
 	private long uptime;
 	private Map<Integer, EasyboxInterfaceImpl> interfaces = new HashMap<Integer, EasyboxInterfaceImpl>();
+	private EasyboxInterface activeInterface;
+	private List<EasyboxInterfaceListener> listeners = new LinkedList<EasyboxInterfaceListener>();
 	
 	private IfPhysAddrTableListener physAddrTableListener = new IfPhysAddrTableListener();
 	private UptimeListener upTimerListener = new UptimeListener();
@@ -362,6 +366,43 @@ public class EasyboxInstanceImpl implements EasyboxInstance {
 				}
 			}
 		}
+
+		boolean hasActive= false;
+		
+		for(EasyboxInterface ifp : getInterfaces()) {
+			if(ifp.isAdminUp() && ifp.isOperUp()) {
+				hasActive = true;
+				
+				if(ifp.isChanged(activeInterface)) {
+					EasyboxInterfaceEvent event = new EasyboxInterfaceEventImpl(activeInterface , ifp);
+					
+					for(EasyboxInterfaceListener listener : listeners) {
+						try {
+							listener.interfaceChanged(this, event);
+						} catch(Exception e) {
+							log.error("failed to send interface event to listener", e);
+						}
+					}
+					
+					activeInterface = new EasyboxInterfaceImpl(ifp);
+					break;
+				}
+			}
+		}
+		
+		if(!hasActive && activeInterface != null) {
+			EasyboxInterfaceEvent event = new EasyboxInterfaceEventImpl(activeInterface , null);
+			
+			for(EasyboxInterfaceListener listener : listeners) {
+				try {
+					listener.interfaceChanged(this, event);
+				} catch(Exception e) {
+					log.error("failed to send interface event to listener", e);
+				}
+			}
+			
+			activeInterface = null;
+		}
 	}
 
 	private void reset() {
@@ -397,6 +438,24 @@ public class EasyboxInstanceImpl implements EasyboxInstance {
 		}
 		
 		return Collections.unmodifiableList(result);
+	}
+
+	/**
+	 * @return the activeInterface
+	 */
+	@Override
+	public EasyboxInterface getActiveInterface() {
+		return activeInterface;
+	}
+
+	@Override
+	public void addInterfaceListener(EasyboxInterfaceListener listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeInterfaceListener(EasyboxInterfaceListener listener) {
+		listeners.remove(listener);
 	}
 
 }

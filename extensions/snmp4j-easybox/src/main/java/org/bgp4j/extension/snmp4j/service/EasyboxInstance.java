@@ -24,8 +24,29 @@ public interface EasyboxInstance {
 	public long getUptime();
 	
 	/**
+	 * get all known interfaces
 	 * 
 	 * @return
 	 */
 	public List<EasyboxInterface> getInterfaces();
+
+	/**
+	 * return the active interface instance
+	 * 
+	 * @return
+	 */
+	public EasyboxInterface getActiveInterface();
+	
+	/**
+	 * 
+	 * @param listener
+	 */
+	public void addInterfaceListener(EasyboxInterfaceListener listener);
+
+	
+	/**
+	 * 
+	 * @param listener
+	 */
+	public void removeInterfaceListener(EasyboxInterfaceListener listener);
 }
