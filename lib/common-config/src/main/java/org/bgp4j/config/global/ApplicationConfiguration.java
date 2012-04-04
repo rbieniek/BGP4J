@@ -59,6 +59,7 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	
 	public void importConfiguration(Configuration configuration) {
 		setBgpServerConfiguration(configuration.getBgpServerConfiguration());
+		setHttpServerConfiguration(configuration.getHttpServerConfiguration());
 		
 		for(PeerConfiguration peer : configuration.listPeerConfigurations())
 			putPeer(peer);

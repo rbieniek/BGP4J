@@ -232,5 +232,21 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	public static final int calculateOctetsForPrefixLength(int prefixLength) {
 		return (prefixLength / 8) + (prefixLength % 8 > 0 ? 1 :0);		
 	}
+
+	private static final char[] chars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		for(int i=0; i<prefix.length; i++) {
+			builder.append(chars[(prefix[i]/ 16) & 0x0f]);
+			builder.append(chars[(prefix[i] % 16) & 0x0f]);
+		}
+		builder.append('/');
+		builder.append(Integer.toString(prefixLength));
+		
+		return builder.toString();
+	}
 	
 }

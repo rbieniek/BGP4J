@@ -24,7 +24,8 @@
     
     <PathAttributes>
         <LocalPreference value="100" />
-        <MultiExitDisc value="1" />        
+        <MultiExitDisc value="1" />
+        <Origin value="incomplete" />
     </PathAttributes>
     
 </Configuration>

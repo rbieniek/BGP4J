@@ -12,8 +12,10 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.bgp4j.config.ConfigTestBase;
 import org.bgp4j.config.nodes.PathAttributeConfiguration;
 import org.bgp4j.config.nodes.impl.PathAttributeConfigurationParser;
+import org.bgp4j.net.Origin;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
+import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.junit.After;
 import org.junit.Before;
@@ -85,7 +87,7 @@ public class PathAttributeConfigurationParserTest extends ConfigTestBase {
 	public void testAll() throws Exception {
 		PathAttributeConfiguration pac = parser.parseConfiguration(config.configurationAt("PathAttributes(5)"));
 		
-		Assert.assertEquals(2, pac.getAttributes().size());
+		Assert.assertEquals(3, pac.getAttributes().size());
 		
 		Iterator<PathAttribute> it = pac.getAttributes().iterator();
 
@@ -96,6 +98,9 @@ public class PathAttributeConfigurationParserTest extends ConfigTestBase {
 		pa = it.next();
 		Assert.assertEquals(MultiExitDiscPathAttribute.class, pa.getClass());
 		Assert.assertEquals(1, ((MultiExitDiscPathAttribute)pa).getDiscriminator());
-	}
 
+		pa = it.next();
+		Assert.assertEquals(OriginPathAttribute.class, pa.getClass());
+		Assert.assertEquals(Origin.INCOMPLETE, ((OriginPathAttribute)pa).getOrigin());
+	}
 }

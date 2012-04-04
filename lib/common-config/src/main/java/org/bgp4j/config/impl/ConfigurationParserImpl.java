@@ -44,7 +44,7 @@ public class ConfigurationParserImpl {
 	private @Inject ExtensionsConfigurationParser extensionsConfigurationParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
-		ConfigurationImpl configImpl = new ConfigurationImpl();
+		ConfigurationImpl configImpl = new ConfigurationImpl(); 
 		List<HierarchicalConfiguration> bgpServerNodes = configuration.configurationsAt("BgpServer");
 		List<HierarchicalConfiguration> httpServerNodes = configuration.configurationsAt("HttpServer");
 		List<HierarchicalConfiguration> bgpPeerNodes = configuration.configurationsAt("BgpPeers.BgpPeer");

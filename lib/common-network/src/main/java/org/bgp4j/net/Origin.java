@@ -1,5 +1,7 @@
 package org.bgp4j.net;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Discrete origin types as specified in RFC 4271
  * 
@@ -15,5 +17,16 @@ public enum Origin {
 	EGP,
 	
 	/** NLRI learned by some other means (RFC 4271)*/
-	INCOMPLETE
+	INCOMPLETE;
+	
+	public static Origin fromString(String value) {
+		if(StringUtils.equalsIgnoreCase("igp", value))
+			return IGP;
+		else if(StringUtils.equalsIgnoreCase("egp", value))
+			return EGP;
+		if(StringUtils.equalsIgnoreCase("incomplete", value))
+			return INCOMPLETE;
+		else 
+			throw new IllegalArgumentException("Illegal Origin type: " + value);
+	}
 }

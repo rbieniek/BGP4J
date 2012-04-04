@@ -14,8 +14,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.bgp4j.config.nodes.PathAttributeConfiguration;
+import org.bgp4j.net.Origin;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
+import org.bgp4j.net.attributes.OriginPathAttribute;
 
 /**
  * @author rainer
@@ -40,6 +42,8 @@ public class PathAttributeConfigurationParser {
 			parseLocalPreference(first(configurations, key), result, key);
 		} else if(StringUtils.equals(key, "MultiExitDisc")) {
 			parseMultiExitDiscPreference(first(configurations, key), result, key);			
+		} else if(StringUtils.equals(key, "Origin")) {
+			parseOrigin(first(configurations, key), result, key);			
 		} else
 			throw new ConfigurationException("Unknown path attribute: " + key);
 	}
@@ -52,6 +56,14 @@ public class PathAttributeConfigurationParser {
 
 	private void parseLocalPreference(HierarchicalConfiguration config, PathAttributeConfigurationImpl result, String key) throws ConfigurationException {
 		result.getAttributes().add(new LocalPrefPathAttribute(parseValue(config, key)));
+	}
+
+	private void parseOrigin(HierarchicalConfiguration config, PathAttributeConfigurationImpl result, String key) throws ConfigurationException {
+		try {
+			result.getAttributes().add(new OriginPathAttribute(Origin.fromString(config.getString("[@value]"))));			
+		} catch(IllegalArgumentException e) {
+			throw new ConfigurationException(e);
+		}
 	}
 
 

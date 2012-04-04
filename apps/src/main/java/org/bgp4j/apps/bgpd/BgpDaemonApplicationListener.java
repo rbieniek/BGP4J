@@ -63,31 +63,39 @@ public class BgpDaemonApplicationListener {
 			option = new Option("l", "log4-file", true, "Log4J XML configuration file (optional");
 			option.setRequired(false);
 			options.addOption(option);
-			
+
+			option = new Option("t", "test-config-file", false, "test XML configuration file and exit (optional)");
+			option.setRequired(false);
+			options.addOption(option);
+
 			CommandLine cmd = (new PosixParser()).parse(options, commandLine);
 
 			if(cmd.hasOption("l")) {
 				LogManager.resetConfiguration();
 				DOMConfigurator.configure(cmd.getOptionValue("l"));
 			}
+
+			boolean testOnly = cmd.hasOption("t");
 			
 			configurationFileProcessor.processConfigFile(cmd.getOptionValue("c"));
 
-			for(Extension extension : extensionsFactory.listExtensions()) {
-				if(extension.isReadyForService()) {
-					Set<Object> managementObjects = extension.getManagementObjects();
-					
-					if(managementObjects != null) {
-						for(Object managementObject : managementObjects)
-							webManagementService.registerSingleton(managementObject);
+			if(!testOnly) {
+				for(Extension extension : extensionsFactory.listExtensions()) {
+					if(extension.isReadyForService()) {
+						Set<Object> managementObjects = extension.getManagementObjects();
+						
+						if(managementObjects != null) {
+							for(Object managementObject : managementObjects)
+								webManagementService.registerSingleton(managementObject);
+						}
+	
+						extension.startExtension();
 					}
-					
-					extension.startExtension();
 				}
-			}
-			
-			webManagementService.startService();			
-			bgpService.startService();
+				
+				webManagementService.startService();			
+				bgpService.startService();
+			}			
 		} catch(Exception e) {
 			log.error("failed to run client", e);
 			
