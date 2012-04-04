@@ -3,6 +3,8 @@
  */
 package org.bgp4j.extension.snmp4j.web;
 
+import java.util.ArrayList;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -11,6 +13,7 @@ import javax.ws.rs.Produces;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bgp4j.extension.snmp4j.service.EasyboxInstance;
+import org.bgp4j.extension.snmp4j.service.EasyboxInterface;
 import org.bgp4j.extension.snmp4j.service.EasyboxService;
 
 /**
@@ -61,6 +64,25 @@ public class EasyboxWebApplication {
 					result.setRunning(true);
 					result.setUptime(up);
 				}
+				
+				ArrayList<InterfaceResult> interfaces = new ArrayList<InterfaceResult>();
+				
+				for(EasyboxInterface ifp : instance.getInterfaces()) {
+					InterfaceResult ir = new InterfaceResult();
+
+					if(ifp.getAddress() != null)
+						ir.setAddress(ifp.getAddress().toString());
+					ir.setAdminUp(ifp.isAdminUp());
+					ir.setDescription(ifp.getDescription());
+					ir.setMtu(ifp.getMtu());
+					ir.setOctetsIn(ifp.getOctetsIn());
+					ir.setOctetsOut(ifp.getOctetsOut());
+					ir.setOperUp(ifp.isOperUp());
+					ir.setSpeed(ifp.getSpeed());
+					
+					interfaces.add(ir);
+				}
+				result.setInterfaces(interfaces.toArray(new InterfaceResult[0]));
 				
 				break;
 			}

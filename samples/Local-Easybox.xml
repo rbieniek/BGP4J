@@ -3,7 +3,7 @@
     <Server port="8080" />
   </HttpServer>
 
-  <Easybox name="box1" interfaceMac="7C-4F-B5-E0-3A-90" >
+  <Easybox name="box1" interfaceMac="7C4FB5E03A90" >
     <Snmp targetAddress="192.168.12.253" localPort="16161" community="public" />
     <Routing />
   </Easybox>

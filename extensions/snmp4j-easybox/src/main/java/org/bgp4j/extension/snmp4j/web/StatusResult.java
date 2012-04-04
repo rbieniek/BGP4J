@@ -15,6 +15,7 @@ public class StatusResult {
 	
 	private boolean running;
 	private UptimeResult uptime;
+	private InterfaceResult[] interfaces;
 	
 	/**
 	 * @return the running
@@ -44,5 +45,20 @@ public class StatusResult {
 	 */
 	void setUptime(UptimeResult uptime) {
 		this.uptime = uptime;
+	}
+
+	/**
+	 * @return the interfaces
+	 */
+	@XmlElement
+	public InterfaceResult[] getInterfaces() {
+		return interfaces;
+	}
+
+	/**
+	 * @param interfaces the interfaces to set
+	 */
+	void setInterfaces(InterfaceResult[] interfaces) {
+		this.interfaces = interfaces;
 	}
 }
