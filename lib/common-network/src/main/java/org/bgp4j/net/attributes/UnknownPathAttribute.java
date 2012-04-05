@@ -67,7 +67,7 @@ public class UnknownPathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		return (new HashCodeBuilder())
 			.append(getTypeCode())
 			.append(getValue())

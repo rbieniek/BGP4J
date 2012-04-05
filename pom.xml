@@ -153,6 +153,7 @@
     <version.org.drools>5.3.1.Final</version.org.drools>
     <version.org.eclipse.jetty>8.1.2.v20120308</version.org.eclipse.jetty>
     <version.org.jboss.resteasy>2.3.1.GA</version.org.jboss.resteasy>
+    <version.javax.xml.bind>2.2.3</version.javax.xml.bind>
   </properties>
 
   <modules>
@@ -205,6 +206,11 @@
 	<groupId>commons-jxpath</groupId>
 	<artifactId>commons-jxpath</artifactId>
 	<version>${version.commons.jxpath}</version> 
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${version.javax.xml.bind}</version>
       </dependency>
       <dependency> 
 	<groupId>junit</groupId> 

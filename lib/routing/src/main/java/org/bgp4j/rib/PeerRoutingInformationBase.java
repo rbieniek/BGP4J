@@ -123,6 +123,13 @@ public class PeerRoutingInformationBase {
 		visitRoutingBases(side, visitor, null);
 	}
 
+	public void vistPeerRoutingBases(PeerRoutingInformationBaseVisitor visitor) {
+		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : localRIBs.entrySet())
+			visitor.visitRoutingBase(peerName, entry.getKey(), RIBSide.Local);
+		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : remoteRIBs.entrySet())
+			visitor.visitRoutingBase(peerName, entry.getKey(), RIBSide.Remote);
+	}
+	
 	private void visitRoutingBases(Map<AddressFamilyKey, RoutingInformationBase> ribs, RoutingInformationBaseVisitor visitor, Set<AddressFamilyKey> wanted) {
 		if(wanted == null)
 			wanted = ribs.keySet();

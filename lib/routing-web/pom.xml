@@ -85,6 +85,35 @@
       <artifactId>arquillian-junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>common-weld</artifactId>
+      <version>${version.de.urb.quagga}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>web-management</artifactId>
+      <version>${version.de.urb.quagga}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

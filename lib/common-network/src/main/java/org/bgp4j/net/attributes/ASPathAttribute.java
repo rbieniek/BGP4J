@@ -228,7 +228,7 @@ public class ASPathAttribute extends PathAttribute implements ASTypeAware {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		HashCodeBuilder builder = (new HashCodeBuilder())
 				.append(getAsType());
 		Iterator<PathSegment> it = getPathSegments().iterator();

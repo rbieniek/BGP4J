@@ -82,6 +82,12 @@
 
     <dependency>
       <groupId>de.urb.quagga</groupId>
+      <artifactId>routing-web</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.urb.quagga</groupId>
       <artifactId>web-management</artifactId>
       <version>${version.de.urb.quagga}</version>
     </dependency>

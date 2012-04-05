@@ -91,7 +91,7 @@ public class ClusterListPathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		HashCodeBuilder builder = new HashCodeBuilder();
 		Iterator<Integer> it = getClusterIds().iterator();
 		

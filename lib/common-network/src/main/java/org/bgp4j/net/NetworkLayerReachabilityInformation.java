@@ -18,6 +18,10 @@ package org.bgp4j.net;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -40,12 +44,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@XmlRootElement(name="nlri")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NetworkLayerReachabilityInformation implements Serializable, Comparable<NetworkLayerReachabilityInformation>  {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8319262066302848737L;
+	
 	private int prefixLength;
 	private byte[] prefix;
 	
@@ -61,6 +68,7 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	public int getPrefixLength() {
 		return prefixLength;
 	}
+	
 	/**
 	 * @return the prefix
 	 */

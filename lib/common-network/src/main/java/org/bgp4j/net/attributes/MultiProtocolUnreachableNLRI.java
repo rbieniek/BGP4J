@@ -140,7 +140,7 @@ public class MultiProtocolUnreachableNLRI extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		HashCodeBuilder builder = (new HashCodeBuilder())
 				.append(getAddressFamily())
 				.append(getSubsequentAddressFamily());

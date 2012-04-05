@@ -39,7 +39,7 @@ public class AtomicAggregatePathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		return 0;
 	}
 

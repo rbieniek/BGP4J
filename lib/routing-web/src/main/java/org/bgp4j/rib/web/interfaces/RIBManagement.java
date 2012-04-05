@@ -19,9 +19,14 @@ package org.bgp4j.rib.web.interfaces;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.RIBSide;
+import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.rib.web.dto.RIBCollection;
+import org.bgp4j.rib.web.dto.RouteCollection;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -31,7 +36,15 @@ import org.bgp4j.rib.web.dto.RIBCollection;
 public interface RIBManagement {
 
 	@GET
-	@Path("/overview")
-	@Produces("appliction/text+json")
-	public RIBCollection listRIBs();
+	@Path("/list")
+	@Produces("application/*+json")
+	public RIBCollection ribs();
+	
+	@GET
+	@Path("/routes/{peer}/{side}/{afi}/{safi}")
+	@Produces("application/*+json")
+	public RouteCollection routes(@PathParam("peer") String peer, 
+			@PathParam("side") RIBSide side, 
+			@PathParam("afi") AddressFamily afi, 
+			@PathParam("safi") SubsequentAddressFamily safi);
 }

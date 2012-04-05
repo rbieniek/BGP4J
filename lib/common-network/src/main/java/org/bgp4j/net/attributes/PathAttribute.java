@@ -16,9 +16,12 @@
  */
 package org.bgp4j.net.attributes;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.bgp4j.net.attributes.bind.PathAttributeBindAdapter;
 
 
 /**
@@ -27,6 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@XmlJavaTypeAdapter(value=PathAttributeBindAdapter.class)
 public abstract class PathAttribute implements Comparable<PathAttribute> {
 
 	/**
@@ -164,10 +168,13 @@ public abstract class PathAttribute implements Comparable<PathAttribute> {
 			.append(isOptional())
 			.append(isPartial())
 			.append(isTransitive())
-			.appendSuper(sublcassHashCode())
+			.appendSuper(subclassHashCode())
 			.toHashCode();
 	}
 
+	public PathAttributeType getType() {
+		return internalType();
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -212,7 +219,7 @@ public abstract class PathAttribute implements Comparable<PathAttribute> {
 	 * handle hashCode on subclass
 	 * @return
 	 */
-	protected abstract int sublcassHashCode();
+	protected abstract int subclassHashCode();
 	
 	/**
 	 * handle compareTo on subclass

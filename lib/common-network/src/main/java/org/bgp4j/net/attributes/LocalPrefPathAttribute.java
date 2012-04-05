@@ -67,7 +67,7 @@ public class LocalPrefPathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		return (new HashCodeBuilder()).append(getLocalPreference()).toHashCode();
 	}
 

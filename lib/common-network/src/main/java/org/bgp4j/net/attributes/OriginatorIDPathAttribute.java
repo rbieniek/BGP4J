@@ -67,7 +67,7 @@ public class OriginatorIDPathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		return (new HashCodeBuilder()).append(getOriginatorID()).toHashCode();
 	}
 

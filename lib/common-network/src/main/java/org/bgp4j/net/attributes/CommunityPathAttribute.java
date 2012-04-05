@@ -178,7 +178,7 @@ public class CommunityPathAttribute extends PathAttribute {
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		HashCodeBuilder builder = (new HashCodeBuilder())
 				.append(getCommunity());
 		Iterator<CommunityMember> it = getMembers().iterator();

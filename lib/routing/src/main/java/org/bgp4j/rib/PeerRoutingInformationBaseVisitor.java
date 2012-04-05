@@ -13,14 +13,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  * 
- * File: org.bgp4j.rib.web.Dummy.java 
+ * File: org.bgp4j.rib.RoutingInformationBaseVisitor.java 
  */
-package org.bgp4j.rib.web;
+package org.bgp4j.rib;
+
+import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.net.RIBSide;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class DummyTest {
+public interface PeerRoutingInformationBaseVisitor {
+
+	/**
+	 * Called when a routing base is visited
+	 * 
+	 * @param ribName
+	 * @param afk
+	 * @param side
+	 */
+	void visitRoutingBase(String ribName, AddressFamilyKey afk, RIBSide side);
 
 }

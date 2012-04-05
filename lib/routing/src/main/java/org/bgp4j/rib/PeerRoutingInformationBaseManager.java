@@ -20,6 +20,7 @@ package org.bgp4j.rib;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
@@ -75,6 +76,14 @@ public class PeerRoutingInformationBaseManager {
 		
 		if(prib != null)
 			peerRibDestroyed.fire(new PeerRoutingInformationBaseDestroyed(prib.getPeerName()));
+	}
+	
+	public void vistPeerRoutingBases(PeerRoutingInformationBaseVisitor visitor) {
+		synchronized (peerRibs) {
+			for(Entry<String, PeerRoutingInformationBase> entry : peerRibs.entrySet()) {
+				entry.getValue().vistPeerRoutingBases(visitor);
+			}
+		}
 	}
 	
 	/**

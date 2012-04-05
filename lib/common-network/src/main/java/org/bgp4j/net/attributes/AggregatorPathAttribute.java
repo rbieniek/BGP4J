@@ -108,7 +108,7 @@ public class AggregatorPathAttribute extends PathAttribute implements ASTypeAwar
 	}
 
 	@Override
-	protected int sublcassHashCode() {
+	protected int subclassHashCode() {
 		return (new HashCodeBuilder())
 			.append(getAsNumber())
 			.append(getAggregator())
