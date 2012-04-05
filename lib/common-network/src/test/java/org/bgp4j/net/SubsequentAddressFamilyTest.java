@@ -55,6 +55,6 @@ public class SubsequentAddressFamilyTest {
 	public void testWellKnownSubsequentAddressFamilies() {
 		Assert.assertEquals(SubsequentAddressFamily.fromString("unicast"), SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 		Assert.assertEquals(SubsequentAddressFamily.fromString("multicast"), SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING);
-		Assert.assertEquals(SubsequentAddressFamily.fromString("unicast_multicast"), SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING);
+		Assert.assertEquals(SubsequentAddressFamily.fromString("unicast+multicast"), SubsequentAddressFamily.NLRI_UNICAST_MULTICAST_FORWARDING);
 	}
 }

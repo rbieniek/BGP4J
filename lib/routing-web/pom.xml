@@ -44,6 +44,12 @@
     </dependency>
 
     <dependency>
+      <groupId>de.urb.quagga</groupId>
+      <artifactId>web-management</artifactId>
+      <version>${version.de.urb.quagga}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <scope>provided</scope>
