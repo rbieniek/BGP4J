@@ -67,6 +67,16 @@ public class MultiProtocolUnreachableNLRI extends PathAttribute {
 	}
 	
 	/**
+	 * @param category
+	 */
+	public MultiProtocolUnreachableNLRI(AddressFamily addressFamily, SubsequentAddressFamily subsequentAddressFamily, List<NetworkLayerReachabilityInformation> nlris) {
+		this(addressFamily, subsequentAddressFamily);
+
+		if(nlris != null)
+			this.nlris = new LinkedList<NetworkLayerReachabilityInformation>(nlris);
+	}
+	
+	/**
 	 * @return the addressFamily
 	 */
 	public AddressFamily getAddressFamily() {

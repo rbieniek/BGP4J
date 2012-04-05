@@ -22,6 +22,17 @@ public class PathAttributeDTO {
 	private boolean partial;
 	
 	private LocalPreferenceDTO localPreference;
+	private AggregatorDTO aggregator;
+	private ASPathDTO asPath;
+	private ClusterListDTO clusterList;
+	private CommunityDTO community;
+	private MultiExitDiscDTO multiExitDisc;
+	private MultiProtocolReachableDTO multiProtocolReachable;
+	private MultiProtocolUnreachableDTO multiProtocolUnreachable;
+	private IPv4NextHopDTO nextHop;
+	private OriginatorIDDTO originatorID;
+	private OriginDTO origin;
+	private UnknownDTO unknown;
 	
 	public PathAttributeDTO() {}
 	
@@ -100,5 +111,161 @@ public class PathAttributeDTO {
 	 */
 	public void setLocalPreference(LocalPreferenceDTO localPreference) {
 		this.localPreference = localPreference;
+	}
+
+	/**
+	 * @return the aggregator
+	 */
+	public AggregatorDTO getAggregator() {
+		return aggregator;
+	}
+
+	/**
+	 * @param aggregator the aggregator to set
+	 */
+	public void setAggregator(AggregatorDTO aggregator) {
+		this.aggregator = aggregator;
+	}
+
+	/**
+	 * @return the asPath
+	 */
+	public ASPathDTO getAsPath() {
+		return asPath;
+	}
+
+	/**
+	 * @param asPath the asPath to set
+	 */
+	public void setAsPath(ASPathDTO asPath) {
+		this.asPath = asPath;
+	}
+
+	/**
+	 * @return the clusterList
+	 */
+	public ClusterListDTO getClusterList() {
+		return clusterList;
+	}
+
+	/**
+	 * @param clusterList the clusterList to set
+	 */
+	public void setClusterList(ClusterListDTO clusterList) {
+		this.clusterList = clusterList;
+	}
+
+	/**
+	 * @return the community
+	 */
+	public CommunityDTO getCommunity() {
+		return community;
+	}
+
+	/**
+	 * @param community the community to set
+	 */
+	public void setCommunity(CommunityDTO community) {
+		this.community = community;
+	}
+
+	/**
+	 * @return the multiExitDisc
+	 */
+	public MultiExitDiscDTO getMultiExitDisc() {
+		return multiExitDisc;
+	}
+
+	/**
+	 * @param multiExitDisc the multiExitDisc to set
+	 */
+	public void setMultiExitDisc(MultiExitDiscDTO multiExitDisc) {
+		this.multiExitDisc = multiExitDisc;
+	}
+
+	/**
+	 * @return the multiProtocolReachable
+	 */
+	public MultiProtocolReachableDTO getMultiProtocolReachable() {
+		return multiProtocolReachable;
+	}
+
+	/**
+	 * @param multiProtocolReachable the multiProtocolReachable to set
+	 */
+	public void setMultiProtocolReachable(
+			MultiProtocolReachableDTO multiProtocolReachable) {
+		this.multiProtocolReachable = multiProtocolReachable;
+	}
+
+	/**
+	 * @return the multiProtocolUnReachable
+	 */
+	public MultiProtocolUnreachableDTO getMultiProtocolUnreachable() {
+		return multiProtocolUnreachable;
+	}
+
+	/**
+	 * @param multiProtocolUnReachable the multiProtocolUnReachable to set
+	 */
+	public void setMultiProtocolUnreachable(
+			MultiProtocolUnreachableDTO multiProtocolUnReachable) {
+		this.multiProtocolUnreachable = multiProtocolUnReachable;
+	}
+
+	/**
+	 * @return the nextHop
+	 */
+	public IPv4NextHopDTO getNextHop() {
+		return nextHop;
+	}
+
+	/**
+	 * @param nextHop the nextHop to set
+	 */
+	public void setNextHop(IPv4NextHopDTO nextHop) {
+		this.nextHop = nextHop;
+	}
+
+	/**
+	 * @return the originatorID
+	 */
+	public OriginatorIDDTO getOriginatorID() {
+		return originatorID;
+	}
+
+	/**
+	 * @param originatorID the originatorID to set
+	 */
+	public void setOriginatorID(OriginatorIDDTO originatorID) {
+		this.originatorID = originatorID;
+	}
+
+	/**
+	 * @return the origin
+	 */
+	public OriginDTO getOrigin() {
+		return origin;
+	}
+
+	/**
+	 * @param origin the origin to set
+	 */
+	public void setOrigin(OriginDTO origin) {
+		this.origin = origin;
+	}
+
+	/**
+	 * @return the unknown
+	 */
+	public UnknownDTO getUnknown() {
+		return unknown;
+	}
+
+	/**
+	 * @param unknown the unknown to set
+	 */
+	public void setUnknown(UnknownDTO unknown) {
+		this.unknown = unknown;
 	}
 }

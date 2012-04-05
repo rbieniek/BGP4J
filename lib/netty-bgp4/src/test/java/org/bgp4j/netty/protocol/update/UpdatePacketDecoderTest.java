@@ -25,6 +25,7 @@ import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.Origin;
+import org.bgp4j.net.PathSegment;
 import org.bgp4j.net.PathSegmentType;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.ASPathAttribute;
@@ -472,7 +473,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SEQUENCE, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -503,7 +504,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SEQUENCE, segment.getPathSegmentType());
 		Assert.assertEquals(2, segment.getAses().size());
@@ -535,7 +536,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SET, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -566,7 +567,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_CONFED_SEQUENCE, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -597,7 +598,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_CONFED_SET, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -628,7 +629,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SET, segment.getPathSegmentType());
 		Assert.assertEquals(2, segment.getAses().size());
@@ -656,7 +657,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -693,7 +694,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -731,7 +732,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -770,7 +771,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -808,7 +809,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -845,7 +846,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -883,7 +884,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -922,7 +923,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -960,7 +961,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -997,7 +998,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -1035,7 +1036,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -1074,7 +1075,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS4_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_4OCTETS, asPath.getAsType());
@@ -1179,7 +1180,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SEQUENCE, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -1209,7 +1210,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SEQUENCE, segment.getPathSegmentType());
 		Assert.assertEquals(2, segment.getAses().size());
@@ -1240,7 +1241,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SET, segment.getPathSegmentType());
 		Assert.assertEquals(1, segment.getAses().size());
@@ -1270,7 +1271,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
 		Assert.assertEquals(1, asPath.getPathSegments().size());
 		
-		ASPathAttribute.PathSegment segment = asPath.getPathSegments().remove(0);
+		PathSegment segment = asPath.getPathSegments().remove(0);
 		
 		Assert.assertEquals(PathSegmentType.AS_SET, segment.getPathSegmentType());
 		Assert.assertEquals(2, segment.getAses().size());
@@ -1298,7 +1299,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1335,7 +1336,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1373,7 +1374,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1412,7 +1413,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1450,7 +1451,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1487,7 +1488,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1525,7 +1526,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1564,7 +1565,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1602,7 +1603,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1639,7 +1640,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1677,7 +1678,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());
@@ -1716,7 +1717,7 @@ public class UpdatePacketDecoderTest extends BGPv4TestBase {
 		Assert.assertEquals(0, packet.getNlris().size());		
 		
 		ASPathAttribute asPath = (ASPathAttribute)packet.getPathAttributes().remove(0);
-		ASPathAttribute.PathSegment segment;
+		PathSegment segment;
 		
 		Assert.assertEquals(BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_AS_PATH, PathAttributeCodec.typeCode(asPath));
 		Assert.assertEquals(ASType.AS_NUMBER_2OCTETS, asPath.getAsType());

@@ -18,8 +18,8 @@
 package org.bgp4j.netty.protocol.update;
 
 import org.bgp4j.net.ASType;
+import org.bgp4j.net.PathSegment;
 import org.bgp4j.net.attributes.ASPathAttribute;
-import org.bgp4j.net.attributes.ASPathAttribute.PathSegment;
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;

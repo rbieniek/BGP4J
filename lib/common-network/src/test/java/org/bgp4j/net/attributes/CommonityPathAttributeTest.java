@@ -21,7 +21,6 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.bgp4j.net.attributes.CommunityPathAttribute.CommunityMember;
 import org.junit.Test;
 
 /**

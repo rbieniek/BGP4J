@@ -31,80 +31,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class CommunityPathAttribute extends PathAttribute {
 
-	public static class CommunityMember implements Comparable<CommunityMember> {
-		private int asNumber;
-		private int memberFlags;
-		
-		public CommunityMember() {}
-		
-		public CommunityMember(int asNumber, int memberFlags) {
-			this.asNumber = asNumber;
-			this.memberFlags = memberFlags;
-		}
-		
-		/**
-		 * @return the asNumber
-		 */
-		public int getAsNumber() {
-			return asNumber;
-		}
-		/**
-		 * @param asNumber the asNumber to set
-		 */
-		public void setAsNumber(int asNumber) {
-			this.asNumber = asNumber;
-		}
-		/**
-		 * @return the memberFlags
-		 */
-		public int getMemberFlags() {
-			return memberFlags;
-		}
-		/**
-		 * @param memberFlags the memberFlags to set
-		 */
-		public void setMemberFlags(int memberFlags) {
-			this.memberFlags = memberFlags;
-		}
-		
-		@Override
-		public int compareTo(CommunityMember o) {
-			return (new CompareToBuilder())
-				.append(getAsNumber(), o.getAsNumber())
-				.append(getMemberFlags(), o.getMemberFlags())
-				.toComparison();
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
-		@Override
-		public int hashCode() {
-			return (new HashCodeBuilder())
-				.append(getAsNumber())
-				.append(getMemberFlags())
-				.toHashCode();
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if(!(obj instanceof CommunityMember))
-				return false;
-			
-			CommunityMember o = (CommunityMember)obj;
-			
-			return (new EqualsBuilder())
-				.append(getAsNumber(), o.getAsNumber())
-				.append(getMemberFlags(), o.getMemberFlags())
-				.isEquals();
-		}
-	}
-	
 	private int community;
-	private List<CommunityMember> members = new LinkedList<CommunityPathAttribute.CommunityMember>();
+	private List<CommunityMember> members = new LinkedList<CommunityMember>();
 
 	public CommunityPathAttribute() {
 		super(Category.OPTIONAL_TRANSITIVE);
@@ -120,7 +48,7 @@ public class CommunityPathAttribute extends PathAttribute {
 		this(community);
 		
 		if(members != null)
-			this.members.addAll(members);
+			this.members = new LinkedList<CommunityMember>(members);
 	}
 	/**
 	 * @return the community
@@ -150,7 +78,7 @@ public class CommunityPathAttribute extends PathAttribute {
 		if(members != null)
 			this.members = members;
 		else
-			this.members = new LinkedList<CommunityPathAttribute.CommunityMember>();
+			this.members = new LinkedList<CommunityMember>();
 	}
 
 	@Override

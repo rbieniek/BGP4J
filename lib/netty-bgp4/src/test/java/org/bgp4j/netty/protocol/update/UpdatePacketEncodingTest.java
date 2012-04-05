@@ -24,6 +24,7 @@ import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.BinaryNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.Origin;
+import org.bgp4j.net.PathSegment;
 import org.bgp4j.net.PathSegmentType;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.ASPathAttribute;
@@ -92,8 +93,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
 				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234
 				}),
 		})));
@@ -101,8 +102,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x5678
 				}),
 		})));
@@ -110,8 +111,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x03, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_CONFED_SEQUENCE 2 AS 0x1234 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SEQUENCE, new int[] {
 						0x1234, 0x5678
 				}),
 		})));
@@ -119,8 +120,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x04, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SET 2 AS 0x1234 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_CONFED_SET, new int[] {
 						0x1234, 0x5678
 				}),
 		})));
@@ -129,11 +130,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
 				0x01, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
 				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
 		})));
@@ -142,11 +143,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
 		})));
@@ -155,11 +156,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
 				0x01, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 0x9abc,
 				}),
 		})));
@@ -167,8 +168,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x04, // Path attribute: AS_PATH  
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x1234
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234
 				}),
 		})));
@@ -176,8 +177,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x02, (byte)0x06, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x56, 0x78 // AS_SEQUENCE 2 AS 0x1234 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x5678
 				}),
 		})));
@@ -186,11 +187,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: AS_PATH  
 				0x02, 0x01, 0x12, 0x34, // AS_SET 1 AS 0x1234 
 				0x02, 0x01, 0x56, 0x78, // AS_SET 1 AS 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 
 				}),
 		})));
@@ -199,11 +200,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x5678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 
 				}),
 		})));
@@ -212,11 +213,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: AS_PATH  
 				0x02, 0x02, 0x12, 0x34, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x1234 0x9abc 
 				0x02, 0x02, 0x56, 0x78, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x5678 0x9abc
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0x9abc,
 				}),
 		})));
@@ -232,8 +233,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
 				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234
 				}),
 		})));
@@ -241,8 +242,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SET 2 AS 0x12341234 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x56785678
 				}),
 		})));
@@ -251,11 +252,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
 				0x01, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
 				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 
 				}),
 		})));
@@ -264,11 +265,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x12341234 0x9abc9abc 
 				0x01, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 
 				}),
 		})));
@@ -277,11 +278,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
 				0x01, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x1234 0x9abc 
 				0x01, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SET 2 AS 0x5678 0x9abc
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x56785678, 0x9abc9abc,
 				}),
 		})));
@@ -289,8 +290,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: AS4_PATH  
 				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SEQUENCE 1 AS 0x12341234
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234
 				}),
 		})));
@@ -298,8 +299,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 		assertBufferContents(new byte[] {
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 2 AS 0x12341234 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x56785678
 				}),
 		})));
@@ -308,11 +309,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: AS4_PATH  
 				0x02, 0x01, 0x12, 0x34, 0x12, 0x34, // AS_SET 1 AS 0x12341234 
 				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SET 1 AS 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 
 				}),
 		})));
@@ -321,11 +322,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc 9abc
 				0x02, 0x01, 0x56, 0x78, 0x56, 0x78, // AS_SEQUENCE 1 AS 0x56785678
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 
 				}),
 		})));
@@ -334,11 +335,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: AS4_PATH  
 				0x02, 0x02, 0x12, 0x34, 0x12, 0x34, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x12341234 0x9abc9abc 
 				0x02, 0x02, 0x56, 0x78, 0x56, 0x78, (byte)0x9a, (byte)0xbc, (byte)0x9a, (byte)0xbc, // AS_SEQUENCE 2 AS 0x56785678 0x9abc9abc
-		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		}, PathAttributeCodec.encodePathAttribute(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x12341234, 0x9abc9abc,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x56785678, 0x9abc9abc,
 				}),
 		})));
@@ -349,11 +350,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678,
 				}),
 		}));
@@ -375,11 +376,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -401,11 +402,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceOneASNumberASSetOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
 		}));
@@ -427,11 +428,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceOneASNumberASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -453,11 +454,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678,
 				}),
 		}));
@@ -479,11 +480,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -505,11 +506,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSetASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 
 				}),
 		}));
@@ -531,11 +532,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSeqeunceTw0ASNumberASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -557,8 +558,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSequenceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 
 				}),
 		}));
@@ -578,8 +579,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSequenceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x1234, 0x5678,
 				}),
 		}));
@@ -599,11 +600,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678,
 				}),
 		}));
@@ -625,11 +626,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -651,8 +652,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234,
 				}),
 		}));
@@ -672,11 +673,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678,
 				}),
 		}));
@@ -698,11 +699,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234, 0x89ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x5678, 0xcdef,
 				}),
 		}));
@@ -724,8 +725,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath2ASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_2OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x1234,
 				}),
 		}));
@@ -762,11 +763,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678
 				})
 		}));
@@ -788,11 +789,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 0x0000cdef
 				})
 		}));
@@ -814,11 +815,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceOneASNumberASSetOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00005678, 
 				})
 		}));
@@ -840,11 +841,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceOneASNumberASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00005678, 0x0000cdef
 				})
 		}));
@@ -866,11 +867,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 0x000089ab
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678
 				})
 		}));
@@ -892,11 +893,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 0x000089ab
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 0x0000cdef
 				})
 		}));
@@ -918,11 +919,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSetASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 0x000089ab
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00005678, 
 				})
 		}));
@@ -944,11 +945,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSeqeunceTw0ASNumberASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 0x000089ab
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00005678, 0x0000cdef
 				})
 		}));
@@ -970,8 +971,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSequenceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234,
 				})
 		}));
@@ -992,8 +993,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSequenceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00001234, 0x00005678
 				})
 		}));
@@ -1014,11 +1015,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetOneASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 
 				})
 		}));
@@ -1040,11 +1041,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetOneASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234, 
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 0x0000cdef,
 				})
 		}));
@@ -1066,8 +1067,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234,
 				})
 		}));
@@ -1088,11 +1089,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetTw0ASNumberASSeqeunceOneASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234, 0x000089ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 
 				})
 		}));
@@ -1114,11 +1115,11 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetTw0ASNumberASSeqeunceTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234, 0x000089ab,
 				}),
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SEQUENCE, new int[] {
 						0x00005678, 0x0000cdef,
 				})
 		}));
@@ -1140,8 +1141,8 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 	public void testEncodeASPath4ASSetTwoASNumberPacket() throws Exception {
 		UpdatePacket update = new UpdatePacket();
 		
-		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new ASPathAttribute.PathSegment[] {
-				new ASPathAttribute.PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
+		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS, new PathSegment[] {
+				new PathSegment(ASType.AS_NUMBER_4OCTETS, PathSegmentType.AS_SET, new int[] {
 						0x00001234, 0x00005678
 				})
 		}));

@@ -50,6 +50,12 @@ public class ClusterListPathAttribute extends PathAttribute {
 			this.clusterIds.add(clusterId);
 	}
 
+	public ClusterListPathAttribute(List<Integer> clusterIds) {
+		super(Category.OPTIONAL_NON_TRANSITIVE);
+		
+		setClusterIds(clusterIds);
+	}
+
 	/**
 	 * @return the clusterIds
 	 */
@@ -62,7 +68,7 @@ public class ClusterListPathAttribute extends PathAttribute {
 	 */
 	public void setClusterIds(List<Integer> clusterIds) {
 		if(clusterIds != null)
-			this.clusterIds = clusterIds;
+			this.clusterIds = new LinkedList<Integer>(clusterIds);
 		else
 			this.clusterIds = new LinkedList<Integer>();
 	}

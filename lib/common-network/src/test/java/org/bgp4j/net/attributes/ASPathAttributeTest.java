@@ -20,8 +20,8 @@ package org.bgp4j.net.attributes;
 import junit.framework.Assert;
 
 import org.bgp4j.net.ASType;
+import org.bgp4j.net.PathSegment;
 import org.bgp4j.net.PathSegmentType;
-import org.bgp4j.net.attributes.ASPathAttribute.PathSegment;
 import org.junit.Test;
 
 /**
