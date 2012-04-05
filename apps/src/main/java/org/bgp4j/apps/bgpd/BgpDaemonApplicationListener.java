@@ -33,6 +33,7 @@ import org.bgp4j.extensions.Extension;
 import org.bgp4j.extensions.ExtensionsFactory;
 import org.bgp4j.management.web.service.WebManagementService;
 import org.bgp4j.netty.service.BGPv4Service;
+import org.bgp4j.rib.web.server.RIBManagementServer;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class BgpDaemonApplicationListener {
 	private @Inject BGPv4Service  bgpService;
 	private @Inject WebManagementService webManagementService;
 	private @Inject ExtensionsFactory extensionsFactory;
+	private @Inject RIBManagementServer ribServer;
 	
 	public void listen(@Observes @BgpDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
 		BasicConfigurator.configure();
@@ -92,6 +94,8 @@ public class BgpDaemonApplicationListener {
 						extension.startExtension();
 					}
 				}
+				
+				webManagementService.registerSingleton(ribServer);
 				
 				webManagementService.startService();			
 				bgpService.startService();
