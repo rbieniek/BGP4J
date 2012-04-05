@@ -39,6 +39,7 @@ import org.bgp4j.net.RIBSide;
 public class PeerRoutingInformationBase {
 
 	private String peerName;
+	private boolean extensionRoutingBase;
 	private Map<AddressFamilyKey, RoutingInformationBase> localRIBs = new HashMap<AddressFamilyKey, RoutingInformationBase>();
 	private Map<AddressFamilyKey, RoutingInformationBase> remoteRIBs = new HashMap<AddressFamilyKey, RoutingInformationBase>();
 	private @Inject Instance<RoutingInformationBase> ribProvider;
@@ -187,5 +188,19 @@ public class PeerRoutingInformationBase {
 	
 	public void removeRoutingListener(RoutingEventListener listener) {
 		listeners.remove(listener);
+	}
+
+	/**
+	 * @return the extensionRoutingBase
+	 */
+	public boolean isExtensionRoutingBase() {
+		return extensionRoutingBase;
+	}
+
+	/**
+	 * @param extensionRoutingBase the extensionRoutingBase to set
+	 */
+	void setExtensionRoutingBase(boolean extensionRoutingBase) {
+		this.extensionRoutingBase = extensionRoutingBase;
 	}
 }

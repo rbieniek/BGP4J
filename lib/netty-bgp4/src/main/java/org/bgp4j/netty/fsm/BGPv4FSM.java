@@ -496,7 +496,7 @@ public class BGPv4FSM {
 		Set<MultiProtocolReachableNLRI> mpReachables = message.lookupPathAttributes(MultiProtocolReachableNLRI.class);
 		Set<MultiProtocolUnreachableNLRI> mpUnreachables = message.lookupPathAttributes(MultiProtocolUnreachableNLRI.class);
 		Set<PathAttribute> otherAttributes = message.filterPathAttributes(MultiProtocolReachableNLRI.class, 
-				MultiProtocolUnreachableNLRI.class);
+				MultiProtocolUnreachableNLRI.class, NextHopPathAttribute.class);
 		AddressFamilyKey ipv4Unicast = new AddressFamilyKey(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
 		
 		if(mpReachables.size() > 0)

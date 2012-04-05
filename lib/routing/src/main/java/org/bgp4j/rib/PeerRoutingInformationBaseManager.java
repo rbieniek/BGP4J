@@ -36,7 +36,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  */
 @Singleton
-public class PeerRoutingInformationBaseManager {
+public class PeerRoutingInformationBaseManager implements ExtensionRoutingBaseManager {
 
 	private Map<String, PeerRoutingInformationBase> peerRibs = Collections.synchronizedMap(new HashMap<String, PeerRoutingInformationBase>());
 	private @Inject Event<PeerRoutingInformationBaseCreated> peerRibCreated;
@@ -67,6 +67,24 @@ public class PeerRoutingInformationBaseManager {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.bgp4j.rib.ExtensionRoutingBaseManager#extensionRoutingInformationBase(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public PeerRoutingInformationBase extensionRoutingInformationBase(String extensionName, String key) {
+		if(StringUtils.isBlank(extensionName))
+			throw new IllegalArgumentException("empty extension name");
+
+		if(StringUtils.isBlank(key))
+			throw new IllegalArgumentException("empty key");
+		
+		PeerRoutingInformationBase prib = peerRoutingInformationBase(extensionName + "_" + key);
+		
+		prib.setExtensionRoutingBase(true);
+		
+		return prib;
+	}
+	
 	public void destroyPeerRoutingInformationBase(String peerName) {
 		PeerRoutingInformationBase prib = null;
 		

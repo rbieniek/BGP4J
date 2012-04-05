@@ -25,6 +25,7 @@ import org.bgp4j.extensions.ExtensionBeanFactory;
 import org.bgp4j.extensions.ProvidedRIBs;
 import org.bgp4j.extensions.ProvidedRIBs.SideKeyPair;
 import org.bgp4j.net.RIBSide;
+import org.bgp4j.rib.ExtensionRoutingBaseManager;
 import org.bgp4j.rib.PeerRoutingInformationBase;
 import org.bgp4j.rib.PeerRoutingInformationBaseManager;
 
@@ -37,7 +38,7 @@ public class EasyboxSnmpExtension extends ExtensionBase implements Extension {
 	private EasyBoxConfigurationParser parser;
 	private EasyboxWebApplication webApplication;
 	private EasyboxService service;
-	private PeerRoutingInformationBaseManager pribManager;
+	private ExtensionRoutingBaseManager pribManager;
 	private List<EasyboxConfiguration> easyboxConfigurations = new LinkedList<EasyboxConfiguration>();
 	private List<ProvidedRIBs> providedRibs = new LinkedList<ProvidedRIBs>();
 	private ExtensionBeanFactory beanFactory;
@@ -75,8 +76,7 @@ public class EasyboxSnmpExtension extends ExtensionBase implements Extension {
 		}
 		
 		for(EasyboxConfiguration config : easyboxConfigurations) {
-			String peerName = getName() + "-" + config.getName();
-			PeerRoutingInformationBase prib = pribManager.peerRoutingInformationBase(peerName);
+			PeerRoutingInformationBase prib = pribManager.extensionRoutingInformationBase(getName(), config.getName());
 			List<SideKeyPair> keyPairs = new LinkedList<ProvidedRIBs.SideKeyPair>();
 			
 			for(AddressFamilyRoutingConfiguration routingConfig : config.getRoutingConfiguration().getRoutingConfigurations()) {
@@ -92,7 +92,7 @@ public class EasyboxSnmpExtension extends ExtensionBase implements Extension {
 				keyPairs.add(new SideKeyPair(RIBSide.Remote, routingConfig.getKey()));
 			}
 			
-			providedRibs.add(new ProvidedRIBs(peerName, keyPairs));
+			providedRibs.add(new ProvidedRIBs(prib.getPeerName(), keyPairs));
 		}
 		
 		service.startService();
