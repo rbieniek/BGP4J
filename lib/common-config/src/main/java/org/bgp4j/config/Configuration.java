@@ -23,6 +23,7 @@ import java.util.Set;
 import org.bgp4j.config.nodes.BgpServerConfiguration;
 import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 
 /**
  * Configuration object of the BGP daemon.
@@ -64,4 +65,10 @@ public interface Configuration {
 	 * 
 	 */
 	public PeerConfiguration getPeer(String peerName);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public RoutingProcessorConfiguration getRoutingProcessorConfiguration();
 }

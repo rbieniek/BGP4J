@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Filter name="foo">
+        <Prefixes>
+            
+        </Prefixes>
+    </Filter>
+
+    <Filter name="foo">
+        <Prefixes>
+            <Prefix value="ipv4:192.168.1.0/24" />
+        </Prefixes>
+    </Filter>
+
+    <Filter name="foo">
+        <Prefixes>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <Prefix value="ipv4:192.168.2.0/24" />
+        </Prefixes>
+    </Filter>
+    
+    <Filter name="foo">
+    </Filter>
+    
+    <Filter name="foo">
+        <Prefixess>
+            <Prefix value="ipv4:192.168.1.0/24" />
+            <Prefix value="ipv4:192.168.2.0/24" />
+        </Prefixess>
+    </Filter>
+    
+    <Filter name="foo">
+        <Prefixes>
+            <Prefix />
+        </Prefixes>
+    </Filter>
+    
+    <Filter name="foo">
+        <Prefixes>
+            <Prefix value="" />
+        </Prefixes>
+    </Filter>
+    
+</Configuration>

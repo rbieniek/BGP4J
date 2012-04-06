@@ -33,6 +33,7 @@ import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.config.nodes.IPv4RequiredCapabilityPeerConfigurationDecorator;
 import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.config.nodes.PeerConfigurationTimerDecorator;
+import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 import org.bgp4j.config.nodes.impl.FixedDefaultsPeerConfigurationTimerDecorator;
 
 /**
@@ -43,6 +44,7 @@ public class ConfigurationImpl implements Configuration {
 
 	private BgpServerConfiguration bgpServerConfigImpl;
 	private HttpServerConfiguration httpServerConfiguration;
+	private RoutingProcessorConfiguration routingProcessorConfiguration;
 	
 	private Map<String, PeerConfiguration> peerMap = new HashMap<String, PeerConfiguration>();
 	
@@ -60,7 +62,7 @@ public class ConfigurationImpl implements Configuration {
 		return httpServerConfiguration;
 	}
 
-	public void setHttpServerConfiguration(
+	void setHttpServerConfiguration(
 			HttpServerConfiguration httpServerConfiguration) {
 		this.httpServerConfiguration = httpServerConfiguration;
 	}
@@ -96,5 +98,20 @@ public class ConfigurationImpl implements Configuration {
 			peers.add(peerEntry.getValue());
 		
 		return Collections.unmodifiableList(peers);
+	}
+
+	/**
+	 * @return the routingProcessorConfiguration
+	 */
+	public RoutingProcessorConfiguration getRoutingProcessorConfiguration() {
+		return routingProcessorConfiguration;
+	}
+
+	/**
+	 * @param routingProcessorConfiguration the routingProcessorConfiguration to set
+	 */
+	void setRoutingProcessorConfiguration(
+			RoutingProcessorConfiguration routingProcessorConfiguration) {
+		this.routingProcessorConfiguration = routingProcessorConfiguration;
 	}
 }

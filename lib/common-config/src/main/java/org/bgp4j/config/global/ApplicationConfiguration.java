@@ -35,6 +35,7 @@ import org.bgp4j.config.ModifiableConfiguration;
 import org.bgp4j.config.nodes.BgpServerConfiguration;
 import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.config.nodes.PeerConfiguration;
+import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -45,6 +46,7 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 
 	private BgpServerConfiguration bgpServerConfiguration;
 	private HttpServerConfiguration httpServerConfiguration;
+	private RoutingProcessorConfiguration routingProcessorConfiguration;
 	private Map<String, PeerConfiguration> peers = new HashMap<String, PeerConfiguration>();
 	
 	private @Any @Inject Event<BgpServerConfigurationEvent> bgpServerConfigurationEvent;
@@ -54,12 +56,14 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 	void resetConfiguration() {
 		this.bgpServerConfiguration = null;
 		this.httpServerConfiguration = null;
+		this.routingProcessorConfiguration = null;
 		this.peers = new HashMap<String, PeerConfiguration>();
 	}
 	
 	public void importConfiguration(Configuration configuration) {
 		setBgpServerConfiguration(configuration.getBgpServerConfiguration());
 		setHttpServerConfiguration(configuration.getHttpServerConfiguration());
+		setRoutingProcessorConfiguration(configuration.getRoutingProcessorConfiguration());
 		
 		for(PeerConfiguration peer : configuration.listPeerConfigurations())
 			putPeer(peer);
@@ -140,5 +144,17 @@ public class ApplicationConfiguration implements ModifiableConfiguration {
 		
 		if(peer != null)
 			peerConfigurationEvent.fire(new PeerConfigurationEvent(EventType.CONFIGURATION_REMOVED, peer, null));
+	}
+
+	@Override
+	public RoutingProcessorConfiguration getRoutingProcessorConfiguration() {
+		return routingProcessorConfiguration;
+	}
+
+	/**
+	 * @param routingProcessorConfiguration the routingProcessorConfiguration to set
+	 */
+	public void setRoutingProcessorConfiguration(RoutingProcessorConfiguration routingProcessorConfiguration) {
+		this.routingProcessorConfiguration = routingProcessorConfiguration;
 	}
 }

@@ -30,6 +30,7 @@ import org.bgp4j.config.nodes.impl.BgpServerConfigurationParser;
 import org.bgp4j.config.nodes.impl.ExtensionsConfigurationParser;
 import org.bgp4j.config.nodes.impl.HttpServerConfigurationParser;
 import org.bgp4j.config.nodes.impl.PeerConfigurationParser;
+import org.bgp4j.config.nodes.impl.RoutingProcessorConfigurationParser;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -41,6 +42,7 @@ public class ConfigurationParserImpl {
 	private @Inject BgpServerConfigurationParser bgpServerConfigurationParser;
 	private @Inject HttpServerConfigurationParser httpServerConfigurationParser;
 	private @Inject PeerConfigurationParser peerConfigurationParser;
+	private @Inject RoutingProcessorConfigurationParser routingConfigurationParser;
 	private @Inject ExtensionsConfigurationParser extensionsConfigurationParser;
 	
 	public Configuration parseConfiguration(XMLConfiguration configuration) throws ConfigurationException {
@@ -49,6 +51,7 @@ public class ConfigurationParserImpl {
 		List<HierarchicalConfiguration> httpServerNodes = configuration.configurationsAt("HttpServer");
 		List<HierarchicalConfiguration> bgpPeerNodes = configuration.configurationsAt("BgpPeers.BgpPeer");
 		List<HierarchicalConfiguration> extensionNodes = configuration.configurationsAt("Extensions.Extension");
+		List<HierarchicalConfiguration> routingProcessorNodes = configuration.configurationsAt("RoutingProcessor");
 		
 		if(bgpServerNodes.size() > 1)
 			throw new ConfigurationException("Duplicate <BgpServer /> element");
@@ -59,6 +62,11 @@ public class ConfigurationParserImpl {
 			throw new ConfigurationException("Duplicate <HttpServer /> element");
 		else if(httpServerNodes.size() == 1)
 			configImpl.setHttpServerConfiguration(httpServerConfigurationParser.parseConfiguration(httpServerNodes.get(0)));
+		
+		if(routingProcessorNodes.size() > 1) 
+			throw new ConfigurationException("Duplicate <RoutingProcessor /> element");
+		else if(routingProcessorNodes.size() == 1)
+			configImpl.setRoutingProcessorConfiguration(routingConfigurationParser.parseConfigration(routingProcessorNodes.get(0)));
 		
 		for(HierarchicalConfiguration bgpPeerNode : bgpPeerNodes) {
 			configImpl.addPeer(peerConfigurationParser.parseConfiguration(bgpPeerNode));

@@ -19,6 +19,7 @@ package org.bgp4j.config;
 
 import org.bgp4j.config.nodes.BgpServerConfiguration;
 import org.bgp4j.config.nodes.HttpServerConfiguration;
+import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 
 /**
  * Interface implemented by configuration obejct which support modifications of its contents
@@ -40,4 +41,10 @@ public interface ModifiableConfiguration extends Configuration {
 	 * @param serverConfiguration
 	 */
 	public void setHttpServerConfiguration(HttpServerConfiguration serverConfiguration);
+	
+	/**
+	 * 
+	 * @param routingProcessorConfiguration
+	 */
+	public void setRoutingProcessorConfiguration(RoutingProcessorConfiguration routingProcessorConfiguration);
 }
