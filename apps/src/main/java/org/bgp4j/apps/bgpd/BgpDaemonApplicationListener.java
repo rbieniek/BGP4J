@@ -33,6 +33,7 @@ import org.bgp4j.extensions.Extension;
 import org.bgp4j.extensions.ExtensionsFactory;
 import org.bgp4j.management.web.service.WebManagementService;
 import org.bgp4j.netty.service.BGPv4Service;
+import org.bgp4j.rib.processor.GlobalRoutingProcessor;
 import org.bgp4j.rib.web.server.RIBManagementServer;
 import org.bgp4j.weld.SeApplicationStartEvent;
 import org.jboss.weld.environment.se.bindings.Parameters;
@@ -50,6 +51,7 @@ public class BgpDaemonApplicationListener {
 	private @Inject WebManagementService webManagementService;
 	private @Inject ExtensionsFactory extensionsFactory;
 	private @Inject RIBManagementServer ribServer;
+	private @Inject GlobalRoutingProcessor routingProcessor;
 	
 	public void listen(@Observes @BgpDaemonApplicationSelector SeApplicationStartEvent event) throws Exception {
 		BasicConfigurator.configure();
@@ -95,10 +97,12 @@ public class BgpDaemonApplicationListener {
 					}
 				}
 				
+				routingProcessor.configure();
 				webManagementService.registerSingleton(ribServer);
 				
 				webManagementService.startService();			
 				bgpService.startService();
+				routingProcessor.startService();
 			}			
 		} catch(Exception e) {
 			log.error("failed to run client", e);
