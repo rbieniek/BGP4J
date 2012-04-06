@@ -66,7 +66,7 @@ public class ConfigurationParserImpl {
 		if(routingProcessorNodes.size() > 1) 
 			throw new ConfigurationException("Duplicate <RoutingProcessor /> element");
 		else if(routingProcessorNodes.size() == 1)
-			configImpl.setRoutingProcessorConfiguration(routingConfigurationParser.parseConfigration(routingProcessorNodes.get(0)));
+			configImpl.setRoutingProcessorConfiguration(routingConfigurationParser.parseConfiguration(routingProcessorNodes.get(0)));
 		
 		for(HierarchicalConfiguration bgpPeerNode : bgpPeerNodes) {
 			configImpl.addPeer(peerConfigurationParser.parseConfiguration(bgpPeerNode));

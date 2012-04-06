@@ -23,7 +23,7 @@ public class RoutingProcessorConfigurationParser {
 
 	private @Inject RoutingInstanceConfurationParser instanceParser;
 	
-	public RoutingProcessorConfiguration parseConfigration(HierarchicalConfiguration config) throws ConfigurationException {
+	public RoutingProcessorConfiguration parseConfiguration(HierarchicalConfiguration config) throws ConfigurationException {
 		RoutingProcessorConfigurationImpl result = new RoutingProcessorConfigurationImpl();
 		Set<String> instanceKeys = new HashSet<String>();
 		

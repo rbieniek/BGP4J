@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    
+    <RoutingProcessor>
+        <RoutingInstance>
+            <First peerName="peer1">
+                <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>
+            </First>
+            <Second extension="extension" key="key1">
+                <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>
+                <Routing  addressFamily="IPv6" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.1.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="100" />
+                            <MultiExitDisc value="1" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>        
+            </Second>
+        </RoutingInstance>
+        
+        <RoutingInstance>
+            <First peerName="peer2">
+                <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="igp" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="igp" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>
+            </First>
+            <Second extension="extension" key="key2">
+                <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>
+                <Routing  addressFamily="IPv6" subsequentAddressFamily="unicast">
+                    <Local>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                    </Local>      
+                    <Remote>
+                        <Filters>
+                            <Filter name="prefix">
+                                <Prefixes>
+                                    <Prefix value="ipv4:192.168.2.0/24" />
+                                </Prefixes>
+                            </Filter>
+                        </Filters>
+                        <DefaultPathAttributes>
+                            <LocalPreference value="200" />
+                            <MultiExitDisc value="2" />
+                            <Origin value="incomplete" />                
+                        </DefaultPathAttributes>
+                    </Remote>
+                </Routing>        
+            </Second>
+        </RoutingInstance>        
+    </RoutingProcessor>
+    
+    <RoutingInstance>
+        <First peerName="peer1">
+            <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>
+        </First>
+        <Second extension="extension" key="key1">
+            <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>
+            <Routing  addressFamily="IPv6" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.1.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="100" />
+                        <MultiExitDisc value="1" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>        
+        </Second>
+    </RoutingInstance>
+    
+    <RoutingInstance>
+        <First peerName="peer2">
+            <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="igp" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="igp" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>
+        </First>
+        <Second extension="extension" key="key2">
+            <Routing  addressFamily="IPv4" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>
+            <Routing  addressFamily="IPv6" subsequentAddressFamily="unicast">
+                <Local>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                </Local>      
+                <Remote>
+                    <Filters>
+                        <Filter name="prefix">
+                            <Prefixes>
+                                <Prefix value="ipv4:192.168.2.0/24" />
+                            </Prefixes>
+                        </Filter>
+                    </Filters>
+                    <DefaultPathAttributes>
+                        <LocalPreference value="200" />
+                        <MultiExitDisc value="2" />
+                        <Origin value="incomplete" />                
+                    </DefaultPathAttributes>
+                </Remote>
+            </Routing>        
+        </Second>
+    </RoutingInstance>
+
+</Configuration>
