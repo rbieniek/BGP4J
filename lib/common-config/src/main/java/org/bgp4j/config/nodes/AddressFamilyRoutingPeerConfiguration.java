@@ -37,7 +37,7 @@ public interface AddressFamilyRoutingPeerConfiguration extends Comparable<Addres
 	public Set<RoutingFilterConfiguration> getLocalRoutingFilters();
 
 	/**
-	 * get the path attributes which are inserted into routes injected into the
+	 * get the path attributes which are inserted into routes received from the
 	 * remote-side routing information base of a peer
 	 * 
 	 * @return
@@ -45,8 +45,8 @@ public interface AddressFamilyRoutingPeerConfiguration extends Comparable<Addres
 	public PathAttributeConfiguration getRemoteDefaultPathAttributes();
 
 	/**
-	 * get the filters to be applied on routes before they are inserted into the 
-	 * local-side routing information base of a peer
+	 * get the filters to be applied on routes after they have been received from the remote-side
+	 * routing information base of a peer
 	 * 
 	 * @return
 	 */

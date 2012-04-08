@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import org.bgp4j.config.nodes.AddressFamilyRoutingPeerConfiguration;
 import org.bgp4j.config.nodes.RoutingInstanceConfiguration;
 import org.bgp4j.net.AddressFamilyKey;
+import org.bgp4j.rib.PeerRoutingInformationBaseManager;
 import org.slf4j.Logger;
 
 /**
@@ -29,6 +30,8 @@ public class RoutingInstance {
 	private @Inject Instance<AddressFamilyRoutingInstance> familyInstanceProvider;
 	private String firstPeerName;
 	private String secondPeerName;
+	private @Inject PeerRoutingInformationBaseManager pribManager;
+	private RoutingInstanceState state = RoutingInstanceState.STOPPED;
 	
 	private List<AddressFamilyRoutingInstance> familyInstances = new LinkedList<AddressFamilyRoutingInstance>();
 
@@ -60,15 +63,36 @@ public class RoutingInstance {
 	}
 
 	void startInstance() {
-		for(AddressFamilyRoutingInstance instance : getFamilyInstances()) {
-			log.info("Starting routing instance for " + instance.getAddressFamilyKey());
-			
-			try {
-				instance.startInstance();
-			} catch(Throwable t) {
-				log.error("failed to routing instance for " + instance.getAddressFamilyKey(), t);
-			}
-		}
+		if(pribManager.isPeerRoutingInformationBaseAvailable(getFirstPeerName())) {
+			if(pribManager.isPeerRoutingInformationBaseAvailable(getSecondPeerName())) {
+				state = RoutingInstanceState.STARTING;
+				
+				for(AddressFamilyRoutingInstance instance : getFamilyInstances()) {
+					log.info("Starting routing instance for " + instance.getAddressFamilyKey());
+					
+					try {
+						instance.startInstance(pribManager.peerRoutingInformationBase(getFirstPeerName()), 
+								pribManager.peerRoutingInformationBase(getSecondPeerName()));
+						
+						if(instance.getState() != RoutingInstanceState.RUNNING) {
+							log.error("failed to routing instance for " + instance.getAddressFamilyKey() + " with state " + instance.getState());
+							state = RoutingInstanceState.PARTLY_RUNNING;
+						}
+					} catch(Throwable t) {
+						log.error("failed to routing instance for " + instance.getAddressFamilyKey(), t);
+						
+						state = RoutingInstanceState.PARTLY_RUNNING;
+					}
+				}
+				
+				if(state == RoutingInstanceState.STARTING)
+					state = RoutingInstanceState.RUNNING;
+			} else {
+				state = RoutingInstanceState.PEER_ROUTING_BASE_UNAVAILABLE;
+			}			
+		} else {
+			state = RoutingInstanceState.PEER_ROUTING_BASE_UNAVAILABLE;	
+		}		
 	}
 	
 	void stopInstance() {
@@ -116,5 +140,12 @@ public class RoutingInstance {
 	 */
 	public List<AddressFamilyRoutingInstance> getFamilyInstances() {
 		return familyInstances;
+	}
+
+	/**
+	 * @return the state
+	 */
+	public RoutingInstanceState getState() {
+		return state;
 	}
 }

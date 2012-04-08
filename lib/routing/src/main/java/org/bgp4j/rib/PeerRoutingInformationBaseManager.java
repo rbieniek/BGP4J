@@ -111,4 +111,19 @@ public class PeerRoutingInformationBaseManager implements ExtensionRoutingBaseMa
 		peerRibs.clear();
 	}
 
+	/**
+	 * check if a peer has created a peer routing information base
+	 * 
+	 * @param peerName
+	 * @return <code>true</code> if a peer routing information base with the given name exists, <code>false</code> otherwise
+	 */
+	public boolean isPeerRoutingInformationBaseAvailable(String peerName) {
+		if(StringUtils.isBlank(peerName))
+			return false;
+		
+		synchronized (peerRibs) {
+			return peerRibs.containsKey(peerName);
+		}
+	}
+
 }

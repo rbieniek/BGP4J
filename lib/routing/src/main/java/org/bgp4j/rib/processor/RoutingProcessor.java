@@ -40,6 +40,8 @@ public class RoutingProcessor {
 			
 			try {
 				instance.startInstance();
+				
+				log.info("Starting routing instance between " + instance.getFirstPeerName() + " and " + instance.getSecondPeerName() + " in state " + instance.getState()); 
 			}  catch(Throwable t) {
 				log.error("failed to start routing instances between " + instance.getFirstPeerName() + " and " + instance.getSecondPeerName(), t);
 			}

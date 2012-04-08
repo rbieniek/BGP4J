@@ -18,6 +18,9 @@
 package org.bgp4j.rib;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -41,6 +44,7 @@ public class RoutingInformationBase {
 	private @Inject Event<RouteAdded> routeAddedEvent;
 	private @Inject Event<RouteWithdrawn> routeWithdrawnEvent;
 	private Collection<RoutingEventListener> listeners;
+	private List<RoutingEventListener> perRibListeners = Collections.synchronizedList(new LinkedList<RoutingEventListener>());
 	
 	RoutingInformationBase() {
 	}
@@ -110,6 +114,8 @@ public class RoutingInformationBase {
 				
 				for(RoutingEventListener listener : listeners)
 					listener.routeAdded(event);
+				for(RoutingEventListener listener : perRibListeners)
+					listener.routeAdded(event);
 			}
 	}
 
@@ -128,8 +134,9 @@ public class RoutingInformationBase {
 				
 				for(RoutingEventListener listener : listeners)
 					listener.routeWithdrawn(event);
+				for(RoutingEventListener listener : perRibListeners)
+					listener.routeWithdrawn(event);
 			}
-		
 	}
 	
 	/**
@@ -157,6 +164,14 @@ public class RoutingInformationBase {
 		});
 	}
 
+	public void addPerRibListener(RoutingEventListener listener) {
+		this.perRibListeners.add(listener);
+	}
+	
+	public void removePerRibListener(RoutingEventListener listener) {
+		this.perRibListeners.remove(listener);
+	}
+	
 	/**
 	 * @param listeners the listeners to set
 	 */
