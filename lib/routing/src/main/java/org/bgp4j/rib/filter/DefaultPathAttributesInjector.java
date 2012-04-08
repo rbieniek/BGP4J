@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import org.bgp4j.config.nodes.PathAttributeConfiguration;
 import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.rib.Route;
 
 /**
  * @author rainer
@@ -25,8 +26,8 @@ public class DefaultPathAttributesInjector {
 		}
 	}
 	
-	public Set<PathAttribute> injectMissingPathAttribute(Set<PathAttribute> pathAttributes) {
-		Set<PathAttribute> result = new TreeSet<PathAttribute>(pathAttributes);
+	public Route injectMissingPathAttribute(Route route) {
+		Set<PathAttribute> result = new TreeSet<PathAttribute>(route.getPathAttributes());
 		Map<Class<? extends PathAttribute>, PathAttribute> pathClazz = new HashMap<Class<? extends PathAttribute>, PathAttribute>();
 		
 		for(PathAttribute pa : result) {
@@ -38,6 +39,6 @@ public class DefaultPathAttributesInjector {
 				result.add(attrs.get(clazz));
 		}
 
-		return result;
+		return new Route(route, null, result, null);
 	}
 }

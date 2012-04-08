@@ -17,7 +17,6 @@
  */
 package org.bgp4j.rib.web.server;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,19 +25,17 @@ import javax.inject.Singleton;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
 import org.bgp4j.net.RIBSide;
 import org.bgp4j.net.SubsequentAddressFamily;
-import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.rib.PeerRoutingInformationBase;
 import org.bgp4j.rib.PeerRoutingInformationBaseManager;
 import org.bgp4j.rib.PeerRoutingInformationBaseVisitor;
+import org.bgp4j.rib.Route;
 import org.bgp4j.rib.RoutingInformationBaseVisitor;
 import org.bgp4j.rib.web.dto.RIBCollection;
-import org.bgp4j.rib.web.dto.RIBEntry;
+import org.bgp4j.rib.web.dto.RouteInformationBaseDTO;
 import org.bgp4j.rib.web.dto.RouteCollection;
-import org.bgp4j.rib.web.dto.RouteEntry;
+import org.bgp4j.rib.web.dto.RouteDTO;
 import org.bgp4j.rib.web.interfaces.RIBManagement;
 
 /**
@@ -53,13 +50,11 @@ public class RIBManagementServer implements RIBManagement {
 		private RouteCollection routeCollection;
 		
 		@Override
-		public void visitRouteNode(String ribName, AddressFamilyKey afk,
-				RIBSide side, NetworkLayerReachabilityInformation nlri,
-				NextHop nextHop, Collection<PathAttribute> pathAttributes) {
+		public void visitRouteNode(String ribName, RIBSide side, Route route) {
 			if(routeCollection == null)
 				routeCollection = new RouteCollection();
 			
-			routeCollection.getEntries().add(new RouteEntry(nlri, nextHop, pathAttributes));
+			routeCollection.getEntries().add(new RouteDTO(route));
 		}
 
 		/**
@@ -81,7 +76,7 @@ public class RIBManagementServer implements RIBManagement {
 			
 			@Override
 			public void visitRoutingBase(String ribName, AddressFamilyKey afk, RIBSide side) {
-				RIBEntry entry = new RIBEntry();
+				RouteInformationBaseDTO entry = new RouteInformationBaseDTO();
 
 				entry.setName(ribName);
 				entry.setAfi(afk.getAddressFamily());

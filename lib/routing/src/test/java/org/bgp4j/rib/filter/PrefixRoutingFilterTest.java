@@ -5,12 +5,15 @@ package org.bgp4j.rib.filter;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import junit.framework.Assert;
 
 import org.bgp4j.config.nodes.PrefixRoutingFilterConfiguration;
 import org.bgp4j.config.nodes.RoutingFilterConfiguration;
+import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
+import org.bgp4j.rib.Route;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +39,8 @@ public class PrefixRoutingFilterTest extends WeldTestCaseBase {
 	
 	@Test
 	public void testEmptyFilter() {
-		Assert.assertFalse(filter.matchFilter(new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null));
+		Assert.assertFalse(filter.matchFilter(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, 
+				new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null)));
 	}
 	
 	@Test
@@ -65,7 +69,8 @@ public class PrefixRoutingFilterTest extends WeldTestCaseBase {
 			}
 		});
 		
-		Assert.assertFalse(filter.matchFilter(new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null));
+		Assert.assertFalse(filter.matchFilter(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, 
+				new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null)));
 	}
 
 	
@@ -95,6 +100,7 @@ public class PrefixRoutingFilterTest extends WeldTestCaseBase {
 			}
 		});
 		
-		Assert.assertTrue(filter.matchFilter(new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null));
+		Assert.assertTrue(filter.matchFilter(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, 
+				new NetworkLayerReachabilityInformation(24, new byte[] { (byte)0xc0, (byte)0xa8, 0x01 }), null, null)));
 	}
 }

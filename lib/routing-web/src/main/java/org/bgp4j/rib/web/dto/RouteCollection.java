@@ -16,21 +16,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class RouteCollection {
 	
-	private Set<RouteEntry> entries = new TreeSet<RouteEntry>();
+	private Set<RouteDTO> entries = new TreeSet<RouteDTO>();
 	
 	@XmlElement
-	public Set<RouteEntry> getEntries() {
+	public Set<RouteDTO> getEntries() {
 		return entries;
 	}
 
 	/**
 	 * @param entries the entries to set
 	 */
-	public void setEntries(Set<RouteEntry> entries) {		
+	public void setEntries(Set<RouteDTO> entries) {		
 		if(entries != null)
-			this.entries = new TreeSet<RouteEntry>(entries);
+			this.entries = new TreeSet<RouteDTO>(entries);
 		else
-			this.entries = new TreeSet<RouteEntry>();
+			this.entries = new TreeSet<RouteDTO>();
 	}
 
 }

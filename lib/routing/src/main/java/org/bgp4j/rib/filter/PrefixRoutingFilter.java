@@ -10,6 +10,7 @@ import org.bgp4j.config.nodes.PrefixRoutingFilterConfiguration;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.NextHop;
 import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.rib.Route;
 
 /**
  * @author rainer
@@ -28,11 +29,11 @@ public class PrefixRoutingFilter implements RoutingFilter {
 	 * @see org.bgp4j.rib.filter.RoutingFilter#matchFilter(org.bgp4j.net.NetworkLayerReachabilityInformation, org.bgp4j.net.NextHop, java.util.Set)
 	 */
 	@Override
-	public boolean matchFilter(NetworkLayerReachabilityInformation prefix, NextHop nextHop, Set<PathAttribute> pathAttributes) {
+	public boolean matchFilter(Route route) {
 		boolean match = false;
 		
 		for(NetworkLayerReachabilityInformation filterPrefix : filterPrefixes) {
-			if(filterPrefix.isPrefixOf(prefix)) {
+			if(filterPrefix.isPrefixOf(route.getNlri())) {
 				match = true;
 				break;
 			}

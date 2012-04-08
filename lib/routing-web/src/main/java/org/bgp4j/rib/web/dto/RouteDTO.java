@@ -18,6 +18,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.NextHop;
 import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.rib.Route;
 
 /**
  * @author rainer
@@ -25,20 +26,26 @@ import org.bgp4j.net.attributes.PathAttribute;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class RouteEntry implements Comparable<RouteEntry> {
+public class RouteDTO implements Comparable<RouteDTO> {
 
 	private NetworkLayerReachabilityInformation nlri;
 	private NextHop nextHop;
 	private Set<PathAttribute> pathAttributes = new TreeSet<PathAttribute>();
 
-	public RouteEntry() {}
+	public RouteDTO() {}
 	
-	public RouteEntry(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
+	public RouteDTO(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
 		setNlri(nlri);
 		setNextHop(nextHop);
 		getPathAttributes().addAll(pathAttributes);
 	}
 	
+	public RouteDTO(Route route) {
+		setNlri(route.getNlri());
+		setNextHop(route.getNextHop());
+		setPathAttributes(route.getPathAttributes());
+	}
+
 	/**
 	 * @return the nlri
 	 */
@@ -54,7 +61,7 @@ public class RouteEntry implements Comparable<RouteEntry> {
 	}
 
 	@Override
-	public int compareTo(RouteEntry o) {
+	public int compareTo(RouteDTO o) {
 		CompareToBuilder builder = (new CompareToBuilder())
 				.append(getNlri(), o.getNlri())
 				.append(getNextHop(), o.getNextHop())
@@ -92,10 +99,10 @@ public class RouteEntry implements Comparable<RouteEntry> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof RouteEntry))
+		if(!(obj instanceof RouteDTO))
 			return false;
 		
-		RouteEntry o = (RouteEntry)obj;
+		RouteDTO o = (RouteDTO)obj;
 		
 		EqualsBuilder builder = (new EqualsBuilder())
 				.append(getNlri(), o.getNlri())

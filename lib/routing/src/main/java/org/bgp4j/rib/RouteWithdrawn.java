@@ -33,14 +33,12 @@ public class RouteWithdrawn {
 
 	private String peerName;
 	private RIBSide side;
-	private AddressFamilyKey addressFamilyKey;
-	private NetworkLayerReachabilityInformation nlri;
+	private Route route;
 	
-	RouteWithdrawn(String peerName, RIBSide side, AddressFamilyKey addressFamilyKey, NetworkLayerReachabilityInformation nlri) {
+	RouteWithdrawn(String peerName, RIBSide side, Route route) {
 		this.peerName = peerName;
 		this.side = side;
-		this.addressFamilyKey = addressFamilyKey;
-		this.nlri = nlri;
+		this.route = route;
 	}
 
 	/**
@@ -57,19 +55,6 @@ public class RouteWithdrawn {
 		return side;
 	}
 
-	/**
-	 * @return the addressFamilyKey
-	 */
-	public AddressFamilyKey getAddressFamilyKey() {
-		return addressFamilyKey;
-	}
-
-	/**
-	 * @return the nlri
-	 */
-	public NetworkLayerReachabilityInformation getNlri() {
-		return nlri;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -77,8 +62,7 @@ public class RouteWithdrawn {
 	@Override
 	public int hashCode() {
 		return (new HashCodeBuilder())
-				.append(getAddressFamilyKey())
-				.append(getNlri())
+				.append(getRoute())
 				.append(getPeerName())
 				.append(getSide())
 				.toHashCode();
@@ -99,10 +83,16 @@ public class RouteWithdrawn {
 		RouteWithdrawn other = (RouteWithdrawn) obj;
 		
 		return (new EqualsBuilder())
-				.append(getAddressFamilyKey(), other.getAddressFamilyKey())
-				.append(getNlri(), other.getNlri())
+				.append(getRoute(), other.getRoute())
 				.append(getPeerName(), other.getPeerName())
 				.append(getSide(), other.getSide())
 				.isEquals();
+	}
+
+	/**
+	 * @return the route
+	 */
+	public Route getRoute() {
+		return route;
 	}
 }

@@ -11,11 +11,13 @@ import java.util.TreeSet;
 import junit.framework.Assert;
 
 import org.bgp4j.config.nodes.PathAttributeConfiguration;
+import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.Origin;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.rib.Route;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;
 import org.junit.Before;
@@ -59,7 +61,7 @@ public class DefaultPathAttributesInjectorTest extends WeldTestCaseBase {
 		attrs.add(multiExit);
 		attrs.add(origin);
 		
-		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(attrs).iterator();
+		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, null, attrs, null)).getPathAttributes().iterator();
 		
 		Assert.assertTrue(it.hasNext());
 		Assert.assertEquals(localPref, it.next());
@@ -95,7 +97,7 @@ public class DefaultPathAttributesInjectorTest extends WeldTestCaseBase {
 		attrs.add(multiExit);
 		attrs.add(origin);
 		
-		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(attrs).iterator();
+		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, null, attrs, null)).getPathAttributes().iterator();
 		
 		Assert.assertTrue(it.hasNext());
 		Assert.assertEquals(localPref2, it.next());
@@ -133,7 +135,7 @@ public class DefaultPathAttributesInjectorTest extends WeldTestCaseBase {
 		attrs.add(multiExit);
 		attrs.add(origin);
 		
-		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(attrs).iterator();
+		Iterator<PathAttribute> it = injector.injectMissingPathAttribute(new Route(AddressFamilyKey.IPV4_UNICAST_FORWARDING, null, attrs, null)).getPathAttributes().iterator();
 		
 		Assert.assertTrue(it.hasNext());
 		Assert.assertEquals(localPref, it.next());

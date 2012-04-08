@@ -38,7 +38,6 @@ import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.BinaryNextHop;
 import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
 import org.bgp4j.net.RIBSide;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
@@ -48,6 +47,7 @@ import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.update.UpdatePacket;
+import org.bgp4j.rib.Route;
 import org.bgp4j.rib.RouteAdded;
 import org.bgp4j.rib.RouteWithdrawn;
 import org.bgp4j.rib.RoutingEventListener;
@@ -89,9 +89,8 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 	private class QueueingVisitor implements RoutingInformationBaseVisitor {
 
 		@Override
-		public void visitRouteNode(String ribName, AddressFamilyKey afk, RIBSide side, NetworkLayerReachabilityInformation nlri, 
-				NextHop nextHop, Collection<PathAttribute> pathAttributes) {
-			addRoute(ribName, afk, side, nlri, nextHop, pathAttributes);
+		public void visitRouteNode(String ribName, RIBSide side,  Route route) {
+			addRoute(ribName, side, route);
 		}
 		
 	}
@@ -115,14 +114,14 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 	}
 	
 	public void routeAdded(RouteAdded event) {
-		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getAddressFamilyKey())) {
-			addRoute(peerName, event.getAddressFamilyKey(), event.getSide(), event.getNlri(), event.getNextHop(), event.getPathAttributes());
+		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getRoute().getAddressFamilyKey())) {
+			addRoute(peerName, event.getSide(), event.getRoute());
 		}
 	}
 	
 	public void routeWithdrawn(RouteWithdrawn event) {
-		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getAddressFamilyKey())) {
-			withdrawRoute(peerName, event.getAddressFamilyKey(), event.getSide(), event.getNlri());
+		if(active && event.getSide() == RIBSide.Local && StringUtils.equals(event.getPeerName(), peerName) && updateMask.contains(event.getRoute().getAddressFamilyKey())) {
+			withdrawRoute(peerName, event.getSide(), event.getRoute());
 		}
 	}
 
@@ -200,38 +199,38 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addRoute(String ribName, AddressFamilyKey afk, RIBSide side, NetworkLayerReachabilityInformation nlri,  
-			NextHop nextHop, Collection<PathAttribute> pathAttributes) {
+	private void addRoute(String ribName, RIBSide side, Route route) {
 		TopologicalTreeSortingKey key ;
 		Collection<PathAttribute> keyAttributes;
 		
-		if(afk.matches(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)) {
+		if(route.getAddressFamilyKey().matches(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)) {
 			// handle non-MP  IPv4 case
-			keyAttributes = filterAttribute(pathAttributes, Arrays.asList(NextHopPathAttribute.class));
-			keyAttributes.add(new NextHopPathAttribute((InetAddressNextHop<Inet4Address>)nextHop));
+			keyAttributes = filterAttribute(route.getPathAttributes(), Arrays.asList(NextHopPathAttribute.class));
+			keyAttributes.add(new NextHopPathAttribute((InetAddressNextHop<Inet4Address>)route.getNextHop()));
 		} else {
 			// handle any other case
-			keyAttributes = filterAttribute(pathAttributes, Arrays.asList(MultiProtocolReachableNLRI.class, MultiProtocolReachableNLRI.class));
-			keyAttributes.add(new MultiProtocolReachableNLRI(afk.getAddressFamily(), afk.getSubsequentAddressFamily(), (BinaryNextHop)nextHop));
+			keyAttributes = filterAttribute(route.getPathAttributes(), Arrays.asList(MultiProtocolReachableNLRI.class, MultiProtocolReachableNLRI.class));
+			keyAttributes.add(new MultiProtocolReachableNLRI(route.getAddressFamilyKey().getAddressFamily(), 
+					route.getAddressFamilyKey().getSubsequentAddressFamily(), (BinaryNextHop)route.getNextHop()));
 		}
 		
-		key = new TopologicalTreeSortingKey(afk, keyAttributes);
+		key = new TopologicalTreeSortingKey(route.getAddressFamilyKey(), keyAttributes);
 		
 		synchronized (addedRoutes) {
 			if(!addedRoutes.containsKey(key))
 				addedRoutes.put(key, new LinkedList<NetworkLayerReachabilityInformation>());
-			addedRoutes.get(key).add(nlri);
+			addedRoutes.get(key).add(route.getNlri());
 		}
 	}
 
-	private void withdrawRoute(String ribName, AddressFamilyKey addressFamilyKey, RIBSide side, NetworkLayerReachabilityInformation nlri) {
+	private void withdrawRoute(String ribName, RIBSide side, Route route) {
 		// remove the NLRI from any scheduled route add updates
 		synchronized (addedRoutes) {
 			Set<TopologicalTreeSortingKey> removeableKeys = new HashSet<TopologicalTreeSortingKey>();
 			
 			for(TopologicalTreeSortingKey key : addedRoutes.keySet()) {
-				if(key.getAddressFamilyKey().equals(addressFamilyKey)) {
-					addedRoutes.get(key).remove(nlri);
+				if(key.getAddressFamilyKey().equals(route.getAddressFamilyKey())) {
+					addedRoutes.get(key).remove(route.getNlri());
 					
 					if(addedRoutes.get(key).size() == 0)
 						removeableKeys.add(key);
@@ -243,10 +242,10 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 		}
 		
 		synchronized (withdrawnRoutes) {
-			if(!withdrawnRoutes.containsKey(addressFamilyKey))
-				withdrawnRoutes.put(addressFamilyKey, new LinkedList<NetworkLayerReachabilityInformation>());
+			if(!withdrawnRoutes.containsKey(route.getAddressFamilyKey()))
+				withdrawnRoutes.put(route.getAddressFamilyKey(), new LinkedList<NetworkLayerReachabilityInformation>());
 			
-			withdrawnRoutes.get(addressFamilyKey).add(nlri);
+			withdrawnRoutes.get(route.getAddressFamilyKey()).add(route.getNlri());
 		}
 	}
 

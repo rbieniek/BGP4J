@@ -59,9 +59,9 @@ import org.bgp4j.rib.PeerRoutingInformationBase;
 import org.bgp4j.rib.PeerRoutingInformationBaseManager;
 import org.bgp4j.rib.RoutingInformationBase;
 import org.bgp4j.rib.web.dto.RIBCollection;
-import org.bgp4j.rib.web.dto.RIBEntry;
+import org.bgp4j.rib.web.dto.RouteInformationBaseDTO;
 import org.bgp4j.rib.web.dto.RouteCollection;
-import org.bgp4j.rib.web.dto.RouteEntry;
+import org.bgp4j.rib.web.dto.RouteDTO;
 import org.bgp4j.rib.web.interfaces.RIBManagement;
 import org.bgp4j.rib.web.server.RIBManagementServer;
 import org.jboss.resteasy.client.ProxyFactory;
@@ -132,11 +132,11 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(ribCollection);
 		
-		Iterator<RIBEntry> it = ribCollection.getEntries().iterator();
+		Iterator<RouteInformationBaseDTO> it = ribCollection.getEntries().iterator();
 
 		Assert.assertTrue(it.hasNext());
 		
-		RIBEntry entry = it.next();
+		RouteInformationBaseDTO entry = it.next();
 
 		Assert.assertEquals("foo", entry.getName());
 		Assert.assertEquals(RIBSide.Local, entry.getSide());
@@ -168,8 +168,8 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(ribCollection);
 		
-		Iterator<RIBEntry> it = ribCollection.getEntries().iterator();
-		RIBEntry entry;
+		Iterator<RouteInformationBaseDTO> it = ribCollection.getEntries().iterator();
+		RouteInformationBaseDTO entry;
 		
 		Assert.assertTrue(it.hasNext());
 		
@@ -197,7 +197,7 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 	@Test
 	public void testListOnePeerLocalIPv4UnicastLocalIPv6UnicastRoutingBase() throws Exception {
 		PeerRoutingInformationBase prib = pribManager.peerRoutingInformationBase("foo");
-		RIBEntry entry;
+		RouteInformationBaseDTO entry;
 		
 		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
 		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV6_UNICAST_FORWARDING);
@@ -215,7 +215,7 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(ribCollection);
 		
-		Iterator<RIBEntry> it = ribCollection.getEntries().iterator();
+		Iterator<RouteInformationBaseDTO> it = ribCollection.getEntries().iterator();
 		
 		Assert.assertTrue(it.hasNext());
 		
@@ -243,7 +243,7 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 	@Test
 	public void testListTwoPeerLocalIPv4UnicastRoutingBase() throws Exception {
 		PeerRoutingInformationBase prib;
-		RIBEntry entry;
+		RouteInformationBaseDTO entry;
 		
 		prib = pribManager.peerRoutingInformationBase("foo");
 		prib.allocateRoutingInformationBase(RIBSide.Local, AddressFamilyKey.IPV4_UNICAST_FORWARDING);
@@ -264,7 +264,7 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(ribCollection);
 		
-		Iterator<RIBEntry> it = ribCollection.getEntries().iterator();
+		Iterator<RouteInformationBaseDTO> it = ribCollection.getEntries().iterator();
 		
 		Assert.assertTrue(it.hasNext());
 		
@@ -353,11 +353,11 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(routeCollection);
 		
-		Iterator<RouteEntry> it = routeCollection.getEntries().iterator();
+		Iterator<RouteDTO> it = routeCollection.getEntries().iterator();
 
 		Assert.assertTrue(it.hasNext());
 		
-		RouteEntry entry = it.next();
+		RouteDTO entry = it.next();
 
 		Assert.assertEquals(nlri1, entry.getNlri());
 		Assert.assertEquals(nextHop, entry.getNextHop());
@@ -433,11 +433,11 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(routeCollection);
 		
-		Iterator<RouteEntry> it = routeCollection.getEntries().iterator();
+		Iterator<RouteDTO> it = routeCollection.getEntries().iterator();
 
 		Assert.assertTrue(it.hasNext());
 		
-		RouteEntry entry = it.next();
+		RouteDTO entry = it.next();
 
 		Assert.assertEquals(nlri1, entry.getNlri());
 		Assert.assertEquals(nextHop, entry.getNextHop());
@@ -510,11 +510,11 @@ public class RIBManagementServerTest extends WebManagementTestBase {
 
 		Assert.assertNotNull(routeCollection);
 		
-		Iterator<RouteEntry> it = routeCollection.getEntries().iterator();
+		Iterator<RouteDTO> it = routeCollection.getEntries().iterator();
 
 		Assert.assertTrue(it.hasNext());
 		
-		RouteEntry entry = it.next();
+		RouteDTO entry = it.next();
 
 		Assert.assertEquals(nlri1, entry.getNlri());
 		Assert.assertEquals(nextHop, entry.getNextHop());

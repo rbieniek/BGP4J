@@ -31,20 +31,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class RIBCollection {
 	
-	private Set<RIBEntry> entries = new TreeSet<RIBEntry>();
+	private Set<RouteInformationBaseDTO> entries = new TreeSet<RouteInformationBaseDTO>();
 	
 	@XmlElement
-	public Set<RIBEntry> getEntries() {
+	public Set<RouteInformationBaseDTO> getEntries() {
 		return entries;
 	}
 
 	/**
 	 * @param entries the entries to set
 	 */
-	public void setEntries(Set<RIBEntry> entries) {		
+	public void setEntries(Set<RouteInformationBaseDTO> entries) {		
 		if(entries != null)
-			this.entries = new TreeSet<RIBEntry>(entries);
+			this.entries = new TreeSet<RouteInformationBaseDTO>(entries);
 		else
-			this.entries = new TreeSet<RIBEntry>();
+			this.entries = new TreeSet<RouteInformationBaseDTO>();
 	}	
 }

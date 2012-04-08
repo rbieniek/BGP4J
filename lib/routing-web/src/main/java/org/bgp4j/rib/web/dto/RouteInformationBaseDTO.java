@@ -20,22 +20,22 @@ import org.bgp4j.net.SubsequentAddressFamily;
  *
  */
 @XmlRootElement
-public class RIBEntry implements Comparable<RIBEntry> {
+public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseDTO> {
 	private String name;
 	private AddressFamily afi;
 	private SubsequentAddressFamily safi;
 	private RIBSide side;
 	
-	public RIBEntry() {}
+	public RouteInformationBaseDTO() {}
 
-	public RIBEntry(String name, AddressFamily afi, SubsequentAddressFamily safi, RIBSide side) {
+	public RouteInformationBaseDTO(String name, AddressFamily afi, SubsequentAddressFamily safi, RIBSide side) {
 		this.name = name;
 		this.afi = afi;
 		this.safi = safi;
 		this.side = side;
 	}
 	
-	public RIBEntry(String name, AddressFamilyKey afk, RIBSide side) {
+	public RouteInformationBaseDTO(String name, AddressFamilyKey afk, RIBSide side) {
 		this(name, afk.getAddressFamily(), afk.getSubsequentAddressFamily(), side);
 	}
 	
@@ -100,7 +100,7 @@ public class RIBEntry implements Comparable<RIBEntry> {
 	}
 
 	@Override
-	public int compareTo(RIBEntry o) {
+	public int compareTo(RouteInformationBaseDTO o) {
 		return (new CompareToBuilder())
 				.append(getAfi(), o.getAfi())
 				.append(getName(), o.getName())
@@ -127,10 +127,10 @@ public class RIBEntry implements Comparable<RIBEntry> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof RIBEntry))
+		if(!(obj instanceof RouteInformationBaseDTO))
 			return false;
 
-		RIBEntry o = (RIBEntry)obj;
+		RouteInformationBaseDTO o = (RouteInformationBaseDTO)obj;
 		
 		return (new EqualsBuilder())
 			.append(getAfi(), o.getAfi())

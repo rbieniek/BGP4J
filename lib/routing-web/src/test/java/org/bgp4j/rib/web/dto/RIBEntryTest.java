@@ -18,8 +18,8 @@ public class RIBEntryTest {
 
 	@Test
 	public void testEquals() {
-		RIBEntry a = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
-		RIBEntry b = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO a = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO b = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
 		
 		Assert.assertTrue(a.equals(b));
 		Assert.assertTrue(a.hashCode() == b.hashCode());
@@ -28,8 +28,8 @@ public class RIBEntryTest {
 
 	@Test
 	public void testSmallerName() {
-		RIBEntry a = new RIBEntry("bar", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
-		RIBEntry b = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO a = new RouteInformationBaseDTO("bar", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO b = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
 		
 		Assert.assertFalse(a.equals(b));
 		Assert.assertFalse(a.hashCode() == b.hashCode());
@@ -38,8 +38,8 @@ public class RIBEntryTest {
 
 	@Test
 	public void testSmallerAddressFamily() {
-		RIBEntry a = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
-		RIBEntry b = new RIBEntry("foo", AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO a = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO b = new RouteInformationBaseDTO("foo", AddressFamily.IPv6, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
 		
 		Assert.assertFalse(a.equals(b));
 		Assert.assertFalse(a.hashCode() == b.hashCode());
@@ -48,8 +48,8 @@ public class RIBEntryTest {
 
 	@Test
 	public void testSmallerSubsequentAddressFamily() {
-		RIBEntry a = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
-		RIBEntry b = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO a = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO b = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_MULTICAST_FORWARDING, RIBSide.Local);
 		
 		Assert.assertFalse(a.equals(b));
 		Assert.assertFalse(a.hashCode() == b.hashCode());
@@ -58,8 +58,8 @@ public class RIBEntryTest {
 
 	@Test
 	public void testSmallerSide() {
-		RIBEntry a = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
-		RIBEntry b = new RIBEntry("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Remote);
+		RouteInformationBaseDTO a = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Local);
+		RouteInformationBaseDTO b = new RouteInformationBaseDTO("foo", AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, RIBSide.Remote);
 		
 		Assert.assertFalse(a.equals(b));
 		Assert.assertFalse(a.hashCode() == b.hashCode());

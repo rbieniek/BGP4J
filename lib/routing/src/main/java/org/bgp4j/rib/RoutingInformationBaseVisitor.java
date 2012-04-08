@@ -17,13 +17,7 @@
  */
 package org.bgp4j.rib;
 
-import java.util.Collection;
-
-import org.bgp4j.net.AddressFamilyKey;
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
 import org.bgp4j.net.RIBSide;
-import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -41,7 +35,6 @@ public interface RoutingInformationBaseVisitor {
 	 * @param nextHop
 	 * @param pathAttributes
 	 */
-	void visitRouteNode(String ribName, AddressFamilyKey afk, RIBSide side,
-			NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes);
+	void visitRouteNode(String ribName, RIBSide side, Route route);
 
 }

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -45,6 +46,7 @@ public class RoutingInformationBase {
 	private @Inject Event<RouteWithdrawn> routeWithdrawnEvent;
 	private Collection<RoutingEventListener> listeners;
 	private List<RoutingEventListener> perRibListeners = Collections.synchronizedList(new LinkedList<RoutingEventListener>());
+	private UUID ribID = UUID.randomUUID();
 	
 	RoutingInformationBase() {
 	}
@@ -102,13 +104,13 @@ public class RoutingInformationBase {
 	 * @param pathAttributes
 	 */
 	public void addRoutes(Collection<NetworkLayerReachabilityInformation> nlris, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
-		for(NetworkLayerReachabilityInformation nlri : nlris)
+		for(NetworkLayerReachabilityInformation nlri : nlris) {
+			Route route = new Route(getRibID(), getAddressFamilyKey(), nlri, pathAttributes, nextHop);
+
 			if(routingTree.addRoute(nlri, pathAttributes, nextHop)) {
 				RouteAdded event = new RouteAdded(getPeerName(), 
 						getSide(), 
-						getAddressFamilyKey(), 
-						nlri, 
-						pathAttributes, nextHop);
+						route);
 				
 				routeAddedEvent.fire(event);
 				
@@ -117,6 +119,7 @@ public class RoutingInformationBase {
 				for(RoutingEventListener listener : perRibListeners)
 					listener.routeAdded(event);
 			}
+		}
 	}
 
 	/**
@@ -128,7 +131,7 @@ public class RoutingInformationBase {
 	public void withdrawRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
 		for(NetworkLayerReachabilityInformation nlri : nlris)
 			if(routingTree.withdrawRoute(nlri)) {
-				RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), getAddressFamilyKey(), nlri);
+				RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), new Route(getRibID(), getAddressFamilyKey(), nlri, null, null));
 				
 				routeWithdrawnEvent.fire(event);
 				
@@ -159,7 +162,8 @@ public class RoutingInformationBase {
 			
 			@Override
 			public void visitRouteTreeNode(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
-				visitor.visitRouteNode(getPeerName(), getAddressFamilyKey(), getSide(), nlri, nextHop, pathAttributes);
+				visitor.visitRouteNode(getPeerName(), getSide(), 
+						new Route(getRibID(), getAddressFamilyKey(), nlri, pathAttributes, nextHop));
 			}
 		});
 	}
@@ -177,5 +181,12 @@ public class RoutingInformationBase {
 	 */
 	void setListeners(Collection<RoutingEventListener> listeners) {
 		this.listeners = listeners;
+	}
+
+	/**
+	 * @return the ribID
+	 */
+	public UUID getRibID() {
+		return ribID;
 	}
 }

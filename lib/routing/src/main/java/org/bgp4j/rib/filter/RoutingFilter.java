@@ -3,11 +3,7 @@
  */
 package org.bgp4j.rib.filter;
 
-import java.util.Set;
-
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
-import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.rib.Route;
 
 /**
  * @author rainer
@@ -15,5 +11,5 @@ import org.bgp4j.net.attributes.PathAttribute;
  */
 public interface RoutingFilter {
 
-	public boolean matchFilter(NetworkLayerReachabilityInformation prefix, NextHop nextHop, Set<PathAttribute> pathAttributes);
+	public boolean matchFilter(Route route);
 }

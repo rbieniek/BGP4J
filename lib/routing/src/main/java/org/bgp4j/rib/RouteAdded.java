@@ -17,15 +17,9 @@
  */
 package org.bgp4j.rib;
 
-import java.util.Collection;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bgp4j.net.AddressFamilyKey;
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
 import org.bgp4j.net.RIBSide;
-import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * Event fired by a RoutingInformationBase instance when a route has been added to the RIB.
@@ -37,19 +31,12 @@ public class RouteAdded {
 
 	private String peerName;
 	private RIBSide side;
-	private AddressFamilyKey addressFamilyKey;
-	private NetworkLayerReachabilityInformation nlri;
-	private Collection<PathAttribute> pathAttributes;
-	private NextHop nextHop;
+	private Route route;
 	
-	RouteAdded(String peerName, RIBSide side, AddressFamilyKey addressFamilyKey, NetworkLayerReachabilityInformation nlri, 
-			Collection<PathAttribute> pathAttributes, NextHop nextHop) {
+	RouteAdded(String peerName, RIBSide side, Route route) {
 		this.peerName = peerName;
 		this.side = side;
-		this.addressFamilyKey = addressFamilyKey;
-		this.nlri = nlri;
-		this.pathAttributes = pathAttributes;
-		this.nextHop = nextHop;
+		this.route = route;
 	}
 
 	/**
@@ -65,40 +52,15 @@ public class RouteAdded {
 	public RIBSide getSide() {
 		return side;
 	}
-
-	/**
-	 * @return the addressFamilyKey
-	 */
-	public AddressFamilyKey getAddressFamilyKey() {
-		return addressFamilyKey;
-	}
-
-	/**
-	 * @return the nlri
-	 */
-	public NetworkLayerReachabilityInformation getNlri() {
-		return nlri;
-	}
-
-	/**
-	 * @return the pathAttributes
-	 */
-	public Collection<PathAttribute> getPathAttributes() {
-		return pathAttributes;
-	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		return (new HashCodeBuilder())
-				.append(getAddressFamilyKey())
-				.append(getNlri())
-				.append(getPathAttributes())
 				.append(getPeerName())
 				.append(getSide())
-				.append(getNextHop())
+				.append(getRoute())
 				.toHashCode();
 	}
 
@@ -117,19 +79,17 @@ public class RouteAdded {
 		RouteAdded other = (RouteAdded) obj;
 		
 		return (new EqualsBuilder())
-				.append(getAddressFamilyKey(), other.getAddressFamilyKey())
-				.append(getNlri(), other.getNlri())
-				.append(getPathAttributes(), other.getPathAttributes())
 				.append(getPeerName(), other.getPeerName())
 				.append(getSide(), other.getSide())
-				.append(getNextHop(), other.getNextHop())
+				.append(getRoute(), other.getRoute())
 				.isEquals();
 	}
 
 	/**
-	 * @return the nextHop
+	 * @return the route
 	 */
-	public NextHop getNextHop() {
-		return nextHop;
+	public Route getRoute() {
+		return route;
 	}
+
 }
