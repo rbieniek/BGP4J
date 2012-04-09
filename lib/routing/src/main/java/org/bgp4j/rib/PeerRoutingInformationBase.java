@@ -126,9 +126,9 @@ public class PeerRoutingInformationBase {
 
 	public void vistPeerRoutingBases(PeerRoutingInformationBaseVisitor visitor) {
 		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : localRIBs.entrySet())
-			visitor.visitRoutingBase(peerName, entry.getKey(), RIBSide.Local);
+			visitor.visitRoutingBase(peerName, entry.getValue().getRibID(), entry.getKey(), RIBSide.Local);
 		for(Entry<AddressFamilyKey, RoutingInformationBase> entry : remoteRIBs.entrySet())
-			visitor.visitRoutingBase(peerName, entry.getKey(), RIBSide.Remote);
+			visitor.visitRoutingBase(peerName, entry.getValue().getRibID(), entry.getKey(), RIBSide.Remote);
 	}
 	
 	private void visitRoutingBases(Map<AddressFamilyKey, RoutingInformationBase> ribs, RoutingInformationBaseVisitor visitor, Set<AddressFamilyKey> wanted) {

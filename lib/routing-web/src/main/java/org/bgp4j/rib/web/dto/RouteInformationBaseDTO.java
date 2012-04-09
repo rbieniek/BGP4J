@@ -3,6 +3,8 @@
  */
 package org.bgp4j.rib.web.dto;
 
+import java.util.UUID;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -25,18 +27,20 @@ public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseD
 	private AddressFamily afi;
 	private SubsequentAddressFamily safi;
 	private RIBSide side;
+	private UUID ribID;
 	
 	public RouteInformationBaseDTO() {}
 
-	public RouteInformationBaseDTO(String name, AddressFamily afi, SubsequentAddressFamily safi, RIBSide side) {
+	public RouteInformationBaseDTO(String name, UUID ribID, AddressFamily afi, SubsequentAddressFamily safi, RIBSide side) {
 		this.name = name;
 		this.afi = afi;
 		this.safi = safi;
 		this.side = side;
+		this.ribID = ribID;
 	}
 	
-	public RouteInformationBaseDTO(String name, AddressFamilyKey afk, RIBSide side) {
-		this(name, afk.getAddressFamily(), afk.getSubsequentAddressFamily(), side);
+	public RouteInformationBaseDTO(String name, UUID ribID, AddressFamilyKey afk, RIBSide side) {
+		this(name, ribID, afk.getAddressFamily(), afk.getSubsequentAddressFamily(), side);
 	}
 	
 	/**
@@ -104,6 +108,7 @@ public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseD
 		return (new CompareToBuilder())
 				.append(getAfi(), o.getAfi())
 				.append(getName(), o.getName())
+				.append(getRibID(), o.getRibID())
 				.append(getSafi(), o.getSafi())
 				.append(getSide(), o.getSide())
 				.toComparison();
@@ -117,6 +122,7 @@ public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseD
 		return (new HashCodeBuilder())
 				.append(getAfi())
 				.append(getName())
+				.append(getRibID())
 				.append(getSafi())
 				.append(getSide())
 				.toHashCode();
@@ -135,6 +141,7 @@ public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseD
 		return (new EqualsBuilder())
 			.append(getAfi(), o.getAfi())
 			.append(getName(), o.getName())
+			.append(getRibID(), o.getRibID())
 			.append(getSafi(), o.getSafi())
 			.append(getSide(), o.getSide())
 			.isEquals();
@@ -148,5 +155,20 @@ public class RouteInformationBaseDTO implements Comparable<RouteInformationBaseD
 	@XmlTransient
 	public AddressFamilyKey getAddressFamilyKey() {
 		return new AddressFamilyKey(getAfi(), getSafi());
+	}
+
+	/**
+	 * @return the ribID
+	 */
+	@XmlElement
+	public UUID getRibID() {
+		return ribID;
+	}
+
+	/**
+	 * @param ribID the ribID to set
+	 */
+	public void setRibID(UUID ribID) {
+		this.ribID = ribID;
 	}
 }

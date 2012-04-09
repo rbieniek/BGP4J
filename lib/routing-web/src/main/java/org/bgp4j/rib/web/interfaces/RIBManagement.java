@@ -17,6 +17,8 @@
  */
 package org.bgp4j.rib.web.interfaces;
 
+import java.util.UUID;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -41,10 +43,16 @@ public interface RIBManagement {
 	public RIBCollection ribs();
 	
 	@GET
-	@Path("/routes/{peer}/{side}/{afi}/{safi}")
+	@Path("/routes-by-peer/{peer}/{side}/{afi}/{safi}")
 	@Produces("application/*+json")
 	public RouteCollection routes(@PathParam("peer") String peer, 
 			@PathParam("side") RIBSide side, 
 			@PathParam("afi") AddressFamily afi, 
 			@PathParam("safi") SubsequentAddressFamily safi);
+
+	
+	@GET
+	@Path("/routes-by-uuid/{uuid}")
+	@Produces("application/*+json")
+	public RouteCollection routes(@PathParam("uuid") UUID uuid);
 }

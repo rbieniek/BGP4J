@@ -17,6 +17,8 @@
  */
 package org.bgp4j.rib;
 
+import java.util.UUID;
+
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.RIBSide;
 
@@ -33,6 +35,6 @@ public interface PeerRoutingInformationBaseVisitor {
 	 * @param afk
 	 * @param side
 	 */
-	void visitRoutingBase(String ribName, AddressFamilyKey afk, RIBSide side);
+	void visitRoutingBase(String ribName, UUID ribID, AddressFamilyKey afk, RIBSide side);
 
 }

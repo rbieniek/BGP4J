@@ -19,6 +19,7 @@ package org.bgp4j.rib.web.server;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,9 +34,9 @@ import org.bgp4j.rib.PeerRoutingInformationBaseVisitor;
 import org.bgp4j.rib.Route;
 import org.bgp4j.rib.RoutingInformationBaseVisitor;
 import org.bgp4j.rib.web.dto.RIBCollection;
-import org.bgp4j.rib.web.dto.RouteInformationBaseDTO;
 import org.bgp4j.rib.web.dto.RouteCollection;
 import org.bgp4j.rib.web.dto.RouteDTO;
+import org.bgp4j.rib.web.dto.RouteInformationBaseDTO;
 import org.bgp4j.rib.web.interfaces.RIBManagement;
 
 /**
@@ -66,6 +67,60 @@ public class RIBManagementServer implements RIBManagement {
 		
 	}
 	
+	private static class RibFinder implements PeerRoutingInformationBaseVisitor {
+
+		private UUID ribID;
+		private String ribName;
+		private AddressFamilyKey afk;
+		private RIBSide side;
+		private boolean found;
+		
+		public RibFinder(UUID ribID) {
+			this.ribID = ribID;
+		}
+		
+		@Override
+		public void visitRoutingBase(String ribName, UUID ribID, AddressFamilyKey afk, RIBSide side) {
+			if(this.ribID.equals(ribID)) {
+				this.afk = afk;
+				this.ribName = ribName;
+				this.side = side;
+				
+				found = true;
+			}
+		}
+
+		/**
+		 * @return the ribName
+		 */
+		public String getRibName() {
+			return ribName;
+		}
+
+		/**
+		 * @return the afk
+		 */
+		public AddressFamilyKey getAfk() {
+			return afk;
+		}
+
+		/**
+		 * @return the found
+		 */
+		public boolean isFound() {
+			return found;
+		}
+
+		/**
+		 * @return the side
+		 */
+		public RIBSide getSide() {
+			return side;
+		}
+
+		
+	}
+
 	private @Inject PeerRoutingInformationBaseManager pribManager; 
 	
 	@Override
@@ -75,10 +130,11 @@ public class RIBManagementServer implements RIBManagement {
 		pribManager.vistPeerRoutingBases(new PeerRoutingInformationBaseVisitor() {
 			
 			@Override
-			public void visitRoutingBase(String ribName, AddressFamilyKey afk, RIBSide side) {
+			public void visitRoutingBase(String ribName, UUID ribID, AddressFamilyKey afk, RIBSide side) {
 				RouteInformationBaseDTO entry = new RouteInformationBaseDTO();
 
 				entry.setName(ribName);
+				entry.setRibID(ribID);
 				entry.setAfi(afk.getAddressFamily());
 				entry.setSafi(afk.getSubsequentAddressFamily());
 				entry.setSide(side);
@@ -105,6 +161,19 @@ public class RIBManagementServer implements RIBManagement {
 		}
 		
 		return builder.getRouteCollection();
+	}
+
+	@Override
+	public RouteCollection routes(UUID uuid) {
+		RibFinder finder = new RibFinder(uuid);
+		RouteCollection result = null;
+		
+		pribManager.vistPeerRoutingBases(finder);
+		
+		if(finder.isFound())
+			result = routes(finder.getRibName(), finder.getSide(), finder.getAfk().getAddressFamily(), finder.getAfk().getSubsequentAddressFamily());
+		
+		return result;
 	}
 
 }
