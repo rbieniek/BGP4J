@@ -28,8 +28,10 @@ public class AddressFamilyRoutingInstance {
 	void configure(AddressFamilyKey addressFamilyKey, AddressFamilyRoutingPeerConfiguration firstConfig, AddressFamilyRoutingPeerConfiguration secondConfig) {
 		this.addressFamilyKey = addressFamilyKey;
 		
-		firstListener.configure(firstConfig.getLocalRoutingFilters(), firstConfig.getLocalDefaultPathAttributes());
-		secondListener.configure(secondConfig.getLocalRoutingFilters(), secondConfig.getLocalDefaultPathAttributes());
+		if(firstConfig != null)
+			firstListener.configure(firstConfig.getLocalRoutingFilters(), firstConfig.getLocalDefaultPathAttributes());
+		if(secondConfig != null)
+			secondListener.configure(secondConfig.getLocalRoutingFilters(), secondConfig.getLocalDefaultPathAttributes());
 	}
 	
 	void startInstance(PeerRoutingInformationBase firstPeerRIB, PeerRoutingInformationBase secondPeerRIB) {

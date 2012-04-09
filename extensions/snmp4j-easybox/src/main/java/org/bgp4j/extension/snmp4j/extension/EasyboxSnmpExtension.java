@@ -85,7 +85,7 @@ public class EasyboxSnmpExtension extends ExtensionBase implements Extension {
 				// add interface status listener here 
 				RIBInterfaceListener listener = beanFactory.getBeanInstance(RIBInterfaceListener.class);
 				
-				listener.configureRouting(routingConfig, prib.routingBase(RIBSide.Remote, routingConfig.getKey()));
+				listener.configureRouting(config.getSnmpConfiguration().getTargetAddress(), routingConfig, prib.routingBase(RIBSide.Remote, routingConfig.getKey()));
 				
 				instances.get(config.getName()).addInterfaceListener(listener);
 				

@@ -29,6 +29,7 @@ public class RoutingProcessor {
 			RoutingInstance instance = instanceProvider.get();
 			
 			instance.configure(instConfig);
+			instances.add(instance);
 		}
 		
 		instances = Collections.unmodifiableList(instances);

@@ -34,18 +34,11 @@
 	  <AddressFamily addressFamily="IPv4" subsequentAddressFamily="unicast" >
             <Route>
               <Prefix value="ipv4:159.153.0.0/16" />
-              <PathAttributes>
-                <LocalPreference value="100" />
-                <MultiExitDisc value="1" />
-		<Origin value="incomplete" />
-              </PathAttributes>
             </Route>
             <Route>
               <Prefix value="ipv4:0.0.0.0/0" />
               <PathAttributes>
                 <LocalPreference value="150" />
-                <MultiExitDisc value="1" />
-		<Origin value="incomplete" />
               </PathAttributes>
             </Route>
 	  </AddressFamily>
@@ -53,5 +46,23 @@
       </Easybox>
     </Extension>
   </Extensions>
+
+  <RoutingProcessor>
+    <RoutingInstance>
+      <First peerName="coyote">
+	<Routing addressFamily="IPv4" subsequentAddressFamily="unicast" >
+	  <Local>
+	    <DefaultPathAttributes>
+              <LocalPreference value="100" />
+              <MultiExitDisc value="1" />
+	      <Origin value="incomplete" />
+	    </DefaultPathAttributes>
+	  </Local>
+	</Routing>
+      </First>
+      <Second extension="snmp4j-easybox" key="box1">
+      </Second>
+    </RoutingInstance>
+  </RoutingProcessor>
 
 </Config>

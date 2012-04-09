@@ -17,6 +17,7 @@
 package org.bgp4j.net;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -60,6 +61,12 @@ public class NetworkLayerReachabilityInformation implements Serializable, Compar
 	
 	public NetworkLayerReachabilityInformation(int prefixLength, byte[] prefix) {
 		setPrefix(prefixLength, prefix);
+	}
+	
+	public NetworkLayerReachabilityInformation(InetAddress source) {
+		byte[] raw = source.getAddress();
+		
+		setPrefix(8*raw.length, raw);
 	}
 	
 	/**

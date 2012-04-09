@@ -4,7 +4,9 @@
 package org.bgp4j.extension.snmp4j.extension;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,7 @@ public class RIBInterfaceListener implements EasyboxInterfaceListener {
 	private List<Route> routes = new LinkedList<RIBInterfaceListener.Route>();
 	private RoutingInformationBase rib;
 	private @Inject Logger log;
+	private InetAddressNextHop<Inet4Address> nextHop; 
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.extension.snmp4j.service.EasyboxInterfaceListener#interfaceChanged(org.bgp4j.extension.snmp4j.service.EasyboxInstance, org.bgp4j.extension.snmp4j.service.EasyboxInterfaceEvent)
@@ -78,17 +81,21 @@ public class RIBInterfaceListener implements EasyboxInterfaceListener {
 			for(Route route : routes) {
 				log.info("Easybox " + instance.getName() + ": adding route for " + route.getNlri());
 				
-				rib.addRoutes(Arrays.asList(route.getNlri()), route.getPathAttrbiutes(), new InetAddressNextHop<Inet4Address>(event.getCurrentInterface().getAddress()));
+				rib.addRoutes(Arrays.asList(route.getNlri()), route.getPathAttrbiutes(), nextHop);
 			}
+			
+			rib.addRoutes(Arrays.asList(new NetworkLayerReachabilityInformation(event.getCurrentInterface().getAddress())), new HashSet<PathAttribute>(), nextHop);
 		}		
 	}
 
-	public void configureRouting(AddressFamilyRoutingConfiguration routingConfig, RoutingInformationBase rib) {
+	public void configureRouting(InetAddress nextHopAddress, AddressFamilyRoutingConfiguration routingConfig, RoutingInformationBase rib) {
 		this.rib = rib;
 		
 		for(RouteConfiguration routeConfig : routingConfig.getRoutes()) {
 			routes.add(new Route(routeConfig.getNlri(), routeConfig.getPathAttributes().getAttributes()));
 		}
+		
+		this.nextHop = new InetAddressNextHop<Inet4Address>((Inet4Address)nextHopAddress);
 	}
 
 }

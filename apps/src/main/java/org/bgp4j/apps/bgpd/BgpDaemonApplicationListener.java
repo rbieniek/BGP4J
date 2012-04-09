@@ -100,8 +100,8 @@ public class BgpDaemonApplicationListener {
 				routingProcessor.configure();
 				webManagementService.registerSingleton(ribServer);
 				
-				webManagementService.startService();			
 				bgpService.startService();
+				webManagementService.startService();			
 				routingProcessor.startService();
 			}			
 		} catch(Exception e) {
