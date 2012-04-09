@@ -31,7 +31,7 @@ public class PrefixRoutingFilter implements RoutingFilter {
 		boolean match = false;
 		
 		for(NetworkLayerReachabilityInformation filterPrefix : filterPrefixes) {
-			if(filterPrefix.isPrefixOf(route.getNlri())) {
+			if(filterPrefix.isPrefixOf(route.getNlri()) || filterPrefix.equals(route.getNlri())) {
 				match = true;
 				break;
 			}
