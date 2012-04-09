@@ -17,11 +17,6 @@
  */
 package org.bgp4j.rib;
 
-import java.util.Collection;
-
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
-import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * Visitor interface used for recursive descendent routing tree walking.
@@ -33,6 +28,6 @@ import org.bgp4j.net.attributes.PathAttribute;
  */
 interface RoutingTreeVisitor {
 
-	void visitRouteTreeNode(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes);
+	void visitRouteTreeNode(Route route);
 
 }

@@ -8,8 +8,6 @@ import java.util.TreeSet;
 
 import org.bgp4j.config.nodes.PrefixRoutingFilterConfiguration;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
-import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.rib.Route;
 
 /**

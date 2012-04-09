@@ -17,11 +17,6 @@
  */
 package org.bgp4j.rib;
 
-import java.util.Collection;
-
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
-import org.bgp4j.net.NextHop;
-import org.bgp4j.net.attributes.PathAttribute;
 
 /**
  * Result bean for a NLRI prefix lookup in a RIB 
@@ -31,34 +26,18 @@ import org.bgp4j.net.attributes.PathAttribute;
  */
 public class LookupResult {
 
-	private NetworkLayerReachabilityInformation nlri;
-	private Collection<PathAttribute> pathAttributes;
-	private NextHop nextHop;
+	private Route route;
 	
-	LookupResult(NetworkLayerReachabilityInformation nlri, Collection<PathAttribute> pathAttributes, NextHop nextHop) {
-		this.nlri = nlri;
-		this.pathAttributes = pathAttributes;
-		this.nextHop = nextHop;
+	LookupResult(Route route) {
+		this.route = route;
 	}
 
 	/**
-	 * @return the nlri
+	 * @return the route
 	 */
-	public NetworkLayerReachabilityInformation getNlri() {
-		return nlri;
+	public Route getRoute() {
+		return route;
 	}
 
-	/**
-	 * @return the pathAttributes
-	 */
-	public Collection<PathAttribute> getPathAttributes() {
-		return pathAttributes;
-	}
-
-	/**
-	 * @return the nextHop
-	 */
-	public NextHop getNextHop() {
-		return nextHop;
-	}
+	
 }

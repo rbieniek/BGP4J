@@ -26,7 +26,8 @@ public class AddressFamilyRoutingInstance {
 	private RoutingInstanceState state = RoutingInstanceState.STOPPED;
 	
 	void configure(AddressFamilyKey addressFamilyKey, AddressFamilyRoutingPeerConfiguration firstConfig, AddressFamilyRoutingPeerConfiguration secondConfig) {
-
+		firstListener.configure(firstConfig.getLocalRoutingFilters(), firstConfig.getLocalDefaultPathAttributes());
+		secondListener.configure(secondConfig.getLocalRoutingFilters(), secondConfig.getLocalDefaultPathAttributes());
 	}
 	
 	void startInstance(PeerRoutingInformationBase firstPeerRIB, PeerRoutingInformationBase secondPeerRIB) {
@@ -84,12 +85,5 @@ public class AddressFamilyRoutingInstance {
 	 */
 	public RoutingInstanceState getState() {
 		return state;
-	}
-
-	/**
-	 * @param state the state to set
-	 */
-	private void setState(RoutingInstanceState state) {
-		this.state = state;
 	}
 }

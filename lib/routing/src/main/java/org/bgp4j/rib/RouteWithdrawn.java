@@ -19,8 +19,6 @@ package org.bgp4j.rib;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bgp4j.net.AddressFamilyKey;
-import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.RIBSide;
 
 /**

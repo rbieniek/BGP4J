@@ -38,7 +38,7 @@ import org.bgp4j.net.attributes.PathAttribute;
  *
  */
 public class Route implements Comparable<Route> {
-
+	
 	private AddressFamilyKey addressFamilyKey;
 	private NetworkLayerReachabilityInformation nlri;
 	private Set<PathAttribute> pathAttributes = new TreeSet<PathAttribute>();
@@ -201,8 +201,7 @@ public class Route implements Comparable<Route> {
 				.append(getAddressFamilyKey(), o.getAddressFamilyKey())
 				.append(getNlri(), o.getNlri())
 				.append(getPathAttributes().size(), o.getPathAttributes().size())
-				.append(getNextHop(), o.getNextHop())
-				.append(getRibID(), o.getRibID());
+				.append(getNextHop(), o.getNextHop());
 		
 		if(builder.isEquals()) {
 			Iterator<PathAttribute> lit = getPathAttributes().iterator();

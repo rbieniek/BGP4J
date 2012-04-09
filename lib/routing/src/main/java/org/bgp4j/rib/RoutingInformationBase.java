@@ -107,15 +107,17 @@ public class RoutingInformationBase {
 		for(NetworkLayerReachabilityInformation nlri : nlris) {
 			Route route = new Route(getRibID(), getAddressFamilyKey(), nlri, pathAttributes, nextHop);
 
-			if(routingTree.addRoute(nlri, pathAttributes, nextHop)) {
+			if(routingTree.addRoute(route)) {
 				RouteAdded event = new RouteAdded(getPeerName(), 
 						getSide(), 
 						route);
 				
 				routeAddedEvent.fire(event);
 				
-				for(RoutingEventListener listener : listeners)
-					listener.routeAdded(event);
+				if(listeners != null) {
+					for(RoutingEventListener listener : listeners)
+						listener.routeAdded(event);
+				}
 				for(RoutingEventListener listener : perRibListeners)
 					listener.routeAdded(event);
 			}
@@ -129,17 +131,22 @@ public class RoutingInformationBase {
 	 * @param pathAttributes
 	 */
 	public void withdrawRoutes(Collection<NetworkLayerReachabilityInformation> nlris) {
-		for(NetworkLayerReachabilityInformation nlri : nlris)
-			if(routingTree.withdrawRoute(nlri)) {
-				RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), new Route(getRibID(), getAddressFamilyKey(), nlri, null, null));
+		for(NetworkLayerReachabilityInformation nlri : nlris) {
+			Route route = new Route(getRibID(), getAddressFamilyKey(), nlri, null, null);
+			
+			if(routingTree.withdrawRoute(route)) {
+				RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), route);
 				
 				routeWithdrawnEvent.fire(event);
 				
-				for(RoutingEventListener listener : listeners)
-					listener.routeWithdrawn(event);
+				if(listeners != null) {
+					for(RoutingEventListener listener : listeners)
+						listener.routeWithdrawn(event);
+				}
 				for(RoutingEventListener listener : perRibListeners)
 					listener.routeWithdrawn(event);
 			}
+		}
 	}
 	
 	/**
@@ -161,9 +168,8 @@ public class RoutingInformationBase {
 		this.routingTree.visitTree(new RoutingTreeVisitor() {
 			
 			@Override
-			public void visitRouteTreeNode(NetworkLayerReachabilityInformation nlri, NextHop nextHop, Collection<PathAttribute> pathAttributes) {
-				visitor.visitRouteNode(getPeerName(), getSide(), 
-						new Route(getRibID(), getAddressFamilyKey(), nlri, pathAttributes, nextHop));
+			public void visitRouteTreeNode(Route route) {
+				visitor.visitRouteNode(getPeerName(), getSide(), route);
 			}
 		});
 	}
@@ -188,5 +194,43 @@ public class RoutingInformationBase {
 	 */
 	public UUID getRibID() {
 		return ribID;
+	}
+
+	public void withdrawRoute(Route route) {
+		if(route.getRibID() == null)
+			route = new Route(getRibID(), route.getAddressFamilyKey(), route.getNlri(), route.getPathAttributes(), route.getNextHop());
+		
+		if(routingTree.withdrawRoute(route)) {
+			RouteWithdrawn event = new RouteWithdrawn(getPeerName(), getSide(), route);
+			
+			routeWithdrawnEvent.fire(event);
+			
+			if(listeners != null) {
+				for(RoutingEventListener listener : listeners)
+					listener.routeWithdrawn(event);
+			}
+			for(RoutingEventListener listener : perRibListeners)
+				listener.routeWithdrawn(event);
+		}
+	}
+
+	public void addRoute(Route route) {
+		if(route.getRibID() == null)
+			route = new Route(getRibID(), route.getAddressFamilyKey(), route.getNlri(), route.getPathAttributes(), route.getNextHop());
+		
+		if(routingTree.addRoute(route)) {
+			RouteAdded event = new RouteAdded(getPeerName(), 
+					getSide(), 
+					route);
+			
+			routeAddedEvent.fire(event);
+			
+			if(listeners != null) {
+				for(RoutingEventListener listener : listeners)
+					listener.routeAdded(event);
+			}
+			for(RoutingEventListener listener : perRibListeners)
+				listener.routeAdded(event);
+		}
 	}
 }
