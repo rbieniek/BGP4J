@@ -26,6 +26,8 @@ public class AddressFamilyRoutingInstance {
 	private RoutingInstanceState state = RoutingInstanceState.STOPPED;
 	
 	void configure(AddressFamilyKey addressFamilyKey, AddressFamilyRoutingPeerConfiguration firstConfig, AddressFamilyRoutingPeerConfiguration secondConfig) {
+		this.addressFamilyKey = addressFamilyKey;
+		
 		firstListener.configure(firstConfig.getLocalRoutingFilters(), firstConfig.getLocalDefaultPathAttributes());
 		secondListener.configure(secondConfig.getLocalRoutingFilters(), secondConfig.getLocalDefaultPathAttributes());
 	}

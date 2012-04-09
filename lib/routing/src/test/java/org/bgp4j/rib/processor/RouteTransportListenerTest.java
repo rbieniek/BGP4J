@@ -7,7 +7,6 @@ import java.net.Inet4Address;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import junit.framework.Assert;
 
@@ -18,14 +17,12 @@ import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.InetAddressNextHop;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.Origin;
-import org.bgp4j.net.RIBSide;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.rib.Route;
 import org.bgp4j.rib.RoutingInformationBase;
-import org.bgp4j.rib.RoutingInformationBaseVisitor;
 import org.bgp4j.weld.WeldTestCaseBase;
 import org.junit.After;
 import org.junit.Before;
@@ -36,39 +33,6 @@ import org.junit.Test;
  *
  */
 public class RouteTransportListenerTest  extends WeldTestCaseBase {
-
-	public static class RouteChecker implements RoutingInformationBaseVisitor {
-
-		public RouteChecker(UUID ribID, Route checkedRoute) {
-			this.checkedRoute = checkedRoute;
-			this.ribID = ribID;
-		}
-		
-		private UUID ribID;
-		private Route checkedRoute;
-		private boolean found;
-		
-		
-		@Override
-		public void visitRouteNode(String ribName, RIBSide side, Route route) {
-			if(route.getRibID().equals(ribID)) {
-				if(route.networkEquals(checkedRoute))
-					found = true;
-			}
-		}
-
-
-		/**
-		 * @return the found
-		 */
-		public boolean isFound() {
-			return found;
-		}
-		
-		public void resetFound() {
-			found = false;
-		}
-	}
 
 	@Before
 	public void before() throws Exception {
