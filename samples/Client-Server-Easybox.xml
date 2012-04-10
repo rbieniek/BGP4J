@@ -56,6 +56,7 @@
               <LocalPreference value="100" />
               <MultiExitDisc value="1" />
 	      <Origin value="incomplete" />
+	      <ASPath asType="as2" />
 	    </DefaultPathAttributes>
 	  </Local>
 	</Routing>
