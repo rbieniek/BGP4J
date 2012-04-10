@@ -1,0 +1,208 @@
+#!/bin/bash
+#
+### BEGIN INIT INFO
+# Provides: bgg4j
+# Required-Start: $local_fs $network $remote_fs $syslog
+# Required-Stop: $local_fs $network $remote_fs $syslog
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop the BGP4J daemon
+# Description: BGP4J is a BGP routing daemon implementation written in Java
+### END INIT INFO
+#
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+PREFIX=/
+C_PATH=$PREFIX/etc/bgp4j
+D_PATH=$PREFIX/bin
+
+# Local Daemon selection may be done by using /etc/quagga/daemons.
+# See /usr/share/doc/quagga/README.Debian.gz for further information.
+DAEMONS="zebra bgpd ripd ripngd ospfd ospf6d isisd" # keep zebra first!
+
+# Print the name of the pidfile.
+pidfile()
+{
+	echo "$PREFIX/var/run/bgp4j/$1.pid"
+}
+
+# Check if daemon is started by using the pidfile.
+started()
+{
+	[ -e `pidfile $1` ] && kill -0 `cat \`pidfile $1\`` 2> /dev/null && return 0
+	return 1
+}
+
+# Check if the daemon is activated and if its executable and config files 
+# are in place.
+# params: 	daemon name
+# returns:	0=ok, 1=error
+check_daemon()
+{
+	# Check in the configuration file is there
+	if [ -r "$C_PATH/$1-conf.xml" ]; then
+	  return 0
+	fi 
+
+	# check for daemon binary
+        if [ ! -x "$D_PATH/$1" ]; then return 1; fi		
+
+	return 0
+}
+
+# Starts the server if it's not alrady running according to the pid file.
+# The Quagga daemons creates the pidfile when starting.
+start()
+{
+	echo -n " $1"
+	if ! check_daemon $1; then return; fi
+
+	start-stop-daemon \
+		--start \
+		--pidfile=`pidfile $1` \
+	        --make-pidfile \
+                --background \
+	        --chuid nobody:nogroup \
+		--exec "$D_PATH/$1" \
+		-- \
+                -c $C_PATH/$1-conf.xml \
+	        -l $C_APTH/log-conf.xml		
+}
+
+# Stop the daemon given in the parameter, printing its name to the terminal.
+stop()
+{
+    if ! started "$1" ; then
+	echo -n " ($1)"
+	return 0
+    else
+	PIDFILE=`pidfile $1`
+	PID=`cat $PIDFILE 2>/dev/null`
+	start-stop-daemon --stop --quiet --oknodo --exec "$D_PATH/$1"
+	#
+	#       Now we have to wait until $DAEMON has _really_ stopped.
+	#
+	if test -n "$PID" && kill -0 $PID 2>/dev/null; then
+	    echo -n " (waiting) ."
+	    cnt=0
+	    while kill -0 $PID 2>/dev/null; do
+		cnt=`expr $cnt + 1`
+		if [ $cnt -gt 60 ]; then
+		    # Waited 120 secs now, fail.
+		    echo -n "Failed.. "
+		    break
+		fi
+		sleep 2
+		echo -n "."
+		done
+	    fi
+	echo -n " $1"
+	rm -f `pidfile $1`
+    fi
+}
+
+# Stops all daemons that have a lower level of priority than the given.
+# (technically if daemon_prio >= wanted_prio)
+stop_prio() 
+{
+	local wanted_prio
+	local daemon_prio
+	local daemon_list
+
+	wanted_prio=$1
+	daemon_list=${2:-$DAEMONS}
+
+	echo -n "Stopping Quagga daemons (prio:$wanted_prio):"
+
+	for prio_i in `seq 10 -1 $wanted_prio`; do
+	    for daemon_name in $daemon_list; do
+		eval daemon_prio=\$$daemon_name
+		if [ $daemon_prio -eq $prio_i ]; then
+		    stop "$daemon_name"
+		fi
+	    done
+	done
+	echo "."
+}
+
+# Starts all daemons that have a higher level of priority than the given.
+# (technically if daemon_prio <= wanted_prio)
+start_prio()
+{
+	local wanted_prio
+	local daemon_prio
+	local daemon_list
+	
+	wanted_prio=$1
+	daemon_list=${2:-$DAEMONS}
+
+	echo -n "Starting Quagga daemons (prio:$wanted_prio):"
+
+	for prio_i in `seq 1 $wanted_prio`; do
+	    for daemon_name in $daemon_list; do
+		eval daemon_prio=\$$daemon_name
+		if [ $daemon_prio -eq $prio_i ]; then
+	 	    start "$daemon_name"
+		fi
+	    done
+	done
+	echo "."
+}
+
+
+#########################################################
+# 		Main program 				#
+#########################################################
+
+# Config broken but script must exit silently.
+[ ! -r "$C_PATH/daemons" ] && exit 0
+
+. "$C_PATH/daemons"
+
+# Just for me :-)
+if [ "$DEBIAN_SCRIPT_DEBUG" != "" ]; then
+  for name in $DAEMONS; do
+    echo -n "$name="; eval echo \$$name
+  done
+fi
+
+if [ ! -d $PREFIX/var/run/bgp4j ]; then
+    mkdir -p $PREFIX/var/run/bgp4j
+    chown nobody:nogroup $PREFIX/var/run/bgp4j
+    chmod 755 $PREFIX/var/run/bgp4j
+fi
+
+if [ ! -d $PREFIX/var/log/bgp4j ]; then
+    mkdir -p $PREFIX/var/log/bgp4j
+    chown nobody:nogroup $PREFIX/var/log/bgp4j
+    chmod 755 $PREFIX/var/log/bgp4j
+fi
+
+case "$1" in
+    start)
+	# Start all daemons
+	cd $C_PATH/
+	start_prio 10 $2
+    	;;
+	
+    stop)
+	# Stop all daemons at level '0' or 'stop'
+  	stop_prio 0 $2
+
+   	;;
+
+    restart|force-reload)
+	$0 stop $2
+	sleep 1
+	$0 start $2
+	;;
+
+    *)
+    	echo "Usage: /etc/init.d/bgp4j {start|stop|restart|force-reload|<priority>} [daemon]"
+	echo "       E.g. '/etc/init.d/bgp4j 5' would start all daemons with a prio 1-5."
+	echo "       Read /usr/share/doc/bgp4j/README.Debian for details."
+	exit 1
+	;;
+esac
+
+exit 0
