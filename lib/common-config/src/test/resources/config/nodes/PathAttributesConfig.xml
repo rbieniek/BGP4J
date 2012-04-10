@@ -26,6 +26,22 @@
         <LocalPreference value="100" />
         <MultiExitDisc value="1" />
         <Origin value="incomplete" />
+        <ASPath asType="AS2" />
+    </PathAttributes>
+
+    <PathAttributes>
+        <ASPath asType="as2">
+            <PathSegment type="sequence">
+                <As value="1" />
+                <As value="2" />
+                <As value="3" />
+            </PathSegment>
+            <PathSegment type="set">
+                <As value="4" />
+                <As value="5" />
+                <As value="6" />
+            </PathSegment>
+        </ASPath>
     </PathAttributes>
     
 </Configuration>

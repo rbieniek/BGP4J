@@ -14,7 +14,11 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.bgp4j.config.nodes.PathAttributeConfiguration;
+import org.bgp4j.net.ASType;
 import org.bgp4j.net.Origin;
+import org.bgp4j.net.PathSegment;
+import org.bgp4j.net.PathSegmentType;
+import org.bgp4j.net.attributes.ASPathAttribute;
 import org.bgp4j.net.attributes.LocalPrefPathAttribute;
 import org.bgp4j.net.attributes.MultiExitDiscPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
@@ -43,11 +47,56 @@ public class PathAttributeConfigurationParser {
 		} else if(StringUtils.equals(key, "MultiExitDisc")) {
 			parseMultiExitDiscPreference(first(configurations, key), result, key);			
 		} else if(StringUtils.equals(key, "Origin")) {
-			parseOrigin(first(configurations, key), result, key);			
+			parseOrigin(first(configurations, key), result, key);
+		} else if(StringUtils.equals(key, "ASPath")) {
+			parseASPath(first(configurations, key), result, key);
 		} else
 			throw new ConfigurationException("Unknown path attribute: " + key);
 	}
 
+	private void parseASPath(HierarchicalConfiguration config, PathAttributeConfigurationImpl result, String key) throws ConfigurationException {
+		String asTypeRep = config.getString("[@asType]", "as2");
+		ASType type;
+		
+		if(StringUtils.equalsIgnoreCase(asTypeRep, "as2"))
+			type = ASType.AS_NUMBER_2OCTETS;
+		else if(StringUtils.equalsIgnoreCase(asTypeRep, "as4"))
+			type = ASType.AS_NUMBER_4OCTETS;
+		else
+			throw new ConfigurationException("unknown AS type: " + asTypeRep);
+		
+		ASPathAttribute pa = new ASPathAttribute(type);
+		
+		for(HierarchicalConfiguration segConfig : config.configurationsAt("PathSegment")) {
+			PathSegment segment = new PathSegment(type);
+			String segType = segConfig.getString("[@type]");
+			
+			if(StringUtils.equalsIgnoreCase(segType, "set"))
+				segment.setPathSegmentType(PathSegmentType.AS_SET);
+			else if(StringUtils.equalsIgnoreCase(segType, "sequence"))
+				segment.setPathSegmentType(PathSegmentType.AS_SEQUENCE);
+			else if(StringUtils.equalsIgnoreCase(segType, "confed_set"))
+				segment.setPathSegmentType(PathSegmentType.AS_CONFED_SET);
+			else if(StringUtils.equalsIgnoreCase(segType, "confed_sequence"))
+				segment.setPathSegmentType(PathSegmentType.AS_CONFED_SEQUENCE);
+			else
+				throw new ConfigurationException("Unknown path segment type: " + segType);
+
+			for(HierarchicalConfiguration asConfig : segConfig.configurationsAt("As")) {
+				int asNumber = asConfig.getInt("[@value]", -1);
+				
+				if(asNumber < 0 || (type == ASType.AS_NUMBER_2OCTETS && asNumber > 65536))
+					throw new ConfigurationException("Invalid AS number: " + asNumber);
+				
+				segment.getAses().add(asNumber);
+			}
+			
+			pa.getPathSegments().add(segment);
+		}
+		
+		result.getAttributes().add(pa);
+	}
+	
 
 	private void parseMultiExitDiscPreference(HierarchicalConfiguration config, PathAttributeConfigurationImpl result, String key) throws ConfigurationException {
 		result.getAttributes().add(new MultiExitDiscPathAttribute(parseValue(config, key)));
@@ -96,6 +145,12 @@ public class PathAttributeConfigurationParser {
 				
 				key = StringUtils.substring(key, 0, index);
 			}
+			if(StringUtils.contains(key, ".")) {
+				int index = StringUtils.indexOf(key, ".");
+				
+				key = StringUtils.substring(key, 0, index);
+			}
+
 			
 			cleaned.add(key);
 		}
