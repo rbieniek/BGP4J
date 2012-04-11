@@ -21,8 +21,7 @@
    <!-- ================================= -->
 
    <!-- A time/date based rolling appender -->
-   <appender name="FILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
-      <errorHandler class="org.apache.log4j.DailyRollingFileAppender"/>
+   <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
       <param name="File" value="/var/log/bgp4j/bgp4j.log"/>
       <param name="Append" value="true"/>
       <!-- In AS 5.0.x the server log threshold was set by a system

@@ -12,13 +12,13 @@
 #
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
-PREFIX=/
+PREFIX=
 C_PATH=$PREFIX/etc/bgp4j
 D_PATH=$PREFIX/bin
 
 # Local Daemon selection may be done by using /etc/quagga/daemons.
 # See /usr/share/doc/quagga/README.Debian.gz for further information.
-DAEMONS="zebra bgpd ripd ripngd ospfd ospf6d isisd" # keep zebra first!
+DAEMONS="BgpDaemon"
 
 # Print the name of the pidfile.
 pidfile()
@@ -66,7 +66,7 @@ start()
 		--exec "$D_PATH/$1" \
 		-- \
                 -c $C_PATH/$1-conf.xml \
-	        -l $C_APTH/log-conf.xml		
+	        -l $C_PATH/log-conf.xml		
 }
 
 # Stop the daemon given in the parameter, printing its name to the terminal.
@@ -78,7 +78,12 @@ stop()
     else
 	PIDFILE=`pidfile $1`
 	PID=`cat $PIDFILE 2>/dev/null`
-	start-stop-daemon --stop --quiet --oknodo --exec "$D_PATH/$1"
+	start-stop-daemon \
+		--stop \
+		--quiet \
+		--oknodo \
+		--pidfile=`pidfile $1` \
+		--exec "$D_PATH/$1"
 	#
 	#       Now we have to wait until $DAEMON has _really_ stopped.
 	#
@@ -99,6 +104,27 @@ stop()
 	echo -n " $1"
 	rm -f `pidfile $1`
     fi
+}
+
+convert_daemon_prios()
+{
+        for name in $DAEMONS ; do
+          # First, assign the value set by the user to $value 
+          eval value=\$$name
+
+          # Daemon not activated or entry missing?
+          if [ "$value" = "no" -o "$value" = "" ]; then value=0; fi
+
+          # These strings parsed for backwards compatibility.
+          if [ "$value" = "yes"  -o  "$value" = "true" ]; then value=1; fi
+
+          # Zebra is threatened special. It must be between 0=off and the first
+          # user assigned value "1" so we increase all other enabled daemons' values.
+          if [ "$name" != "zebra" -a "$value" -gt 0 ]; then value=`expr "$value" + 1`; fi
+
+          # If e.g. name is zebra then we set "zebra=yes".
+          eval $name=$value
+        done
 }
 
 # Stops all daemons that have a lower level of priority than the given.
@@ -136,7 +162,7 @@ start_prio()
 	wanted_prio=$1
 	daemon_list=${2:-$DAEMONS}
 
-	echo -n "Starting Quagga daemons (prio:$wanted_prio):"
+	echo -n "Starting BGP4J daemons (prio:$wanted_prio):"
 
 	for prio_i in `seq 1 $wanted_prio`; do
 	    for daemon_name in $daemon_list; do
@@ -158,6 +184,9 @@ start_prio()
 [ ! -r "$C_PATH/daemons" ] && exit 0
 
 . "$C_PATH/daemons"
+
+# Set priority of un-startable daemons to 'no' and substitute 'yes' to '0'
+convert_daemon_prios
 
 # Just for me :-)
 if [ "$DEBIAN_SCRIPT_DEBUG" != "" ]; then
