@@ -127,7 +127,7 @@
     <version.commons.lang>3.0.1</version.commons.lang>
     <version.commons.jexl>2.1.1</version.commons.jexl>
     <version.commons.vfs>2.0</version.commons.vfs>
-    <version.de.urb.quagga>0.1-SNAPSHOT</version.de.urb.quagga>
+    <version.de.urb.quagga>0.2-SNAPSHOT</version.de.urb.quagga>
     <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
     <version.log4j>1.2.16</version.log4j>
     <version.org.apache.maven.plugins.maven_jar_plugin>2.3.2</version.org.apache.maven.plugins.maven_jar_plugin>
