@@ -427,6 +427,8 @@ public class BGPv4FSM {
 	}
 
 	public void handleEvent(Channel channel, BgpEvent message) {
+		log.info("received event " + message);
+
 		if(message instanceof NotificationEvent) {
 			for(NotificationPacket packet :((NotificationEvent)message).getNotifications()) {
 				if(packet instanceof UnsupportedVersionNumberNotificationPacket) {

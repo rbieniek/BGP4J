@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -79,5 +80,12 @@ public class CommunityMember implements Comparable<CommunityMember> {
 			.append(getAsNumber(), o.getAsNumber())
 			.append(getMemberFlags(), o.getMemberFlags())
 			.isEquals();
+	}
+	
+	public String toString() {
+		return (new ToStringBuilder(this))
+				.append("asNumber", asNumber)
+				.append("memberFlags", memberFlags)
+				.toString();
 	}
 }

@@ -19,6 +19,7 @@ package org.bgp4j.net.attributes;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -82,6 +83,13 @@ public class UnknownPathAttribute extends PathAttribute {
 				.append(getTypeCode(), o.getTypeCode())
 				.append(getValue(), o.getValue())
 				.toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("typeCode", typeCode)
+				.append("value", value);
 	}
 
 }

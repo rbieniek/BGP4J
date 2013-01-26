@@ -22,6 +22,7 @@ import java.net.Inet4Address;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.ASTypeAware;
 import org.bgp4j.net.InetAddressComparator;
@@ -125,6 +126,14 @@ public class AggregatorPathAttribute extends PathAttribute implements ASTypeAwar
 			.append(getAggregator(), o.getAggregator(), new InetAddressComparator())
 			.append(getAsType(), o.getAsType())
 			.toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("asNumber", this.asNumber)
+				.append("aggregator", this.aggregator)
+				.append("asType", this.asType);
 	}
 
 }

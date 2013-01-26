@@ -34,5 +34,4 @@ public class KeepalivePacket extends BGPv4Packet {
 	public int getType() {
 		return BGPv4Constants.BGP_PACKET_TYPE_KEEPALIVE;
 	}
-
 }

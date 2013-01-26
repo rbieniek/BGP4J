@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.netty.BGPv4Constants;
 import org.bgp4j.netty.protocol.BGPv4Packet;
@@ -186,5 +187,20 @@ public class OpenPacket extends BGPv4Packet {
 			}
 		}
 		return cap;
+	}
+	
+	@Override
+	public String toString() {
+		ToStringBuilder builder = (new ToStringBuilder(this))
+				.append("type", getType())
+				.append("autonomousSystem", autonomousSystem)
+				.append("bgpIdentifier", bgpIdentifier)
+				.append("holdTime", holdTime)
+				.append("protocolVersion", protocolVersion);
+				
+		for(Capability cap : capabilities)
+			builder.append("capability", cap);
+		
+		return builder.toString();
 	}
 }

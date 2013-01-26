@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.ASTypeAware;
 import org.bgp4j.net.PathSegment;
@@ -144,5 +145,15 @@ public class ASPathAttribute extends PathAttribute implements ASTypeAware {
 		}
 		
 		return builder.toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		ToStringBuilder builder = new ToStringBuilder(this).append("asType", asType);
+		
+		for(PathSegment ps : this.pathSegments)
+			builder.append("pathSegment", ps);
+		
+		return builder;
 	}
 }

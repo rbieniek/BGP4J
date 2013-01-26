@@ -81,4 +81,18 @@ public class BinaryNextHop implements NextHop {
 	public Type getType() {
 		return Type.Binary;
 	}
+
+	private static final char[] chars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		for(int i=0; i<address.length; i++) {
+			builder.append(chars[(address[i]/ 16) & 0x0f]);
+			builder.append(chars[(address[i] % 16) & 0x0f]);
+		}
+		
+		return builder.toString();
+	}
 }

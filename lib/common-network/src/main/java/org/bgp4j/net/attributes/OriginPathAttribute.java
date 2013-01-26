@@ -19,6 +19,7 @@ package org.bgp4j.net.attributes;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.Origin;
 
 /**
@@ -79,6 +80,12 @@ public class OriginPathAttribute extends PathAttribute {
 		OriginPathAttribute o = (OriginPathAttribute)obj;
 		
 		return (new CompareToBuilder()).append(getOrigin(), o.getOrigin()).toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("origin", origin);
 	}
 
 }

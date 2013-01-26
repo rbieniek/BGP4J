@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -133,4 +134,15 @@ public class PathSegment implements Comparable<PathSegment> {
 		return builder.isEquals();
 	}
 
+	@Override
+	public String toString() {
+		ToStringBuilder builder = new ToStringBuilder(this)
+			.append("asType", asType)
+			.append("pathSegmentType", pathSegmentType);
+		
+		for(int as : ases)
+			builder.append("as", as);
+		
+		return builder.toString();
+	}
 }

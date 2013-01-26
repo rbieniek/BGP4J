@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.protocol.refresh;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.ORFEntry;
 import org.bgp4j.net.ORFType;
@@ -152,4 +153,13 @@ public class RouteRefreshPacket extends BGPv4Packet {
 		this.outboundRouteFilter = outboundRouteFilter;
 	}
 
+	@Override
+	public String toString() {
+		return (new ToStringBuilder(this))
+				.append("type", getType())
+				.append("addressFamiliy", addressFamily)
+				.append("outboundRouteFilter", outboundRouteFilter)
+				.append("subsequentAddressFamily", subsequentAddressFamily)
+				.toString();
+	}
 }

@@ -20,6 +20,7 @@ package org.bgp4j.net.attributes;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -78,4 +79,9 @@ public class MultiExitDiscPathAttribute extends PathAttribute {
 		return (new CompareToBuilder()).append(getDiscriminator(), o.getDiscriminator()).toComparison();
 	}
 
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("discriminator", discriminator);
+	}
 }

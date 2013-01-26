@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -133,6 +134,17 @@ public class CommunityPathAttribute extends PathAttribute {
 		}
 		
 		return builder.toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		ToStringBuilder builder = new ToStringBuilder(this)
+			.append("community", community);
+		
+		for(CommunityMember c : members)
+			builder.append("member", c);
+		
+		return builder;
 	}
 
 }

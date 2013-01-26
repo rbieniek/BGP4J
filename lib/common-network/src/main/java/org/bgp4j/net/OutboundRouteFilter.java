@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -131,5 +133,14 @@ public class OutboundRouteFilter {
 	 */
 	public void setEntries(Map<ORFType, List<ORFEntry>> entries) {
 		this.entries = entries;
+	}
+	
+	@Override
+	public String toString() {
+		return (new ToStringBuilder(this))
+				.append("addressFamily", addressFamily)
+				.append("subsequentAddressFamily", subsequentAddressFamily)
+				.append("refreshType", refreshType)
+				.toString();
 	}
 }

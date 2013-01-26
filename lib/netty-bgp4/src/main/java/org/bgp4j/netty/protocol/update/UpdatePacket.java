@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.netty.BGPv4Constants;
@@ -220,5 +221,20 @@ public class UpdatePacket extends BGPv4Packet {
 		}
 		
 		return attrs;
+	}
+	
+	public String toString() {
+		ToStringBuilder builder = new ToStringBuilder(this);
+		
+		for(NetworkLayerReachabilityInformation n : withdrawnRoutes)
+			builder.append("withdrawnRoute", n);
+		
+		for(NetworkLayerReachabilityInformation n : nlris)
+			builder.append("nlri", n);
+
+		for(PathAttribute a : pathAttributes)
+			builder.append("pathAttribute", a);
+		
+		return builder.toString();
 	}
 }

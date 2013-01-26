@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.attributes;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -46,5 +48,10 @@ public class AtomicAggregatePathAttribute extends PathAttribute {
 	@Override
 	protected int subclassCompareTo(PathAttribute o) {
 		return 0;
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return new ToStringBuilder(this);
 	}
 }

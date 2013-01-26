@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.InetAddressNextHop;
 
 /**
@@ -102,6 +103,12 @@ public class NextHopPathAttribute extends PathAttribute {
 		NextHopPathAttribute o = (NextHopPathAttribute)obj;
 		
 		return (new CompareToBuilder()).append(getNextHop(), o.getNextHop()).toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("nextHop", nextHop);
 	}
 
 }

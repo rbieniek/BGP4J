@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bgp4j.netty.BGPv4Constants;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -69,5 +70,13 @@ public class NotificationPacket extends BGPv4Packet {
 	
 	protected ChannelBuffer encodeAdditionalPayload() {
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		return (new ToStringBuilder(this))
+				.append("type", getType())
+				.append("errorCode", errorCode)
+				.append("errorSubcode", errorSubcode).toString();
 	}
 }

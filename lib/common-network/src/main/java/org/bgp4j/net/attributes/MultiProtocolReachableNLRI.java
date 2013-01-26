@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressFamilyKey;
 import org.bgp4j.net.BinaryNextHop;
@@ -239,6 +240,19 @@ public class MultiProtocolReachableNLRI extends PathAttribute {
 		}
 		
 		return builer.toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		ToStringBuilder builder = new ToStringBuilder(this)
+			.append(addressFamily)
+			.append(subsequentAddressFamily)
+			.append(nextHop);
+
+		for(NetworkLayerReachabilityInformation n : nlris)
+			builder.append("nlri", n);
+
+		return builder;
 	}
 	
 }

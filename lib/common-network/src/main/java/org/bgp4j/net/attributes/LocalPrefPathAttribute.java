@@ -20,6 +20,7 @@ package org.bgp4j.net.attributes;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -76,6 +77,12 @@ public class LocalPrefPathAttribute extends PathAttribute {
 		LocalPrefPathAttribute  o = (LocalPrefPathAttribute)obj;
 		
 		return (new CompareToBuilder()).append(getLocalPreference(), o.getLocalPreference()).toComparison();
+	}
+
+	@Override
+	protected ToStringBuilder subclassToString() {
+		return (new ToStringBuilder(this))
+				.append("localPreference", localPreference);
 	}
 
 }

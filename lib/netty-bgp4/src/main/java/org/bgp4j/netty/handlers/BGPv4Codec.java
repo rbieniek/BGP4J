@@ -58,6 +58,8 @@ public class BGPv4Codec extends SimpleChannelHandler {
 			try {
 				BGPv4Packet packet = packetDecoder.decodePacket(buffer);
 				
+				log.info("received packet " + packet);
+				
 				if(packet != null) {
 					ctx.sendUpstream(new UpstreamMessageEvent(e.getChannel(), packet, e.getRemoteAddress()));
 				}
@@ -87,6 +89,8 @@ public class BGPv4Codec extends SimpleChannelHandler {
 		if(e.getMessage() instanceof BGPv4Packet) {
 			ChannelBuffer buffer = ((BGPv4Packet)e.getMessage()).encodePacket();
 						
+			log.info("writing packet " + e.getMessage());
+
 			if(buffer != null) {
 				ctx.sendDownstream(new DownstreamMessageEvent(e.getChannel(), e.getFuture(), buffer, e.getRemoteAddress()));
 			}
