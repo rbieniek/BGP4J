@@ -265,6 +265,37 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 		List<UpdatePacket> updates = new LinkedList<UpdatePacket>();
 		UpdatePacket current = null;
 		
+		synchronized (withdrawnRoutes) {
+			for(Entry<AddressFamilyKey, List<NetworkLayerReachabilityInformation>> withdrawnRouteEntry : withdrawnRoutes.entrySet()) {
+				for(NetworkLayerReachabilityInformation nlri : withdrawnRouteEntry.getValue()) {
+					MultiProtocolUnreachableNLRI mpUnreachable = null;
+					AddressFamilyKey afk = withdrawnRouteEntry.getKey();
+					
+					if((current == null  
+							|| (current.calculatePacketSize() + NLRICodec.calculateEncodedNLRILength(nlri) 
+									> (BGPv4Constants.BGP_PACKET_MAX_LENGTH - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)))) {
+						current = new UpdatePacket();
+						
+						if(!afk.equals(AddressFamilyKey.IPV4_UNICAST_FORWARDING)) {
+							mpUnreachable = new MultiProtocolUnreachableNLRI(afk.getAddressFamily(), afk.getSubsequentAddressFamily());
+							
+							current.getPathAttributes().add(mpUnreachable);
+						}
+						updates.add(current);
+					}
+					
+					if(afk.matches(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)) {					
+						current.getWithdrawnRoutes().add(nlri);
+					} else {
+						mpUnreachable.getNlris().add(nlri);
+					}
+				}
+				current = null;
+			}
+			
+			withdrawnRoutes.clear();
+		}
+
 		synchronized (addedRoutes) {
 			for(Entry<TopologicalTreeSortingKey, List<NetworkLayerReachabilityInformation>> addedRouteEntry : addedRoutes.entrySet()) {
 				TopologicalTreeSortingKey key = addedRouteEntry.getKey();
@@ -300,37 +331,6 @@ public class OutboundRoutingUpdateQueue implements RoutingEventListener {
 			}
 			
 			addedRoutes.clear();
-		}
-		
-		synchronized (withdrawnRoutes) {
-			for(Entry<AddressFamilyKey, List<NetworkLayerReachabilityInformation>> withdrawnRouteEntry : withdrawnRoutes.entrySet()) {
-				for(NetworkLayerReachabilityInformation nlri : withdrawnRouteEntry.getValue()) {
-					MultiProtocolUnreachableNLRI mpUnreachable = null;
-					AddressFamilyKey afk = withdrawnRouteEntry.getKey();
-					
-					if((current == null  
-							|| (current.calculatePacketSize() + NLRICodec.calculateEncodedNLRILength(nlri) 
-									> (BGPv4Constants.BGP_PACKET_MAX_LENGTH - BGPv4Constants.BGP_PACKET_HEADER_LENGTH)))) {
-						current = new UpdatePacket();
-						
-						if(!afk.equals(AddressFamilyKey.IPV4_UNICAST_FORWARDING)) {
-							mpUnreachable = new MultiProtocolUnreachableNLRI(afk.getAddressFamily(), afk.getSubsequentAddressFamily());
-							
-							current.getPathAttributes().add(mpUnreachable);
-						}
-						updates.add(current);
-					}
-					
-					if(afk.matches(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING)) {					
-						current.getWithdrawnRoutes().add(nlri);
-					} else {
-						mpUnreachable.getNlris().add(nlri);
-					}
-				}
-				current = null;
-			}
-			
-			withdrawnRoutes.clear();
 		}
 		
 		return updates;
