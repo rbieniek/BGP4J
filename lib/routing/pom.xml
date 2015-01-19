@@ -5,36 +5,36 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <parent>
-    <groupId>de.urb.quagga</groupId>
+    <groupId>org.bgp4j</groupId>
     <artifactId>lib</artifactId>
-    <version>${version.de.urb.quagga}</version>
+    <version>${version.org.bgp4j}</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.urb.quagga</groupId>
+  <groupId>org.bgp4j</groupId>
   <artifactId>routing</artifactId>
-  <version>${version.de.urb.quagga}</version>
+  <version>${version.org.bgp4j}</version>
   <name>RIB implementation</name>
   <description>RIB implementation</description>
 
   <dependencies>
 
     <dependency>
-      <groupId>de.urb.quagga</groupId>
+      <groupId>org.bgp4j</groupId>
       <artifactId>common-config</artifactId>
-      <version>${version.de.urb.quagga}</version>
+      <version>${version.org.bgp4j}</version>
     </dependency>
 
     <dependency>
-      <groupId>de.urb.quagga</groupId>
+      <groupId>org.bgp4j</groupId>
       <artifactId>common-network</artifactId>
-      <version>${version.de.urb.quagga}</version>
+      <version>${version.org.bgp4j}</version>
     </dependency>
 
     <dependency>
-      <groupId>de.urb.quagga</groupId>
+      <groupId>org.bgp4j</groupId>
       <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
+      <version>${version.org.bgp4j}</version>
     </dependency>
 
     <dependency>
@@ -53,9 +53,9 @@
     </dependency>
     
     <dependency>
-      <groupId>de.urb.quagga</groupId>
+      <groupId>org.bgp4j</groupId>
       <artifactId>common-weld</artifactId>
-      <version>${version.de.urb.quagga}</version>
+      <version>${version.org.bgp4j}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

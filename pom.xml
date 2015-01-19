@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.urb.quagga</groupId>
+  <groupId>org.bgp4j</groupId>
   <artifactId>quagga-java</artifactId>
   <packaging>pom</packaging>
-  <version>${version.de.urb.quagga}</version>
+  <version>${version.org.bgp4j}</version>
   <name>BGP4J</name>
   <description>BGP4 Java implementation</description>
 
@@ -127,7 +127,7 @@
     <version.commons.lang>3.1</version.commons.lang>
     <version.commons.jexl>2.1.1</version.commons.jexl>
     <version.commons.vfs>2.0</version.commons.vfs>
-    <version.de.urb.quagga>0.3-SNAPSHOT</version.de.urb.quagga>
+    <version.org.bgp4j>0.4-SNAPSHOT</version.org.bgp4j>
     <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
     <version.log4j>1.2.16</version.log4j>
     <version.org.apache.maven.plugins.maven_jar_plugin>2.4</version.org.apache.maven.plugins.maven_jar_plugin>
@@ -161,14 +161,6 @@
     <module>lib</module>
     <module>extensions</module>
     <module>apps</module>
-<!--
-    <module>clients</module>1
-    <module>wow-log-ear</module>
-    <module>ejb</module>
-    <module>webapps</module>
-    <module>timesheet-ear</module>
--->
-
   </modules>
 
   <dependencyManagement>
