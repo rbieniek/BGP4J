@@ -1,16 +1,10 @@
 package org.bgp4j.net.attributes;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class CommunityMember implements Comparable<CommunityMember> {
 	private int asNumber;
 	private int memberFlags;

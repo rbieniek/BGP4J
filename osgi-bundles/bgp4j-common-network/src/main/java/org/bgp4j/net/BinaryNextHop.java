@@ -17,18 +17,14 @@
  */
 package org.bgp4j.net;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bgp4j.net.bind.NextHopBindAdapter;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@XmlJavaTypeAdapter(value=NextHopBindAdapter.class)
 public class BinaryNextHop implements NextHop {
 
 	private byte[] address;

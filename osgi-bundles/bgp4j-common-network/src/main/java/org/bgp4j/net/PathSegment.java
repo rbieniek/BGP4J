@@ -4,17 +4,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class PathSegment implements Comparable<PathSegment> {
 	private ASType asType;
 	private List<Integer> ases = new LinkedList<Integer>(); 

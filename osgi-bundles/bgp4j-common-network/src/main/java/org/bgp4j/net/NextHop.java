@@ -17,17 +17,12 @@
  */
 package org.bgp4j.net;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.bgp4j.net.bind.NextHopBindAdapter;
-
 /**
  * Generic next-hop information
  * 
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@XmlJavaTypeAdapter(value=NextHopBindAdapter.class)
 public interface NextHop extends Comparable<NextHop> {
 
 	public enum Type {

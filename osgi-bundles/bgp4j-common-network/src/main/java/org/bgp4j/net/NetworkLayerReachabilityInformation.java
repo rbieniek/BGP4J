@@ -19,10 +19,6 @@ package org.bgp4j.net;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -45,8 +41,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@XmlRootElement(name="nlri")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class NetworkLayerReachabilityInformation implements Serializable, Comparable<NetworkLayerReachabilityInformation>  {
 
 	/**
