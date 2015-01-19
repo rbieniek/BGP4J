@@ -25,6 +25,7 @@
     </developer>
   </developers>
 
+<!--
   <pluginRepositories>
     <pluginRepository>
       <id>codehaus-repository</id>
@@ -54,6 +55,7 @@
       <url>http://maven.davidtrott.com/repository</url>
     </pluginRepository>
   </pluginRepositories>
+-->
 
   <repositories>
     <repository>
@@ -100,6 +102,16 @@
     	  <artifactId>maven-surefire-plugin</artifactId>
     	  <version>${version.org.apache.maven.plugins.maven_surefire_plugin}</version>
     	</plugin>
+    	<plugin>
+    	  <groupId>org.apache.felix</groupId>
+    	  <artifactId>maven-bundle-plugin</artifactId>
+    	  <version>${version.org.apache.felix.bundle_maven_plugin}</version>
+    	</plugin>
+	<plugin>
+    	  <groupId>org.apache.servicemix.tooling</groupId>
+    	  <artifactId>depends-maven-plugin</artifactId>
+    	  <version>${version.org.apache.servicemix.depends_maven_plugin}</version>
+	</plugin>
       </plugins>
     </pluginManagement>
     <plugins>    
@@ -124,15 +136,17 @@
     <version.commons.configuration>1.9</version.commons.configuration>
     <version.commons.digester>3.2</version.commons.digester>
     <version.commons.jxpath>1.3</version.commons.jxpath>
-    <version.commons.lang>3.1</version.commons.lang>
+    <version.commons.lang>3.3.2</version.commons.lang>
     <version.commons.jexl>2.1.1</version.commons.jexl>
     <version.commons.vfs>2.0</version.commons.vfs>
-    <version.org.bgp4j>0.4-SNAPSHOT</version.org.bgp4j>
+    <version.org.bgp4j>0.5-SNAPSHOT</version.org.bgp4j>
     <version.javax.enterprise.cdi-api>1.1.EDR1.2</version.javax.enterprise.cdi-api>
     <version.log4j>1.2.16</version.log4j>
     <version.org.apache.maven.plugins.maven_jar_plugin>2.4</version.org.apache.maven.plugins.maven_jar_plugin>
     <version.org.apache.maven.plugins.maven_surefire_plugin>2.13</version.org.apache.maven.plugins.maven_surefire_plugin>
     <version.org.codehaus.mojo.appassembler_maven_plugin>1.0</version.org.codehaus.mojo.appassembler_maven_plugin>
+    <version.org.apache.felix.bundle_maven_plugin>2.5.3</version.org.apache.felix.bundle_maven_plugin>
+    <version.org.apache.servicemix.depends_maven_plugin>1.2</version.org.apache.servicemix.depends_maven_plugin>
     <version.org.hibernate.validator>4.3.1.Final</version.org.hibernate.validator>
     <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
     <version.io.netty>3.6.2.Final</version.io.netty>
@@ -159,6 +173,7 @@
 
   <modules>
     <module>lib</module>
+    <module>osgi-bundles</module>
     <module>extensions</module>
     <module>apps</module>
   </modules>

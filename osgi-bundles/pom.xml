@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.bgp4j</groupId>
+    <artifactId>quagga-java</artifactId>
+    <version>${version.org.bgp4j}</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.bgp4j</groupId>
+  <artifactId>osgi-bundles</artifactId>
+  <packaging>pom</packaging>
+  <version>${version.org.bgp4j}</version>
+  <name>OSGi bundles project</name>
+  <description>OSGi bundles project</description>
+
+  <modules>
+    <module>bgp4j-common-network</module>
+<!--
+    <module>common-weld</module>
+    <module>common-network</module>
+    <module>common-extensions</module>
+    <module>common-config</module>
+    <module>routing</module>
+    <module>routing-web</module>
+    <module>netty-bgp4</module>
+    <module>web-management</module>
+-->
+  </modules>
+
+</project>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:nil
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
