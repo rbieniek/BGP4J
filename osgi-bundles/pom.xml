@@ -15,6 +15,7 @@
 
   <modules>
     <module>bgp4j-common-network</module>
+    <module>bgp4j-protocol-netty</module>
 <!--
     <module>common-weld</module>
     <module>common-network</module>
