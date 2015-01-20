@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+  xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.bgp4j</groupId>
+    <artifactId>osgi-bundles</artifactId>
+    <version>${version.org.bgp4j}</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.bgp4j</groupId>
+  <artifactId>bgp4j-protocol-netty</artifactId>
+  <packaging>bundle</packaging>
+  <version>${version.org.bgp4j}</version>
+  <name>OSGi bundle / Netty protocol handlers</name>
+  <description>OSGi bundle / Netty protocol handlers</description>
+
+  <build>
+    <plugins>
+      <plugin>
+    	<groupId>org.apache.felix</groupId>
+    	<artifactId>maven-bundle-plugin</artifactId>
+	<extensions>true</extensions>
+      </plugin>
+      <plugin>
+    	<groupId>org.apache.servicemix.tooling</groupId>
+    	<artifactId>depends-maven-plugin</artifactId>
+	<executions>
+          <execution>
+            <id>generate-depends-file</id>
+            <goals>
+              <goal>generate-depends-file</goal>
+            </goals>
+          </execution>
+	</executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bgp4j</groupId>
+      <artifactId>bgp4j-common-network</artifactId>
+      <version>${version.org.bgp4j}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport</artifactId>
+    </dependency>
+
+    <dependency> 
+      <groupId>junit</groupId> 
+      <artifactId>junit</artifactId> 
+      <scope>test</scope> 
+    </dependency> 
+
+  </dependencies>
+
+</project>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: xml
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:nil
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
