@@ -150,7 +150,7 @@
     <version.org.hibernate.validator>4.3.1.Final</version.org.hibernate.validator>
     <version.org.jboss.arquillian>1.0.0.Alpha5</version.org.jboss.arquillian>
     <version.io.netty>3.6.2.Final</version.io.netty>
-    <version.io.netty4>4.0.25.Final</version.io.netty4>
+    <version.io.netty4>4.0.24.Final</version.io.netty4>
     <version.org.jboss.spec.bom>2.0.0.Final</version.org.jboss.spec.bom>
     <version.org.jboss.weld.api.bom>1.1.Final</version.org.jboss.weld.api.bom>
     <version.org.jboss.weld.core.bom>1.1.4.Final</version.org.jboss.weld.core.bom>
@@ -158,7 +158,6 @@
     <version.org.jboss.weld.spi>1.1.Final</version.org.jboss.weld.spi>
     <version.org.richfaces.bom>4.0.0.Final</version.org.richfaces.bom>
     <version.org.seamframework>3.0.0.Final</version.org.seamframework>
-    <!-- version.org.slf4j>1.5.10</version.org.slf4j -->
     <version.org.slf4j>1.7.5</version.org.slf4j>
     <version.org.snmp4j>2.0.3</version.org.snmp4j>
     <version.junit.junit>4.11</version.junit.junit>
