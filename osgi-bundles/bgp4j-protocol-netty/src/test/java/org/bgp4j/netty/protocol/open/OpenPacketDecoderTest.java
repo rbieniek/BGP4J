@@ -27,7 +27,10 @@ import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.net.capabilities.RouteRefreshCapability;
 import org.bgp4j.net.capabilities.UnknownCapability;
+import org.bgp4j.net.packets.BGPv4Packet;
+import org.bgp4j.net.packets.open.OpenPacket;
 import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.protocol.BGPv4PacketEncoderFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +44,16 @@ public class OpenPacketDecoderTest extends BGPv4TestBase {
 
 	private OpenPacketDecoder decoder = new OpenPacketDecoder();
 		
+	private BGPv4PacketEncoderFactory encoderFactory = new BGPv4PacketEncoderFactory();
+	
+	private ByteBuf encodePacket(BGPv4Packet packet) {
+		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactory.encoderForPacket(packet).encodePacket(packet, buffer);
+		
+		return buffer;
+	}
+
 	@Test
 	public void testDecodeBasicOpenPacket() {
 		OpenPacket open = safeDowncast(decoder.decodeOpenPacket(buildProtocolPacket(new byte[] {
@@ -125,12 +138,6 @@ public class OpenPacketDecoderTest extends BGPv4TestBase {
 		open.setHoldTime(180);
 		open.setBgpIdentifier(((192<<24) | (168 << 16) | (9 << 8) | 1));
 		
-		ByteBuf buffer = allocator.buffer();
-
-		buffer.order(ByteOrder.BIG_ENDIAN);
-
-		open.encodePacket(buffer);
-		
 		assertBufferContents(new byte[] { 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -141,7 +148,7 @@ public class OpenPacketDecoderTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0xb4, // hold time 180 seconds
 				(byte)0xc0, (byte)0xa8, (byte)0x09, (byte)0x01, /// BGP identifier 192.168.9.1 
 				(byte)0x0, // optional parameter length 0 
-				}, buffer);
+				}, encodePacket(open));
 	}
 	
 	@Test
@@ -253,11 +260,6 @@ public class OpenPacketDecoderTest extends BGPv4TestBase {
 		as4cap.setAutonomousSystem(64512);
 		open.getCapabilities().add(as4cap);
 		
-		ByteBuf buffer = allocator.buffer();
-		
-		buffer.order(ByteOrder.BIG_ENDIAN);
-		open.encodePacket(buffer);
-
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
@@ -272,6 +274,6 @@ public class OpenPacketDecoderTest extends BGPv4TestBase {
 				(byte)0x01, (byte)0x04, (byte)0x00, (byte)0x01, (byte)0x00, (byte)0x01, // Multi-Protocol capability (type 1), IPv4, Unicast  
 				(byte)0x02, (byte)0x00, // Route-Refresh capability, length 0 octets
 				(byte)0x41,	(byte)0x04, (byte)0x00, (byte)0x00, (byte)0xfc, (byte)0x00 // 4 octet AS capability, AS 64512				
-		}, buffer);
+		}, encodePacket(open));
 	}
 }

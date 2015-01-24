@@ -19,8 +19,17 @@ package org.bgp4j.netty.protocol.open;
 
 import io.netty.buffer.ByteBuf;
 
-import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.net.packets.open.BadBgpIdentifierNotificationPacket;
+import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
+import org.bgp4j.net.packets.open.CapabilityListUnsupportedCapabilityNotificationPacket;
+import org.bgp4j.net.packets.open.OpenNotificationPacket;
+import org.bgp4j.net.packets.open.OpenPacket;
+import org.bgp4j.net.packets.open.UnacceptableHoldTimerNotificationPacket;
+import org.bgp4j.net.packets.open.UnspecificOpenNotificationPacket;
+import org.bgp4j.net.packets.open.UnsupportedOptionalParameterNotificationPacket;
+import org.bgp4j.net.packets.open.UnsupportedVersionNumberNotificationPacket;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
 
 /**

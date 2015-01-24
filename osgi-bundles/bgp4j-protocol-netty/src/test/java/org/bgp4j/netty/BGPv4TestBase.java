@@ -23,7 +23,7 @@ import io.netty.buffer.UnpooledByteBufAllocator;
 
 import java.nio.ByteOrder;
 
-import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.net.packets.BGPv4Packet;
 import org.junit.Assert;
 
 /**
@@ -40,18 +40,6 @@ public class BGPv4TestBase {
 		buffer.readBytes(packet);
 		
 		assertArraysEquals(expected, packet);
-	}
-
-	protected void assertBufferContents(byte[] expected, BGPv4Packet packet) {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		packet.encodePacket(buffer);
-		
-		byte[] array = new byte[buffer.readableBytes()];
-		
-		buffer.readBytes(array);
-		
-		assertArraysEquals(expected, array);
 	}
 
 	protected void assertBufferContents(byte[] expected, IByteBufFiller filler) {
@@ -134,6 +122,13 @@ public class BGPv4TestBase {
 		}
 	}
 
+	protected void assertArrayByteBufEquals(byte[] a, ByteBuf b) {
+		byte[] b2 = new byte[b.readableBytes()];
+		
+		b.readBytes(b2);
+		assertArraysEquals(a, b2);
+	}
+	
 	/*
 	protected void assertNotificationEvent(Class<? extends NotificationPacket> packetClass, ChannelEvent event) {
 		Assert.assertTrue(event instanceof MessageEvent);

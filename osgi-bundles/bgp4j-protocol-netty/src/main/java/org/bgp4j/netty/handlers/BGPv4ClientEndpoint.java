@@ -23,9 +23,10 @@ import javax.inject.Singleton;
 
 import org.bgp4j.definitions.PeerConnectionInformation;
 import org.bgp4j.definitions.PeerConnectionInformationAware;
+import org.bgp4j.net.events.BgpEvent;
+import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.netty.fsm.BGPv4FSM;
 import org.bgp4j.netty.fsm.FSMRegistry;
-import org.bgp4j.netty.protocol.BGPv4Packet;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;

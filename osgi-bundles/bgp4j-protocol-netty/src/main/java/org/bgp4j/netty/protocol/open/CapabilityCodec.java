@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.ORFSendReceive;
 import org.bgp4j.net.ORFType;
 import org.bgp4j.net.SubsequentAddressFamily;
@@ -33,7 +34,6 @@ import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.net.capabilities.OutboundRouteFilteringCapability;
 import org.bgp4j.net.capabilities.RouteRefreshCapability;
 import org.bgp4j.net.capabilities.UnknownCapability;
-import org.bgp4j.netty.BGPv4Constants;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

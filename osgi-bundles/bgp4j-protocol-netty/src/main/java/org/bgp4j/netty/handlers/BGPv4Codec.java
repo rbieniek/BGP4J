@@ -20,7 +20,7 @@ package org.bgp4j.netty.handlers;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4j.netty.protocol.BGPv4Packet;
+import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.netty.protocol.BGPv4PacketDecoder;
 import org.bgp4j.netty.protocol.ProtocolPacketException;
 import org.jboss.netty.buffer.ChannelBuffer;

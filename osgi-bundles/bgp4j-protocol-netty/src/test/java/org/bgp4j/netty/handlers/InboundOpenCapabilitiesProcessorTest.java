@@ -22,14 +22,14 @@ import java.util.UUID;
 import junit.framework.Assert;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.capabilities.MultiProtocolCapability;
-import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
+import org.bgp4j.net.packets.open.OpenPacket;
 import org.bgp4j.netty.LocalChannelBGPv4TestBase;
 import org.bgp4j.netty.MessageRecordingChannelHandler;
-import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
-import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;

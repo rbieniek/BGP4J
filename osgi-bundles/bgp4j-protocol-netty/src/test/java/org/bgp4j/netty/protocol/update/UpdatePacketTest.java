@@ -25,6 +25,7 @@ import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
 import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
+import org.bgp4j.net.packets.update.UpdatePacket;
 import org.junit.Test;
 
 /**

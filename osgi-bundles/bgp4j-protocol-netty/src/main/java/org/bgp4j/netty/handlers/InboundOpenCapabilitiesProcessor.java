@@ -21,12 +21,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.capabilities.MultiProtocolCapability;
-import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
-import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
+import org.bgp4j.net.packets.open.OpenPacket;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;

@@ -17,7 +17,10 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import io.netty.buffer.ByteBuf;
+
 import java.net.Inet4Address;
+import java.nio.ByteOrder;
 
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
@@ -38,7 +41,10 @@ import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.attributes.NextHopPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
+import org.bgp4j.net.packets.BGPv4Packet;
+import org.bgp4j.net.packets.update.UpdatePacket;
 import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.protocol.BGPv4PacketEncoderFactory;
 import org.junit.Test;
 
 /**
@@ -46,6 +52,16 @@ import org.junit.Test;
  *
  */
 public class UpdatePacketEncodingTest extends BGPv4TestBase {
+
+	private BGPv4PacketEncoderFactory encoderFactory = new BGPv4PacketEncoderFactory();
+	
+	private ByteBuf encodePacket(BGPv4Packet packet) {
+		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactory.encoderForPacket(packet).encodePacket(packet, buffer);
+		
+		return buffer;
+	}
 
 	@Test
 	public void testEncodeAggregatorPathAttribute() throws Exception {
@@ -64,7 +80,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0xc0, (byte)0x07, (byte)0x06, // Path attribute: AS_AGGREGATOR 
 				0x12, 0x34, // AS Number 0x1234
 				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Aggregator IP 192.168.4.2
-		}, update);
+		}, encodePacket(update));
 	
 		update = new UpdatePacket();
 	
@@ -81,7 +97,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0xc0, (byte)0x12, (byte)0x08,  // Path attribute: AS4_AGGREGATOR 
 				0x56, 0x78, 0x12, 0x34, // AS Number 0x56781234
 				(byte)0xc0, (byte)0xa8, (byte)0x04, (byte)0x02, // Aggregator IP 192.168.4.2
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -369,7 +385,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 7 octets AS_PATH
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -395,7 +411,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234 
 				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -421,7 +437,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 8 octets AS_PATH
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234
 				0x01, 0x01, 0x56, 0x78, // AS_SET 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -447,7 +463,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x02, 0x01, 0x12, 0x34, // AS_SEQUENCE 0x1234 
 				0x01, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -473,7 +489,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -499,7 +515,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
 				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -525,7 +541,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x01, 0x01, 0x56, 0x78, // AS_SET 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -551,7 +567,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
 				0x02, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x01, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -572,7 +588,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
 				(byte)0x40, (byte)0x02, (byte)0x04, 0x02, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SEQUENCE 0x1234 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -593,7 +609,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
 				(byte)0x40, (byte)0x02, (byte)0x06, 0x02, 0x02, 0x12, 0x34, 0x56, 0x78, // Path attribute: 6 octets AS_PATH AS_SEQUENCE 0x1234 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -619,7 +635,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x08, // Path attribute: 8 octets AS_PATH
 				0x01, 0x01, 0x12, 0x34, // AS_SET 0x1234
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -645,7 +661,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x01, 0x01, 0x12, 0x34, // AS_SET 0x1234 
 				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -666,7 +682,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
 				(byte)0x40, (byte)0x02, (byte)0x04, 0x01, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SET 0x1234 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -692,7 +708,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0a, // Path attribute: 10 octets AS_PATH
 				0x01, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
 				0x02, 0x01, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -718,7 +734,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x02, (byte)0x0c, // Path attribute: 12 octets AS_PATH
 				0x01, 0x02, 0x12, 0x34, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
 				0x02, 0x02, 0x56, 0x78, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -739,7 +755,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x07, // path attributes length (7 octets)
 				(byte)0x40, (byte)0x02, (byte)0x04, 0x01, 0x01, 0x12, 0x34, // Path attribute: 4 octets AS_PATH AS_SET 0x1234 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -756,7 +772,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x03, // path attributes length (3 octets)
 				(byte)0x40, (byte)0x02, (byte)0x00, // Path attribute: AS_PATH emtpy 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -782,7 +798,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS4_PATH
 				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234
 				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -808,7 +824,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234 
 				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -834,7 +850,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS_PATH
 				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234
 				0x01, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -860,7 +876,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x1234 
 				0x01, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -886,7 +902,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -912,7 +928,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -938,7 +954,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x01, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -964,7 +980,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SEQUENCE 0x1234 0x89ab
 				0x01, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SET 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -986,7 +1002,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: 6 octets AS_PATH 
 				0x02, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SEQUENCE 0x00001234 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1008,7 +1024,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: 10 octets AS4_PATH 
 				0x02, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x1234 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1034,7 +1050,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x0c, // Path attribute: 12 octets AS4_PATH
 				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234
 				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1060,7 +1076,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
 				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1082,7 +1098,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x09, // path attributes length (9 octets)
 				(byte)0x40, (byte)0x11, (byte)0x06, // Path attribute: 6 octets AS4_PATH 
 				0x01, 0x01, 0x00, 0x00, 0x12, 0x34, // AS_SET 0x1234 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1108,7 +1124,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x10, // Path attribute: 16 octets AS4_PATH
 				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
 				0x02, 0x01, 0x00, 0x00, 0x56, 0x78, // AS_SEQUENCE 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1134,7 +1150,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x40, (byte)0x11, (byte)0x14, // Path attribute: 20 octets AS4_PATH
 				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, (byte)0x89, (byte)0xab, // AS_SET 0x1234 0x89ab
 				0x02, 0x02, 0x00, 0x00, 0x56, 0x78, 0x00, 0x00, (byte)0xcd, (byte)0xef // AS_SEQUENCE 0x5678 0xcdef 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1156,7 +1172,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x0d, // path attributes length (13 octets)
 				(byte)0x40, (byte)0x11, (byte)0x0a, // Path attribute: 10 octets AS4_PATH 
 				0x01, 0x02, 0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x56, 0x78, // AS_SET 0x1234 0x5678 
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1173,7 +1189,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x03, // path attributes length (3 octets)
 				(byte)0x40, (byte)0x11, (byte)0x00, // Path attribute: AS4_PATH emtpy 
-		}, update);
+		},  encodePacket(update));
 		
 	}
 
@@ -1191,7 +1207,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x03, // path attributes length (5 octets)
 				(byte)0x40, (byte)0x06, (byte)0x00, // Path attribute: ATOMIC_AGGREGATE
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1218,7 +1234,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x80, (byte)0x04, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x08, (byte)0x00, // Path attribute: MULT_EXIT_DISC 2048
 				(byte)0x40, (byte)0x05, (byte)0x04, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x64, // Path attribute: LOCAL_PREF 100
 				(byte)0x00 // NLRI: 0.0.0.0/0	
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1232,7 +1248,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x02, // type code UPDATE
 				0x00, 0x00, // withdrawn routes length (0 octets)
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1250,7 +1266,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x07, // path attributes length (5 octets)
 				(byte)0x40, (byte)0x05, (byte)0x04, // Path attribute: LOCAL_PREF
 				0x00, 0x00, 0x00, 0x64, // LOCAL_PREF 100
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1277,7 +1293,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, // next hop length 4 octets, next hop 192.168.4.2
 				0x00, // reserved
 				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1306,7 +1322,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, // reserved
 				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
 				0x0c, (byte)0xac, (byte)0x20, // NLRI 172.32.0.0/12
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1329,7 +1345,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x01, // safi unicast routing
 				0x04, (byte)0xc0, (byte)0xa8, 0x04, 0x02, // next hop length 4 octets, next hop 192.168.4.2
 				0x00, // reserved
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1356,7 +1372,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, // next hop length 0
 				0x00, // reserved
 				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1377,7 +1393,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x01, // safi unicast routing
 				0x00, // next hop length
 				0x00, // reserved
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1409,7 +1425,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
 				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1426,7 +1442,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x01, // Path attribute: ORIGIN EGP  
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1443,7 +1459,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x00, // Path attribute: ORIGIN IGP  
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1460,7 +1476,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // withdrawn routes length (0 octets)
 				(byte)0x00, (byte)0x04, // path attributes length (49 octets)
 				(byte)0x40, (byte)0x01, (byte)0x01, (byte)0x02, // Path attribute: ORIGIN INCOMPLETE  
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1494,7 +1510,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x00, // path attributes length (0 octets)
 				0x10, (byte)0xac, 0x10, // NLRI 172.16/16
 				0x1c, (byte)0xc0, (byte)0xa8, 0x20, 0x00 // NLRI 192.168.32/28 bogus one octet missing
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1511,7 +1527,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x01, // withdrawn routes length (1 octets)
 				0x00,       // withdrawn 0/0 prefix
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1528,7 +1544,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x02, // withdrawn routes length (2 octets)
 				0x08, (byte)0xc8, // withdrawn 200.0.0.0/8 prefix
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1545,7 +1561,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x02, // withdrawn routes length (2 octets)
 				0x04, (byte)0xc0, // withdrawn 192.0.0.0/4 prefix
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1562,7 +1578,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x03, // withdrawn routes length (3 octets)
 				0x10, (byte)0xc0, (byte)0xef, // withdrawn 192.239.0.0/12 prefix
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1579,7 +1595,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x03, // withdrawn routes length (3 octets)
 				0x0c, (byte)0xc0, (byte)0xe0, // withdrawn 192.224.0.0/12 prefix
 				0x00, 0x00, // Total path attributes length  (0 octets)
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1603,7 +1619,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x00, 0x01, // AFI IPv4
 				0x01, // safi unicast routing
 				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1629,7 +1645,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				0x01, // safi unicast routing
 				0x0c, (byte)0xac, (byte)0x10, // NLRI 172.16.0.0/12
 				0x0c, (byte)0xac, (byte)0x20, // NLRI 172.32.0.0/12
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test
@@ -1648,7 +1664,7 @@ public class UpdatePacketEncodingTest extends BGPv4TestBase {
 				(byte)0x80, 0x0f, 0x03, // MP_REACH_NLRI attribute (3 octets)
 				0x00, 0x01, // AFI IPv4
 				0x01, // safi unicast routing
-		}, update);
+		},  encodePacket(update));
 	}
 
 	@Test

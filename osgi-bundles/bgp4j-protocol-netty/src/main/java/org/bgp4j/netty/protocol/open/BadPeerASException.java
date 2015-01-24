@@ -17,7 +17,8 @@
  */
 package org.bgp4j.netty.protocol.open;
 
-import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

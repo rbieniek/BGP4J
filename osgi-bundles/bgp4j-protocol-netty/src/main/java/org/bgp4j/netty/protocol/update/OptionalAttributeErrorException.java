@@ -19,7 +19,8 @@ package org.bgp4j.netty.protocol.update;
 
 import io.netty.buffer.ByteBuf;
 
-import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.net.packets.update.OptionalAttributeErrorNotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

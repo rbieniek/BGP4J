@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.Origin;
 import org.bgp4j.net.PathSegment;
@@ -37,7 +38,7 @@ import org.bgp4j.net.attributes.MultiProtocolUnreachableNLRI;
 import org.bgp4j.net.attributes.NextHopPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
-import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.net.packets.update.UpdatePacket;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.protocol.ConnectionNotSynchronizedException;
 import org.junit.Assert;

@@ -19,7 +19,7 @@ package org.bgp4j.netty.protocol;
 
 import io.netty.buffer.ByteBuf;
 
-import org.bgp4j.netty.BGPv4Constants;
+import org.bgp4j.net.BGPv4Constants;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

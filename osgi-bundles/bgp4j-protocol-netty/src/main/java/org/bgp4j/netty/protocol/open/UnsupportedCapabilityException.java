@@ -20,7 +20,8 @@ package org.bgp4j.netty.protocol.open;
 import java.util.Collection;
 
 import org.bgp4j.net.capabilities.Capability;
-import org.bgp4j.netty.protocol.NotificationPacket;
+import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.net.packets.open.ByteArrayUnsupportedCapabilityNotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

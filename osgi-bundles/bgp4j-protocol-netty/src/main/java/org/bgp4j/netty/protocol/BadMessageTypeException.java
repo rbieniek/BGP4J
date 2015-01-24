@@ -16,6 +16,9 @@
  */
 package org.bgp4j.netty.protocol;
 
+import org.bgp4j.net.packets.BadMessageTypeNotificationPacket;
+import org.bgp4j.net.packets.NotificationPacket;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *

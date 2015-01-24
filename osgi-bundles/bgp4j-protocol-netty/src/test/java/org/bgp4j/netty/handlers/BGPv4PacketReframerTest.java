@@ -16,26 +16,15 @@
  */
 package org.bgp4j.netty.handlers;
 
-import java.util.UUID;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.embedded.EmbeddedChannel;
 
-import junit.framework.Assert;
-
-import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.LocalChannelBGPv4TestBase;
-import org.bgp4j.netty.MessageRecordingChannelHandler;
-import org.bgp4j.netty.protocol.BadMessageLengthNotificationPacket;
-import org.bgp4j.netty.protocol.ConnectionNotSynchronizedNotificationPacket;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.local.LocalAddress;
+import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.packets.BadMessageLengthNotificationPacket;
+import org.bgp4j.net.packets.ConnectionNotSynchronizedNotificationPacket;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,50 +33,24 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
+public class BGPv4PacketReframerTest extends BGPv4TestBase {
+
+	private EmbeddedChannel channel;
+	private UserEventInboundHandler eventHandler;
 
 	@Before
 	public void before() {
-		messageRecorder = obtainInstance(MessageRecordingChannelHandler.class);
+		eventHandler = new UserEventInboundHandler();
 		
-		LocalAddress codecOnlyAddress = new LocalAddress(UUID.randomUUID().toString());
-		
-		serverBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
-			
-			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new ChannelHandler[] { 
-						obtainInstance(BGPv4Reframer.class), 
-						messageRecorder });
-			}
-		});
-		serverChannel = serverBootstrap.bind(codecOnlyAddress);
-
-		clientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] {
-				messageRecorder 
-				}));
-		clientChannel = clientBootstrap.connect(codecOnlyAddress).getChannel();
+		channel = new EmbeddedChannel(new BGPv4Reframer(), eventHandler);
 	}
 	
 	@After
 	public void after() {
-		if(clientChannel != null)
-			clientChannel.close();
-		if(serverChannel != null)
-			serverChannel.close();
-		clientChannel = null;
-		clientBootstrap.releaseExternalResources();
-		clientBootstrap = null;
-		serverBootstrap.releaseExternalResources();
-		serverBootstrap = null;
+		channel.close();
+		channel = null;
 	}
 
-	private MessageRecordingChannelHandler messageRecorder;
-	
-	private ServerBootstrap serverBootstrap;
-	private ClientBootstrap clientBootstrap;
-	private Channel clientChannel;
-	private Channel serverChannel;
 	
 	@Test
 	public void testValidPacket() throws Exception {
@@ -100,12 +63,13 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		clientChannel.write(buildProtocolPacket(packet));
+		channel.writeInbound(buildProtocolPacket(packet));
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.inboundMessages().size());
+		Assert.assertEquals(0, channel.outboundMessages().size());
+		Assert.assertEquals(0,  eventHandler.events().size());
 		
-		assertChannelEventContents(new byte[] { 0x04 }, messageRecorder.nextEvent(serverChannel));
+		assertArrayByteBufEquals(new byte[] { 0x04 }, (ByteBuf)channel.readInbound());
 	}
 
 	@Test
@@ -119,13 +83,14 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 				0x00, 0x13, 0x04
 		};
 
-		clientChannel.write(buildProtocolPacket(packet1));
-		clientChannel.write(buildProtocolPacket(packet2));
+		channel.writeInbound(buildProtocolPacket(packet1));
+		channel.writeInbound(buildProtocolPacket(packet2));
 
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.inboundMessages().size());
+		Assert.assertEquals(0, channel.outboundMessages().size());
+		Assert.assertEquals(0,  eventHandler.events().size());
 		
-		assertChannelEventContents(new byte[] { 0x04 }, messageRecorder.nextEvent(serverChannel));
+		assertArrayByteBufEquals(new byte[] { 0x04 }, (ByteBuf)channel.readInbound());
 	}	
 
 	@Test
@@ -140,20 +105,21 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		clientChannel.write(buildProtocolPacket(packet));
+		channel.writeInbound(buildProtocolPacket(packet));
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(1,  eventHandler.events().size());
 
-		assertChannelEventContents(new byte[] { 
+		assertArrayByteBufEquals(new byte[] { 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x15, // length
 				0x03,       // notification type code
 				0x01, 0x01, // Error code: Message Header Error, Error subcode: Connection not synchronized
-				}, messageRecorder.nextEvent(clientChannel));
+				}, (ByteBuf)channel.readOutbound());
 		
-		assertNotificationEvent(ConnectionNotSynchronizedNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		// assertNotificationEvent(ConnectionNotSynchronizedNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}
 
 	@Test
@@ -167,21 +133,20 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x10;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		clientChannel.write(buildProtocolPacket(packet));
+		channel.writeInbound(buildProtocolPacket(packet));
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(1,  eventHandler.events().size());
 
-		assertChannelEventContents(new byte[] { 
+		assertArrayByteBufEquals(new byte[] { 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 				0x00, 0x17, // length
 				0x03,       // notification type code
 				0x01, 0x02, // Error code: Message Header Error, Error subcode: Bad message length
 				0x00, 0x10  // Data: Broken length field
-				}, messageRecorder.nextEvent(clientChannel));
-		
-		assertNotificationEvent(BadMessageLengthNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+				}, (ByteBuf)channel.readOutbound());
 	}
 
 	@Test
@@ -195,26 +160,21 @@ public class BGPv4PacketReframerTest extends LocalChannelBGPv4TestBase {
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 1] = 0x13;
 		packet[BGPv4Constants.BGP_PACKET_MARKER_LENGTH + 2] = 0x04;
 		
-		clientChannel.write(buildProtocolPacket(packet));
+		channel.writeInbound(buildProtocolPacket(packet));
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-
-		MessageEvent notityEvent = messageRecorder.nextEvent(clientChannel);
-		ChannelBuffer notifyBuffer = (ChannelBuffer)notityEvent.getMessage();		
-		byte[] notifyPacket = new byte[notifyBuffer.readableBytes()];
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(1,  eventHandler.events().size());
 		
-		notifyBuffer.readBytes(notifyPacket);
-		
-		assertArraysEquals(new byte[] { 
+		assertArrayByteBufEquals(new byte[] { 
 			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker 
 			(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, // marker
 			0x00, 0x17, // length
 			0x03,       // notification type code
 			0x01, 0x02, // Error code: Message Header Error, Error subcode: Bad message length
 			0x14, 0x13  // Data: Broken length field
-			}, notifyPacket);
+			}, (ByteBuf)channel.readOutbound());
 		
-		assertNotificationEvent(BadMessageLengthNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		// assertNotificationEvent(BadMessageLengthNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}
 }

@@ -17,6 +17,10 @@
  */
 package org.bgp4j.netty.protocol.refresh;
 
+import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteOrder;
+
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.AddressPrefixBasedORFEntry;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
@@ -26,7 +30,10 @@ import org.bgp4j.net.ORFMatch;
 import org.bgp4j.net.ORFRefreshType;
 import org.bgp4j.net.OutboundRouteFilter;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.packets.BGPv4Packet;
+import org.bgp4j.net.packets.refresh.RouteRefreshPacket;
 import org.bgp4j.netty.BGPv4TestBase;
+import org.bgp4j.netty.protocol.BGPv4PacketEncoderFactory;
 import org.junit.Test;
 
 /**
@@ -35,6 +42,16 @@ import org.junit.Test;
  */
 public class RouteRefreshPacketEncodingTest extends BGPv4TestBase {
 	
+	private BGPv4PacketEncoderFactory encoderFactory = new BGPv4PacketEncoderFactory();
+	
+	private ByteBuf encodePacket(BGPv4Packet packet) {
+		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactory.encoderForPacket(packet).encodePacket(packet, buffer);
+		
+		return buffer;
+	}
+
 	@Test
 	public void testEncodeSimpleRouteRefreshPacket() throws Exception {
 		RouteRefreshPacket packet = new RouteRefreshPacket(AddressFamily.IPv4, SubsequentAddressFamily.NLRI_UNICAST_FORWARDING);
@@ -47,7 +64,7 @@ public class RouteRefreshPacketEncodingTest extends BGPv4TestBase {
 				(byte)0x00, (byte)0x01, // AFI IPv4
 				(byte)0x00, // reserved
 				(byte)0x01, // SAFI Unicast forwarding
-		}, packet);
+		}, encodePacket(packet));
 	}
 
 	@Test
@@ -75,7 +92,7 @@ public class RouteRefreshPacketEncodingTest extends BGPv4TestBase {
 				(byte)0x0, // min length 0
 				(byte)0x00, // max length 0
 				(byte)0x0, // prefix 0.0.0.0/0
-		}, packet);
+		}, encodePacket(packet));
 	}
 
 	@Test
@@ -124,6 +141,6 @@ public class RouteRefreshPacketEncodingTest extends BGPv4TestBase {
 				(byte)0x18, // min length 24
 				(byte)0x20, // max length 32
 				(byte)0x18, (byte)0xc0, (byte)0xa8, 0x10, // prefix 192.168.10.0/16
-		}, packet);
+		}, encodePacket(packet));
 	}
 }

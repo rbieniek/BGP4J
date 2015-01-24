@@ -28,8 +28,18 @@ import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.capabilities.Capability;
 import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.net.capabilities.RouteRefreshCapability;
+import org.bgp4j.net.packets.AdministrativeResetNotificationPacket;
+import org.bgp4j.net.packets.AdministrativeShutdownNotificationPacket;
+import org.bgp4j.net.packets.BGPv4Packet;
+import org.bgp4j.net.packets.ConnectionCollisionResolutionNotificationPacket;
+import org.bgp4j.net.packets.ConnectionRejectedNotificationPacket;
+import org.bgp4j.net.packets.MaximumNumberOfPrefixesReachedNotificationPacket;
+import org.bgp4j.net.packets.OtherConfigurationChangeNotificationPacket;
+import org.bgp4j.net.packets.OutOfResourcesNotificationPacket;
+import org.bgp4j.net.packets.PeerDeconfiguredNotificationPacket;
+import org.bgp4j.net.packets.UnspecifiedCeaseNotificationPacket;
+import org.bgp4j.net.packets.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.protocol.open.CapabilityListUnsupportedCapabilityNotificationPacket;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,7 +51,16 @@ import org.junit.Test;
 public class NotificationPacketTest extends BGPv4TestBase {
 
 	private BGPv4PacketDecoder decoder = new BGPv4PacketDecoder();
+	private BGPv4PacketEncoderFactory encoderFactory = new BGPv4PacketEncoderFactory();
 		
+	private ByteBuf encodePacket(BGPv4Packet packet) {
+		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactory.encoderForPacket(packet).encodePacket(packet, buffer);
+		
+		return buffer;
+	}
+	
 	@Test
 	public void testDecodeUnspecificCeaseNotificationPacket() {
 		safeDowncast(decoder.decodePacket(buildProtocolPacket(new byte[] {
@@ -53,10 +72,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeUnspecificCeaseNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-
-		(new UnspecifiedCeaseNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -64,7 +79,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x00, // UNSPECIFIC
-		}, buffer);
+		}, encodePacket(new UnspecifiedCeaseNotificationPacket()));
 	}
 
 	@Test
@@ -140,10 +155,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeMaximumNumberOfPrefixesReachedPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-
-		(new MaximumNumberOfPrefixesReachedNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -151,13 +162,8 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x01, // Maximum number of prefixes reached
-		}, buffer);
+		}, encodePacket(new MaximumNumberOfPrefixesReachedNotificationPacket()));
 
-		buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		(new MaximumNumberOfPrefixesReachedNotificationPacket(AddressFamily.IPv4, 
-				SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, 0x1234)).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -168,7 +174,8 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				0x00, 0x01, // AFI IPv4
 				0x01,       // SAFI Unicast routing
 				0x00, 0x00, 0x12, 0x34, // upper bound 0x1234
-		}, buffer);
+		}, encodePacket(new MaximumNumberOfPrefixesReachedNotificationPacket(AddressFamily.IPv4, 
+				SubsequentAddressFamily.NLRI_UNICAST_FORWARDING, 0x1234)));
 	}
 
 	@Test
@@ -182,10 +189,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeAdministrativeShutdownNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-
-		(new AdministrativeShutdownNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -193,7 +196,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x02, // Administrative shutodwn
-		}, buffer);
+		}, encodePacket(new AdministrativeShutdownNotificationPacket()));
 	}
 	
 	@Test
@@ -207,10 +210,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodePeerDeconfiguredNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		(new PeerDeconfiguredNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -218,7 +217,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x03, // Peer deconfigured
-		}, buffer);
+		}, encodePacket(new PeerDeconfiguredNotificationPacket()));
 	}
 	
 	@Test
@@ -232,10 +231,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeAdministrativeResetNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		(new AdministrativeResetNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -243,7 +238,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x04, // administrative reset
-		}, buffer);
+		}, encodePacket(new AdministrativeResetNotificationPacket()));
 	}
 
 	@Test
@@ -257,10 +252,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeConnectionRejectedNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		(new ConnectionRejectedNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -268,7 +259,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x05, // connection rejected
-		}, buffer);
+		}, encodePacket(new ConnectionRejectedNotificationPacket()));
 	}
 
 	@Test
@@ -282,10 +273,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeOtherConfigurationChangeNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		 (new OtherConfigurationChangeNotificationPacket()).encodePacket(buffer);
-		 
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -293,7 +280,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x06, // other configuration change
-		}, buffer);
+		}, encodePacket(new OtherConfigurationChangeNotificationPacket()));
 	}
 
 	@Test
@@ -307,10 +294,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeConnectionCollisionResolutionNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-		
-		(new ConnectionCollisionResolutionNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -318,7 +301,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x07, // Connection collision resolution
-		}, buffer);
+		}, encodePacket(new ConnectionCollisionResolutionNotificationPacket()));
 	}
 	
 	@Test
@@ -332,10 +315,6 @@ public class NotificationPacketTest extends BGPv4TestBase {
 
 	@Test
 	public void testEncodeOutOfResourcesNotificationPacket() {
-		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
-
-		(new OutOfResourcesNotificationPacket()).encodePacket(buffer);
-		
 		assertBufferContents(new byte[] {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
@@ -343,7 +322,7 @@ public class NotificationPacketTest extends BGPv4TestBase {
 				(byte)0x03, // type code NOTIFICATION
 				(byte)0x06, // CEASE error code
 				(byte)0x08, // Out of resources
-		}, buffer);
+		}, encodePacket(new OutOfResourcesNotificationPacket()));
 	}
 	
 	@Test

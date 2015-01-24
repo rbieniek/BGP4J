@@ -16,8 +16,9 @@
  */
 package org.bgp4j.netty.protocol;
 
+import org.bgp4j.net.packets.KeepalivePacket;
+import org.bgp4j.net.packets.open.OpenPacket;
 import org.bgp4j.netty.BGPv4TestBase;
-import org.bgp4j.netty.protocol.open.OpenPacket;
 import org.junit.Assert;
 import org.junit.Test;
 

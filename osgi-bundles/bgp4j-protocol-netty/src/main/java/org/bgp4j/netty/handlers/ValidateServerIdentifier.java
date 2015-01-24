@@ -21,11 +21,11 @@ import javax.inject.Singleton;
 
 import org.bgp4j.definitions.PeerConnectionInformation;
 import org.bgp4j.definitions.PeerConnectionInformationAware;
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
-import org.bgp4j.netty.BGPv4Constants;
-import org.bgp4j.netty.protocol.open.BadBgpIdentifierNotificationPacket;
-import org.bgp4j.netty.protocol.open.BadPeerASNotificationPacket;
-import org.bgp4j.netty.protocol.open.OpenPacket;
+import org.bgp4j.net.packets.open.BadBgpIdentifierNotificationPacket;
+import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
+import org.bgp4j.net.packets.open.OpenPacket;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;

@@ -16,14 +16,19 @@
  */
 package org.bgp4j.netty.handlers;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.nio.ByteOrder;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bgp4j.netty.protocol.NotificationPacket;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.netty.protocol.BGPv4PacketEncoderFactory;
 
 /**
  * This helper class contains static methods for sending notifications.
@@ -47,7 +52,7 @@ public class NotificationHelper {
 		 */
 		@Override
 		public void operationComplete(ChannelFuture future) throws Exception {
-			send(future.getChannel());
+			send(future.channel());
 		}
 		
 		private void send(Channel channel) {
@@ -57,7 +62,9 @@ public class NotificationHelper {
 				channel.write(notification);
 		}
 	}
-	
+
+	private static BGPv4PacketEncoderFactory encoderFactor = new BGPv4PacketEncoderFactory();
+
 	/**
 	 * send a notification and close the channel after the message was sent.
 	 * 
@@ -65,7 +72,7 @@ public class NotificationHelper {
 	 * @param notification the notification to send
 	 */
 	public static void sendNotification(ChannelHandlerContext ctx, NotificationPacket notification, ChannelFutureListener listener) {
-		sendNotification(ctx.getChannel(), notification, listener);
+		sendNotification(ctx.channel(), notification, listener);
 	}
 	
 	/**
@@ -116,7 +123,7 @@ public class NotificationHelper {
 	 * @param notification the notification to send
 	 */
 	public static void sendNotifications(ChannelHandlerContext ctx, List<NotificationPacket> notifications, ChannelFutureListener listener) {
-		sendNotifications(ctx.getChannel(), notifications, listener);
+		sendNotifications(ctx.channel(), notifications, listener);
 	}
 
 	/**
@@ -126,7 +133,8 @@ public class NotificationHelper {
 	 * @param notification the notification to send
 	 */
 	public static void sendEncodedNotification(ChannelHandlerContext ctx, NotificationPacket notification, ChannelFutureListener listener) {
-		sendEncodedNotification(ctx.getChannel(), notification, listener);
+		sendEncodedNotification(ctx.channel(), notification, listener);
+		
 	}
 	
 	/**
@@ -138,10 +146,13 @@ public class NotificationHelper {
 	public static void sendEncodedNotification(Channel channel, NotificationPacket notification, ChannelFutureListener listener) {
 		if(listener instanceof BgpEventFireChannelFutureListener)
 			((BgpEventFireChannelFutureListener)listener).setBgpEvent(new NotificationEvent(notification));
+		ByteBuf buffer = channel.alloc().buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactor.encoderForPacket(notification).encodePacket(notification, buffer);
 		
 		if(listener != null) 
-			channel.write(notification.encodePacket()).addListener(listener);
+			channel.writeAndFlush(buffer).addListener(listener);
 		else
-			channel.write(notification.encodePacket());
+			channel.writeAndFlush(buffer);
 	}
 }

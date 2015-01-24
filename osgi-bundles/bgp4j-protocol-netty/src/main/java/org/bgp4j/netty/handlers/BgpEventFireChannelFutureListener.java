@@ -17,6 +17,8 @@
  */
 package org.bgp4j.netty.handlers;
 
+import org.bgp4j.net.events.BgpEvent;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;

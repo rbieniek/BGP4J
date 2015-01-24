@@ -17,6 +17,12 @@
  */
 package org.bgp4j.netty.protocol;
 
+import io.netty.buffer.ByteBuf;
+
+import java.nio.ByteOrder;
+
+import org.bgp4j.net.packets.BGPv4Packet;
+import org.bgp4j.net.packets.KeepalivePacket;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.Test;
 
@@ -26,6 +32,16 @@ import org.junit.Test;
  */
 public class BGPv4PacketEncodingTest extends BGPv4TestBase {
 
+	private BGPv4PacketEncoderFactory encoderFactory = new BGPv4PacketEncoderFactory();
+	
+	private ByteBuf encodePacket(BGPv4Packet packet) {
+		ByteBuf buffer = allocator.buffer().order(ByteOrder.BIG_ENDIAN);
+		
+		encoderFactory.encoderForPacket(packet).encodePacket(packet, buffer);
+		
+		return buffer;
+	}
+
 	@Test
 	public void encodeKeepalivePacket() {
 		assertBufferContents(new byte[] {
@@ -33,7 +49,7 @@ public class BGPv4PacketEncodingTest extends BGPv4TestBase {
 				(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
 				0x00, 0x13,
 				(byte)0x04, // type code KEEP				
-		}, new KeepalivePacket());
+		}, encodePacket(new KeepalivePacket()));
 	}
 
 }

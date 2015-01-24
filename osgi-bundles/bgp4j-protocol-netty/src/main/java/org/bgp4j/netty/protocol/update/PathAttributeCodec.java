@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.attributes.ASPathAttribute;
 import org.bgp4j.net.attributes.AggregatorPathAttribute;
 import org.bgp4j.net.attributes.AtomicAggregatePathAttribute;
@@ -39,7 +40,6 @@ import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.attributes.UnknownPathAttribute;
-import org.bgp4j.netty.BGPv4Constants;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
