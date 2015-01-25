@@ -17,28 +17,23 @@
  */
 package org.bgp4j.netty.handlers;
 
-import java.util.UUID;
-
-import junit.framework.Assert;
+import static org.fest.assertions.api.Assertions.assertThat;
+import io.netty.channel.embedded.EmbeddedChannel;
 
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
+import org.bgp4j.net.events.open.BadBgpIdentifierNotificationEvent;
+import org.bgp4j.net.events.open.BadPeerASNotificationEvent;
+import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.net.packets.open.BadBgpIdentifierNotificationPacket;
 import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
 import org.bgp4j.net.packets.open.OpenPacket;
-import org.bgp4j.netty.LocalChannelBGPv4TestBase;
-import org.bgp4j.netty.MessageRecordingChannelHandler;
+import org.bgp4j.netty.Attributes;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockPeerConnectionInformation;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.local.LocalAddress;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,58 +41,29 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
+public class ValidateServerIdentifierTest extends BGPv4TestBase {
+
+	private EmbeddedChannel channel;
+	private UserEventInboundHandler eventHandler;
 
 	@Before
 	public void before() {
+		eventHandler = new UserEventInboundHandler();		
+		channel = new EmbeddedChannel(new ValidateServerIdentifier(), eventHandler);
 		peerInfo = new MockPeerConnectionInformation();
-
-		messageRecorder = obtainInstance(MessageRecordingChannelHandler.class);
-		messageRecorder.setPeerInfo(peerInfo);
 		
-		LocalAddress codecOnlyAddress = new LocalAddress(UUID.randomUUID().toString());
-		
-		serverBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
-			
-			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new ChannelHandler[] { 
-						obtainInstance(ValidateServerIdentifier.class), 
-						messageRecorder });
-			}
-		});
-		serverChannel = serverBootstrap.bind(codecOnlyAddress);
-
-		clientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] {
-				messageRecorder 
-				}));
-		clientChannel = clientBootstrap.connect(codecOnlyAddress).getChannel();		
+		channel.attr(Attributes.peerInfoKey).set(peerInfo);
 	}
 	
 	@After
 	public void after() {
-		if(clientChannel != null)
-			clientChannel.close();
-		if(serverChannel != null)
-			serverChannel.close();
-		clientChannel = null;
-		clientBootstrap.releaseExternalResources();
-		clientBootstrap = null;
-		serverBootstrap.releaseExternalResources();
-		serverBootstrap = null;
-
+		channel.close();
+		channel = null;
 		peerInfo = null;
 	}
 
-	private MessageRecordingChannelHandler messageRecorder;
 	private MockPeerConnectionInformation peerInfo;
-	
-	private ServerBootstrap serverBootstrap;
-	private ClientBootstrap clientBootstrap;
-	private Channel clientChannel;
-	private Channel serverChannel;
-
-	
+		
 	@Test
 	public void testPassOpenMessage() throws Exception {
 		peerInfo.setAsTypeInUse(ASType.AS_NUMBER_2OCTETS);
@@ -110,12 +76,13 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.setAutonomousSystem(64172);
 		open.setBgpIdentifier(12345);
 		
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(0, channel.outboundMessages().size());
+		Assert.assertEquals(1, channel.inboundMessages().size());
+		Assert.assertEquals(0, eventHandler.events().size());
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+		OpenPacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), OpenPacket.class);
 
 		Assert.assertEquals(12345, consumed.getBgpIdentifier());
 		Assert.assertEquals(64172, consumed.getAutonomousSystem());
@@ -134,12 +101,13 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.getCapabilities().add(new AutonomousSystem4Capability(641720));
 		open.setBgpIdentifier(12345);
 			
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(0, channel.outboundMessages().size());
+		Assert.assertEquals(1, channel.inboundMessages().size());
+		Assert.assertEquals(0, eventHandler.events().size());
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+		OpenPacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), OpenPacket.class);
 
 		Assert.assertEquals(12345, consumed.getBgpIdentifier());
 		Assert.assertEquals(BGPv4Constants.BGP_AS_TRANS, consumed.getAutonomousSystem());
@@ -163,12 +131,13 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.getCapabilities().add(new AutonomousSystem4Capability(64172));
 		open.setBgpIdentifier(12345);
 			
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(0, channel.outboundMessages().size());
+		Assert.assertEquals(1, channel.inboundMessages().size());
+		Assert.assertEquals(0, eventHandler.events().size());
 	
-		OpenPacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), OpenPacket.class);
+		OpenPacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), OpenPacket.class);
 
 		Assert.assertEquals(12345, consumed.getBgpIdentifier());
 		Assert.assertEquals(64172, consumed.getAutonomousSystem());
@@ -190,13 +159,14 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.setAutonomousSystem(64173);
 		open.setBgpIdentifier(12345);
 
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, eventHandler.events().size());
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.readOutbound()).isInstanceOf(BadPeerASNotificationPacket.class);
+		assertThat(eventHandler.events().get(0)).isInstanceOf(BadPeerASNotificationEvent.class);
 	}
 	
 	@Test
@@ -211,13 +181,14 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.setAutonomousSystem(64172);
 		open.setBgpIdentifier(123456);
 
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(BadBgpIdentifierNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(BadBgpIdentifierNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, eventHandler.events().size());
+
+		assertThat(channel.readOutbound()).isInstanceOf(BadBgpIdentifierNotificationPacket.class);
+		assertThat(eventHandler.events().get(0)).isInstanceOf(BadBgpIdentifierNotificationEvent.class);
 	}
 
 	@Test
@@ -233,13 +204,14 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.getCapabilities().add(new AutonomousSystem4Capability(64173));
 		open.setBgpIdentifier(12345);
 			
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, eventHandler.events().size());
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.readOutbound()).isInstanceOf(BadPeerASNotificationPacket.class);
+		assertThat(eventHandler.events().get(0)).isInstanceOf(BadPeerASNotificationEvent.class);
 	}
 
 	@Test
@@ -255,13 +227,14 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.getCapabilities().add(new AutonomousSystem4Capability(641720));
 		open.setBgpIdentifier(12345);
 			
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, eventHandler.events().size());
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.readOutbound()).isInstanceOf(BadPeerASNotificationPacket.class);
+		assertThat(eventHandler.events().get(0)).isInstanceOf(BadPeerASNotificationEvent.class);
 	}
 	
 
@@ -278,13 +251,14 @@ public class ValidateServerIdentifierTest extends LocalChannelBGPv4TestBase {
 		open.getCapabilities().add(new AutonomousSystem4Capability(641721));
 		open.setBgpIdentifier(12345);
 			
-		clientChannel.write(open);
+		channel.writeInbound(open);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		Assert.assertEquals(1, channel.outboundMessages().size());
+		Assert.assertEquals(0, channel.inboundMessages().size());
+		Assert.assertEquals(1, eventHandler.events().size());
 	
-		Assert.assertEquals(BadPeerASNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(BadPeerASNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.readOutbound()).isInstanceOf(BadPeerASNotificationPacket.class);
+		assertThat(eventHandler.events().get(0)).isInstanceOf(BadPeerASNotificationEvent.class);
 	}
 	
 }

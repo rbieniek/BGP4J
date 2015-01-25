@@ -17,6 +17,9 @@
  */
 package org.bgp4j.netty.handlers;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bgp4j.net.events.BgpEvent;
 
 import io.netty.channel.ChannelFuture;
@@ -30,7 +33,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class BgpEventFireChannelFutureListener implements ChannelFutureListener {
 
 	private ChannelHandlerContext upstreamContext;
-	private BgpEvent bgpEvent;
+	private List<BgpEvent> bgpEvents = new LinkedList<BgpEvent>();
 	
 	BgpEventFireChannelFutureListener(ChannelHandlerContext upstreamContext) {
 		this.upstreamContext = upstreamContext;
@@ -41,23 +44,16 @@ public class BgpEventFireChannelFutureListener implements ChannelFutureListener 
 	 */
 	@Override
 	public void operationComplete(ChannelFuture future) throws Exception {
-		if(upstreamContext != null && bgpEvent != null) {
-			upstreamContext.fireUserEventTriggered(bgpEvent);
+		if(upstreamContext != null && !bgpEvents.isEmpty()) {
+			bgpEvents.forEach((n) ->  upstreamContext.fireUserEventTriggered(n));
 		}
-	}
-
-	/**
-	 * @return the bgpEvent
-	 */
-	public BgpEvent getBgpEvent() {
-		return bgpEvent;
 	}
 
 	/**
 	 * @param bgpEvent the bgpEvent to set
 	 */
-	public void setBgpEvent(BgpEvent bgpEvent) {
-		this.bgpEvent = bgpEvent;
+	public void addBgpEvent(BgpEvent bgpEvent) {
+		this.bgpEvents.add(bgpEvent);
 	}
 
 }

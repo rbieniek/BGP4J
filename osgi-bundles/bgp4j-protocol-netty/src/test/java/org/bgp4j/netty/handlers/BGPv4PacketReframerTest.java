@@ -20,8 +20,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
 
 import org.bgp4j.net.BGPv4Constants;
-import org.bgp4j.net.packets.BadMessageLengthNotificationPacket;
-import org.bgp4j.net.packets.ConnectionNotSynchronizedNotificationPacket;
 import org.bgp4j.netty.BGPv4TestBase;
 import org.junit.After;
 import org.junit.Assert;
@@ -50,7 +48,6 @@ public class BGPv4PacketReframerTest extends BGPv4TestBase {
 		channel.close();
 		channel = null;
 	}
-
 	
 	@Test
 	public void testValidPacket() throws Exception {
@@ -174,6 +171,7 @@ public class BGPv4PacketReframerTest extends BGPv4TestBase {
 			0x01, 0x02, // Error code: Message Header Error, Error subcode: Bad message length
 			0x14, 0x13  // Data: Broken length field
 			}, (ByteBuf)channel.readOutbound());
+		
 		
 		// assertNotificationEvent(BadMessageLengthNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
 	}

@@ -16,20 +16,18 @@
  */
 package org.bgp4j.netty.handlers;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import org.bgp4j.definitions.PeerConnectionInformation;
-import org.bgp4j.definitions.PeerConnectionInformationAware;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.packets.open.BadBgpIdentifierNotificationPacket;
 import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
 import org.bgp4j.net.packets.open.OpenPacket;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.bgp4j.netty.Attributes;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -40,22 +38,16 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@PeerConnectionInformationAware
-@Singleton
-public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
-	public static final String HANDLER_NAME ="BGP4-ValidateServerIdentifier";
-	
-	private @Inject Logger log;
+public class ValidateServerIdentifier extends ChannelInboundHandlerAdapter {
+	private Logger log = LoggerFactory.getLogger(ValidateServerIdentifier.class);
 
-	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelUpstreamHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
-	 */
+	public static final String HANDLER_NAME ="BGP4-ValidateServerIdentifier";
+
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		
-		if(e.getMessage() instanceof OpenPacket) {
-			OpenPacket openPacket = (OpenPacket)e.getMessage();
-			PeerConnectionInformation peerConnInfo = (PeerConnectionInformation)ctx.getAttachment();
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		if(msg instanceof OpenPacket) {
+			OpenPacket openPacket = (OpenPacket)msg;
+			PeerConnectionInformation peerConnInfo = ctx.channel().attr(Attributes.peerInfoKey).get();
 			
 			if(openPacket.getBgpIdentifier() != peerConnInfo.getRemoteBgpIdentifier()) {	
 				log.error("expected remote BGP identifier {}, received BGP identifier {}", peerConnInfo.getRemoteBgpIdentifier(), openPacket.getBgpIdentifier());
@@ -131,8 +123,8 @@ public class ValidateServerIdentifier extends SimpleChannelUpstreamHandler {
 			
 		}
 		
-		ctx.sendUpstream(e);
+		ctx.fireChannelRead(msg);
 	}
-	
+
 	
 }
