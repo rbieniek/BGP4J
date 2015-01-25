@@ -17,8 +17,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import io.netty.buffer.ByteBuf;
-
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.NotificationPacket;
 import org.bgp4j.net.packets.update.UnrecognizedWellKnownAttributeNotificationPacket;
 
@@ -34,49 +33,28 @@ public class UnrecognizedWellKnownAttributeException extends AttributeException 
 	private static final long serialVersionUID = -8298311237342239339L;
 
 	/**
-	 * 
-	 */
-	public UnrecognizedWellKnownAttributeException() {
-	}
-
-	/**
 	 * @param offendingAttribute
 	 */
-	public UnrecognizedWellKnownAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
-		// TODO Auto-generated constructor stub
+	public UnrecognizedWellKnownAttributeException(PathAttribute offendingAttributes) {
+		super(offendingAttributes);
 	}
 
 	/**
 	 * @param message
 	 * @param offendingAttribute
 	 */
-	public UnrecognizedWellKnownAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public UnrecognizedWellKnownAttributeException(String message, PathAttribute offendingAttributes) {
+		super(message, offendingAttributes);
 	}
 
-	/**
-	 * @param buffer
-	 */
-	public UnrecognizedWellKnownAttributeException(ByteBuf buffer) {
-		super(buffer);
-	}
-
-	/**
-	 * @param message
-	 * @param buffer
-	 */
-	public UnrecognizedWellKnownAttributeException(String message, ByteBuf buffer) {
-		super(message, buffer);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.bgp4j.netty.protocol.ProtocolPacketException#toNotificationPacket()
-	 */
 	@Override
-	public NotificationPacket toNotificationPacket() {
+	protected NotificationPacket toNotificationPacketUsingAttributes() {
 		return new UnrecognizedWellKnownAttributeNotificationPacket(getOffendingAttribute());
+	}
+
+	@Override
+	protected NotificationPacket toNotificationPacketUsingBytes() {
+		return new UnrecognizedWellKnownAttributeNotificationPacket(getRawOffendingAttributes());
 	}
 
 }

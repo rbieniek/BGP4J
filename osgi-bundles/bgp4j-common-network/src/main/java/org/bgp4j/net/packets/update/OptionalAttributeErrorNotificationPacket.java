@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,8 +31,15 @@ public class OptionalAttributeErrorNotificationPacket extends
 	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public OptionalAttributeErrorNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR, offendingAttribute);
+	public OptionalAttributeErrorNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR, offendingAttributes);
 	}
 
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public OptionalAttributeErrorNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR, offendingAttributes);
+	}
 }

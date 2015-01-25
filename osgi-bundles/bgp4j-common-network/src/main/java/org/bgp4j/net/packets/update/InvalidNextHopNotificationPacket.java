@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -28,8 +30,16 @@ public class InvalidNextHopNotificationPacket extends AttributeNotificationPacke
 	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public InvalidNextHopNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_INVALID_NEXT_HOP_ATTRIBUTE, offendingAttribute);
+	public InvalidNextHopNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_NEXT_HOP_ATTRIBUTE, offendingAttributes);
+	}
+
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public InvalidNextHopNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_NEXT_HOP_ATTRIBUTE, offendingAttributes);
 	}
 
 }

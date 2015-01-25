@@ -17,6 +17,9 @@
  */
 package org.bgp4j.netty.handlers;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,11 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.bgp4j.definitions.PeerConnectionInformation;
-import org.bgp4j.definitions.PeerConnectionInformationAware;
 import org.bgp4j.net.ASTypeAware;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.attributes.ASPathAttribute;
@@ -41,29 +40,23 @@ import org.bgp4j.net.packets.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.net.packets.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.net.packets.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.net.packets.update.UpdatePacket;
-import org.bgp4j.netty.protocol.update.PathAttributeCodec;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.bgp4j.netty.Attributes;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Rainer Bieniek (rainer@bgp4j.org)
  *
  */
-@PeerConnectionInformationAware
-@Singleton
-public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {	
-	private @Inject Logger log;
+public class UpdateAttributeChecker extends ChannelInboundHandlerAdapter {	
+	private Logger log = LoggerFactory.getLogger(UpdateAttributeChecker.class);
 	
 	private Set<Class<? extends PathAttribute>> mandatoryIBGPAttributes = new HashSet<Class<? extends PathAttribute>>();
 	private Set<Class<? extends PathAttribute>> mandatoryEBGPAttributes = new HashSet<Class<? extends PathAttribute>>();
 	private Map<Class<? extends PathAttribute>, Integer> as2ClazzCodeMap = new HashMap<Class<? extends PathAttribute>, Integer>();
 	private Map<Class<? extends PathAttribute>, Integer> as4ClazzCodeMap = new HashMap<Class<? extends PathAttribute>, Integer>();
 	
-	private UpdateAttributeChecker() {
+	public UpdateAttributeChecker() {
 		mandatoryEBGPAttributes.add(OriginPathAttribute.class);
 		mandatoryEBGPAttributes.add(ASPathAttribute.class);
 		mandatoryEBGPAttributes.add(NextHopPathAttribute.class);
@@ -84,13 +77,16 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 		as4ClazzCodeMap.put(OriginPathAttribute.class, BGPv4Constants.BGP_PATH_ATTRIBUTE_TYPE_ORIGIN);
 }
 	
+	/* (non-Javadoc)
+	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
+	 */
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		boolean sentUpstream = false;
 		
-		if(e.getMessage() instanceof UpdatePacket) {
-			PeerConnectionInformation connInfo = (PeerConnectionInformation)ctx.getAttachment();
-			UpdatePacket update = (UpdatePacket)e.getMessage();
+		if(msg instanceof UpdatePacket) {
+			PeerConnectionInformation peerConnInfo = ctx.channel().attr(Attributes.peerInfoKey).get();
+			UpdatePacket update = (UpdatePacket)msg;
 			List<PathAttribute> attributeFlagsErrorList = new LinkedList<PathAttribute>();
 			List<Class<? extends PathAttribute>> missingWellKnownList = new LinkedList<Class<? extends PathAttribute>>();
 			Set<Class<? extends PathAttribute>> givenAttributes = new HashSet<Class<? extends PathAttribute>>();
@@ -122,15 +118,15 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 			}
 			
 			// if we have any bad attribute, generate notification message and leave
-			if(attributeFlagsErrorList.size() > 0) {
-				NotificationHelper.sendNotification(ctx, 
-						new AttributeFlagsNotificationPacket(serializeAttributes(attributeFlagsErrorList)), 
-						new BgpEventFireChannelFutureListener(ctx));
+			if(!attributeFlagsErrorList.isEmpty()) {
+				attributeFlagsErrorList.forEach((n) -> NotificationHelper.sendNotification(ctx,  
+						new AttributeFlagsNotificationPacket(n),  
+						new BgpEventFireChannelFutureListener(ctx)));
 			} else {
 				// check presence of mandatory attributes
 				Set<Class<? extends PathAttribute>> mandatoryAttributes;
 
-				if (connInfo.isIBGPConnection())
+				if (peerConnInfo.isIBGPConnection())
 					mandatoryAttributes = mandatoryIBGPAttributes;
 				else
 					mandatoryAttributes = mandatoryEBGPAttributes;
@@ -145,13 +141,13 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 					Map<Class<? extends PathAttribute>, Integer> codeMap;
 					List<NotificationPacket> notifications = new LinkedList<NotificationPacket>();
 
-					if(connInfo.isAS4OctetsInUse())
+					if(peerConnInfo.isAS4OctetsInUse())
 						codeMap = as4ClazzCodeMap;
 					else
 						codeMap = as2ClazzCodeMap;
 
 					
-					if(connInfo.isAS4OctetsInUse())
+					if(peerConnInfo.isAS4OctetsInUse())
 						codeMap = as4ClazzCodeMap;
 					else
 						codeMap = as2ClazzCodeMap;
@@ -163,16 +159,14 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 						notifications.add(new MissingWellKnownAttributeNotificationPacket(code));
 					}
 					
-					NotificationHelper.sendNotifications(ctx, 
-							notifications, 
-							new BgpEventFireChannelFutureListener(ctx));
+					notifications.forEach((n) -> NotificationHelper.sendNotification(ctx, n, new BgpEventFireChannelFutureListener(ctx)));
 				} else {
 					boolean haveBougsWidth = false;
 					
 					// check path attributes for AS number width (2 or 4) settings which mismatch the connection configuration
 					for(PathAttribute attribute : update.getPathAttributes()) {
 						if(attribute instanceof ASTypeAware) {
-							if(((ASTypeAware)attribute).getAsType() != connInfo.getAsTypeInUse()) {
+							if(((ASTypeAware)attribute).getAsType() != peerConnInfo.getAsTypeInUse()) {
 								haveBougsWidth = true;
 							}
 						}
@@ -190,24 +184,6 @@ public class UpdateAttributeChecker extends SimpleChannelUpstreamHandler {
 			sentUpstream = true;
 		
 		if(sentUpstream)
-	        ctx.sendUpstream(e);
-	}
-
-	private byte[] serializeAttributes(List<PathAttribute> attrs) {
-		int size = 0;
-		
-		for(PathAttribute attr : attrs)
-			size += PathAttributeCodec.calculateEncodedPathAttributeLength(attr);
-		
-		ChannelBuffer buffer = ChannelBuffers.buffer(size);
-		
-		for(PathAttribute attr : attrs)
-			buffer.writeBytes(PathAttributeCodec.encodePathAttribute(attr));
-		
-		byte[] b = new byte[size];
-		
-		buffer.readBytes(b);
-		
-		return b;
+	        ctx.fireChannelRead(msg);
 	}
 }

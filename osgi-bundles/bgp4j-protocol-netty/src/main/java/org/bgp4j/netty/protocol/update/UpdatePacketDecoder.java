@@ -518,7 +518,7 @@ public class UpdatePacketDecoder {
 				byte[] packet = new byte[attributeLength];
 				
 				buffer.readBytes(packet);
-				ex.setOffendingAttribute(packet);
+				ex.setRawOffendingAttributes(packet);
 				
 				throw ex;
 			} catch(IndexOutOfBoundsException ex) {

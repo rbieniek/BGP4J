@@ -20,9 +20,13 @@ public class AttributeNotificationPacketEncoder extends
 	 */
 	@Override
 	protected void encodeNotificationPayload(AttributeNotificationPacket packet, ByteBuf buffer) {
-		if(packet.getOffendingAttribute() != null)  {
-			buffer.writeBytes(packet.getOffendingAttribute());
+		switch(packet.getAttributeMode()) {
+		case BYTES:
+			buffer.writeBytes(packet.getRawOffendingAttributes());
+			break;
+		case PATH_ATTRIBUTE:
+			PathAttributeCodec.encodePathAttribute(buffer, packet.getOffendingAttributes());
+			break;
 		}
 	}
-
 }

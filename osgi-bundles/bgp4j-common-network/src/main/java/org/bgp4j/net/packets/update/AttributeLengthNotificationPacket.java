@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -27,8 +29,14 @@ public class AttributeLengthNotificationPacket extends AttributeNotificationPack
 	/**
 	 * @param subcode
 	 */
-	public AttributeLengthNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_LENGTH_ERROR, offendingAttribute);
+	public AttributeLengthNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_LENGTH_ERROR, offendingAttributes);
 	}
 
+	/**
+	 * @param subcode
+	 */
+	public AttributeLengthNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_LENGTH_ERROR, offendingAttributes);
+	}
 }

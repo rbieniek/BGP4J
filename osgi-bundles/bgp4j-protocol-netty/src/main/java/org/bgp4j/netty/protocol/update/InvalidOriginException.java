@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.NotificationPacket;
 import org.bgp4j.net.packets.update.InvalidOriginNotificationPacket;
 
@@ -24,34 +25,41 @@ import org.bgp4j.net.packets.update.InvalidOriginNotificationPacket;
  *
  */
 public class InvalidOriginException extends AttributeException {
+	public InvalidOriginException() {
+		super();
+	}
+
+	public InvalidOriginException(String message) {
+		super(message);
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4983725877677879162L;
 
 	/**
-	 * 
-	 */
-	public InvalidOriginException() {
-	}
-
-	/**
 	 * @param offendingAttribute
 	 */
-	public InvalidOriginException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public InvalidOriginException(PathAttribute offendingAttributes) {
+		super(offendingAttributes);
 	}
 
 	/**
 	 * @param message
 	 */
-	public InvalidOriginException(String message, byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public InvalidOriginException(String message, PathAttribute offendingAttributes) {
+		super(message, offendingAttributes);
 	}
 
 	@Override
-	public NotificationPacket toNotificationPacket() {
+	protected NotificationPacket toNotificationPacketUsingAttributes() {
 		return new InvalidOriginNotificationPacket(getOffendingAttribute());
+	}
+
+	@Override
+	protected NotificationPacket toNotificationPacketUsingBytes() {
+		return new InvalidOriginNotificationPacket(getRawOffendingAttributes());
 	}
 
 

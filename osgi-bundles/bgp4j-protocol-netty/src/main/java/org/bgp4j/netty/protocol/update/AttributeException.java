@@ -16,7 +16,8 @@
  */
 package org.bgp4j.netty.protocol.update;
 
-import io.netty.buffer.ByteBuf;
+import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.net.packets.NotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -24,72 +25,108 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class AttributeException extends UpdatePacketException {
 
+	public enum EAttributeMode {
+		NONE,
+		PATH_ATTRIBUTES,
+		RAW_BYTES;
+	}
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8265508454292519918L;
 	
-	private byte[] offendingAttribute;
-
-	/**
-	 * 
-	 */
-	public AttributeException() {
+	private PathAttribute offendingAttributes;
+	private byte[] rawOffendingAttributes;
+	private EAttributeMode attributeMode = EAttributeMode.NONE;
+	
+	protected AttributeException() {}
+	
+	protected AttributeException(String message) {
+		super(message);
 	}
-
+	
 	/**
 	 * 
 	 */
-	public AttributeException(byte[] offendingAttribute) {
-		setOffendingAttribute(offendingAttribute);
+	protected AttributeException(PathAttribute offendingAttributes) {
+		setOffendingAttribute(offendingAttributes);
+		
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTES;
 	}
 
 	/**
 	 * @param message
 	 */
-	public AttributeException(String message, byte[] offendingAttribute) {
+	protected AttributeException(String message, PathAttribute offendingAttributes) {
 		super(message);
 
-		setOffendingAttribute(offendingAttribute);
+		setOffendingAttribute(offendingAttributes);
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTES;
 	}
 
 	/**
 	 * 
 	 */
-	public AttributeException(ByteBuf buffer) {
-		setOffendingAttribute(buffer);
+	protected AttributeException(byte[] offendingAttributes) {
+		setRawOffendingAttributes(offendingAttributes);
+		
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTES;
 	}
 
 	/**
 	 * @param message
 	 */
-	public AttributeException(String message, ByteBuf buffer) {
+	protected AttributeException(String message, byte[] offendingAttributes) {
 		super(message);
 
-		setOffendingAttribute(buffer);
+		setRawOffendingAttributes(offendingAttributes);
+		
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTES;
 	}
 
 	/**
 	 * @return the offendingAttribute
 	 */
-	public byte[] getOffendingAttribute() {
-		return offendingAttribute;
+	public PathAttribute getOffendingAttribute() {
+		return offendingAttributes;
 	}
 
 	/**
 	 * @param offendingAttribute the offendingAttribute to set
 	 */
-	public void setOffendingAttribute(byte[] offendingAttribute) {
-		this.offendingAttribute = offendingAttribute;
+	public void setOffendingAttribute(PathAttribute offendingAttributes) {
+		this.offendingAttributes = offendingAttributes;
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTES;
 	}
 
-	/**
-	 * @param offendingAttribute the offendingAttribute to set
-	 */
-	public void setOffendingAttribute(ByteBuf buffer) {
-		byte[] packet = new byte[buffer.readableBytes()];
+	public byte[] getRawOffendingAttributes() {
+		return rawOffendingAttributes;
+	}
+
+	public void setRawOffendingAttributes(byte[] rawOffendingAttributes) {
+		this.rawOffendingAttributes = rawOffendingAttributes;
+		this.attributeMode = EAttributeMode.RAW_BYTES;
 		
-		buffer.readBytes(packet);		
-		this.offendingAttribute = packet;
 	}
+
+	public EAttributeMode getAttributeMode() {
+		return attributeMode;
+	}
+
+	@Override
+	public final NotificationPacket toNotificationPacket() {
+		switch(this.attributeMode) {
+		case PATH_ATTRIBUTES:
+			return toNotificationPacketUsingAttributes();
+		case RAW_BYTES:
+			return toNotificationPacketUsingBytes();
+		default:
+			return null;
+		}
+	}
+	
+	protected abstract NotificationPacket toNotificationPacketUsingAttributes();
+
+	protected abstract NotificationPacket toNotificationPacketUsingBytes();
 }

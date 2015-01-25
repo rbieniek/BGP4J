@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,8 +31,15 @@ public class MalformedASPathAttributeNotificationPacket extends
 	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH, offendingAttribute);
+	public MalformedASPathAttributeNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH, offendingAttributes);
 	}
 
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public MalformedASPathAttributeNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH, offendingAttributes);
+	}
 }

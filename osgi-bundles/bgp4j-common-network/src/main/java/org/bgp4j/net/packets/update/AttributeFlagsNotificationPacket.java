@@ -16,6 +16,11 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.update.AttributeFlagsNotificationEvent;
+
 
 
 /**
@@ -24,8 +29,17 @@ package org.bgp4j.net.packets.update;
  */
 public class AttributeFlagsNotificationPacket extends AttributeNotificationPacket {
 
-	public AttributeFlagsNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_FLAGS_ERROR, offendingAttribute);
+	public AttributeFlagsNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_FLAGS_ERROR, offendingAttributes);
+	}
+
+	public AttributeFlagsNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_ATTRIBUTE_FLAGS_ERROR, offendingAttributes);
+	}
+	
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new AttributeFlagsNotificationEvent(direction);
 	}
 
 }

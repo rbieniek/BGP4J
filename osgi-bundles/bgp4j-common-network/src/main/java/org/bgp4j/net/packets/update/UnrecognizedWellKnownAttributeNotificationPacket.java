@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,8 +31,16 @@ public class UnrecognizedWellKnownAttributeNotificationPacket extends
 	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public UnrecognizedWellKnownAttributeNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE, offendingAttribute);
+	public UnrecognizedWellKnownAttributeNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE, offendingAttributes);
+	}
+
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public UnrecognizedWellKnownAttributeNotificationPacket(byte[] rawOffendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE, rawOffendingAttributes);
 	}
 
 }

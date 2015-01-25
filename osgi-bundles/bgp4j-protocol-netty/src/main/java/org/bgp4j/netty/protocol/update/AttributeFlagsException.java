@@ -17,6 +17,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.NotificationPacket;
 import org.bgp4j.net.packets.update.AttributeFlagsNotificationPacket;
 
@@ -31,19 +32,22 @@ public class AttributeFlagsException extends UpdatePacketException {
 	 */
 	private static final long serialVersionUID = -359375717544249436L;
 
-	private byte[] offendingAttribute;
+	private PathAttribute offendingAttributes;
 	
 	/**
 	 * 
 	 */
-	public AttributeFlagsException() {
+	public AttributeFlagsException(PathAttribute offendingAttributes) {
+		this.offendingAttributes = offendingAttributes;
 	}
 
 	/**
 	 * @param message
 	 */
-	public AttributeFlagsException(String message) {
+	public AttributeFlagsException(String message, PathAttribute offendingAttributes) {
 		super(message);
+
+		this.offendingAttributes = offendingAttributes;
 	}
 
 	/* (non-Javadoc)
@@ -51,7 +55,7 @@ public class AttributeFlagsException extends UpdatePacketException {
 	 */
 	@Override
 	public NotificationPacket toNotificationPacket() {
-		return new AttributeFlagsNotificationPacket(offendingAttribute);
+		return new AttributeFlagsNotificationPacket(offendingAttributes);
 	}
 
 }

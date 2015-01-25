@@ -9,12 +9,12 @@ import org.bgp4j.net.EChannelDirection;
  * @author rainer
  *
  */
-public class AttributeNotificationEvent extends UpdateNotificationEvent {
+public class AttributeFlagsNotificationEvent extends AttributeNotificationEvent {
 
 	/**
 	 * @param direction
 	 */
-	public AttributeNotificationEvent(EChannelDirection direction) {
+	public AttributeFlagsNotificationEvent(EChannelDirection direction) {
 		super(direction);
 	}
 

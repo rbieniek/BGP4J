@@ -17,11 +17,10 @@
  */
 package org.bgp4j.netty.handlers;
 
-import java.net.Inet4Address;
-import java.util.ArrayList;
-import java.util.UUID;
+import static org.fest.assertions.api.Assertions.assertThat;
+import io.netty.channel.embedded.EmbeddedChannel;
 
-import junit.framework.Assert;
+import java.net.Inet4Address;
 
 import org.bgp4j.net.ASType;
 import org.bgp4j.net.Origin;
@@ -32,23 +31,19 @@ import org.bgp4j.net.attributes.NextHopPathAttribute;
 import org.bgp4j.net.attributes.OriginPathAttribute;
 import org.bgp4j.net.attributes.OriginatorIDPathAttribute;
 import org.bgp4j.net.attributes.PathAttribute;
-import org.bgp4j.net.packets.NotificationPacket;
+import org.bgp4j.net.events.update.AttributeFlagsNotificationEvent;
+import org.bgp4j.net.events.update.MalformedAttributeListNotificationEvent;
+import org.bgp4j.net.events.update.MissingWellKnownAttributeNotificationEvent;
+import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.net.packets.update.AttributeFlagsNotificationPacket;
 import org.bgp4j.net.packets.update.MalformedAttributeListNotificationPacket;
 import org.bgp4j.net.packets.update.MissingWellKnownAttributeNotificationPacket;
 import org.bgp4j.net.packets.update.UpdatePacket;
-import org.bgp4j.netty.LocalChannelBGPv4TestBase;
-import org.bgp4j.netty.MessageRecordingChannelHandler;
+import org.bgp4j.netty.Attributes;
+import org.bgp4j.netty.BGPv4TestBase;
 import org.bgp4j.netty.MockPeerConnectionInformation;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.channel.local.LocalAddress;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,57 +51,28 @@ import org.junit.Test;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
+public class UpdateAttributeCheckerTest extends BGPv4TestBase {
+
+	private EmbeddedChannel channel;
+	private UserEventInboundHandler eventHandler;
 
 	@Before
 	public void before() {
+		eventHandler = new UserEventInboundHandler();		
+		channel = new EmbeddedChannel(new UpdateAttributeChecker(), eventHandler);
 		peerInfo = new MockPeerConnectionInformation();
-
-		messageRecorder = obtainInstance(MessageRecordingChannelHandler.class);
-		messageRecorder.setPeerInfo(peerInfo);
 		
-		LocalAddress codecOnlyAddress = new LocalAddress(UUID.randomUUID().toString());
-		
-		serverBootstrap = buildLocalServerBootstrap(new ChannelPipelineFactory() {
-			
-			@Override
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new ChannelHandler[] { 
-						obtainInstance(UpdateAttributeChecker.class), 
-						messageRecorder });
-			}
-		});
-		serverChannel = serverBootstrap.bind(codecOnlyAddress);
-
-		clientBootstrap = buildLocalClientBootstrap(Channels.pipeline(new ChannelHandler[] {
-				messageRecorder 
-				}));
-		clientChannel = clientBootstrap.connect(codecOnlyAddress).getChannel();		
-
+		channel.attr(Attributes.peerInfoKey).set(peerInfo);
 	}
 	
 	@After
 	public void after() {
-		if(clientChannel != null)
-			clientChannel.close();
-		if(serverChannel != null)
-			serverChannel.close();
-		clientChannel = null;
-		clientBootstrap.releaseExternalResources();
-		clientBootstrap = null;
-		serverBootstrap.releaseExternalResources();
-		serverBootstrap = null;
-
+		channel.close();
+		channel = null;
 		peerInfo = null;
 	}
 
-	private MessageRecordingChannelHandler messageRecorder;
 	private MockPeerConnectionInformation peerInfo;
-	
-	private ServerBootstrap serverBootstrap;
-	private ClientBootstrap clientBootstrap;
-	private Channel clientChannel;
-	private Channel serverChannel;
 	
 	@Test
 	public void testPassAllRequiredAttributes2OctetsASIBGPConnection() throws Exception {
@@ -121,12 +87,12 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 		
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		UpdatePacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), UpdatePacket.class);
+		assertThat(channel.outboundMessages()).isEmpty();
+		assertThat(channel.inboundMessages()).hasSize(1);
+		
+		UpdatePacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), UpdatePacket.class);
 
 		Assert.assertEquals(4, consumed.getPathAttributes().size());
 	}
@@ -144,12 +110,12 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 		
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		assertThat(channel.outboundMessages()).isEmpty();
+		assertThat(channel.inboundMessages()).hasSize(1);
 	
-		UpdatePacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), UpdatePacket.class);
+		UpdatePacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), UpdatePacket.class);
 
 		Assert.assertEquals(4, consumed.getPathAttributes().size());
 	}
@@ -167,12 +133,12 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_2OCTETS));
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		assertThat(channel.outboundMessages()).isEmpty();
+		assertThat(channel.inboundMessages()).hasSize(1);
 	
-		UpdatePacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), UpdatePacket.class);
+		UpdatePacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), UpdatePacket.class);
 
 		Assert.assertEquals(3, consumed.getPathAttributes().size());
 	}
@@ -189,12 +155,12 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(0, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
+		assertThat(channel.outboundMessages()).isEmpty();
+		assertThat(channel.inboundMessages()).hasSize(1);
 	
-		UpdatePacket consumed = safeDowncast(safeExtractChannelEvent(messageRecorder.nextEvent(serverChannel)), UpdatePacket.class);
+		UpdatePacket consumed = safeDowncast((BGPv4Packet)channel.readInbound(), UpdatePacket.class);
 
 		Assert.assertEquals(3, consumed.getPathAttributes().size());
 	}
@@ -207,24 +173,21 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		
 		UpdatePacket update = new UpdatePacket();
 		
-		clientChannel.write(update);
+		channel.writeInbound(update);
+
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(4);
+		assertThat(eventHandler.events()).hasSize(4);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
 		
-		Assert.assertEquals(4, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		
-		ArrayList<Class<? extends NotificationPacket>> packetClasses = new ArrayList<Class<? extends NotificationPacket>>();
-				
-		packetClasses.add(MissingWellKnownAttributeNotificationPacket.class);
-		packetClasses.add(MissingWellKnownAttributeNotificationPacket.class);
-		packetClasses.add(MissingWellKnownAttributeNotificationPacket.class);
-		packetClasses.add(MissingWellKnownAttributeNotificationPacket.class);
-		
-		assertNotificationEvent(packetClasses, messageRecorder.nextEvent(serverChannel));
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 	}
 	
 	@Test
@@ -241,27 +204,29 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
-		
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
+
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
 		// update.getPathAttributes().add(new ASPathAttribute(ASType.AS_NUMBER_4OCTETS));
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 		
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
@@ -269,13 +234,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		// update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 		
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
@@ -283,13 +249,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		// update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 	}
 
 	
@@ -307,13 +274,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 		
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
@@ -321,13 +289,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 		
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
@@ -335,13 +304,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		// update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 		
 		update = new UpdatePacket();
 		update.getPathAttributes().add(new OriginPathAttribute(Origin.INCOMPLETE));
@@ -349,13 +319,14 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new NextHopPathAttribute((Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x4, 0x1 })));
 		// update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MissingWellKnownAttributeNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MissingWellKnownAttributeNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MissingWellKnownAttributeNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MissingWellKnownAttributeNotificationEvent.class);
 	}
 	
 	@Test
@@ -372,72 +343,84 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		attr = new LocalPrefPathAttribute(100);
 		attr.setTransitive(false); // bogus flag, must be true according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
-		
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
+
 		// well-known mandatory
 		update = new UpdatePacket();
 		attr = new LocalPrefPathAttribute(100);
 		attr.setOptional(true); // bogus flag, must be false according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
 
 		// optional transitive
 		update = new UpdatePacket();
 		attr = new AggregatorPathAttribute(ASType.AS_NUMBER_2OCTETS, 64173, (Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x01 } ));
 		attr.setTransitive(false); // bogus flag, must be true according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
 		
 		// optional transitive
 		update = new UpdatePacket();
 		attr = new AggregatorPathAttribute(ASType.AS_NUMBER_2OCTETS, 64173, (Inet4Address)Inet4Address.getByAddress(new byte[] { (byte)0xc0, (byte)0xa8, 0x04, 0x01 } ));
 		attr.setOptional(false); // bogus flag, must be true according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
 
 		// optional non-transitive
 		update = new UpdatePacket();
 		attr = new OriginatorIDPathAttribute(1);
 		attr.setOptional(false); // bogus flag, must be true according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
 
 		// optional non-transitive
 		update = new UpdatePacket();
 		attr = new OriginatorIDPathAttribute(1);
 		attr.setTransitive(true); // bogus flag, must be false according to RFC 4271
 		update.getPathAttributes().add(attr);
-		clientChannel.write(update);
+		channel.writeInbound(update);
 		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-		Assert.assertEquals(AttributeFlagsNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(AttributeFlagsNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(AttributeFlagsNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(AttributeFlagsNotificationEvent.class);
 	}
 	
 	@Test
@@ -455,12 +438,13 @@ public class UpdateAttributeCheckerTest extends LocalChannelBGPv4TestBase {
 		update.getPathAttributes().add(new LocalPrefPathAttribute(100));
 		update.getPathAttributes().add(new AggregatorPathAttribute(ASType.AS_NUMBER_4OCTETS));
 
-		clientChannel.write(update);
-		
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(clientChannel));
-		Assert.assertEquals(1, messageRecorder.getWaitingEventNumber(serverChannel));
-	
-		Assert.assertEquals(MalformedAttributeListNotificationPacket.class, safeExtractChannelEvent(messageRecorder.nextEvent(clientChannel)).getClass());
-		assertNotificationEvent(MalformedAttributeListNotificationPacket.class, messageRecorder.nextEvent(serverChannel));
+		channel.writeInbound(update);
+
+		assertThat(channel.inboundMessages()).isEmpty();;
+		assertThat(channel.outboundMessages()).hasSize(1);
+		assertThat(eventHandler.events()).hasSize(1);
+
+		assertThat(channel.readOutbound()).isInstanceOf(MalformedAttributeListNotificationPacket.class);
+		assertThat(eventHandler.readEvent()).isInstanceOf(MalformedAttributeListNotificationEvent.class);
 	}
 }

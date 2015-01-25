@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.NotificationPacket;
 import org.bgp4j.net.packets.update.MalformedASPathAttributeNotificationPacket;
 
@@ -25,36 +26,43 @@ import org.bgp4j.net.packets.update.MalformedASPathAttributeNotificationPacket;
  */
 public class MalformedASPathAttributeException extends AttributeException {
 
+	public MalformedASPathAttributeException() {
+		super();
+	}
+
+	public MalformedASPathAttributeException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 835955227257193451L;
 
 	/**
-	 * 
-	 */
-	public MalformedASPathAttributeException() {
-	}
-
-	/**
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public MalformedASPathAttributeException(PathAttribute offendingAttributes) {
+		super(offendingAttributes);
 	}
 
 	/**
 	 * @param message
 	 * @param offendingAttribute
 	 */
-	public MalformedASPathAttributeException(String message,
-			byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public MalformedASPathAttributeException(String message, PathAttribute offendingAttributes) {
+		super(message, offendingAttributes);
 	}
 
 	@Override
-	public NotificationPacket toNotificationPacket() {
+	protected NotificationPacket toNotificationPacketUsingAttributes() {
 		return new MalformedASPathAttributeNotificationPacket(getOffendingAttribute());
+	}
+
+	@Override
+	protected NotificationPacket toNotificationPacketUsingBytes() {
+		return new MalformedASPathAttributeNotificationPacket(getRawOffendingAttributes());
 	}
 
 

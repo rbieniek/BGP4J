@@ -17,6 +17,8 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -28,8 +30,15 @@ public class InvalidOriginNotificationPacket extends AttributeNotificationPacket
 	 * @param subcode
 	 * @param offendingAttribute
 	 */
-	public InvalidOriginNotificationPacket(byte[] offendingAttribute) {
-		super(UpdateNotificationPacket.SUBCODE_INVALID_ORIGIN_ATTRIBUTE, offendingAttribute);
+	public InvalidOriginNotificationPacket(PathAttribute offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_ORIGIN_ATTRIBUTE, offendingAttributes);
 	}
 
+	/**
+	 * @param subcode
+	 * @param offendingAttribute
+	 */
+	public InvalidOriginNotificationPacket(byte[] offendingAttributes) {
+		super(UpdateNotificationPacket.SUBCODE_INVALID_ORIGIN_ATTRIBUTE, offendingAttributes);
+	}
 }

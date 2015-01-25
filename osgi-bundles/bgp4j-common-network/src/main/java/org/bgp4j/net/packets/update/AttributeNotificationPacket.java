@@ -18,6 +18,7 @@
 package org.bgp4j.net.packets.update;
 
 import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.events.NotificationEvent;
 import org.bgp4j.net.events.update.AttributeNotificationEvent;
 
@@ -29,29 +30,45 @@ import org.bgp4j.net.events.update.AttributeNotificationEvent;
  */
 public class AttributeNotificationPacket extends UpdateNotificationPacket {
 
-	private byte[] offendingAttribute;
+	public enum EAttributeMode {
+		PATH_ATTRIBUTE,
+		BYTES
+	}
 	
+	private PathAttribute offendingAttributes;
+	private byte[] rawOffendingAttributes;
+	private EAttributeMode attributeMode;
+	
+	public EAttributeMode getAttributeMode() {
+		return attributeMode;
+	}
+
+	public byte[] getRawOffendingAttributes() {
+		return rawOffendingAttributes;
+	}
+
+	public PathAttribute getOffendingAttributes() {
+		return offendingAttributes;
+	}
+
 	/**
 	 * @param subcode
 	 */
-	protected AttributeNotificationPacket(int subcode, byte[] offendingAttribute) {
+	protected AttributeNotificationPacket(int subcode, PathAttribute offendingAttributes) {
 		super(subcode);
 		
-		this.offendingAttribute = offendingAttribute;
+		this.attributeMode = EAttributeMode.PATH_ATTRIBUTE;
+		this.offendingAttributes = offendingAttributes;
 	}
 
 	/**
-	 * @return the offendingAttribute
+	 * @param subcode
 	 */
-	public byte[] getOffendingAttribute() {
-		return offendingAttribute;
-	}
+	protected AttributeNotificationPacket(int subcode, byte[] rawOffendingAttributes) {
+		super(subcode);
 
-	/**
-	 * @param offendingAttribute the offendingAttribute to set
-	 */
-	void setOffendingAttribute(byte[] offendingAttribute) {
-		this.offendingAttribute = offendingAttribute;
+		this.attributeMode = EAttributeMode.BYTES;
+		this.rawOffendingAttributes = rawOffendingAttributes;
 	}
 
 	@Override

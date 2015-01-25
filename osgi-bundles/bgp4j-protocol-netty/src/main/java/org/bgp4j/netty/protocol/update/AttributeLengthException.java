@@ -16,6 +16,7 @@
  */
 package org.bgp4j.netty.protocol.update;
 
+import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.NotificationPacket;
 import org.bgp4j.net.packets.update.AttributeLengthNotificationPacket;
 
@@ -25,28 +26,44 @@ import org.bgp4j.net.packets.update.AttributeLengthNotificationPacket;
  */
 public class AttributeLengthException extends AttributeException {
 
+	public AttributeLengthException() {
+		super();
+	}
+
+	public AttributeLengthException(String message) {
+		super(message);
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3386494133413403227L;
 
-	/**
-	 * 
-	 */
-	public AttributeLengthException() {
+
+	public AttributeLengthException(PathAttribute offendingAttributes) {
+		super(offendingAttributes);
 	}
 
-	public AttributeLengthException(byte[] offendingAttribute) {
-		super(offendingAttribute);
+	public AttributeLengthException(String message, PathAttribute offendingAttributes) {
+		super(message, offendingAttributes);
 	}
 
-	public AttributeLengthException(String message, byte[] offendingAttribute) {
-		super(message, offendingAttribute);
+	public AttributeLengthException(byte[] offendingAttributes) {
+		super(offendingAttributes);
+	}
+
+	public AttributeLengthException(String message, byte[] offendingAttributes) {
+		super(message, offendingAttributes);
 	}
 
 	@Override
-	public NotificationPacket toNotificationPacket() {
+	public NotificationPacket toNotificationPacketUsingAttributes () {
 		return new AttributeLengthNotificationPacket(getOffendingAttribute());
+	}
+
+	@Override
+	protected NotificationPacket toNotificationPacketUsingBytes() {
+		return new AttributeLengthNotificationPacket(getRawOffendingAttributes());
 	}
 
 }
