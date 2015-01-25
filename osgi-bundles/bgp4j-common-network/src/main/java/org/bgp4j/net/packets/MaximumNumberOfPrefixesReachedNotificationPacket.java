@@ -18,7 +18,10 @@
 package org.bgp4j.net.packets;
 
 import org.bgp4j.net.AddressFamily;
+import org.bgp4j.net.EChannelDirection;
 import org.bgp4j.net.SubsequentAddressFamily;
+import org.bgp4j.net.events.MaximumNumberOfPrefixesReachedNotificationEvent;
+import org.bgp4j.net.events.NotificationEvent;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -89,6 +92,11 @@ public class MaximumNumberOfPrefixesReachedNotificationPacket extends CeaseNotif
 	 */
 	public void setPrefixUpperBound(int prefixUpperBound) {
 		this.prefixUpperBound = prefixUpperBound;
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new MaximumNumberOfPrefixesReachedNotificationEvent(direction);
 	}
 
 }

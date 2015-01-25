@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.PeerDeconfiguredNotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -29,6 +33,11 @@ public class PeerDeconfiguredNotificationPacket extends CeaseNotificationPacket 
 	public PeerDeconfiguredNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_PEER_DECONFIGURED);
 		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new PeerDeconfiguredNotificationEvent(direction);
 	}
 
 }

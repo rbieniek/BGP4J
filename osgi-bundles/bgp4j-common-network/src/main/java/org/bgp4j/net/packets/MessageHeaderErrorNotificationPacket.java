@@ -17,6 +17,9 @@
 package org.bgp4j.net.packets;
 
 import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.MessageHeaderErrorNotificationEvent;
+import org.bgp4j.net.events.NotificationEvent;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -30,5 +33,10 @@ public class MessageHeaderErrorNotificationPacket extends NotificationPacket {
 	
 	protected MessageHeaderErrorNotificationPacket(int subcode) {
 		super(BGPv4Constants.BGP_ERROR_CODE_MESSAGE_HEADER, subcode);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new MessageHeaderErrorNotificationEvent(direction);
 	}
 }

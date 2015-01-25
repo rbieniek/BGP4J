@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.update.AttributeNotificationEvent;
+
 
 
 /**
@@ -48,5 +52,10 @@ public class AttributeNotificationPacket extends UpdateNotificationPacket {
 	 */
 	void setOffendingAttribute(byte[] offendingAttribute) {
 		this.offendingAttribute = offendingAttribute;
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new AttributeNotificationEvent(direction);
 	}
 }

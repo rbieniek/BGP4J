@@ -17,6 +17,9 @@
 package org.bgp4j.net.packets;
 
 import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.HoldTimerExpiredNotificationEvent;
+import org.bgp4j.net.events.NotificationEvent;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -30,6 +33,11 @@ public class HoldTimerExpiredNotificationPacket extends NotificationPacket {
 	 */
 	public HoldTimerExpiredNotificationPacket() {
 		super(BGPv4Constants.BGP_ERROR_CODE_HOLD_TIMER_EXPIRED, 0);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new HoldTimerExpiredNotificationEvent(direction);
 	}
 
 }

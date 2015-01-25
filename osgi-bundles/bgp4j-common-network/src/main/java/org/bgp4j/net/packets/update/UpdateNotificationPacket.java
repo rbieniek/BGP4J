@@ -23,7 +23,7 @@ import org.bgp4j.net.packets.NotificationPacket;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class UpdateNotificationPacket extends NotificationPacket {
+public abstract class UpdateNotificationPacket extends NotificationPacket {
 
 	public static final int SUBCODE_MALFORMED_ATTRIBUTE_LIST = 1;
 	public static final int SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE = 2;

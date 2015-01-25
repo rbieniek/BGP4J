@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.open;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.BadPeerASNotificationEvent;
+
 
 
 /**
@@ -26,6 +30,11 @@ public class BadPeerASNotificationPacket extends OpenNotificationPacket {
 
 	public BadPeerASNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_BAD_PEER_AS);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new BadPeerASNotificationEvent(direction);
 	}
 
 }

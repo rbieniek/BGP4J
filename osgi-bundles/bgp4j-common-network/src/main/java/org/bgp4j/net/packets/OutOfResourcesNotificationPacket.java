@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.OutOfResourcesNotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,6 +32,11 @@ public class OutOfResourcesNotificationPacket extends CeaseNotificationPacket {
 	 */
 	public OutOfResourcesNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_OUT_OF_RESOURCES);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new OutOfResourcesNotificationEvent(direction);
 	}
 
 }

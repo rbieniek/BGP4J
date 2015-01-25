@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.AdministrativeResetNotificationEvent;
+import org.bgp4j.net.events.NotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,6 +32,11 @@ public class AdministrativeResetNotificationPacket extends CeaseNotificationPack
 	 */
 	public AdministrativeResetNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_ADMINSTRATIVE_RESET);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new AdministrativeResetNotificationEvent(direction);
 	}
 
 }

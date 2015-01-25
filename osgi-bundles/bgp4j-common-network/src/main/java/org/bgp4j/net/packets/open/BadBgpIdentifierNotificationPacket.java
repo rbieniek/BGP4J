@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.open;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.BadBgpIdentifierNotificationEvent;
+
 
 
 /**
@@ -26,6 +30,11 @@ public class BadBgpIdentifierNotificationPacket extends	OpenNotificationPacket {
 
 	public BadBgpIdentifierNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_BAD_BGP_IDENTIFIER);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new BadBgpIdentifierNotificationEvent(direction);
 	}
 
 }

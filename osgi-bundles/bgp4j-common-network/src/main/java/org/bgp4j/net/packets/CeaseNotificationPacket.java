@@ -22,7 +22,7 @@ import org.bgp4j.net.BGPv4Constants;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class CeaseNotificationPacket extends NotificationPacket {
+public abstract class CeaseNotificationPacket extends NotificationPacket {
 
 	public static final int SUBCODE_UNSPECIFIC = 0;
 	public static final int SUBCODE_MAXIMUM_NUMBER_OF_PREFIXES_REACHED = 1;

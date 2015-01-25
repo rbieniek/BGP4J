@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.OtherConfigurationChangeNotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,6 +32,11 @@ public class OtherConfigurationChangeNotificationPacket extends CeaseNotificatio
 	 */
 	public OtherConfigurationChangeNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_OTHER_CONFIGURATION_CHANGE);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new OtherConfigurationChangeNotificationEvent(direction);
 	}
 
 }

@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.update.MalformedAttributeListNotificationEvent;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,6 +33,11 @@ public class MalformedAttributeListNotificationPacket extends
 	 */
 	public MalformedAttributeListNotificationPacket() {
 		super(UpdateNotificationPacket.SUBCODE_MALFORMED_ATTRIBUTE_LIST);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new MalformedAttributeListNotificationEvent(direction);
 	}
 
 }

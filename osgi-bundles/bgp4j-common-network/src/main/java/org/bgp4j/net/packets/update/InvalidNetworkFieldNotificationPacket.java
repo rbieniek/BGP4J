@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.update.InvalidNetworkFieldNotificationEvent;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -29,6 +33,11 @@ public class InvalidNetworkFieldNotificationPacket extends
 	 */
 	public InvalidNetworkFieldNotificationPacket() {
 		super(UpdateNotificationPacket.SUBCODE_INVALID_NETWORK_FIELD);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new InvalidNetworkFieldNotificationEvent(direction);
 	}
 
 }

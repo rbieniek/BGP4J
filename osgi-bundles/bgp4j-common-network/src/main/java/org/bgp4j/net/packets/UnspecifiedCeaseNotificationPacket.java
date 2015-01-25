@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.UnspecifiedCeaseNotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,6 +32,11 @@ public class UnspecifiedCeaseNotificationPacket extends CeaseNotificationPacket 
 	 */
 	public UnspecifiedCeaseNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_UNSPECIFIC);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new UnspecifiedCeaseNotificationEvent(direction);
 	}
 
 }

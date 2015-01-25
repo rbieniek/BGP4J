@@ -17,6 +17,9 @@
 package org.bgp4j.net.packets.open;
 
 import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.UnsupportedVersionNumberNotificationEvent;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -41,6 +44,11 @@ public class UnsupportedVersionNumberNotificationPacket extends	OpenNotification
 	 */
 	public int getSupportedProtocolVersion() {
 		return supportedProtocolVersion;
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new UnsupportedVersionNumberNotificationEvent(direction);
 	}
 
 }

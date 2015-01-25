@@ -23,7 +23,7 @@ import org.bgp4j.net.packets.NotificationPacket;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class OpenNotificationPacket extends NotificationPacket {
+public abstract class OpenNotificationPacket extends NotificationPacket {
 
 	public static final int SUBCODE_UNSPECIFIC = 0;
 	public static final int SUBCODE_UNSUPPORTED_VERSION_NUMBER = 1;

@@ -18,12 +18,14 @@ package org.bgp4j.net.packets;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bgp4j.net.BGPv4Constants;
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class NotificationPacket extends BGPv4Packet {
+public abstract class NotificationPacket extends BGPv4Packet {
 	private int errorCode;
 	private int errorSubcode;
 	
@@ -50,6 +52,13 @@ public class NotificationPacket extends BGPv4Packet {
 	public final int getErrorSubcode() {
 		return errorSubcode;
 	}	
+	
+	/**
+	 * 
+	 * @param diection
+	 * @return
+	 */
+	public abstract NotificationEvent event(EChannelDirection direction);
 	
 	@Override
 	public String toString() {

@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.open;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.UnsupportedCapabilityNotificationEvent;
+
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -25,6 +29,11 @@ public class UnsupportedCapabilityNotificationPacket extends OpenNotificationPac
 
 	protected UnsupportedCapabilityNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_CAPABILITY);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new UnsupportedCapabilityNotificationEvent(direction);
 	}
 
 }

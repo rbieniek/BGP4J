@@ -17,6 +17,10 @@
  */
 package org.bgp4j.net.packets;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.ConnectionCollisionResolutionNotificationEvent;
+import org.bgp4j.net.events.NotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -28,6 +32,11 @@ public class ConnectionCollisionResolutionNotificationPacket extends CeaseNotifi
 	 */
 	public ConnectionCollisionResolutionNotificationPacket() {
 		super(CeaseNotificationPacket.SUBCODE_CONNECTION_COLLISION_RESOLUTION);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new ConnectionCollisionResolutionNotificationEvent(direction);
 	}
 
 }

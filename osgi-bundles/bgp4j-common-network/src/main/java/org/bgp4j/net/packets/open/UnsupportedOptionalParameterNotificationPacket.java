@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.open;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.UnsupportedOptionalParameterNotificationEvent;
+
 
 
 /**
@@ -26,6 +30,11 @@ public class UnsupportedOptionalParameterNotificationPacket extends	OpenNotifica
 
 	public UnsupportedOptionalParameterNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_UNSUPPORTED_OPTIONAL_PARAMETER);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new UnsupportedOptionalParameterNotificationEvent(direction);
 	}
 
 }

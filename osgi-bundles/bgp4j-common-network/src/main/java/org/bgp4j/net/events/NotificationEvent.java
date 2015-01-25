@@ -17,12 +17,8 @@
  */
 package org.bgp4j.net.events;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import org.bgp4j.net.EChannelDirection;
 
-import org.bgp4j.net.packets.NotificationPacket;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
@@ -30,20 +26,13 @@ import org.bgp4j.net.packets.NotificationPacket;
  */
 public class NotificationEvent extends BgpEvent {
 
-	private List<NotificationPacket> notifications = new LinkedList<NotificationPacket>();
+	private EChannelDirection direction;
 	
-	public NotificationEvent(NotificationPacket packet) {
-		notifications.add(packet);
+	protected NotificationEvent(EChannelDirection direction) {
+		this.direction = direction;
 	}
 	
-	public NotificationEvent(Collection<NotificationPacket> notifications) {
-		this.notifications.addAll(notifications);
-	}
-
-	/**
-	 * @return the notifications
-	 */
-	public List<NotificationPacket> getNotifications() {
-		return Collections.unmodifiableList(notifications);
+	public EChannelDirection getDirection() {
+		return direction;
 	}
 }

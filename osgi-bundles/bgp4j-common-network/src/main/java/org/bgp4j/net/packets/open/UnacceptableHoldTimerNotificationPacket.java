@@ -16,6 +16,10 @@
  */
 package org.bgp4j.net.packets.open;
 
+import org.bgp4j.net.EChannelDirection;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.open.UnacceptableHoldTimerNotificationEvent;
+
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
@@ -24,6 +28,11 @@ public class UnacceptableHoldTimerNotificationPacket extends OpenNotificationPac
 
 	public UnacceptableHoldTimerNotificationPacket() {
 		super(OpenNotificationPacket.SUBCODE_UNACCEPTABLE_HOLD_TIMER);
+	}
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new UnacceptableHoldTimerNotificationEvent(direction);
 	}
 
 }
