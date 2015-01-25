@@ -17,8 +17,8 @@
  */
 package org.bgp4j.netty.handlers;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import org.bgp4j.net.AddressFamily;
 import org.bgp4j.net.BGPv4Constants;
@@ -27,10 +27,8 @@ import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.capabilities.MultiProtocolCapability;
 import org.bgp4j.net.packets.open.BadPeerASNotificationPacket;
 import org.bgp4j.net.packets.open.OpenPacket;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This handler performs inbound handling of OPEN capabilites for:
@@ -39,19 +37,18 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Singleton
-public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandler {
+public class InboundOpenCapabilitiesProcessor extends ChannelInboundHandlerAdapter {
 	public static final String HANDLER_NAME="BGP4-InboundOpenCapabilitiesProcessor";
 	
-	private @Inject Logger log;
+	private Logger log = LoggerFactory.getLogger(InboundOpenCapabilitiesProcessor.class);
 
 	/* (non-Javadoc)
 	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
 	 */
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		if(e.getMessage() instanceof OpenPacket) {
-			OpenPacket open = (OpenPacket)e.getMessage();
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		if(msg instanceof OpenPacket) {
+			OpenPacket open = (OpenPacket)msg;
 			AutonomousSystem4Capability as4Cap = open.findCapability(AutonomousSystem4Capability.class);
 			
 			//
@@ -97,7 +94,7 @@ public class InboundOpenCapabilitiesProcessor extends SimpleChannelUpstreamHandl
 			}
 		}
 		
-		ctx.sendUpstream(e);
+		ctx.fireChannelRead(msg);
 	}
 
 }
