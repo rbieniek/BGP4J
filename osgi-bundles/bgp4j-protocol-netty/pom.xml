@@ -24,6 +24,12 @@
     	<groupId>org.apache.felix</groupId>
     	<artifactId>maven-bundle-plugin</artifactId>
 	<extensions>true</extensions>
+	<configuration>
+	  <instructions>
+            <Private-Package>org.bgp4j.netty.*</Private-Package>
+            <Bundle-Activator>org.bgp4j.netty.osgi.Activator</Bundle-Activator>
+	  </instructions>
+	</configuration>
       </plugin>
       <plugin>
     	<groupId>org.apache.servicemix.tooling</groupId>
@@ -41,6 +47,11 @@
   </build>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>

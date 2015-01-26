@@ -14,6 +14,7 @@ import org.bgp4j.netty.protocol.open.OpenPacketEncoder;
 import org.bgp4j.netty.protocol.open.UnsupportedCapabilityNotificationPacketEncoder;
 import org.bgp4j.netty.protocol.open.UnsupportedVersionNumberNotificationPacketEncoder;
 import org.bgp4j.netty.protocol.refresh.RouteRefreshPacketEncoder;
+import org.bgp4j.netty.protocol.update.AttributeNotificationPacketEncoder;
 import org.bgp4j.netty.protocol.update.MissingWellKnownAttributeNotificationPacketEncoder;
 import org.bgp4j.netty.protocol.update.UpdatePacketEncoder;
 import org.slf4j.Logger;
@@ -72,6 +73,7 @@ public class BGPv4PacketEncoderFactory {
 	private UnsupportedVersionNumberNotificationPacketEncoder unsupportedVersionNumberEncoder = new UnsupportedVersionNumberNotificationPacketEncoder();
 	private UnsupportedCapabilityNotificationPacketEncoder unsupportedCapabilityEncoder = new UnsupportedCapabilityNotificationPacketEncoder();
 	private MissingWellKnownAttributeNotificationPacketEncoder missingWellKnownAttributeEncoder = new MissingWellKnownAttributeNotificationPacketEncoder();
+	private AttributeNotificationPacketEncoder attributeEncoder = new AttributeNotificationPacketEncoder();
 	
 	@SuppressWarnings("unchecked")
 	private <T extends NotificationPacket> BGPv4PacketEncoder<T> encoderForNotificationPacket(T packet) {
@@ -116,6 +118,7 @@ public class BGPv4PacketEncoderFactory {
 			case UpdateNotificationPacket.SUBCODE_MALFORMED_AS_PATH:
 			case UpdateNotificationPacket.SUBCODE_OPTIONAL_ATTRIBUTE_ERROR:
 			case UpdateNotificationPacket.SUBCODE_UNRECOGNIZED_WELL_KNOWN_ATTRIBUTE:
+				encoder = (NotificationPacketEncoder<T>)attributeEncoder;
 				break;
 			}
 			break;

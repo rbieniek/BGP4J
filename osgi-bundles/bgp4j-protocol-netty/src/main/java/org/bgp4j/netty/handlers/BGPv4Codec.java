@@ -17,19 +17,19 @@
 package org.bgp4j.netty.handlers;
 
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+
+import java.nio.ByteOrder;
 
 import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.netty.protocol.BGPv4PacketDecoder;
+import org.bgp4j.netty.protocol.BGPv4PacketEncoderFactory;
 import org.bgp4j.netty.protocol.ProtocolPacketException;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.DownstreamMessageEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
-import org.jboss.netty.channel.UpstreamMessageEvent;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -38,12 +38,12 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Singleton
-public class BGPv4Codec extends SimpleChannelHandler {
+public class BGPv4Codec extends ChannelDuplexHandler {
 	public static final String HANDLER_NAME = "BGP4-Codec";
 	
-	private @Inject Logger log;
-	private @Inject BGPv4PacketDecoder packetDecoder;
+	private Logger log = LoggerFactory.getLogger(BGPv4Codec.class);
+	private BGPv4PacketDecoder packetDecoder = new BGPv4PacketDecoder();
+	private BGPv4PacketEncoderFactory packetEncoderFactory = new BGPv4PacketEncoderFactory();
 
 	/**
 	 * Upstream handler which takes care of the network packet to POJO translation
@@ -51,9 +51,9 @@ public class BGPv4Codec extends SimpleChannelHandler {
 	 * @param ctx the channel handler context
 	 */
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		if(e.getMessage() instanceof ChannelBuffer) {
-			ChannelBuffer buffer = (ChannelBuffer)e.getMessage();
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		if(msg instanceof ByteBuf) {
+			ByteBuf buffer = (ByteBuf)msg;
 			
 			try {
 				BGPv4Packet packet = packetDecoder.decodePacket(buffer);
@@ -61,7 +61,7 @@ public class BGPv4Codec extends SimpleChannelHandler {
 				log.info("received packet " + packet);
 				
 				if(packet != null) {
-					ctx.sendUpstream(new UpstreamMessageEvent(e.getChannel(), packet, e.getRemoteAddress()));
+					ctx.fireChannelRead(packet);
 				}
 			} catch(ProtocolPacketException ex) {
 				log.error("received malformed protocol packet, closing connection", ex);
@@ -72,32 +72,32 @@ public class BGPv4Codec extends SimpleChannelHandler {
 			} catch(Exception ex) {
 				log.error("generic decoding exception, closing connection", ex);
 				
-				ctx.getChannel().close();
+				ctx.close();
 			}
 		} else {
 			log.error("expected a {} message payload, got a {} message payload", 
-					ChannelBuffer.class.getName(), 
-					e.getMessage().getClass().getName()); 
+					ByteBuf.class.getName(), 
+					msg.getClass().getName()); 
 		}
 	}
 
-	/**
-	 * Downstream handler which takes care of the POJO to network packet translation
-	 */
 	@Override
-	public void writeRequested(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		if(e.getMessage() instanceof BGPv4Packet) {
-			ChannelBuffer buffer = ((BGPv4Packet)e.getMessage()).encodePacket();
-						
-			log.info("writing packet " + e.getMessage());
+	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+		if(msg instanceof BGPv4Packet) {
+			BGPv4Packet bgpPacket = (BGPv4Packet)msg;
+			ByteBuf buffer = ctx.alloc().buffer().order(ByteOrder.BIG_ENDIAN);
+			
+			log.info("writing packet {}", bgpPacket);
+
+			packetEncoderFactory.encoderForPacket(bgpPacket).encodePacket(bgpPacket, buffer);
 
 			if(buffer != null) {
-				ctx.sendDownstream(new DownstreamMessageEvent(e.getChannel(), e.getFuture(), buffer, e.getRemoteAddress()));
+				ctx.writeAndFlush(buffer, promise);
 			}
 		} else {
 			log.error("expected a {} message payload, got a {} message payload", 
 					BGPv4Packet.class.getName(), 
-					e.getMessage().getClass().getName()); 
+					msg.getClass().getName()); 
 		}
 	}
 

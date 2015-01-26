@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import org.bgp4j.net.AddressPrefixBasedORFEntry;
 import org.bgp4j.net.ORFAction;
 import org.bgp4j.net.ORFEntry;
-import org.bgp4j.netty.NLRICodec;
+import org.bgp4j.netty.util.NLRICodec;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

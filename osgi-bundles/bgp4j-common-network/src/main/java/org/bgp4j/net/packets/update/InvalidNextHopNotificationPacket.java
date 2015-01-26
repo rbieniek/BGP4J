@@ -17,7 +17,10 @@
  */
 package org.bgp4j.net.packets.update;
 
+import org.bgp4j.net.EChannelDirection;
 import org.bgp4j.net.attributes.PathAttribute;
+import org.bgp4j.net.events.NotificationEvent;
+import org.bgp4j.net.events.update.InvalidNextHopNotificationEvent;
 
 
 /**
@@ -25,6 +28,11 @@ import org.bgp4j.net.attributes.PathAttribute;
  *
  */
 public class InvalidNextHopNotificationPacket extends AttributeNotificationPacket {
+
+	@Override
+	public NotificationEvent event(EChannelDirection direction) {
+		return new InvalidNextHopNotificationEvent(direction);
+	}
 
 	/**
 	 * @param subcode

@@ -59,8 +59,8 @@ import org.bgp4j.net.packets.update.OptionalAttributeErrorNotificationPacket;
 import org.bgp4j.net.packets.update.UnrecognizedWellKnownAttributeNotificationPacket;
 import org.bgp4j.net.packets.update.UpdateNotificationPacket;
 import org.bgp4j.net.packets.update.UpdatePacket;
-import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.ProtocolPacketUtils;
+import org.bgp4j.netty.util.NLRICodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

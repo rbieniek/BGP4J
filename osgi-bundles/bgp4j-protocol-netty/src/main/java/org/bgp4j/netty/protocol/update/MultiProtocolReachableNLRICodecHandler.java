@@ -22,7 +22,7 @@ import io.netty.buffer.ByteBuf;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.attributes.MultiProtocolReachableNLRI;
-import org.bgp4j.netty.NLRICodec;
+import org.bgp4j.netty.util.NLRICodec;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)

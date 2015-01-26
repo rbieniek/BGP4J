@@ -15,7 +15,7 @@
  * 
  * File: org.bgp4j.netty.NLRICodec.java 
  */
-package org.bgp4j.netty;
+package org.bgp4j.netty.util;
 
 import io.netty.buffer.ByteBuf;
 

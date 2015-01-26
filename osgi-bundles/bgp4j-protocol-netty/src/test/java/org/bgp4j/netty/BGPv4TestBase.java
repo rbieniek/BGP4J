@@ -58,22 +58,6 @@ public class BGPv4TestBase {
 		assertArraysEquals(expected, array);
 	}
 
-	/*
-	protected void assertMessageEventContents(byte[] expected, MessageEvent me) {
-		Assert.assertTrue("expected class " + me.getMessage().getClass().getName() + " is assignable from " + ChannelBuffer.class.getName(), 
-				ChannelBuffer.class.isAssignableFrom(me.getMessage().getClass()));
-		
-		assertBufferContents(expected, (ChannelBuffer)me.getMessage());
-	}
-	
-	protected void assertChannelEventContents(byte[] expected, ChannelEvent ce) {
-		Assert.assertTrue("expected class " + ce.getClass().getName() + " is assignable from " + MessageEvent.class.getName(),
-				MessageEvent.class.isAssignableFrom(ce.getClass()));
-		
-		assertMessageEventContents(expected, (MessageEvent)ce);
-	}
-	*/
-	
 	protected ByteBuf buildProtocolPacket(byte[] packet) {
 		ByteBuf buffer = allocator.buffer(packet.length);
 		
@@ -82,37 +66,12 @@ public class BGPv4TestBase {
 		return buffer;
 	}
 
-	/*
-	protected UpstreamMessageEvent buildProtocolPacketUpstreamMessageEvent(Channel channel, byte[] packet)throws Exception  {
-		return new UpstreamMessageEvent(channel, buildProtocolPacket(packet), new InetSocketAddress(InetAddress.getLocalHost(), 1));
-	}
-	
-	protected UpstreamMessageEvent buildUpstreamBgpMessageEvent(Channel channel, BGPv4Packet packet)throws Exception  {
-		return new UpstreamMessageEvent(channel, packet, new InetSocketAddress(InetAddress.getLocalHost(), 1));
-	}
-	*/
 	@SuppressWarnings("unchecked")
 	protected <T extends BGPv4Packet> T safeDowncast(BGPv4Packet packet, Class<? extends T> downcastedTo) {
 		Assert.assertEquals(downcastedTo, packet.getClass());
 		
 		return (T)packet;
 	}
-	
-	/*
-	protected BGPv4Packet safeExtractChannelEvent(ChannelEvent ce) {
-		Assert.assertTrue("expected class " + ce.getClass().getName() + " is assignable from " + MessageEvent.class.getName(),
-				MessageEvent.class.isAssignableFrom(ce.getClass()));
-		
-		return safeExtractMessageEvent((MessageEvent)ce);
-	}
-	
-	protected BGPv4Packet safeExtractMessageEvent(MessageEvent me) {
-		Assert.assertTrue("expected class " + me.getMessage().getClass().getName() + " is assignable from " + BGPv4Packet.class.getName(), 
-				BGPv4Packet.class.isAssignableFrom(me.getMessage().getClass()));
-		
-		return (BGPv4Packet)me.getMessage();
-	}
-	*/
 	
 	protected void assertArraysEquals(byte[] a, byte[] b) {
 		Assert.assertEquals("buffer length", a.length, b.length);
@@ -128,75 +87,6 @@ public class BGPv4TestBase {
 		b.readBytes(b2);
 		assertArraysEquals(a, b2);
 	}
-	
-	/*
-	protected void assertNotificationEvent(Class<? extends NotificationPacket> packetClass, ChannelEvent event) {
-		Assert.assertTrue(event instanceof MessageEvent);
-		
-		MessageEvent me = (MessageEvent)event;
-		
-		Assert.assertTrue(me.getMessage() instanceof NotificationEvent);
-		NotificationEvent ne = (NotificationEvent)me.getMessage();
-	
-		Assert.assertEquals(1, ne.getNotifications().size());
-		Assert.assertEquals(packetClass, ne.getNotifications().get(0).getClass());
-	}
-
-	protected void assertNotificationEvent(List<Class<? extends NotificationPacket>> packetClasses, ChannelEvent event) {
-		Assert.assertTrue(event instanceof MessageEvent);
-		
-		MessageEvent me = (MessageEvent)event;
-		
-		Assert.assertTrue(me.getMessage() instanceof NotificationEvent);
-		NotificationEvent ne = (NotificationEvent)me.getMessage();
-	
-		List<Class<? extends NotificationPacket>> notifications = new LinkedList<Class<? extends NotificationPacket>>();
-		
-		for(NotificationPacket packet : ne.getNotifications())
-			notifications.add(packet.getClass());
-
-		Assert.assertEquals(packetClasses.size(), notifications.size());
-
-		Iterator<Class<? extends NotificationPacket>> wantedIt = packetClasses.iterator();
-		
-		while(wantedIt.hasNext())
-			Assert.assertTrue(notifications.remove(wantedIt.next()));
-	}
-
-	protected void assertUpdatePacket(UpdatePacket packet, Collection<NetworkLayerReachabilityInformation> nlris, Collection<NetworkLayerReachabilityInformation> withdrawn,
-			Collection<PathAttribute> pathAttributes) {
-				
-				if(nlris != null) {
-					Assert.assertEquals(nlris.size(), packet.getNlris().size());
-					
-					Iterator<NetworkLayerReachabilityInformation> it = nlris.iterator();
-					
-					while(it.hasNext())
-						Assert.assertTrue(packet.getNlris().contains(it.next()));
-				} else {
-					Assert.assertEquals(0, packet.getNlris().size());
-				}
-				if(withdrawn != null) {
-					Assert.assertEquals(withdrawn.size(), packet.getWithdrawnRoutes().size());
-					
-					Iterator<NetworkLayerReachabilityInformation> it = withdrawn.iterator();
-					
-					while(it.hasNext())
-						Assert.assertTrue(packet.getWithdrawnRoutes().contains(it.next()));
-				} else {
-					Assert.assertEquals(0, packet.getWithdrawnRoutes().size());
-				}
-				
-				if(pathAttributes != null) {
-					Assert.assertEquals(pathAttributes.size(), packet.getPathAttributes().size());
-					
-					Iterator<PathAttribute> it = pathAttributes.iterator();
-					
-					while(it.hasNext())
-						Assert.assertTrue(packet.getPathAttributes().contains(it.next()));
-				}
-			}
-	 */
 	
 	public abstract class AssertExecption {
 		@SuppressWarnings("unchecked")

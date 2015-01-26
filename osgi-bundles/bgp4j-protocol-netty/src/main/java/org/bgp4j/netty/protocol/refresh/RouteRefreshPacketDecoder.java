@@ -33,7 +33,7 @@ import org.bgp4j.net.OutboundRouteFilter;
 import org.bgp4j.net.SubsequentAddressFamily;
 import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.net.packets.refresh.RouteRefreshPacket;
-import org.bgp4j.netty.NLRICodec;
+import org.bgp4j.netty.util.NLRICodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

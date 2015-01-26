@@ -8,8 +8,8 @@ import io.netty.buffer.ByteBuf;
 import org.bgp4j.net.NetworkLayerReachabilityInformation;
 import org.bgp4j.net.attributes.PathAttribute;
 import org.bgp4j.net.packets.update.UpdatePacket;
-import org.bgp4j.netty.NLRICodec;
 import org.bgp4j.netty.protocol.BGPv4PacketEncoder;
+import org.bgp4j.netty.util.NLRICodec;
 
 /**
  * @author rainer
