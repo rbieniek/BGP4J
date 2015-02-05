@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.ReferenceCountUtil;
 
 import java.nio.ByteOrder;
 
@@ -73,6 +74,8 @@ public class BGPv4Codec extends ChannelDuplexHandler {
 				log.error("generic decoding exception, closing connection", ex);
 				
 				ctx.close();
+			} finally {
+				ReferenceCountUtil.release(msg);
 			}
 		} else {
 			log.error("expected a {} message payload, got a {} message payload", 

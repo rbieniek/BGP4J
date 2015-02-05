@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bgp4j.definitions.PeerConnectionInformation;
+import org.bgp4j.definitions.peer.PeerConnectionInformation;
 import org.bgp4j.net.ASTypeAware;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.attributes.ASPathAttribute;

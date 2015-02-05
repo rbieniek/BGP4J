@@ -19,7 +19,7 @@ package org.bgp4j.netty.handlers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import org.bgp4j.definitions.PeerConnectionInformation;
+import org.bgp4j.definitions.peer.PeerConnectionInformation;
 import org.bgp4j.net.BGPv4Constants;
 import org.bgp4j.net.capabilities.AutonomousSystem4Capability;
 import org.bgp4j.net.packets.open.BadBgpIdentifierNotificationPacket;

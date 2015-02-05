@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+	
+	<reference id="serverConfigurationProvider" availability="mandatory" interface="org.bgp4j.definitions.config.ServerConfigurationProvider">
+		<reference-listener ref="bgpNettyService" bind-method="bindServerConfigurationProvider" unbind-method="unbindServerConfigurationProvider"/>
+		<reference-listener ref="bgpServerService" bind-method="bindServerConfigurationProvider" unbind-method="unbindServerConfigurationProvider"/>
+	</reference>
+	
+	<reference id="fsmRegistry" availability="mandatory" interface="org.bgp4j.definitions.fsm.BGPv4FSMRegistry">
+		<reference-listener ref="bgpNettyService" bind-method="bindFsmRegistry" unbind-method="unbindFsmRegistry"/>
+		<reference-listener ref="bgpServerService" bind-method="bindServerConfigurationProvider" unbind-method="unbindServerConfigurationProvider"/>
+	</reference>
+
+	<reference id="peerConnectionInformationRegistry" availability="mandatory" interface="org.bgp4j.definitions.peer.PeerConnectionInformationRegistry">
+		<reference-listener ref="bgpServerService" bind-method="bindPeerConnectionInformationRegistry" unbind-method="unbindPeerConnectionInformationRegistry"/>
+	</reference>
+	
+	<service interface="org.bgp4j.definitions.services.BGPv4ProtocolService" ref="bgpNettyService"/>
+	
+	<bean id="bgpNettyService" class="org.bgp4j.netty.osgi.BGPv4NettyService" init-method="start" factory-method="stop">
+		<property name="serverConfigurationProvider" ref="serverConfigurationProvider"/>
+		<property name="fsmRegistry" ref="fsmRegistry"/>
+	</bean>
+
+	<bean id="bgpServerService" class="org.bgp4j.netty.osgi.BGPv4ServerService" init-method="start" factory-method="stop">
+		<property name="serverConfigurationProvider" ref="serverConfigurationProvider"/>
+		<property name="fsmRegistry" ref="fsmRegistry"/>
+		<property name="peerRegistry" ref="peerConnectionInformationRegistry"/>
+	</bean>
+</blueprint>

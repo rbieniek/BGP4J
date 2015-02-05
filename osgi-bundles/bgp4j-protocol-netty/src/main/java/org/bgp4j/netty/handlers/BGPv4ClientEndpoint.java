@@ -21,8 +21,8 @@ import java.net.InetSocketAddress;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.bgp4j.definitions.PeerConnectionInformation;
-import org.bgp4j.definitions.PeerConnectionInformationAware;
+import org.bgp4j.definitions.peer.PeerConnectionInformation;
+import org.bgp4j.definitions.peer.PeerConnectionInformationAware;
 import org.bgp4j.net.events.BgpEvent;
 import org.bgp4j.net.packets.BGPv4Packet;
 import org.bgp4j.netty.fsm.BGPv4FSM;

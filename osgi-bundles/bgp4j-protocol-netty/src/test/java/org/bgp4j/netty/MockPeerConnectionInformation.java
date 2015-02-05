@@ -17,7 +17,10 @@
  */
 package org.bgp4j.netty;
 
-import org.bgp4j.definitions.PeerConnectionInformation;
+import java.net.InetSocketAddress;
+
+import org.bgp4j.definitions.peer.EPeerDirection;
+import org.bgp4j.definitions.peer.PeerConnectionInformation;
 import org.bgp4j.net.ASType;
 
 /**
@@ -31,6 +34,8 @@ public class MockPeerConnectionInformation implements PeerConnectionInformation 
 	private int remoteAS;
 	private long localBgpIdentifier;
 	private long remoteBgpIdentifier;
+	private InetSocketAddress remotePeerAddress;
+	private EPeerDirection peerDirection;
 	
 	/* (non-Javadoc)
 	 * @see org.bgp4j.netty.PeerConnectionInformation#getAsTypeInUse()
@@ -131,4 +136,21 @@ public class MockPeerConnectionInformation implements PeerConnectionInformation 
 		this.remoteAS = remoteAS;
 	}
 
+	@Override
+	public InetSocketAddress remoteAddress() {
+		return remotePeerAddress;
+	}
+	
+	public void remoteAddress(InetSocketAddress remotePeerAddress) {
+		this.remotePeerAddress = remotePeerAddress;
+	}
+
+	@Override
+	public EPeerDirection peerDirection() {
+		return peerDirection;
+	}
+	
+	public void peerDirection(EPeerDirection peerDirection) {
+		this.peerDirection = peerDirection;
+	}
 }

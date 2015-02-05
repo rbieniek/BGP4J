@@ -27,7 +27,6 @@
 	<configuration>
 	  <instructions>
             <Private-Package>org.bgp4j.netty.*</Private-Package>
-            <Bundle-Activator>org.bgp4j.netty.osgi.Activator</Bundle-Activator>
 	  </instructions>
 	</configuration>
       </plugin>
@@ -51,6 +50,11 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint.api</artifactId>
     </dependency>
 
     <dependency>
@@ -112,6 +116,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
 
 </project>
