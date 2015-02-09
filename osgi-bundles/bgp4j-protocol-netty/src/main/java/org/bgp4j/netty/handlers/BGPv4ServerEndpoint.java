@@ -77,7 +77,7 @@ public class BGPv4ServerEndpoint extends ChannelInboundHandlerAdapter {
 		try {
 			BGPv4FSM fsm = fsmRegistry.createFsm(((InetSocketAddress)ch.remoteAddress()).getAddress(), EChannelDirection.SERVER);
 		
-			if(fsm.peerConnectionInformation().peerDirection().matches(EPeerDirection.ServerOnly)) {
+			if(fsm.peerConnectionInformation().peerDirection().matches(EPeerDirection.Server)) {
 				ch.attr(Attributes.peerInfoKey).set(fsm.peerConnectionInformation());
 				ctx.attr(Attributes.fsmKey).set(fsm);				
 				fsm.messageWriter(new ChannelMeesageWriter(ctx));

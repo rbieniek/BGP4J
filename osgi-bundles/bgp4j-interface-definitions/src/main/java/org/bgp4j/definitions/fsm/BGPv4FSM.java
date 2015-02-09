@@ -65,4 +65,11 @@ public interface BGPv4FSM {
 	 * @param event
 	 */
 	void handleEvent(BgpEvent event);
+	
+	/**
+	 * return the finite machine state value of this instance
+	 * 
+	 * @return
+	 */
+	BGPv4FSMState state();
 }

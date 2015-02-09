@@ -180,7 +180,7 @@
     <version.junit.junit>4.11</version.junit.junit>
     <version.org.easytesting.core>2.0M10</version.org.easytesting.core>
     <version.org.mockito>1.10.18</version.org.mockito>
-    <version.org.quartz-scheduler>2.1.6</version.org.quartz-scheduler>
+    <version.org.quartz-scheduler>2.2.1</version.org.quartz-scheduler>
     <version.org.jbehave>3.5.4</version.org.jbehave>
     <version.org.drools>5.3.1.Final</version.org.drools>
     <version.org.eclipse.jetty>8.1.2.v20120308</version.org.eclipse.jetty>

@@ -16,24 +16,26 @@
  */
 package org.bgp4j.netty.handlers;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
 import java.net.InetSocketAddress;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.bgp4j.definitions.peer.PeerConnectionInformation;
-import org.bgp4j.definitions.peer.PeerConnectionInformationAware;
+import org.bgp4j.definitions.fsm.BGPv4FSM;
+import org.bgp4j.definitions.fsm.BGPv4FSMRegistry;
+import org.bgp4j.definitions.fsm.FiniteStateMachineAlreadyExistsException;
+import org.bgp4j.definitions.fsm.MessageWriter;
+import org.bgp4j.definitions.fsm.UnknownPeerException;
+import org.bgp4j.net.EChannelDirection;
 import org.bgp4j.net.events.BgpEvent;
 import org.bgp4j.net.packets.BGPv4Packet;
-import org.bgp4j.netty.fsm.BGPv4FSM;
-import org.bgp4j.netty.fsm.FSMRegistry;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
+import org.bgp4j.net.packets.FiniteStateMachineErrorNotificationPacket;
+import org.bgp4j.netty.Attributes;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This handler acts as the client side pipeline end. It attaches the peer connection info to the channel context of all insterested 
@@ -42,102 +44,125 @@ import org.slf4j.Logger;
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@Singleton
-public class BGPv4ClientEndpoint extends SimpleChannelHandler {
+public class BGPv4ClientEndpoint extends ChannelInboundHandlerAdapter {
 	public static final String HANDLER_NAME ="BGP4-ClientEndpoint";
+	private static final Logger logger = LoggerFactory.getLogger(BGPv4ClientEndpoint.class);
 
-	private @Inject Logger log;
-	private @Inject FSMRegistry fsmRegistry;
-	
+	private static class ChannelMeesageWriter implements MessageWriter {
+		private ChannelHandlerContext ctx;
+		
+		private ChannelMeesageWriter(ChannelHandlerContext ctx) {
+			this.ctx = ctx;
+		}
+
+		@Override
+		public void sendPacket(BGPv4Packet packet) {
+			ctx.writeAndFlush(packet);
+		}
+		
+	}
+
 	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelHandler#messageReceived(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.MessageEvent)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#channelActive(io.netty.channel.ChannelHandlerContext)
 	 */
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		Channel ch = ctx.channel();
+		BGPv4FSMRegistry fsmRegistry = ch.attr(Attributes.fsmRegistryKey).get();
 		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getRemoteAddress());
+		logger.info("Server channel became active for local address {} and remote address {}", ch.localAddress(), ch.remoteAddress());
+		
+		try {
+			BGPv4FSM fsm = fsmRegistry.createFsm(((InetSocketAddress)ch.remoteAddress()).getAddress(), EChannelDirection.CLIENT);
+		
+			ch.attr(Attributes.peerInfoKey).set(fsm.peerConnectionInformation());
+			ctx.attr(Attributes.fsmKey).set(fsm);				
+			fsm.messageWriter(new ChannelMeesageWriter(ctx));
+			fsm.handleConnectionOpened();
+		} catch(FiniteStateMachineAlreadyExistsException e) {
+			logger.error("Duplicate outbound connection to peer {} detected, closing connection", ch.remoteAddress());
 			
-		if(fsm == null) {
-			log.error("Internal Error: client for address " + e.getRemoteAddress() + " is unknown");
+			ch.close();
+		} catch(UnknownPeerException e) {
+			logger.error("Unknown remote peer {} detected, closing connection", ch.remoteAddress());
 			
-			ctx.getChannel().close();
+			ch.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#channelInactive(io.netty.channel.ChannelHandlerContext)
+	 */
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		Channel ch = ctx.channel();
+		BGPv4FSMRegistry fsmRegistry = ch.attr(Attributes.fsmRegistryKey).get();
+		BGPv4FSM fsm = ctx.attr(Attributes.fsmKey).getAndSet(null);
+
+		logger.info("Client channel became inactive for local address {} and remote address {}", ch.localAddress(), ch.remoteAddress());
+		
+		if(fsm != null) {
+			fsm.messageWriter(null);
+			fsm.handleConnectionClosed();
+			
+			fsmRegistry.disposeFSM(fsm);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#channelRead(io.netty.channel.ChannelHandlerContext, java.lang.Object)
+	 */
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		logger.info("Received message for peer {}: {}", ctx.channel().remoteAddress(), msg);
+		
+		if(msg instanceof BGPv4Packet) {
+			BGPv4FSM fsm = ctx.attr(Attributes.fsmKey).get();
+			
+			fsm.handlePacket((BGPv4Packet)msg);
 		} else {
-			if(e.getMessage() instanceof BGPv4Packet) {
-				fsm.handleMessage(ctx.getChannel(), (BGPv4Packet)e.getMessage());
-			} else if(e.getMessage() instanceof BgpEvent) {
-				fsm.handleEvent(ctx.getChannel(), (BgpEvent)e.getMessage());
-			} else {
-				log.error("unknown payload class " + e.getMessage().getClass().getName() + " received for peer " + e.getRemoteAddress());
+			logger.error("Internal error: Received unexpected message for peer {}: {}", ctx.channel().remoteAddress(), msg);
+			
+			internalErrorAndClose(ctx);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#userEventTriggered(io.netty.channel.ChannelHandlerContext, java.lang.Object)
+	 */
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+		logger.info("Received event for peer {}: {}", ctx.channel().remoteAddress(), evt);
+		
+		if(evt instanceof BgpEvent) {
+			BGPv4FSM fsm = ctx.attr(Attributes.fsmKey).get();
+			
+			fsm.handleEvent((BgpEvent)evt);
+		} else {
+			logger.error("Internal error: Received unexpected event for peer {}: {}", ctx.channel().remoteAddress(), evt);
+			
+			internalErrorAndClose(ctx);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see io.netty.channel.ChannelInboundHandlerAdapter#exceptionCaught(io.netty.channel.ChannelHandlerContext, java.lang.Throwable)
+	 */
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		logger.error("Internal error: Caught exception for peer {}: {}", ctx.channel().remoteAddress(), cause);
+		
+		internalErrorAndClose(ctx);
+	}
+
+	private void internalErrorAndClose(ChannelHandlerContext ctx) {
+		ctx.writeAndFlush(new FiniteStateMachineErrorNotificationPacket()).addListener(new ChannelFutureListener() {
+			
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				future.channel().close();
 			}
-		}
+		});		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelConnected(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
-	 */
-	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("connected to client " + e.getChannel().getRemoteAddress());
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
-		
-		if(fsm == null) {
-			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
-			
-			ctx.getChannel().close();
-		} else {
-			ChannelPipeline pipeline = ctx.getPipeline();
-			PeerConnectionInformation pci = fsm.getPeerConnectionInformation();
-			
-			for(String handlerName : pipeline.getNames()) {
-				ChannelHandler handler = pipeline.get(handlerName);
-
-				if(handler.getClass().isAnnotationPresent(PeerConnectionInformationAware.class)) {
-					log.info("attaching peer connection information " + pci + " to handler " + handlerName + " for client " + e.getChannel().getRemoteAddress());
-					
-					pipeline.getContext(handlerName).setAttachment(pci);
-				}
-			}
-			
-			fsm.handleClientConnected(e.getChannel());
-			ctx.sendUpstream(e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelConnected(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
-	 */
-	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("disconnected from client " + e.getChannel().getRemoteAddress());
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
-		
-		if(fsm == null) {
-			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
-			
-			ctx.getChannel().close();
-		} else {
-			
-			fsm.handleDisconnected(e.getChannel());
-			ctx.sendUpstream(e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jboss.netty.channel.SimpleChannelHandler#channelClosed(org.jboss.netty.channel.ChannelHandlerContext, org.jboss.netty.channel.ChannelStateEvent)
-	 */
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("closed channel to client " + e.getChannel().getRemoteAddress());
-		
-		BGPv4FSM fsm = fsmRegistry.lookupFSM((InetSocketAddress)e.getChannel().getRemoteAddress());
-		
-		if(fsm == null) {
-			log.error("Internal Error: client for address " + e.getChannel().getRemoteAddress() + " is unknown");
-		} else {
-			fsm.handleClosed(e.getChannel());
-			ctx.sendUpstream(e);
-		}
-	}
 }

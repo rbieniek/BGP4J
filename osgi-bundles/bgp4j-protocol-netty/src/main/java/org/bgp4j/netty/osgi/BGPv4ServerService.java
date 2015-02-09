@@ -182,10 +182,11 @@ public class BGPv4ServerService {
 
 	private void serverStart() {
 		if(!running) {
-			for(InetSocketAddress serverAddress : serverConfigurationProvider.bindAddresses()) {
+			bossGroup = new NioEventLoopGroup();
+		    workerGroup = new NioEventLoopGroup();
+
+		    for(InetSocketAddress serverAddress : serverConfigurationProvider.bindAddresses()) {
 				try {
-					bossGroup = new NioEventLoopGroup();
-				    workerGroup = new NioEventLoopGroup();
 					ServerBootstrap b = new ServerBootstrap();
 
 					b.group(bossGroup, workerGroup)

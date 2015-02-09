@@ -3,12 +3,10 @@
  */
 package org.bgp4j.netty.handlers;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +23,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bgp4j.definitions.fsm.BGPv4FSM;
 import org.bgp4j.definitions.fsm.BGPv4FSMRegistry;
@@ -42,8 +39,6 @@ import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 /**
  * @author rainer
@@ -174,7 +169,7 @@ public class BGPv4ServerEndpointTest extends BGPv4TestBase {
 	public void testClientOnlyConnectAndDisconnect() throws Exception {
 		Socket clientSocket = new Socket();
 		
-		when(peerConnection.peerDirection()).thenReturn(EPeerDirection.ClientOnly);
+		when(peerConnection.peerDirection()).thenReturn(EPeerDirection.Client);
 
 		clientSocket.connect(serverAddress); 
 		Thread.sleep(1000);

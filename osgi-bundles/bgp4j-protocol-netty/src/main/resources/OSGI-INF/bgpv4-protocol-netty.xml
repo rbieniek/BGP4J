@@ -29,4 +29,9 @@
 		<property name="fsmRegistry" ref="fsmRegistry"/>
 		<property name="peerRegistry" ref="peerConnectionInformationRegistry"/>
 	</bean>
+
+	<bean id="bgpClientService" class="org.bgp4j.netty.osgi.BGPv4ClientService" init-method="start" factory-method="stop">
+		<property name="fsmRegistry" ref="fsmRegistry"/>
+		<property name="peerRegistry" ref="peerConnectionInformationRegistry"/>
+	</bean>
 </blueprint>

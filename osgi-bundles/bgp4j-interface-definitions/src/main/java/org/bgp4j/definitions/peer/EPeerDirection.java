@@ -8,18 +8,18 @@ package org.bgp4j.definitions.peer;
  *
  */
 public enum EPeerDirection {
-	ServerOnly,
-	ClientOnly,
+	Server,
+	Client,
 	ClientAndServer;
 	
 	public boolean matches(EPeerDirection direction) {
 		switch(direction) {
 		case ClientAndServer:
 			return true;
-		case ClientOnly:
-			return (this == ClientOnly || this == ClientAndServer);
-		case ServerOnly:
-			return (this == ServerOnly || this == ClientAndServer);
+		case Client:
+			return (this == Client || this == ClientAndServer);
+		case Server:
+			return (this == Server || this == ClientAndServer);
 		default:
 			return false;
 		}
