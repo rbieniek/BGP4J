@@ -16,6 +16,7 @@ buildscript {
 
     repositories {
         mavenCentral()
+	jcenter()
     }
 
     dependencies {
@@ -280,42 +281,18 @@ configure(rootProject) {
     }
 }
 
-configure(javaProjects) {
-}
-
 configure(appProjects) {
     apply plugin: 'maven'
     apply plugin: 'application'
     apply plugin: 'spring-boot'
     apply plugin: 'docker'
 
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-netflix:${springCloudNetflixVersion}"
-        }
-    }
-
     configurations {
         all {
             resolutionStrategy {
                 eachDependency { DependencyResolveDetails details ->
-                    if (details.requested.group == 'org.springframework') {
-                        details.useVersion springVersion
-                    }
-                    if (details.requested.group == 'org.springframework.boot') {
-                        details.useVersion springBootVersion
-                    }
-                    if (details.requested.group.startsWith('com.fasterxml.jackson')) {
-                        details.useVersion jacksonVersion
-                    }
-                    if (details.requested.group == 'com.h2database') {
-                        details.useVersion h2DatabaseVersion
-                    }
                     if (details.requested.group == 'org.thymeleaf') {
                         details.useVersion thymeleafVersion
-                    }
-                    if (details.requested.group == 'org.hibernate' && (details.requested.name == 'hibernate-entitymanager' || details.requested.name == 'hibernate-core')) {
-                        details.useVersion hibernateVersion
                     }
                 }
                 exclude group: 'javax.servlet', module: 'javax.servlet-api'
@@ -327,14 +304,15 @@ configure(appProjects) {
         }
     }
 
-    dependencies {
+    repositories {
+        mavenCentral()
     }
 
     springBoot.backupSource = false
 
     // System properties to be set when executing `gradle <project>:bootRun`
     applicationDefaultJvmArgs = [
-        "-Dspring.profiles.active=default,populate",
+        "-Dspring.profiles.active=default",
         "-Dproject.version=${project.version}"
     ]
 
@@ -348,11 +326,6 @@ configure(appProjects) {
             fileMode 0755
         }
         into "${buildDir}/dist"
-    }
-
-    task startServiceMock(type: Exec) {
-        workingDir "${buildDir}/dist"
-        commandLine './freightnet-air-service-mock-start.sh'
     }
 
     task buildDocker(type: Docker) {
