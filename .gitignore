@@ -5,3 +5,6 @@ target
 .classpath
 .metadata
 bin
+
+*~
+*#
