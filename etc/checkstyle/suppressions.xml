@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC " -//Puppy Crawl//DTD Suppressions 1.1//EN" "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+
+    <suppress checks="IllegalCatch" files="\w*(ApacheAmqConfiguration)\.java"/> <!-- this class rethrows checked Exception as a RuntimeException -->
+    <suppress checks="ClassFanOutComplexity" files="\w*(CreateBookingRequestTypeConverter)*\.java" /> <!-- this converter requires an excessive amount of generated webservice classes -->
+
+
+    <!-- The below classes have high complexity because of many dependencies required for the booking PDF creation -->
+    <suppress checks="NPathComplexityCheck" files="CargoModelBuilder"/>
+    <suppress checks="NPathComplexityCheck" files="BookingModelBuilder"/>
+    <suppress checks="CyclomaticComplexityCheck" files="BookingModelBuilder"/>
+    
+    <suppress checks="JavaNCSSCheck" files="BookingModelBuilderUnitTest"/>
+    <suppress checks="JavaNCSSCheck" files="BookingConfirmationDocumentBuilderUnitTest"/>
+
+</suppressions>

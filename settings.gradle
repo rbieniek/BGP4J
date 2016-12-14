@@ -1,0 +1,4 @@
+rootProject.name = 'bgp4j'
+
+include 'common'
+include 'bgpd'

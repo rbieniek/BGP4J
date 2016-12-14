@@ -1,0 +1,368 @@
+def appProjects = [
+    project('bgpd')
+]
+
+wrapper.gradleVersion = '3.2.1'
+
+buildscript {
+    ext {
+        javaVersion = '1.8'
+        springBootVersion = '1.4.2.RELEASE'
+        gradleVersionsPluginVersion = '0.12.0'
+        gradleJaxwsPluginVersion = '1.0.0'
+        springGradleDependencyManagemenPluginVersion = '0.5.6.RELEASE'
+        gradleDockerPluginVersion = '1.2'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "com.github.ben-manes:gradle-versions-plugin:${gradleVersionsPluginVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin:${springGradleDependencyManagemenPluginVersion}"
+        classpath "se.transmode.gradle:gradle-docker:${gradleDockerPluginVersion}"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+configure(allprojects) {
+    apply plugin: 'java'
+    apply plugin: 'com.github.ben-manes.versions'
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+    apply plugin: 'jacoco'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+
+    group = 'org.bgp4j'
+    buildDir = 'target'
+
+    ext {
+        thymeleafVersion = '3.0.1.RELEASE'
+        thymeleafLayoutDialectVersion = '2.0.0'
+
+        javaxAnnotationVersion = '1.0'
+
+        commonsCodecVersion = '1.10'
+        commonsLang3Version = '3.4'
+        commonsIoVersion = '2.5'
+        commonsCollections4Version = '4.1'
+        httpCommonsVersion = '4.5.2'
+
+      	akkaVersion = '2.4.14'
+       	scalaJava8CompatVersion = '0.8.0'
+
+        lombokVersion = '1.16.12'
+
+        equalsVerifierVersion = '2.1.5'
+        assertjVersion = '3.5.2'
+        junitVersion = '4.12'
+        mockitoVersion = '1.10.19'
+
+        pmdVersion = '5.4.2'
+        checkstyleVersion = '7.1.1'
+        antlrVersion = '2.7.7'
+        guavaJdk5Version = '17.0'
+
+        gradleDir = "${rootProject.projectDir}/gradle"
+        configDir = "${rootProject.projectDir}/etc/config"
+        scriptDir = "${rootProject.projectDir}/etc/scripts"
+
+        generatedSourcesDir = 'src/main/generated'
+    }
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    compileJava.options*.compilerArgs = [
+        "-Xlint:serial",
+        "-Xlint:varargs",
+        "-Xlint:cast",
+        "-Xlint:classfile",
+        "-Xlint:dep-ann",
+        "-Xlint:divzero",
+        "-Xlint:empty",
+        "-Xlint:finally",
+        "-Xlint:overrides",
+        "-Xlint:path",
+        "-Xlint:static",
+        "-Xlint:try",
+        "-Xlint:fallthrough",
+        "-Xlint:rawtypes",
+        "-Xlint:deprecation",
+        "-Xlint:unchecked",
+        "-Xlint:-options",
+        "-Werror"
+    ]
+
+    compileTestJava.options*.compilerArgs = [
+        "-Xlint:serial",
+        "-Xlint:varargs",
+        "-Xlint:cast",
+        "-Xlint:classfile",
+        "-Xlint:dep-ann",
+        "-Xlint:divzero",
+        "-Xlint:empty",
+        "-Xlint:finally",
+        "-Xlint:overrides",
+        "-Xlint:path",
+        "-Xlint:static",
+        "-Xlint:try",
+        "-Xlint:-fallthrough",
+        "-Xlint:-rawtypes",
+        "-Xlint:-deprecation",
+        "-Xlint:unchecked",
+        "-Xlint:-options",
+        "-Xlint:deprecation"
+    ]
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+    sourceSets {
+        generated {
+            java { srcDirs = [generatedSourcesDir] }
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        all {
+            resolutionStrategy {
+                eachDependency { DependencyResolveDetails details ->
+                    if (details.requested.group == 'org.thymeleaf') {
+                        details.useVersion thymeleafVersion
+                    }
+                }
+                exclude group: 'javax.servlet', module: 'javax.servlet-api'
+                exclude group: 'commons-logging', module: 'commons-logging'
+                exclude module: 'ha-api'
+            }
+            exclude group: 'javax.servlet', module: 'javax.servlet-api'
+            exclude group: 'commons-logging', module: 'commons-logging'
+        }
+    }
+
+    dependencies {
+	// Spring Boot
+        compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
+        compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+        compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
+        compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
+        compile group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: thymeleafLayoutDialectVersion
+
+	// Akka
+   	compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: akkaVersion
+   	compile group: 'com.typesafe.akka', name: 'akka-agent_2.11', version: akkaVersion
+	compile group: 'com.typesafe.akka', name: 'akka-persistence_2.11', version: akkaVersion
+   	compile group: 'com.typesafe.akka', name: 'akka-slf4j_2.11', version: akkaVersion
+   	compile group: 'com.typesafe.akka', name: 'akka-stream_2.11', version: akkaVersion
+   	compile group: 'com.typesafe.akka', name: 'akka-contrib_2.11', version: akkaVersion
+   	compile group: 'org.scala-lang.modules', name: 'scala-java8-compat_2.11', version: scalaJava8CompatVersion 
+
+	// Utilities
+        compile group: 'javax.annotation', name: 'jsr250-api', version: javaxAnnotationVersion
+        compile group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLang3Version
+        compile group: 'commons-io', name: 'commons-io', version: commonsIoVersion
+        compile group: 'commons-codec', name: 'commons-codec', version: commonsCodecVersion
+        compile group: 'org.apache.commons', name: 'commons-collections4', version: commonsCollections4Version
+
+        // Testing
+        testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+        testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: equalsVerifierVersion
+        testCompile group: 'org.assertj', name: 'assertj-core', version: assertjVersion
+	testCompile group: 'junit', name: 'junit', version: junitVersion
+   	testCompile group: 'com.typesafe.akka', name: 'akka-stream-testkit_2.11', version: akkaVersion
+   	testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: akkaVersion
+
+	// Checkstyle
+        checkstyle group: 'com.puppycrawl.tools', name: 'checkstyle', version: checkstyleVersion
+        checkstyle group: 'com.google.guava', name: 'guava-jdk5', version: guavaJdk5Version
+        checkstyle group: 'antlr', name: 'antlr', version: antlrVersion
+
+        // PMD
+        pmd group: 'net.sourceforge.pmd', name: 'pmd-core', version: pmdVersion
+        pmd group: 'net.sourceforge.pmd', name: 'pmd-java', version: pmdVersion
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        group = 'build'
+        description = 'Assembles a jar archive containing the main sources.'
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts { archives sourcesJar }
+
+    test {
+        systemProperty("java.awt.headless", "true")
+        systemProperty("user.language", "en")
+        systemProperty("user.language", "en")
+
+        jvmArgs('-Dfile.encoding=UTF-8',
+            '-XX:NewRatio=2', '-XX:+UseConcMarkSweepGC', '-XX:+CMSParallelRemarkEnabled',
+            '-XX:+UseCMSInitiatingOccupancyOnly', '-XX:CMSInitiatingOccupancyFraction=50',
+            '-XX:+ScavengeBeforeFullGC', '-XX:+CMSScavengeBeforeRemark',
+            '-XX:+CMSClassUnloadingEnabled', '-XX:+CMSClassUnloadingEnabled')
+
+        minHeapSize = "1024m"
+        maxHeapSize = "6144m"
+
+        logging.captureStandardOutput LogLevel.INFO
+    }
+
+    clean {
+        delete sourceSets.generated.java.srcDirs
+    }
+
+    idea {
+        module {
+	    sourceDirs += file(generatedSourcesDir)
+            excludeDirs += [
+                file('bin'),
+                file('.metadata'),
+                file('.settings'),
+                file('work'),
+                file('logs')
+            ]
+            iml { generateTo = rootProject.projectDir }
+        }
+    }
+
+    checkstyle {
+        sourceSets = [sourceSets.main, sourceSets.test]
+        configFile = file("${configDir}/checkstyle/checkstyle.xml")
+        configProperties = ['suppressionFile': "${configDir}/checkstyle/suppressions.xml"]
+    }
+
+    pmd {
+        toolVersion = pmdVersion
+        sourceSets = [sourceSets.main, sourceSets.test]
+        ruleSets = []
+        ruleSetFiles = files("${configDir}/pmd/ruleset.xml")
+    }
+
+    findbugs {
+        toolVersion = '3.0.0'
+        sourceSets = [sourceSets.main, sourceSets.test]
+        effort = "default"
+        reportLevel = "high"
+    }
+
+    jacoco {
+        toolVersion = '0.7.6+'
+    }
+}
+
+configure(rootProject) {
+    idea.project {
+        languageLevel = javaVersion
+        ipr {
+            withXml { provider ->
+                def mapping = provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping
+                mapping.@vcs = 'Git'
+                mapping.@directory = '$PROJECT_DIR$'
+
+                provider.asNode().component.find { it.@name == 'CompilerConfiguration' }['annotationProcessing'][0].replaceNode {
+                    annotationProcessing {
+                        profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
+                    }
+                }
+            }
+        }
+    }
+}
+
+configure(javaProjects) {
+}
+
+configure(appProjects) {
+    apply plugin: 'maven'
+    apply plugin: 'application'
+    apply plugin: 'spring-boot'
+    apply plugin: 'docker'
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-netflix:${springCloudNetflixVersion}"
+        }
+    }
+
+    configurations {
+        all {
+            resolutionStrategy {
+                eachDependency { DependencyResolveDetails details ->
+                    if (details.requested.group == 'org.springframework') {
+                        details.useVersion springVersion
+                    }
+                    if (details.requested.group == 'org.springframework.boot') {
+                        details.useVersion springBootVersion
+                    }
+                    if (details.requested.group.startsWith('com.fasterxml.jackson')) {
+                        details.useVersion jacksonVersion
+                    }
+                    if (details.requested.group == 'com.h2database') {
+                        details.useVersion h2DatabaseVersion
+                    }
+                    if (details.requested.group == 'org.thymeleaf') {
+                        details.useVersion thymeleafVersion
+                    }
+                    if (details.requested.group == 'org.hibernate' && (details.requested.name == 'hibernate-entitymanager' || details.requested.name == 'hibernate-core')) {
+                        details.useVersion hibernateVersion
+                    }
+                }
+                exclude group: 'javax.servlet', module: 'javax.servlet-api'
+                exclude group: 'commons-logging', module: 'commons-logging'
+                exclude module: 'ha-api'
+            }
+            exclude group: 'javax.servlet', module: 'javax.servlet-api'
+            exclude group: 'commons-logging', module: 'commons-logging'
+        }
+    }
+
+    dependencies {
+    }
+
+    springBoot.backupSource = false
+
+    // System properties to be set when executing `gradle <project>:bootRun`
+    applicationDefaultJvmArgs = [
+        "-Dspring.profiles.active=default,populate",
+        "-Dproject.version=${project.version}"
+    ]
+
+    task dist(type: Copy, dependsOn: assemble) {
+        from("${buildDir}/libs") {
+            include '*.jar'
+            exclude '*-sources.jar'
+        }
+        from("${scriptDir}") {
+            include 'freightnet-air-service-mock-start.sh'
+            fileMode 0755
+        }
+        into "${buildDir}/dist"
+    }
+
+    task startServiceMock(type: Exec) {
+        workingDir "${buildDir}/dist"
+        commandLine './freightnet-air-service-mock-start.sh'
+    }
+
+    task buildDocker(type: Docker) {
+    	 baseImage = 'develar/java:latest'
+   	 push = project.hasProperty('push')
+   	 tag = 'org.bgp4j/bgpd'
+   	 addFile {
+      	 	 from jar
+      		 rename { 'app.jar' }
+   	 }
+         entryPoint(['java', '-Djava.security.egd=file:/dev/.urandom', '-jar', '/app.jar'])
+    }
+}
