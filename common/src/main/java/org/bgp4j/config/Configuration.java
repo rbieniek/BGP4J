@@ -12,8 +12,8 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4.config.Configuration.java 
+ *
+ * File: org.bgp4.config.Configuration.java
  */
 package org.bgp4j.config;
 
@@ -21,54 +21,46 @@ import java.util.List;
 import java.util.Set;
 
 import org.bgp4j.config.nodes.BgpServerConfiguration;
-import org.bgp4j.config.nodes.HttpServerConfiguration;
 import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 
 /**
  * Configuration object of the BGP daemon.
- * 
+ *
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
 public interface Configuration {
-	
-	/**
-	 * get the server configuration
-	 * 
-	 * @return
-	 */
-	public BgpServerConfiguration getBgpServerConfiguration();
-	
-	/**
-	 * get the HTTP server configuration
-	 * 
-	 * @return
-	 */
-	public HttpServerConfiguration getHttpServerConfiguration();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
-	 */
-	public Set<String> listPeerNames();
-	
-	/**
-	 * list peer names
-	 * 
-	 * @return
-	 */
-	public List<PeerConfiguration> listPeerConfigurations();
-	
-	/**
-	 * 
-	 */
-	public PeerConfiguration getPeer(String peerName);
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public RoutingProcessorConfiguration getRoutingProcessorConfiguration();
+
+    /**
+     * get the server configuration
+     * 
+     * @return
+     */
+    public BgpServerConfiguration getBgpServerConfiguration();
+
+    /**
+     * list peer names
+     * 
+     * @return
+     */
+    public Set<String> listPeerNames();
+
+    /**
+     * list peer names
+     * 
+     * @return
+     */
+    public List<PeerConfiguration> listPeerConfigurations();
+
+    /**
+     * 
+     */
+    public PeerConfiguration getPeer(String peerName);
+
+    /**
+     * 
+     * @return
+     */
+    public RoutingProcessorConfiguration getRoutingProcessorConfiguration();
 }
