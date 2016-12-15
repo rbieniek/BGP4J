@@ -12,52 +12,35 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4.config.extensions.IPv4ConverterLookupTest.java 
+ *
+ * File: org.bgp4.config.extensions.IPv4ConverterLookupTest.java
  */
 package org.bgp4j.config.extensions;
 
-import junit.framework.Assert;
-
-import org.bgp4j.config.extensions.IPv4ConverterLookup;
-import org.bgp4j.weld.WeldTestCaseBase;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class IPv4ConverterLookupTest extends WeldTestCaseBase  {
+public class IPv4ConverterLookupTest {
 
-	@Before
-	public void before() {
-		lookup = obtainInstance(IPv4ConverterLookup.class);
-	}
-	
-	@After
-	public void after() {
-		lookup = null;
-	}
-	
-	private IPv4ConverterLookup lookup;
-	
-	@Test
-	public void testGoodIpv4Address() {
-		String value = lookup.lookup("192.168.4.1");
-		
-		Assert.assertEquals("3232236545", value);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testTooLittleParts() {
-		lookup.lookup("192.168.4,1");
-	}
+    private final IPv4ConverterLookup lookup = new IPv4ConverterLookup();
 
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testPartTooLarge() {
-		lookup.lookup("192.168.256.1");
-	}
+    @Test
+    public void testGoodIpv4Address() {
+        assertThat(lookup.lookup("192.168.4.1")).isEqualTo("3232236545");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testTooLittleParts() {
+        lookup.lookup("192.168.4,1");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPartTooLarge() {
+        lookup.lookup("192.168.256.1");
+    }
 }

@@ -19,19 +19,17 @@ package org.bgp4j.config.extensions;
 
 import java.util.StringTokenizer;
 
-import javax.inject.Inject;
+import org.apache.commons.lang3.text.StrLookup;
 
-import org.apache.commons.lang.text.StrLookup;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public class IPv4ConverterLookup extends StrLookup {
+@Slf4j
+public class IPv4ConverterLookup extends StrLookup<String> {
 
-	private @Inject Logger log;
-	
 	/* (non-Javadoc)
 	 * @see org.apache.commons.lang3.text.StrLookup#lookup(java.lang.String)
 	 */
