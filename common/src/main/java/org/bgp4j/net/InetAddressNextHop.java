@@ -12,81 +12,81 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.rib.IPv4NextHop.java 
+ *
+ * File: org.bgp4j.rib.IPv4NextHop.java
  */
 package org.bgp4j.net;
 
 import java.net.InetAddress;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.bgp4j.net.bind.NextHopBindAdapter;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@XmlJavaTypeAdapter(value=NextHopBindAdapter.class)
 public class InetAddressNextHop<T extends InetAddress> implements NextHop {
 
-	private T address;
-	
-	public InetAddressNextHop(T address) {
-		this.address = address;
-	}
-	
-	/**
-	 * @return the address
-	 */
-	public T getAddress() {
-		return address;
-	}
+    private final T address;
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return (new HashCodeBuilder()).append(getAddress()).toHashCode();
-	}
+    public InetAddressNextHop(final T address) {
+        this.address = address;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean equals(Object obj) {
-		if(!(obj instanceof InetAddressNextHop))
-			return false;
+    /**
+     * @return the address
+     */
+    public T getAddress() {
+        return address;
+    }
 
-		InetAddressNextHop<T> o = (InetAddressNextHop<T>)obj;
-		
-		return (new EqualsBuilder()).append(getAddress(), o.getAddress()).isEquals();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(getAddress()).toHashCode();
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public int compareTo(NextHop o) {
-		CompareToBuilder builder = (new CompareToBuilder())
-				.append(getType(), o.getType());
-		
-		if(o.getType() == Type.InetAddress) {
-			builder.append(getAddress().getAddress(), ((InetAddressNextHop<InetAddress>)o).getAddress().getAddress());
-		}
-		
-		return builder.toComparison();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof InetAddressNextHop)) {
+            return false;
+        }
 
-	@Override
-	public Type getType() {
-		return Type.InetAddress;
-	}
+        final InetAddressNextHop<T> o = (InetAddressNextHop<T>) obj;
 
-	public BinaryNextHop toBinaryNextHop() {
-		return new BinaryNextHop(getAddress().getAddress());
-	}
+        return new EqualsBuilder().append(getAddress(), o.getAddress()).isEquals();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compareTo(final NextHop o) {
+        final CompareToBuilder builder = new CompareToBuilder().append(getType(), o.getType());
+
+        if (o.getType() == Type.InetAddress) {
+            builder.append(getAddress().getAddress(), ((InetAddressNextHop<InetAddress>) o).getAddress().getAddress());
+        }
+
+        return builder.toComparison();
+    }
+
+    @Override
+    public Type getType() {
+        return Type.InetAddress;
+    }
+
+    public BinaryNextHop toBinaryNextHop() {
+        return new BinaryNextHop(getAddress().getAddress());
+    }
 }

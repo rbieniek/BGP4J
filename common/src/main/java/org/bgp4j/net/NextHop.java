@@ -12,48 +12,45 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.rib.NextHop.java 
+ *
+ * File: org.bgp4j.rib.NextHop.java
  */
 package org.bgp4j.net;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.bgp4j.net.bind.NextHopBindAdapter;
-
 /**
  * Generic next-hop information
- * 
+ *
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-@XmlJavaTypeAdapter(value=NextHopBindAdapter.class)
 public interface NextHop extends Comparable<NextHop> {
 
-	public enum Type {
-		InetAddress,
-		Binary;
-	}
-	
-	/**
-	 * Equals other instance
-	 * 
-	 * @param o
-	 * @return
-	 */
-	public boolean equals(Object o);
-	
-	/**
-	 * Hash code of this instance
-	 * 
-	 * @return
-	 */
-	public int hashCode();
-	
-	/**
-	 * get the type of the next hop
-	 * 
-	 * @return
-	 */
-	public Type getType();
+    public enum Type {
+        InetAddress,
+        Binary;
+    }
+
+    /**
+     * Equals other instance
+     * 
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o);
+
+    /**
+     * Hash code of this instance
+     * 
+     * @return
+     */
+    @Override
+    public int hashCode();
+
+    /**
+     * get the type of the next hop
+     * 
+     * @return
+     */
+    public Type getType();
 }

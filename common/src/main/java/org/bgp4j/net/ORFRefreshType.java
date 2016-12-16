@@ -12,38 +12,31 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.refresh.ORFRefreshType.java 
+ *
+ * File: org.bgp4j.netty.protocol.refresh.ORFRefreshType.java
  */
 package org.bgp4j.net;
+
+import java.util.EnumSet;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@AllArgsConstructor
+@Getter
 public enum ORFRefreshType {
-	IMMEDIATE,
-	DEFER;
-	
-	public int toCode() {
-		switch(this)  {
-		case IMMEDIATE:
-			return 1;
-		case DEFER:
-			return 2;
-		default:
-			throw new IllegalArgumentException("unknown OutboundRouteFilter refresh type " + this);
-		}
-	}
-	
-	public static ORFRefreshType fromCode(int code) {
-		switch(code) {
-		case 1:
-			return IMMEDIATE;
-		case 2:
-			return DEFER;
-		default:
-			throw new IllegalArgumentException("unknown OutboundRouteFilter refresh type code " + code);
-		}
-	}
+    IMMEDIATE(1),
+    DEFER(2);
+
+    private int code;
+
+    public static ORFRefreshType fromCode(final int code) {
+        return EnumSet.allOf(ORFRefreshType.class).stream().filter(e -> e.getCode() == code).findAny().orElseThrow(
+                () -> new IllegalArgumentException("unknown outbound route filter type code: " + code));
+    }
+
 }

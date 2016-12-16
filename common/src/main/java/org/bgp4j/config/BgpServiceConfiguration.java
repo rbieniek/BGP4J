@@ -12,39 +12,37 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4.config.ModifiableConfiguration.java 
+ *
+ * File: org.bgp4.config.Configuration.java
  */
 package org.bgp4j.config;
 
+import java.util.Map;
+
 import org.bgp4j.config.nodes.BgpServerConfiguration;
-import org.bgp4j.config.nodes.HttpServerConfiguration;
+import org.bgp4j.config.nodes.PeerConfiguration;
 import org.bgp4j.config.nodes.RoutingProcessorConfiguration;
 
 /**
- * Interface implemented by configuration obejct which support modifications of its contents
- * 
+ * Configuration object of the BGP daemon.
+ *
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
-public interface ModifiableConfiguration extends Configuration {
-	/**
-	 * 
-	 * 
-	 * @param serverConfiguration
-	 */
-	public void setBgpServerConfiguration(BgpServerConfiguration serverConfiguration);
+public interface BgpServiceConfiguration {
 
-	/**
-	 * 
-	 * 
-	 * @param serverConfiguration
-	 */
-	public void setHttpServerConfiguration(HttpServerConfiguration serverConfiguration);
-	
-	/**
-	 * 
-	 * @param routingProcessorConfiguration
-	 */
-	public void setRoutingProcessorConfiguration(RoutingProcessorConfiguration routingProcessorConfiguration);
+    /**
+     * get the server configuration
+     *
+     * @return
+     */
+    public BgpServerConfiguration getBgpServerConfiguration();
+
+    public Map<String, PeerConfiguration> getPeerConfigurations();
+
+    /**
+     *
+     * @return
+     */
+    public RoutingProcessorConfiguration getRoutingProcessorConfiguration();
 }

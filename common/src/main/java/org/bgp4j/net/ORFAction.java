@@ -12,43 +12,32 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.refresh.ORFAction.java 
+ *
+ * File: org.bgp4j.netty.protocol.refresh.ORFAction.java
  */
 package org.bgp4j.net;
+
+import java.util.EnumSet;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@AllArgsConstructor
+@Getter
 public enum ORFAction {
-	ADD,
-	REMOVE,
-	REMOVE_ALL;
-	
-	public int toCode() {
-		switch(this) {
-			case ADD:
-				return 0;
-			case REMOVE:
-				return 1;
-			case REMOVE_ALL:
-				return 2;
-			default:
-				throw new IllegalArgumentException("unknown ORF action: " + this);
-		}
-	}
-	
-	public static ORFAction fromCode(int code) {
-		switch(code) {
-		case 0:
-			return ADD;
-		case 1:
-			return REMOVE;
-		case 2:
-			return REMOVE_ALL;
-		default:
-			throw new IllegalArgumentException("unknown ORF action code: " + code);
-		}
-	}
+    ADD(0),
+    REMOVE(1),
+    REMOVE_ALL(2);
+
+    private int code;
+
+    public static ORFAction fromCode(final int code) {
+        return EnumSet.allOf(ORFAction.class).stream().filter(e -> e.getCode() == code).findAny().orElseThrow(
+                () -> new IllegalArgumentException("unknown outbound route filter type code: " + code));
+    }
+
 }

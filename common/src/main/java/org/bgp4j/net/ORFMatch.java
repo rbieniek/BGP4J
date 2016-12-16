@@ -12,38 +12,31 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- * 
- * File: org.bgp4j.netty.protocol.refresh.ORFMatch.java 
+ *
+ * File: org.bgp4j.netty.protocol.refresh.ORFMatch.java
  */
 package org.bgp4j.net;
+
+import java.util.EnumSet;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author Rainer Bieniek (Rainer.Bieniek@web.de)
  *
  */
+@AllArgsConstructor
+@Getter
 public enum ORFMatch {
-	PERMIT,
-	DENY;
-	
-	public int toCode() {
-		switch(this) {
-		case PERMIT:
-			return 0;
-		case DENY:
-			return 1;
-		default:
-			throw new IllegalArgumentException("unknown ORF action code: " + this);			
-		}
-	}
-	
-	public static ORFMatch fromCode(int code) {
-		switch(code) {
-		case 0:
-			return PERMIT;
-		case 1:
-			return DENY;
-		default:
-			throw new IllegalArgumentException("unknown ORF action code: " + code);			
-		}
-	}
+    PERMIT(0),
+    DENY(1);
+
+    private int code;
+
+    public static ORFMatch fromCode(final int code) {
+        return EnumSet.allOf(ORFMatch.class).stream().filter(e -> e.getCode() == code).findAny().orElseThrow(
+                () -> new IllegalArgumentException("unknown outbound route filter type code: " + code));
+    }
+
 }
